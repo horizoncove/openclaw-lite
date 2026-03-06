@@ -1,0 +1,31 @@
+# Core
+python-dotenv>=1.0.0
+pyyaml>=6.0.1
+schedule>=1.2.0
+
+# Data Analysis
+pandas>=2.0.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+openpyxl>=3.1.0
+xlsxwriter>=3.1.0
+
+# Web
+requests>=2.31.0
+playwright>=1.40.0
+flask>=3.0.0
+feedparser>=6.0.10
+beautifulsoup4>=4.12.0
+
+# Database
+sqlite3  # built-in
+
+# Cloud
+aligo>=6.0.0  # 阿里云盘
+
+# Utils
+qrcode>=7.4.0
+pillow>=10.0.0
+tqdm>=4.66.0
+python-dateutil>=2.8.0

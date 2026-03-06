@@ -1,0 +1,102 @@
+# OpenClaw Lite 配置文件
+
+# 股票监控配置
+stocks:
+  - code: "002353"
+    name: "杰瑞股份"
+    shares: 1000
+    cost_price: 40.50
+    alert_threshold: 0.03
+    stop_loss: 35.00
+    take_profit: 55.00
+    
+  - code: "000975"
+    name: "山金国际"
+    shares: 2000
+    cost_price: 12.30
+    alert_threshold: 0.03
+    stop_loss: 10.00
+    take_profit: 18.00
+    
+  - code: "300502"
+    name: "新易盛"
+    shares: 500
+    cost_price: 118.00
+    alert_threshold: 0.05
+    stop_loss: 100.00
+    take_profit: 150.00
+    
+  - code: "688027"
+    name: "国盾量子"
+    shares: 300
+    cost_price: 625.00
+    alert_threshold: 0.05
+    stop_loss: 550.00
+    take_profit: 800.00
+
+# AI API配置（可选）
+ai:
+  deepseek:
+    api_key: ""  # 填入你的DeepSeek API Key
+    base_url: "https://api.deepseek.com/v1"
+    default_model: "deepseek-chat"
+    
+  qwen:
+    api_key: ""  # 填入你的通义千问 API Key
+    base_url: "https://dashscope.aliyuncs.com/api/v1"
+    default_model: "qwen-plus"
+
+# 微信推送配置（Server酱）
+wechat:
+  enabled: true
+  send_key: ""  # 填入你的Server酱SendKey
+  channel: ""   # 可选：企业微信通道ID
+
+# 邮件配置
+email:
+  enabled: true
+  smtp_server: "smtp.qq.com"
+  smtp_port: 587
+  sender: "your-email@qq.com"
+  password: "your-auth-code"  # 邮箱授权码，不是密码
+  receiver: "your-email@qq.com"
+
+# 阿里云盘配置
+aliyundrive:
+  enabled: false
+  refresh_token: ""  # 扫码获取后填入
+  backup_dir: "/OpenClaw备份"
+
+# RSS订阅配置
+rss:
+  enabled: true
+  sources:
+    - name: "36氪"
+      url: "https://36kr.com/feed"
+    - name: "机器之心"
+      url: "https://www.jiqizhixin.com/rss"
+    - name: "量子位"
+      url: "https://www.qbitai.com/feed"
+  check_interval: 7200  # 秒（2小时）
+  summary_length: 500   # 每篇文章摘要长度
+
+# 定时任务配置
+scheduler:
+  morning_report: "09:00"      # 早盘报告时间
+  daily_review: "16:00"        # 收盘复盘时间
+  weekly_report: "fri 21:00"   # 周报时间（周五晚9点）
+  portfolio_backup: "23:00"    # 数据备份时间
+
+# 剧本创作配置
+script:
+  project_name: "迷雾追踪"
+  genre: "悬疑短剧"
+  target_duration: "10-15分钟"
+  episodes: 6
+
+# 日志配置
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file: "logs/openclaw.log"
+  max_size: "10MB"
+  backup_count: 5
