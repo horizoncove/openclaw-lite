@@ -244,6 +244,13 @@ class WorkbenchSmokeTests(unittest.TestCase):
             window.engine.update_current_capital("4900000")
             window._refresh_cockpit()
             self.assertIn("#3fad7a", window.cockpit_kpis["pnl"].styleSheet())
+
+            window.intent_command.setText("买入 002371 12 100000")
+            window.intent_sector.setText("半导体")
+            window._validate_intent()
+            self.assertIn("警示", window.intent_ai_summary.text())
+            self.assertGreater(window.intent_ai_list.count(), 1)
+            self.assertNotEqual(window.intent_projection.values["stock"].text(), "--")
             window.close()
 
 

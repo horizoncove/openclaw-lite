@@ -393,10 +393,27 @@ class WorkbenchWindow(MainWindow):
 
     def _build_intent_tab(self) -> None:
         page = QWidget()
+        page.setObjectName("visualPage")
         self.intent_page = page
         layout = QVBoxLayout(page)
-        form_box = QGroupBox("交易前纪律检查")
-        form = QFormLayout(form_box)
+        layout.setContentsMargins(14, 14, 14, 14)
+        layout.setSpacing(12)
+        layout.addWidget(
+            PageHeader(
+                "交易计划",
+                "先测算仓位与纪律，再由 AI 警告区对本次计划做红黄灯警示",
+            )
+        )
+
+        columns = QHBoxLayout()
+        columns.setSpacing(12)
+
+        planner = CockpitCard(
+            "交易前纪律检查",
+            "指令 · 板块 · 建仓阶段 · 黄灯继续说明",
+        )
+        form = QFormLayout()
+        form.setSpacing(8)
         self.intent_command = QLineEdit()
         self.intent_command.setPlaceholderText("买入 002371 350.00 3000")
         self.intent_sector = QLineEdit()
@@ -412,23 +429,76 @@ class WorkbenchWindow(MainWindow):
         form.addRow("建仓阶段", self.intent_stage)
         form.addRow("黄灯说明", self.intent_override)
         form.addRow(validate)
-        layout.addWidget(form_box)
-        self.intent_light = QLabel("等待测算")
-        self.intent_light.setStyleSheet(
-            "font-size: 22px; font-weight: 700; padding: 12px;"
+        planner.body.addLayout(form)
+
+        self.intent_light_badge = StatusBadge("等待测算", "slate")
+        self.intent_light_badge.set_dark_mode(self.dark_mode)
+        self.intent_light = self.intent_light_badge
+        planner.body.addWidget(self.intent_light_badge)
+
+        self.intent_projection = MetricStrip(
+            [
+                ("stock", "预计单票"),
+                ("sector", "预计板块"),
+                ("total", "预计总仓"),
+                ("cash", "预计现金"),
+            ]
         )
+        planner.body.addWidget(self.intent_projection)
+
         self.intent_details = QTextEdit()
         self.intent_details.setReadOnly(True)
-        layout.addWidget(self.intent_light)
-        layout.addWidget(self.intent_details, 1)
+        self.intent_details.setPlaceholderText(
+            "测算后显示纪律检查明细与预计仓位。"
+        )
+        self.intent_details.setMaximumHeight(160)
+        planner.body.addWidget(self.intent_details)
+
         discipline = QLabel(
             "自动检查：外部 AI 候选池、单票/板块/总仓位/现金、禁买时段、"
             "浮盈 ≥10% 才加仓且仅一次。卖出始终允许用于止损止盈。"
         )
         discipline.setWordWrap(True)
         discipline.setObjectName("hint")
-        layout.addWidget(discipline)
+        planner.body.addWidget(discipline)
+        planner.body.addStretch()
+        columns.addWidget(planner, 5)
+
+        warnings = CockpitCard(
+            "AI 警告",
+            "预检红黄灯 · 持仓纪律信号 · 近期监督事件",
+        )
+        self.intent_ai_summary = StatusBadge("尚未测算 · 暂无警示", "slate")
+        self.intent_ai_summary.set_dark_mode(self.dark_mode)
+        warnings.body.addWidget(self.intent_ai_summary)
+
+        self.intent_ai_count = QLabel("0 条警示")
+        self.intent_ai_count.setObjectName("sectionTitle")
+        warnings.body.addWidget(self.intent_ai_count)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setMinimumHeight(280)
+        host = QWidget()
+        self.intent_ai_list = QVBoxLayout(host)
+        self.intent_ai_list.setContentsMargins(0, 0, 4, 0)
+        self.intent_ai_list.setSpacing(8)
+        self.intent_ai_empty = QLabel(
+            "填写交易指令并点击「测算并保存计划」后，"
+            "AI 将汇总本笔计划的纪律风险与持仓警示。"
+        )
+        self.intent_ai_empty.setWordWrap(True)
+        self.intent_ai_empty.setObjectName("hint")
+        self.intent_ai_list.addWidget(self.intent_ai_empty)
+        self.intent_ai_list.addStretch()
+        scroll.setWidget(host)
+        warnings.body.addWidget(scroll, 1)
+        columns.addWidget(warnings, 4)
+
+        layout.addLayout(columns, 1)
         self.tabs.addTab(page, "交易计划")
+        self._render_intent_ai_warnings()
 
     def _build_supervision_tab(self) -> None:
         page = QWidget()
@@ -654,26 +724,182 @@ class WorkbenchWindow(MainWindow):
         except (ValueError, InvalidTradeError) as exc:
             QMessageBox.warning(self, "计划无效", str(exc))
             return
-        self.intent_light.setText(LIGHT_NAMES[result.light])
-        color = {"green": "#3fad7a", "yellow": "#d4a017", "red": "#e25555"}[
-            result.light
-        ]
-        self.intent_light.setStyleSheet(
-            f"font-size: 22px; font-weight: 700; padding: 12px; color: {color};"
+        self.intent_light_badge.set_status(LIGHT_NAMES[result.light], result.light)
+        self.intent_projection.set_value(
+            "stock",
+            f"{result.projected_stock_ratio:.1%}",
+            "#e25555" if result.projected_stock_ratio > Decimal("0.25") else None,
+        )
+        self.intent_projection.set_value(
+            "sector",
+            f"{result.projected_sector_ratio:.1%}",
+            "#e25555" if result.projected_sector_ratio > Decimal("0.30") else None,
+        )
+        self.intent_projection.set_value(
+            "total",
+            f"{result.projected_total_ratio:.1%}",
+            "#e25555" if result.projected_total_ratio > Decimal("0.60") else None,
+        )
+        self.intent_projection.set_value(
+            "cash",
+            f"{result.projected_cash_ratio:.1%}",
+            "#e25555" if result.projected_cash_ratio < Decimal("0.40") else None,
         )
         self.intent_details.setPlainText(
-            "\n".join(
-                [
-                    *[f"• {reason}" for reason in result.reasons],
-                    "",
-                    f"预计单票仓位：{result.projected_stock_ratio:.2%}",
-                    f"预计板块仓位：{result.projected_sector_ratio:.2%}",
-                    f"预计总仓位：{result.projected_total_ratio:.2%}",
-                    f"预计现金比例：{result.projected_cash_ratio:.2%}",
-                ]
-            )
+            "\n".join(f"• {reason}" for reason in result.reasons)
+        )
+        self._render_intent_ai_warnings(
+            result=result,
+            stock_code=trade.stock_code,
+            override_reason=self.intent_override.text().strip(),
         )
         self._refresh_supervision()
+
+    def _ai_warning_item(
+        self, *, tone: str, source: str, title: str, message: str
+    ) -> QFrame:
+        card = QFrame()
+        card.setObjectName("holdingCard")
+        root = QVBoxLayout(card)
+        root.setContentsMargins(12, 10, 12, 10)
+        root.setSpacing(4)
+        header = QHBoxLayout()
+        badge = StatusBadge(source, tone)
+        badge.set_dark_mode(self.dark_mode)
+        badge.setMaximumWidth(110)
+        heading = QLabel(title)
+        heading.setObjectName("holdingName")
+        heading.setWordWrap(True)
+        header.addWidget(badge)
+        header.addWidget(heading, 1)
+        root.addLayout(header)
+        body = QLabel(message)
+        body.setWordWrap(True)
+        body.setObjectName("hint")
+        root.addWidget(body)
+        return card
+
+    def _render_intent_ai_warnings(
+        self,
+        *,
+        result=None,
+        stock_code: str | None = None,
+        override_reason: str = "",
+    ) -> None:
+        while self.intent_ai_list.count():
+            item = self.intent_ai_list.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
+
+        warnings: list[tuple[str, str, str, str]] = []
+        if result is not None:
+            light_title = {
+                "green": "预检通过",
+                "yellow": "黄灯警示",
+                "red": "红灯禁止",
+            }[result.light]
+            for reason in result.reasons:
+                if reason == "所有自动纪律检查通过":
+                    continue
+                tone = result.light
+                if "黄灯" in reason and result.light == "red":
+                    tone = "yellow"
+                    title = "黄灯警示"
+                else:
+                    title = light_title
+                warnings.append((tone, "预检", title, reason))
+            if result.light == "yellow" and not override_reason:
+                warnings.append(
+                    (
+                        "yellow",
+                        "流程",
+                        "黄灯需说明",
+                        "继续执行前必须填写黄灯说明，否则计划停留在待确认状态。",
+                    )
+                )
+            if result.light == "red":
+                warnings.append(
+                    (
+                        "red",
+                        "流程",
+                        "禁止落单",
+                        "红灯计划已被阻断，需先修正指令、仓位或候选池后再测算。",
+                    )
+                )
+
+        signals = self.system.position_discipline_signals(self.engine)
+        for signal in signals:
+            if stock_code and signal["stock_code"] != stock_code:
+                # Keep ambient stop-loss alerts even when planning another ticker.
+                if signal["severity"] != "red":
+                    continue
+            warnings.append(
+                (
+                    signal["severity"],
+                    "持仓",
+                    f"{signal['stock_code']} · {signal['rule']}",
+                    signal["message"],
+                )
+            )
+
+        # Ambient supervision alerts only before a fresh preflight, to avoid
+        # duplicating the finding just written by save_trade_intent().
+        if result is None:
+            finding_added = 0
+            for finding in self.system.list_findings(limit=12):
+                if finding["severity"] not in {"red", "yellow"}:
+                    continue
+                warnings.append(
+                    (
+                        finding["severity"],
+                        finding["level"],
+                        finding["rule_code"],
+                        finding["message"],
+                    )
+                )
+                finding_added += 1
+                if finding_added >= 3:
+                    break
+
+        if not warnings:
+            empty = QLabel(
+                "当前计划未触发 AI 警示。"
+                if result is not None
+                else "填写交易指令并点击「测算并保存计划」后，"
+                "AI 将汇总本笔计划的纪律风险与持仓警示。"
+            )
+            empty.setWordWrap(True)
+            empty.setObjectName("hint")
+            self.intent_ai_list.addWidget(empty)
+            self.intent_ai_summary.set_status(
+                "测算通过 · 暂无警示" if result is not None else "尚未测算 · 暂无警示",
+                "green" if result is not None else "slate",
+            )
+            self.intent_ai_count.setText("0 条警示")
+            self.intent_ai_list.addStretch()
+            return
+
+        severity_rank = {"red": 2, "yellow": 1, "green": 0}
+        top = max(warnings, key=lambda item: severity_rank.get(item[0], 0))
+        red_count = sum(item[0] == "red" for item in warnings)
+        yellow_count = sum(item[0] == "yellow" for item in warnings)
+        summary_tone = top[0] if top[0] in {"red", "yellow"} else "slate"
+        if red_count:
+            summary = f"AI 警示 · {red_count} 红 / {yellow_count} 黄"
+        elif yellow_count:
+            summary = f"AI 警示 · {yellow_count} 条黄灯"
+        else:
+            summary = "AI 提示 · 请复核明细"
+        self.intent_ai_summary.set_status(summary, summary_tone)
+        self.intent_ai_count.setText(f"{len(warnings)} 条警示")
+        for tone, source, title, message in warnings:
+            self.intent_ai_list.addWidget(
+                self._ai_warning_item(
+                    tone=tone, source=source, title=title, message=message
+                )
+            )
+        self.intent_ai_list.addStretch()
 
     def _enqueue_trade(self) -> None:
         command = self.command_input.text().strip()
@@ -783,6 +1009,8 @@ class WorkbenchWindow(MainWindow):
                 self.cockpit_sync,
                 self.cockpit_candidate_badge,
                 self.cockpit_risk_badge,
+                self.intent_light_badge,
+                self.intent_ai_summary,
                 *self.supervision_layers.values(),
             ):
                 badge.set_dark_mode(self.dark_mode)
