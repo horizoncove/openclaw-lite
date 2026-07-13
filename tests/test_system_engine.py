@@ -212,6 +212,8 @@ class WorkbenchSmokeTests(unittest.TestCase):
             )
             window._refresh_extended()
             self.assertIn("候选池就绪", window.cockpit_candidate_badge.text())
+            self.assertEqual(window.candidate_slots[0].name.text(), "中微公司")
+            self.assertEqual(window.candidate_slots[1].name.text(), "北方华创")
 
             window.command_input.setText("买入 002371 10 100")
             window._enqueue_trade()
@@ -222,6 +224,12 @@ class WorkbenchSmokeTests(unittest.TestCase):
             self.assertGreater(window.position_gauge.ratio, 0)
             self.assertLess(window.cash_gauge.ratio, 1)
             self.assertEqual(window.cockpit_sync.text(), "同步队列 0")
+            self.assertEqual(
+                window.position_viz_kpis["count"].text(), "1 只"
+            )
+            self.assertEqual(len(window.position_donut.segments), 1)
+            self.assertEqual(window.supervision_score_gauge.score, 100)
+            self.assertEqual(len(window.supervision_donut.segments), 3)
             holding_card = window.holdings_cards.itemAt(0).widget()
             self.assertIn("002371", holding_card.code_name.text())
             self.assertIn("#ef4444", holding_card.pnl.styleSheet())

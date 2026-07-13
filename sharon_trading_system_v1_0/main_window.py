@@ -404,13 +404,14 @@ class MainWindow(QMainWindow):
                 color: #dbeafe;
                 font-size: 13px;
             }
-            QFrame#cockpitCard, QFrame#cockpitKpi, QFrame#holdingCard {
+            QFrame#cockpitCard, QFrame#cockpitKpi, QFrame#holdingCard,
+            QFrame#candidateSlot {
                 background: white;
                 border: 1px solid #e3e9f2;
                 border-radius: 14px;
             }
             QFrame#cockpitCard QLabel, QFrame#cockpitKpi QLabel,
-            QFrame#holdingCard QLabel {
+            QFrame#holdingCard QLabel, QFrame#candidateSlot QLabel {
                 background: transparent;
                 border: 0;
             }
@@ -433,6 +434,20 @@ class MainWindow(QMainWindow):
                 color: #334155;
                 font-size: 14px;
                 font-weight: 650;
+            }
+            QLabel#candidateRank {
+                color: #0891b2;
+                font-size: 22px;
+                font-weight: 800;
+            }
+            QLabel#candidateSlotName {
+                color: #14213d;
+                font-size: 17px;
+                font-weight: 750;
+            }
+            QLabel#candidateSlotMeta, QLabel#candidateSlotReason {
+                color: #718096;
+                background: transparent;
             }
             QLabel#cockpitTitle {
                 background: transparent;
@@ -559,12 +574,16 @@ class MainWindow(QMainWindow):
                 );
                 border: 1px solid #0e7490;
             }
-            QFrame#cockpitCard, QFrame#cockpitKpi, QFrame#holdingCard {
+            QFrame#cockpitCard, QFrame#cockpitKpi, QFrame#holdingCard,
+            QFrame#candidateSlot {
                 background: #091827;
                 border: 1px solid #173853;
             }
             QFrame#holdingCard {
                 border-left: 3px solid #06b6d4;
+            }
+            QFrame#candidateSlot {
+                border-top: 3px solid #0891b2;
             }
             QLabel#cockpitTitle { color: #dff6ff; }
             QLabel#cockpitHint, QLabel#kpiTitle { color: #6f91aa; }
@@ -576,6 +595,11 @@ class MainWindow(QMainWindow):
             }
             QLabel#holdingMetricTitle { color: #66859d; }
             QLabel#holdingMetricValue { color: #c9dceb; }
+            QLabel#candidateRank { color: #22d3ee; }
+            QLabel#candidateSlotName { color: #e0f2fe; }
+            QLabel#candidateSlotMeta, QLabel#candidateSlotReason {
+                color: #7190aa;
+            }
             QScrollArea#cockpitScroll, QWidget#cockpitPage {
                 background: #050b14;
             }

@@ -84,6 +84,180 @@ class RingGauge(QWidget):
         painter.drawText(title_rect, Qt.AlignmentFlag.AlignCenter, self.title)
 
 
+class DonutChart(QWidget):
+    """Multi-segment allocation donut with a center summary."""
+
+    COLORS = ["#22d3ee", "#8b5cf6", "#f43f5e", "#f59e0b", "#10b981"]
+
+    def __init__(self, center_title: str = "") -> None:
+        super().__init__()
+        self.center_title = center_title
+        self.center_value = "--"
+        self.segments: list[tuple[str, float, QColor]] = []
+        self.dark_mode = False
+        self.setMinimumSize(210, 190)
+        self.setStyleSheet("background:transparent;")
+
+    def set_data(
+        self,
+        values: list[tuple[str, float] | tuple[str, float, str]],
+        *,
+        center_value: str,
+    ) -> None:
+        self.segments = []
+        for index, item in enumerate(values):
+            label, value = item[0], item[1]
+            color = item[2] if len(item) == 3 else self.COLORS[index % len(self.COLORS)]
+            self.segments.append(
+                (label, max(0.0, float(value)), QColor(color))
+            )
+        self.center_value = center_value
+        self.update()
+
+    def set_dark_mode(self, enabled: bool) -> None:
+        self.dark_mode = bool(enabled)
+        self.update()
+
+    def paintEvent(self, event) -> None:  # noqa: N802
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        size = min(self.width() - 20, self.height() - 36)
+        rect = QRectF(
+            (self.width() - size) / 2,
+            8,
+            size,
+            size,
+        )
+        total = sum(value for _, value, _ in self.segments)
+        track = QPen(QColor("#17324d" if self.dark_mode else "#e8edf5"), 22)
+        track.setCapStyle(Qt.PenCapStyle.FlatCap)
+        painter.setPen(track)
+        painter.drawArc(rect, 90 * 16, -360 * 16)
+        if total:
+            start = 90 * 16
+            for _, value, color in self.segments:
+                span = int(-360 * 16 * value / total)
+                pen = QPen(color, 22)
+                pen.setCapStyle(Qt.PenCapStyle.FlatCap)
+                painter.setPen(pen)
+                painter.drawArc(rect, start, span)
+                start += span
+        painter.setPen(QColor("#e0f2fe" if self.dark_mode else "#14213d"))
+        painter.setFont(QFont("", 18, QFont.Weight.Bold))
+        painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, self.center_value)
+        painter.setPen(QColor("#6f91aa" if self.dark_mode else "#6b7890"))
+        painter.setFont(QFont("", 9, QFont.Weight.Medium))
+        title_rect = QRectF(rect.left(), rect.center().y() + 17, rect.width(), 22)
+        painter.drawText(title_rect, Qt.AlignmentFlag.AlignCenter, self.center_title)
+
+
+class ScoreGauge(QWidget):
+    """Semicircular discipline score gauge."""
+
+    def __init__(self, title: str = "纪律评分") -> None:
+        super().__init__()
+        self.title = title
+        self.score = 100
+        self.grade = "A"
+        self.dark_mode = False
+        self.setMinimumSize(260, 175)
+        self.setStyleSheet("background:transparent;")
+
+    def set_score(self, score: int, grade: str) -> None:
+        self.score = max(0, min(int(score), 100))
+        self.grade = grade
+        self.update()
+
+    def set_dark_mode(self, enabled: bool) -> None:
+        self.dark_mode = bool(enabled)
+        self.update()
+
+    def paintEvent(self, event) -> None:  # noqa: N802
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        rect = QRectF(28, 24, self.width() - 56, (self.width() - 56))
+        track = QPen(QColor("#17324d" if self.dark_mode else "#e8edf5"), 16)
+        track.setCapStyle(Qt.PenCapStyle.RoundCap)
+        painter.setPen(track)
+        painter.drawArc(rect, 0, 180 * 16)
+        color = "#22d3ee" if self.score >= 90 else "#f59e0b" if self.score >= 70 else "#ef4444"
+        pen = QPen(QColor(color), 16)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        painter.setPen(pen)
+        painter.drawArc(rect, 180 * 16, int(-180 * 16 * self.score / 100))
+        painter.setPen(QColor("#e0f2fe" if self.dark_mode else "#14213d"))
+        painter.setFont(QFont("", 28, QFont.Weight.Bold))
+        painter.drawText(
+            QRectF(0, 76, self.width(), 48),
+            Qt.AlignmentFlag.AlignCenter,
+            f"{self.grade} · {self.score}",
+        )
+        painter.setPen(QColor("#6f91aa" if self.dark_mode else "#6b7890"))
+        painter.setFont(QFont("", 10, QFont.Weight.Medium))
+        painter.drawText(
+            QRectF(0, 121, self.width(), 28),
+            Qt.AlignmentFlag.AlignCenter,
+            self.title,
+        )
+
+
+class CandidateSlotCard(QFrame):
+    """One of three externally selected candidate slots."""
+
+    def __init__(self, rank: int) -> None:
+        super().__init__()
+        self.rank = rank
+        self.setObjectName("candidateSlot")
+        root = QVBoxLayout(self)
+        root.setContentsMargins(16, 14, 16, 14)
+        root.setSpacing(8)
+        top = QHBoxLayout()
+        self.rank_label = QLabel(f"0{rank}")
+        self.rank_label.setObjectName("candidateRank")
+        self.name = QLabel("等待外部 AI 候选")
+        self.name.setObjectName("candidateSlotName")
+        top.addWidget(self.rank_label)
+        top.addWidget(self.name)
+        top.addStretch()
+        root.addLayout(top)
+        self.code_sector = QLabel("空席位")
+        self.code_sector.setObjectName("candidateSlotMeta")
+        self.source = QLabel("—")
+        self.source.setObjectName("candidateSlotMeta")
+        self.score = QProgressBar()
+        self.score.setRange(0, 100)
+        self.score.setValue(0)
+        self.score.setFormat("外部评分：未提供")
+        self.reason = QLabel("登记后展示外部 AI 入选摘要")
+        self.reason.setObjectName("candidateSlotReason")
+        self.reason.setWordWrap(True)
+        root.addWidget(self.code_sector)
+        root.addWidget(self.source)
+        root.addWidget(self.score)
+        root.addWidget(self.reason)
+
+    def set_candidate(self, candidate: dict | None) -> None:
+        if not candidate:
+            self.name.setText("等待外部 AI 候选")
+            self.code_sector.setText("空席位")
+            self.source.setText("—")
+            self.score.setValue(0)
+            self.score.setFormat("外部评分：未提供")
+            self.reason.setText("登记后展示外部 AI 入选摘要")
+            return
+        self.name.setText(candidate["stock_name"] or "未命名股票")
+        self.code_sector.setText(
+            f"{candidate['stock_code']}  ·  {candidate['sector']}"
+        )
+        self.source.setText(f"来源：{candidate['source_ai']}")
+        score = candidate["external_score"]
+        self.score.setValue(int(score or 0))
+        self.score.setFormat(
+            f"外部评分 {score:g} / 100" if score is not None else "外部评分：未提供"
+        )
+        self.reason.setText(candidate["selection_reason"] or "未填写入选理由")
+
+
 class CockpitCard(QFrame):
     """White dashboard card with a title and optional subtitle."""
 
@@ -229,4 +403,12 @@ class StatusBadge(QLabel):
         self.set_status(self.text(), self.tone)
 
 
-__all__ = ["CockpitCard", "HoldingCard", "RingGauge", "StatusBadge"]
+__all__ = [
+    "CandidateSlotCard",
+    "CockpitCard",
+    "DonutChart",
+    "HoldingCard",
+    "RingGauge",
+    "ScoreGauge",
+    "StatusBadge",
+]
