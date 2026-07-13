@@ -23,6 +23,13 @@ python3 -m pip install -r sharon_trading_system_v1_0/requirements.txt
 python3 -m sharon_trading_system_v1_0.main
 ```
 
+无桌面的精简 Ubuntu 镜像若提示缺少 `libEGL.so.1`，先执行：
+
+```bash
+sudo apt-get update
+sudo apt-get install -y libegl1 libgl1
+```
+
 数据库首次启动时自动创建：
 
 ```text
