@@ -2,6 +2,18 @@
 
 个人量化交易助手桌面 MVP，使用 Python 3.11+、PyQt6 和 SQLite。数据只保存在本机，不连接券商，也不会自动下单。
 
+## Windows 安装版
+
+自动构建产物 `SharonTradingSystem-Setup.exe` 是免管理员权限的 x64 安装程序，包含 Python 和 PyQt6 运行环境，目标电脑不需要安装 Python。运行安装程序后可选择创建桌面快捷方式，并可从 Windows“已安装的应用”中卸载。
+
+应用数据保存在当前用户的本地应用数据目录，升级或卸载程序不会误删交易数据库：
+
+```text
+%LOCALAPPDATA%\Sharon\Sharon Trading System\data\sharon_trading.db
+```
+
+仓库的 `Build Windows Installer` 工作流同时生成安装程序和单文件免安装版。
+
 ## 已实现
 
 - 账户起始资金、当前总额和累计盈亏持久化
@@ -30,11 +42,7 @@ sudo apt-get update
 sudo apt-get install -y libegl1 libgl1
 ```
 
-数据库首次启动时自动创建：
-
-```text
-sharon_trading_system_v1_0/data/sharon_trading.db
-```
+数据库首次启动时自动创建在操作系统的当前用户应用数据目录。
 
 ## 使用
 

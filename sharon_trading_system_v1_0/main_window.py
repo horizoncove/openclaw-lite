@@ -5,7 +5,7 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import QStandardPaths, QTimer
 from PyQt6.QtGui import QColor, QFont
 from PyQt6.QtWidgets import (
     QAbstractItemView,
@@ -29,6 +29,16 @@ from PyQt6.QtWidgets import (
 )
 
 from .account_engine import AccountEngine, InvalidTradeError
+
+
+def default_database_path() -> Path:
+    """Return a writable per-user location for source and installed builds."""
+    data_directory = QStandardPaths.writableLocation(
+        QStandardPaths.StandardLocation.AppLocalDataLocation
+    )
+    if not data_directory:
+        data_directory = str(Path.home() / ".sharon_trading_system")
+    return Path(data_directory) / "data" / "sharon_trading.db"
 
 
 def _wan(value: Decimal) -> str:
@@ -64,7 +74,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self, db_path: str | Path | None = None) -> None:
         super().__init__()
-        data_path = db_path or Path(__file__).parent / "data" / "sharon_trading.db"
+        data_path = db_path or default_database_path()
         self.engine = AccountEngine(
             data_path,
             sector_mapping={
@@ -403,4 +413,9 @@ def create_window(db_path: str | Path | None = None) -> MainWindow:
     return MainWindow(db_path)
 
 
-__all__ = ["MainWindow", "create_window", "QApplication"]
+__all__ = [
+    "MainWindow",
+    "create_window",
+    "default_database_path",
+    "QApplication",
+]

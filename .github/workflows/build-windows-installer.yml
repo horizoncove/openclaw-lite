@@ -1,0 +1,74 @@
+name: Build Windows Installer
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "cursor/**"
+    paths:
+      - "sharon_trading_system_v1_0/**"
+      - "installer/**"
+      - "windows_launcher.py"
+      - "SharonTradingSystem.spec"
+      - ".github/workflows/build-windows-installer.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: sharon_trading_system_v1_0/requirements.txt
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r sharon_trading_system_v1_0/requirements.txt
+          python -m pip install pyinstaller==6.21.0
+
+      - name: Run automated tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m unittest discover -s tests -v
+
+      - name: Build Windows executable
+        run: python -m PyInstaller --clean --noconfirm SharonTradingSystem.spec
+
+      - name: Smoke test executable
+        shell: pwsh
+        run: |
+          $process = Start-Process `
+            -FilePath "dist\SharonTradingSystem.exe" `
+            -PassThru
+          Start-Sleep -Seconds 8
+          if ($process.HasExited) {
+            throw "SharonTradingSystem.exe exited during startup."
+          }
+          Stop-Process -Id $process.Id -Force
+
+      - name: Compile installer
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" `
+            "installer\SharonTradingSystem.iss"
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: SharonTradingSystem-Windows-x64
+          path: |
+            release/SharonTradingSystem-Setup.exe
+            dist/SharonTradingSystem.exe
+          if-no-files-found: error
+          retention-days: 30
