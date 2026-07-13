@@ -44,14 +44,14 @@ def _ui(size: int, weight: QFont.Weight = QFont.Weight.Medium) -> QFont:
 
 
 class PageHeader(QFrame):
-    """Single-purpose page masthead: title + one supporting line."""
+    """Thin page title row — title + one supporting line, no heavy banner."""
 
     def __init__(self, title: str, subtitle: str = "") -> None:
         super().__init__()
         self.setObjectName("pageHeader")
         root = QVBoxLayout(self)
-        root.setContentsMargins(22, 16, 22, 16)
-        root.setSpacing(4)
+        root.setContentsMargins(0, 0, 0, 4)
+        root.setSpacing(2)
         heading = QLabel(title)
         heading.setObjectName("pageHeaderTitle")
         root.addWidget(heading)
@@ -419,8 +419,8 @@ class CandidateSlotCard(QFrame):
         super().__init__()
         self.rank = rank
         self.setObjectName("candidateSlot")
-        self.setMinimumHeight(148)
-        self.setMaximumHeight(178)
+        self.setMinimumHeight(128)
+        self.setMaximumHeight(156)
         root = QVBoxLayout(self)
         root.setContentsMargins(16, 14, 16, 14)
         root.setSpacing(7)
@@ -503,14 +503,14 @@ class CockpitCard(QFrame):
 
 
 class HoldingCard(QFrame):
-    """Dense card for one currently held A-share position."""
+    """Compact card for one held A-share — fewer fields, more air."""
 
     def __init__(self) -> None:
         super().__init__()
         self.setObjectName("holdingCard")
         root = QVBoxLayout(self)
-        root.setContentsMargins(16, 14, 16, 14)
-        root.setSpacing(8)
+        root.setContentsMargins(18, 16, 18, 16)
+        root.setSpacing(12)
         header = QHBoxLayout()
         self.code_name = QLabel("--")
         self.code_name.setObjectName("holdingName")
@@ -524,33 +524,30 @@ class HoldingCard(QFrame):
         header.addWidget(self.pnl)
         root.addLayout(header)
 
-        metrics = QGridLayout()
-        metrics.setHorizontalSpacing(12)
-        metrics.setVerticalSpacing(4)
+        metrics = QHBoxLayout()
+        metrics.setSpacing(18)
         self.metric_labels: dict[str, QLabel] = {}
-        for index, (key, title) in enumerate(
-            [
-                ("quantity", "数量"),
-                ("avg_cost", "成本"),
-                ("last_price", "现价"),
-                ("market_value", "市值"),
-                ("pnl_amount", "浮盈"),
-                ("stop_price", "止损"),
-            ]
-        ):
+        for key, title in [
+            ("market_value", "市值"),
+            ("last_price", "现价"),
+            ("avg_cost", "成本"),
+            ("quantity", "数量"),
+        ]:
+            cell = QVBoxLayout()
+            cell.setSpacing(2)
             title_label = QLabel(title)
             title_label.setObjectName("holdingMetricTitle")
             value_label = QLabel("--")
             value_label.setObjectName("holdingMetricValue")
-            column = index % 3
-            row = (index // 3) * 2
-            metrics.addWidget(title_label, row, column)
-            metrics.addWidget(value_label, row + 1, column)
+            cell.addWidget(title_label)
+            cell.addWidget(value_label)
             self.metric_labels[key] = value_label
+            metrics.addLayout(cell)
+        metrics.addStretch()
         root.addLayout(metrics)
         self.position_bar = QProgressBar()
         self.position_bar.setRange(0, 250)
-        self.position_bar.setMaximumHeight(18)
+        self.position_bar.setMaximumHeight(16)
         root.addWidget(self.position_bar)
 
     def set_data(self, item: dict, name: str = "") -> None:
@@ -560,7 +557,6 @@ class HoldingCard(QFrame):
         market_value = item["market_value"]
         ratio = item["position_ratio"]
         pnl_rate = last_price / avg_cost - 1 if avg_cost else Decimal(0)
-        pnl_amount = (last_price - avg_cost) * quantity
         self.code_name.setText(
             f"{item['stock_code']}  {name or '持仓股票'}"
         )
@@ -568,7 +564,7 @@ class HoldingCard(QFrame):
         self.pnl.setText(f"{pnl_rate:+.2%}")
         self.pnl.setStyleSheet(
             f"color:{PROFIT if pnl_rate >= 0 else LOSS};"
-            "font-size:18px; font-weight:800; background:transparent;"
+            "font-size:20px; font-weight:800; background:transparent;"
             "font-family:'JetBrains Mono';"
         )
         self.metric_labels["quantity"].setText(f"{quantity:,}")
@@ -576,17 +572,6 @@ class HoldingCard(QFrame):
         self.metric_labels["last_price"].setText(f"{last_price:,.2f}")
         self.metric_labels["market_value"].setText(
             f"{market_value / 10000:,.2f}万"
-        )
-        self.metric_labels["pnl_amount"].setText(
-            f"{pnl_amount / 10000:+,.2f}万"
-        )
-        self.metric_labels["pnl_amount"].setStyleSheet(
-            f"color:{PROFIT if pnl_amount >= 0 else LOSS};"
-            "font-weight:750; background:transparent;"
-            "font-family:'JetBrains Mono';"
-        )
-        self.metric_labels["stop_price"].setText(
-            f"{avg_cost * Decimal('0.93'):,.2f}"
         )
         self.position_bar.setValue(min(250, int(ratio * 1000)))
         self.position_bar.setFormat(f"仓位 {ratio:.2%} / 25%")

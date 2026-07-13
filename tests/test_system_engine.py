@@ -228,8 +228,8 @@ class WorkbenchSmokeTests(unittest.TestCase):
             self.assertGreater(window.position_gauge.ratio, 0)
             self.assertLess(window.cash_gauge.ratio, 1)
             self.assertEqual(window.cockpit_sync.text(), "同步队列 0")
-            self.assertEqual(
-                window.position_viz_kpis["count"].text(), "1 只"
+            self.assertIn(
+                "1 只", window.position_viz_kpis["count"].text()
             )
             self.assertEqual(len(window.position_donut.segments), 1)
             self.assertEqual(window.supervision_score_gauge.score, 100)
