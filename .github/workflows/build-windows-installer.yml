@@ -4,7 +4,10 @@ on:
   workflow_dispatch:
   push:
     branches:
+      - main
       - "cursor/**"
+    tags:
+      - "v*"
     paths:
       - "sharon_trading_system_v1_0/**"
       - "tests/**"
