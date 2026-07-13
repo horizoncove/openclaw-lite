@@ -70,6 +70,7 @@ def seed_preview(window: WorkbenchWindow) -> None:
     window.intent_command.setText("买入 002371 108.50 1200")
     window.intent_sector.setText("半导体设备")
     window.intent_override.setText("等待回调确认后执行")
+    window._validate_intent()
     window.review_summary.setPlainText("按计划完成候选股票建仓。")
     window.review_lessons.setPlainText("控制节奏，不在禁买时段追涨。")
     window.refresh()
