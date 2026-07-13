@@ -404,14 +404,35 @@ class MainWindow(QMainWindow):
                 color: #dbeafe;
                 font-size: 13px;
             }
-            QFrame#cockpitCard, QFrame#cockpitKpi {
+            QFrame#cockpitCard, QFrame#cockpitKpi, QFrame#holdingCard {
                 background: white;
                 border: 1px solid #e3e9f2;
                 border-radius: 14px;
             }
-            QFrame#cockpitCard QLabel, QFrame#cockpitKpi QLabel {
+            QFrame#cockpitCard QLabel, QFrame#cockpitKpi QLabel,
+            QFrame#holdingCard QLabel {
                 background: transparent;
                 border: 0;
+            }
+            QLabel#holdingName {
+                font-size: 16px;
+                font-weight: 750;
+                color: #14213d;
+            }
+            QLabel#holdingSector {
+                color: #2563eb;
+                background: #dbeafe;
+                border-radius: 10px;
+                padding: 3px 8px;
+            }
+            QLabel#holdingMetricTitle {
+                color: #8491a5;
+                font-size: 11px;
+            }
+            QLabel#holdingMetricValue {
+                color: #334155;
+                font-size: 14px;
+                font-weight: 650;
             }
             QLabel#cockpitTitle {
                 background: transparent;
@@ -538,13 +559,23 @@ class MainWindow(QMainWindow):
                 );
                 border: 1px solid #0e7490;
             }
-            QFrame#cockpitCard, QFrame#cockpitKpi {
+            QFrame#cockpitCard, QFrame#cockpitKpi, QFrame#holdingCard {
                 background: #091827;
                 border: 1px solid #173853;
+            }
+            QFrame#holdingCard {
+                border-left: 3px solid #06b6d4;
             }
             QLabel#cockpitTitle { color: #dff6ff; }
             QLabel#cockpitHint, QLabel#kpiTitle { color: #6f91aa; }
             QLabel#cockpitBigText { color: #38bdf8; }
+            QLabel#holdingName { color: #e0f2fe; }
+            QLabel#holdingSector {
+                color: #67e8f9;
+                background: #083344;
+            }
+            QLabel#holdingMetricTitle { color: #66859d; }
+            QLabel#holdingMetricValue { color: #c9dceb; }
             QScrollArea#cockpitScroll, QWidget#cockpitPage {
                 background: #050b14;
             }

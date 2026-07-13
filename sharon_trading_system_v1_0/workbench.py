@@ -31,7 +31,7 @@ from PyQt6.QtWidgets import (
 )
 
 from .account_engine import InvalidTradeError
-from .cockpit import CockpitCard, RingGauge, StatusBadge
+from .cockpit import CockpitCard, HoldingCard, RingGauge, StatusBadge
 from .main_window import MainWindow, default_database_path
 from .system_engine import SystemEngine
 
@@ -202,6 +202,15 @@ class WorkbenchWindow(MainWindow):
         actions.body.addWidget(refresh)
         actions.body.addStretch()
         grid.addWidget(actions, 1, 2)
+
+        holdings = CockpitCard(
+            "当前持仓股票数据仪表盘",
+            "红涨绿跌 · 最新成交价估值 · 单票仓位红线 25%",
+        )
+        self.holdings_cards = QHBoxLayout()
+        self.holdings_cards.setSpacing(12)
+        holdings.body.addLayout(self.holdings_cards)
+        grid.addWidget(holdings, 2, 0, 1, 3)
         grid.setColumnStretch(0, 4)
         grid.setColumnStretch(1, 4)
         grid.setColumnStretch(2, 3)
@@ -725,6 +734,24 @@ class WorkbenchWindow(MainWindow):
             row.addWidget(name)
             row.addWidget(bar, 1)
             self.sector_bars.addLayout(row)
+
+        self._clear_layout(self.holdings_cards)
+        if not snapshot["positions"]:
+            empty = QLabel("当前空仓 · 成交同步后将在这里展示每只持仓股票")
+            empty.setObjectName("cockpitHint")
+            self.holdings_cards.addWidget(empty)
+        candidate_names: dict[str, str] = {}
+        for candidate in self.system.list_candidates(include_archived=True):
+            candidate_names.setdefault(
+                candidate["stock_code"], candidate["stock_name"]
+            )
+        for position in snapshot["positions"]:
+            card = HoldingCard()
+            card.set_data(
+                position,
+                candidate_names.get(position["stock_code"], ""),
+            )
+            self.holdings_cards.addWidget(card, 1)
 
     def _refresh_extended(self) -> None:
         self._refresh_cockpit()

@@ -4,7 +4,15 @@ from __future__ import annotations
 
 from PyQt6.QtCore import QRectF, Qt
 from PyQt6.QtGui import QColor, QFont, QPainter, QPen
-from PyQt6.QtWidgets import QFrame, QLabel, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import (
+    QFrame,
+    QGridLayout,
+    QHBoxLayout,
+    QLabel,
+    QProgressBar,
+    QVBoxLayout,
+    QWidget,
+)
 
 
 class RingGauge(QWidget):
@@ -93,6 +101,89 @@ class CockpitCard(QFrame):
             self.body.addWidget(hint)
 
 
+class HoldingCard(QFrame):
+    """Data-rich card for one currently held A-share position."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.setObjectName("holdingCard")
+        root = QVBoxLayout(self)
+        root.setContentsMargins(16, 14, 16, 14)
+        root.setSpacing(9)
+        header = QHBoxLayout()
+        self.code_name = QLabel("--")
+        self.code_name.setObjectName("holdingName")
+        self.sector = QLabel("--")
+        self.sector.setObjectName("holdingSector")
+        self.pnl = QLabel("--")
+        self.pnl.setObjectName("holdingPnl")
+        header.addWidget(self.code_name)
+        header.addWidget(self.sector)
+        header.addStretch()
+        header.addWidget(self.pnl)
+        root.addLayout(header)
+
+        metrics = QGridLayout()
+        self.metric_labels: dict[str, QLabel] = {}
+        for index, (key, title) in enumerate(
+            [
+                ("quantity", "持仓数量"),
+                ("avg_cost", "平均成本"),
+                ("last_price", "最新价格"),
+                ("market_value", "持仓市值"),
+                ("pnl_amount", "浮动盈亏"),
+                ("stop_price", "-7% 止损价"),
+            ]
+        ):
+            title_label = QLabel(title)
+            title_label.setObjectName("holdingMetricTitle")
+            value_label = QLabel("--")
+            value_label.setObjectName("holdingMetricValue")
+            column = index % 3
+            row = (index // 3) * 2
+            metrics.addWidget(title_label, row, column)
+            metrics.addWidget(value_label, row + 1, column)
+            self.metric_labels[key] = value_label
+        root.addLayout(metrics)
+        self.position_bar = QProgressBar()
+        self.position_bar.setRange(0, 250)
+        root.addWidget(self.position_bar)
+
+    def set_data(self, item: dict, name: str = "") -> None:
+        quantity = int(item["quantity"])
+        avg_cost = item["avg_cost"]
+        last_price = item["last_price"]
+        market_value = item["market_value"]
+        ratio = item["position_ratio"]
+        pnl_rate = last_price / avg_cost - 1 if avg_cost else 0
+        pnl_amount = (last_price - avg_cost) * quantity
+        self.code_name.setText(
+            f"{item['stock_code']}  {name or '持仓股票'}"
+        )
+        self.sector.setText(item["sector"])
+        self.pnl.setText(f"{pnl_rate:+.2%}")
+        self.pnl.setStyleSheet(
+            f"color:{'#ef4444' if pnl_rate >= 0 else '#22c55e'};"
+            "font-size:18px; font-weight:800; background:transparent;"
+        )
+        self.metric_labels["quantity"].setText(f"{quantity:,} 股")
+        self.metric_labels["avg_cost"].setText(f"{avg_cost:,.2f}")
+        self.metric_labels["last_price"].setText(f"{last_price:,.2f}")
+        self.metric_labels["market_value"].setText(
+            f"{market_value / 10000:,.2f} 万"
+        )
+        self.metric_labels["pnl_amount"].setText(
+            f"{pnl_amount / 10000:+,.2f} 万"
+        )
+        self.metric_labels["pnl_amount"].setStyleSheet(
+            f"color:{'#ef4444' if pnl_amount >= 0 else '#22c55e'};"
+            "font-weight:750; background:transparent;"
+        )
+        self.metric_labels["stop_price"].setText(f"{avg_cost * 0.93:,.2f}")
+        self.position_bar.setValue(min(250, int(ratio * 1000)))
+        self.position_bar.setFormat(f"单票仓位 {ratio:.2%} / 红线 25%")
+
+
 class StatusBadge(QLabel):
     """Pill badge used for compliance and synchronization state."""
 
@@ -134,4 +225,4 @@ class StatusBadge(QLabel):
         self.set_status(self.text(), self.tone)
 
 
-__all__ = ["CockpitCard", "RingGauge", "StatusBadge"]
+__all__ = ["CockpitCard", "HoldingCard", "RingGauge", "StatusBadge"]
