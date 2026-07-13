@@ -198,10 +198,13 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("系统已就绪")
 
     def _toggle_context_panels(self, index: int) -> None:
-        is_cockpit = self.tabs.tabText(index) == "驾驶舱"
+        title = self.tabs.tabText(index)
+        is_cockpit = title == "驾驶舱"
+        analysis_pages = {"候选股票", "AI 监督", "每日复盘", "任务与资料"}
+        hide_metrics = is_cockpit or title in analysis_pages or title == "实时持仓"
         for card in self.metric_cards:
-            card.setVisible(not is_cockpit)
-        self.trade_frame.setVisible(not is_cockpit)
+            card.setVisible(not hide_metrics)
+        self.trade_frame.setVisible(not is_cockpit and title not in analysis_pages)
 
     def _update_theme_button(self) -> None:
         self.theme_button.setText("☀ 浅色" if self.dark_mode else "◐ 深色")
@@ -303,8 +306,14 @@ class MainWindow(QMainWindow):
                 _wan(item["market_value"]),
                 _percent(item["position_ratio"]),
             ]
+            pnl_up = item["last_price"] >= item["avg_cost"]
             for column, value in enumerate(values):
-                self.positions_table.setItem(row, column, QTableWidgetItem(value))
+                cell = QTableWidgetItem(value)
+                if column in {4, 5}:
+                    cell.setForeground(
+                        QColor("#ef4444" if pnl_up else "#22c55e")
+                    )
+                self.positions_table.setItem(row, column, cell)
 
     def _render_trades(self, trades: list[dict]) -> None:
         self.trades_table.setRowCount(len(trades))

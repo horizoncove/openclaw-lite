@@ -17,12 +17,14 @@ from PyQt6.QtWidgets import (
     QGridLayout,
     QGroupBox,
     QHBoxLayout,
+    QHeaderView,
     QLabel,
     QLineEdit,
     QMessageBox,
     QPushButton,
     QProgressBar,
     QScrollArea,
+    QSizePolicy,
     QTableWidget,
     QTableWidgetItem,
     QTextEdit,
@@ -36,6 +38,7 @@ from .cockpit import (
     CockpitCard,
     DonutChart,
     HoldingCard,
+    RadarChart,
     RingGauge,
     ScoreGauge,
     StatusBadge,
@@ -84,56 +87,74 @@ class WorkbenchWindow(MainWindow):
         page = QWidget()
         page.setObjectName("visualPage")
         layout = QVBoxLayout(page)
-        layout.setContentsMargins(14, 14, 14, 14)
-        layout.setSpacing(12)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(10)
 
-        kpis = QGridLayout()
+        kpis = QHBoxLayout()
+        kpis.setSpacing(8)
         self.position_viz_kpis: dict[str, QLabel] = {}
-        for column, (key, title, color) in enumerate(
-            [
-                ("count", "持仓股票", "#22d3ee"),
-                ("market", "持仓总市值", "#8b5cf6"),
-                ("pnl", "浮动盈亏", "#ef4444"),
-                ("concentration", "最大单票仓位", "#f59e0b"),
-            ]
-        ):
+        for key, title, color in [
+            ("count", "持仓股票", "#22d3ee"),
+            ("market", "持仓总市值", "#8b5cf6"),
+            ("pnl", "浮动盈亏", "#ef4444"),
+            ("concentration", "最大单票仓位", "#f59e0b"),
+        ]:
             card = QFrame()
             card.setObjectName("cockpitKpi")
+            card.setMaximumHeight(72)
             card_layout = QVBoxLayout(card)
+            card_layout.setContentsMargins(12, 8, 12, 8)
+            card_layout.setSpacing(2)
             title_label = QLabel(title)
             title_label.setObjectName("kpiTitle")
             value = QLabel("--")
             value.setObjectName("kpiValue")
-            value.setStyleSheet(f"color:{color};")
+            value.setStyleSheet(f"color:{color}; font-size:18px;")
             card_layout.addWidget(title_label)
             card_layout.addWidget(value)
             self.position_viz_kpis[key] = value
-            kpis.addWidget(card, 0, column)
+            kpis.addWidget(card, 1)
         layout.addLayout(kpis)
 
-        charts = QHBoxLayout()
-        allocation = CockpitCard("持仓资产分布", "按股票市值动态分配")
+        body = QHBoxLayout()
+        body.setSpacing(10)
+
+        detail = CockpitCard("持仓明细", "成本 · 现价 · 市值 · 仓位 · 红涨绿跌")
+        self.positions_table.setMinimumHeight(220)
+        self.positions_table.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
+        detail.body.addWidget(self.positions_table, 1)
+        self.positions_table.show()
+        body.addWidget(detail, 5)
+
+        side = QVBoxLayout()
+        side.setSpacing(10)
+        allocation = CockpitCard("资产分布", "按市值占比")
+        allocation.setMaximumWidth(420)
+        allocation.setSizePolicy(
+            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding
+        )
         self.position_donut = DonutChart("持仓总市值")
+        self.position_donut.setMinimumHeight(160)
+        self.position_donut.setMaximumHeight(190)
         self.position_donut.set_dark_mode(self.dark_mode)
         self.position_legend = QVBoxLayout()
-        allocation_row = QHBoxLayout()
-        allocation_row.addWidget(self.position_donut, 1)
-        allocation_row.addLayout(self.position_legend, 1)
-        allocation.body.addLayout(allocation_row)
-        charts.addWidget(allocation, 1)
+        self.position_legend.setSpacing(4)
+        allocation.body.addWidget(self.position_donut, 1)
+        allocation.body.addLayout(self.position_legend)
+        side.addWidget(allocation, 1)
 
-        concentration = CockpitCard(
-            "单票仓位与盈亏热度", "仓位条上限对应单票 25% 红线"
-        )
+        concentration = CockpitCard("仓位热度", "上限 = 单票 25% 红线")
+        concentration.setMaximumWidth(420)
         self.position_bars = QVBoxLayout()
+        self.position_bars.setSpacing(6)
         concentration.body.addLayout(self.position_bars)
-        concentration.body.addStretch()
-        charts.addWidget(concentration, 1)
-        layout.addLayout(charts)
+        concentration.body.addStretch(1)
+        side.addWidget(concentration, 1)
+        body.addLayout(side, 3)
 
-        detail = CockpitCard("持仓明细矩阵", "成本、现价、市值与仓位联动")
-        detail.body.addWidget(self.positions_table)
-        layout.addWidget(detail, 1)
+        layout.addLayout(body, 1)
         self.positions_visual_page = page
         self.tabs.insertTab(index, page, "实时持仓")
 
@@ -290,31 +311,47 @@ class WorkbenchWindow(MainWindow):
         self.tabs.setCurrentWidget(scroll)
 
     def _build_candidates_tab(self) -> None:
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
         page = QWidget()
-        self.candidate_page = page
+        self.candidate_page = scroll
         layout = QVBoxLayout(page)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(10)
         note = QLabel(
-            "SOP 选股由外部 AI 完成。本软件不评分、不推荐股票，"
-            "仅记录最终选出的 2–3 只股票并用于交易准入检查。"
+            "SOP 选股由外部 AI 完成。本页只登记最终 2–3 只候选，供买入准入检查。"
         )
         note.setWordWrap(True)
         note.setObjectName("hint")
         layout.addWidget(note)
+
         slots = CockpitCard(
-            "三席候选雷达",
-            "外部 AI 最终候选 · 信心评分 · 板块与来源一屏对比",
+            "三席候选席位",
+            "按外部评分排序 · 空席表示仍可登记",
+        )
+        slots.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Maximum
         )
         slots_row = QHBoxLayout()
+        slots_row.setSpacing(10)
         self.candidate_slots = [CandidateSlotCard(rank) for rank in range(1, 4)]
         for slot in self.candidate_slots:
+            slot.setMaximumHeight(148)
             slots_row.addWidget(slot, 1)
         slots.body.addLayout(slots_row)
         layout.addWidget(slots)
 
         lower = QHBoxLayout()
+        lower.setSpacing(10)
         editor = QGroupBox("登记外部 AI 已选股票")
-        editor.setMaximumWidth(430)
+        editor.setMinimumWidth(300)
+        editor.setMaximumWidth(360)
+        editor.setSizePolicy(
+            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum
+        )
         editor_layout = QFormLayout(editor)
+        editor_layout.setSpacing(8)
         self.candidate_code = QLineEdit()
         self.candidate_code.setPlaceholderText("6 位股票代码")
         self.candidate_name = QLineEdit()
@@ -326,33 +363,49 @@ class WorkbenchWindow(MainWindow):
         self.candidate_score.setRange(0, 100)
         self.candidate_score.setSpecialValueText("未提供")
         self.candidate_reason = QTextEdit()
-        self.candidate_reason.setMaximumHeight(70)
-        self.candidate_reason.setPlaceholderText("粘贴外部 AI 的入选理由或摘要")
+        self.candidate_reason.setMaximumHeight(56)
+        self.candidate_reason.setPlaceholderText("粘贴外部 AI 入选摘要")
         save = QPushButton("加入/更新候选池")
         save.clicked.connect(self._save_candidate)
         editor_layout.addRow("股票代码", self.candidate_code)
         editor_layout.addRow("股票名称", self.candidate_name)
         editor_layout.addRow("所属板块", self.candidate_sector)
         editor_layout.addRow("选股来源", self.candidate_source)
-        editor_layout.addRow("外部评分（可选）", self.candidate_score)
+        editor_layout.addRow("外部评分", self.candidate_score)
         editor_layout.addRow("入选理由", self.candidate_reason)
         editor_layout.addRow(save)
         lower.addWidget(editor, 2)
-        pool = CockpitCard("候选池记录", "最多 3 只，支持归档替换")
-        self.candidate_count_label = QLabel("当前候选池：0/3")
+
+        pool = CockpitCard("候选池记录", "最多 3 只 · 支持归档替换")
+        self.candidate_count_label = QLabel("当前候选池：0 / 3")
         self.candidate_count_label.setObjectName("cockpitBigText")
         pool.body.addWidget(self.candidate_count_label)
         self.candidate_table = self._table(
             ["入选时间", "代码", "名称", "板块", "来源 AI", "外部评分", "理由"]
         )
-        pool.body.addWidget(self.candidate_table)
+        self.candidate_table.setMinimumHeight(120)
+        self.candidate_table.setMaximumHeight(168)
+        self.candidate_table.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Maximum
+        )
+        header = self.candidate_table.horizontalHeader()
+        for column in range(6):
+            header.setSectionResizeMode(column, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(6, QHeaderView.ResizeMode.Stretch)
+        pool.body.addWidget(self.candidate_table, 0)
         archive = QPushButton("移出选中的候选股票")
         archive.setObjectName("secondaryButton")
+        archive.setMaximumHeight(38)
+        archive.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
         archive.clicked.connect(self._archive_candidate)
         pool.body.addWidget(archive)
+        pool.body.addStretch(1)
         lower.addWidget(pool, 5)
         layout.addLayout(lower, 1)
-        self.tabs.addTab(page, "候选股票")
+        scroll.setWidget(page)
+        self.tabs.addTab(scroll, "候选股票")
 
     def _build_intent_tab(self) -> None:
         page = QWidget()
@@ -396,71 +449,76 @@ class WorkbenchWindow(MainWindow):
     def _build_supervision_tab(self) -> None:
         page = QWidget()
         layout = QVBoxLayout(page)
-        visuals = QHBoxLayout()
-        score_card = CockpitCard("月度纪律评分", "红灯 -20 · 黄灯 -5")
-        self.supervision_score_gauge = ScoreGauge()
-        self.supervision_score_gauge.setMinimumHeight(115)
-        self.supervision_score_gauge.setMaximumHeight(125)
-        self.supervision_score_gauge.set_dark_mode(self.dark_mode)
-        score_card.body.addWidget(self.supervision_score_gauge)
-        visuals.addWidget(score_card, 1)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(10)
 
-        distribution = CockpitCard("监督事件分布", "红 / 黄 / 绿灯结构")
-        self.supervision_donut = DonutChart("监督事件")
-        self.supervision_donut.setMinimumHeight(115)
-        self.supervision_donut.setMaximumHeight(125)
-        self.supervision_donut.set_dark_mode(self.dark_mode)
-        distribution.body.addWidget(self.supervision_donut)
-        self.supervision_distribution = QLabel("暂无监督事件")
-        self.supervision_distribution.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        distribution.body.addWidget(self.supervision_distribution)
-        visuals.addWidget(distribution, 1)
-
-        layers = CockpitCard("三层监督雷达", "硬规则 · 软规则 · 心理纪律")
-        self.supervision_layers: dict[str, StatusBadge] = {}
-        for level, title in [
-            ("L1", "L1 硬规则监督"),
-            ("L2", "L2 软规则监督"),
-            ("L3", "L3 心理纪律"),
-        ]:
-            row = QHBoxLayout()
-            label = QLabel(title)
-            badge = StatusBadge("正常", "green")
-            badge.set_dark_mode(self.dark_mode)
-            self.supervision_layers[level] = badge
-            row.addWidget(label)
-            row.addStretch()
-            row.addWidget(badge)
-            layers.body.addLayout(row)
-        self.supervision_penalty_viz = QLabel("处罚状态：正常")
-        self.supervision_penalty_viz.setObjectName("cockpitBigText")
-        layers.body.addWidget(self.supervision_penalty_viz)
-        layers.body.addStretch()
-        visuals.addWidget(layers, 1)
-        layout.addLayout(visuals)
-
-        top = QHBoxLayout()
+        header = QHBoxLayout()
         self.grade_label = QLabel("月度评分：--")
         self.grade_label.setObjectName("cockpitBigText")
         self.penalty_label = QLabel("处罚状态：正常")
         refresh = QPushButton("刷新监督结果")
         refresh.clicked.connect(self._refresh_supervision)
-        top.addWidget(self.grade_label)
-        top.addWidget(self.penalty_label)
-        top.addStretch()
-        top.addWidget(refresh)
-        layout.addLayout(top)
+        header.addWidget(self.grade_label)
+        header.addWidget(self.penalty_label)
+        header.addStretch()
+        header.addWidget(refresh)
+        layout.addLayout(header)
+
+        visuals = QHBoxLayout()
+        visuals.setSpacing(10)
+
+        score_card = CockpitCard("月度纪律评分", "红灯 -20 · 黄灯 -5")
+        self.supervision_score_gauge = ScoreGauge()
+        self.supervision_score_gauge.setMinimumHeight(180)
+        self.supervision_score_gauge.set_dark_mode(self.dark_mode)
+        score_card.body.addWidget(self.supervision_score_gauge, 1)
+        visuals.addWidget(score_card, 1)
+
+        distribution = CockpitCard("监督事件分布", "红 / 黄 / 合规结构")
+        self.supervision_donut = DonutChart("监督事件")
+        self.supervision_donut.setMinimumHeight(170)
+        self.supervision_donut.set_dark_mode(self.dark_mode)
+        distribution.body.addWidget(self.supervision_donut, 1)
+        self.supervision_distribution = QLabel("暂无监督事件")
+        self.supervision_distribution.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        distribution.body.addWidget(self.supervision_distribution)
+        visuals.addWidget(distribution, 1)
+
+        layers = CockpitCard("三层监督雷达", "L1 硬规则 · L2 软规则 · L3 心理")
+        self.supervision_layers: dict[str, StatusBadge] = {}
+        badge_row = QHBoxLayout()
+        badge_row.setSpacing(6)
+        for level in ("L1", "L2", "L3"):
+            badge = StatusBadge(f"{level} 正常", "green")
+            badge.set_dark_mode(self.dark_mode)
+            self.supervision_layers[level] = badge
+            badge_row.addWidget(badge, 1)
+        layers.body.addLayout(badge_row)
+        self.supervision_radar = RadarChart()
+        self.supervision_radar.setMinimumHeight(200)
+        self.supervision_radar.set_dark_mode(self.dark_mode)
+        layers.body.addWidget(self.supervision_radar, 1)
+        self.supervision_penalty_viz = QLabel("")
+        self.supervision_penalty_viz.hide()
+        visuals.addWidget(layers, 1)
+        layout.addLayout(visuals, 1)
+
         timeline = CockpitCard("监督事件时间表", "按时间追踪规则、说明和状态")
         self.findings_table = self._table(
             ["时间", "层级", "灯号", "规则", "说明", "状态"]
         )
-        timeline.body.addWidget(self.findings_table)
+        self.findings_table.setMinimumHeight(140)
+        self.findings_table.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
+        timeline.body.addWidget(self.findings_table, 1)
         layout.addWidget(timeline, 1)
         rules = QLabel(
-            "L1 硬规则：候选池准入、仓位、加仓、止损止盈、时间和处罚；"
-            "L2 软规则：证据与数据一致性；L3 心理规则：亏损日不报复、盈利日不贪。"
+            "L1：候选池准入、仓位、加仓、止损止盈、时间与处罚；"
+            "L2：证据与数据一致性；L3：亏损日不报复、盈利日不贪。"
         )
         rules.setWordWrap(True)
+        rules.setObjectName("hint")
         layout.addWidget(rules)
         self.tabs.addTab(page, "AI 监督")
 
@@ -729,6 +787,7 @@ class WorkbenchWindow(MainWindow):
             self.position_donut.set_dark_mode(self.dark_mode)
             self.supervision_score_gauge.set_dark_mode(self.dark_mode)
             self.supervision_donut.set_dark_mode(self.dark_mode)
+            self.supervision_radar.set_dark_mode(self.dark_mode)
             for badge in (
                 self.cockpit_compliance,
                 self.cockpit_sync,
@@ -977,10 +1036,18 @@ class WorkbenchWindow(MainWindow):
 
     def _refresh_candidates(self) -> None:
         rows = self.system.list_candidates()
+        ranked = sorted(
+            rows,
+            key=lambda item: (
+                item["external_score"] is None,
+                -(item["external_score"] or 0),
+                -item["id"],
+            ),
+        )
         for index, slot in enumerate(self.candidate_slots):
-            slot.set_candidate(rows[index] if index < len(rows) else None)
+            slot.set_candidate(ranked[index] if index < len(ranked) else None)
         self.candidate_count_label.setText(
-            f"当前候选池：{len(rows)}/3"
+            f"当前候选池：{len(rows)} / 3"
             + ("（建议保持 2–3 只）" if len(rows) < 2 else "")
         )
         self.candidate_table.setRowCount(len(rows))
@@ -1040,6 +1107,7 @@ class WorkbenchWindow(MainWindow):
         self.supervision_distribution.setText(
             f"🔴 {red_count}   🟡 {yellow_count}   🟢 {green_count}"
         )
+        radar_scores: dict[str, float] = {}
         for level, badge in self.supervision_layers.items():
             level_rows = [item for item in rows if item["level"] == level]
             level_red = sum(item["severity"] == "red" for item in level_rows)
@@ -1047,11 +1115,15 @@ class WorkbenchWindow(MainWindow):
                 item["severity"] == "yellow" for item in level_rows
             )
             if level_red:
-                badge.set_status(f"{level_red} 红灯", "red")
+                badge.set_status(f"{level} {level_red} 红灯", "red")
+                radar_scores[level] = max(15.0, 100.0 - 35.0 * level_red)
             elif level_yellow:
-                badge.set_status(f"{level_yellow} 黄灯", "yellow")
+                badge.set_status(f"{level} {level_yellow} 黄灯", "yellow")
+                radar_scores[level] = max(40.0, 100.0 - 20.0 * level_yellow)
             else:
-                badge.set_status("正常", "green")
+                badge.set_status(f"{level} 正常", "green")
+                radar_scores[level] = 100.0
+        self.supervision_radar.set_scores(radar_scores)
         self.supervision_penalty_viz.setText(
             f"处罚状态：{penalty or '正常'}"
         )

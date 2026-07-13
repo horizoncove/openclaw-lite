@@ -2,16 +2,18 @@
 
 from __future__ import annotations
 
+import math
 from decimal import Decimal
 
-from PyQt6.QtCore import QRectF, Qt
-from PyQt6.QtGui import QColor, QFont, QPainter, QPen
+from PyQt6.QtCore import QPointF, QRectF, Qt, QSize
+from PyQt6.QtGui import QColor, QFont, QPainter, QPen, QPolygonF
 from PyQt6.QtWidgets import (
     QFrame,
     QGridLayout,
     QHBoxLayout,
     QLabel,
     QProgressBar,
+    QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
@@ -95,7 +97,10 @@ class DonutChart(QWidget):
         self.center_value = "--"
         self.segments: list[tuple[str, float, QColor]] = []
         self.dark_mode = False
-        self.setMinimumSize(210, 190)
+        self.setMinimumSize(180, 170)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
         self.setStyleSheet("background:transparent;")
 
     def set_data(
@@ -165,7 +170,10 @@ class ScoreGauge(QWidget):
         self.score = 100
         self.grade = "A"
         self.dark_mode = False
-        self.setMinimumSize(260, 175)
+        self.setMinimumSize(200, 160)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
         self.setStyleSheet("background:transparent;")
 
     def set_score(self, score: int, grade: str) -> None:
@@ -180,10 +188,10 @@ class ScoreGauge(QWidget):
     def paintEvent(self, event) -> None:  # noqa: N802
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        baseline = self.height() - 14
+        baseline = self.height() - 10
         radius = max(
-            42.0,
-            min((self.width() - 48) / 2, self.height() - 36),
+            48.0,
+            min((self.width() - 36) / 2, self.height() - 28),
         )
         rect = QRectF(
             self.width() / 2 - radius,
@@ -191,29 +199,135 @@ class ScoreGauge(QWidget):
             radius * 2,
             radius * 2,
         )
-        track = QPen(QColor("#17324d" if self.dark_mode else "#e8edf5"), 16)
+        track = QPen(QColor("#17324d" if self.dark_mode else "#e8edf5"), 14)
         track.setCapStyle(Qt.PenCapStyle.RoundCap)
         painter.setPen(track)
         painter.drawArc(rect, 0, 180 * 16)
-        color = "#22d3ee" if self.score >= 90 else "#f59e0b" if self.score >= 70 else "#ef4444"
-        pen = QPen(QColor(color), 16)
+        color = (
+            "#22d3ee"
+            if self.score >= 90
+            else "#f59e0b"
+            if self.score >= 70
+            else "#ef4444"
+        )
+        pen = QPen(QColor(color), 14)
         pen.setCapStyle(Qt.PenCapStyle.RoundCap)
         painter.setPen(pen)
         painter.drawArc(rect, 180 * 16, int(-180 * 16 * self.score / 100))
         painter.setPen(QColor("#e0f2fe" if self.dark_mode else "#14213d"))
-        painter.setFont(QFont("", 28, QFont.Weight.Bold))
+        painter.setFont(QFont("", 26, QFont.Weight.Bold))
         painter.drawText(
-            QRectF(0, baseline - radius * 0.68, self.width(), 42),
+            QRectF(0, baseline - radius * 0.72, self.width(), 40),
             Qt.AlignmentFlag.AlignCenter,
             f"{self.grade} · {self.score}",
         )
         painter.setPen(QColor("#6f91aa" if self.dark_mode else "#6b7890"))
         painter.setFont(QFont("", 10, QFont.Weight.Medium))
         painter.drawText(
-            QRectF(0, baseline - radius * 0.28, self.width(), 24),
+            QRectF(0, baseline - radius * 0.32, self.width(), 22),
             Qt.AlignmentFlag.AlignCenter,
             self.title,
         )
+
+
+class RadarChart(QWidget):
+    """Triangular radar for L1 / L2 / L3 supervision health."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.dark_mode = False
+        self.axes = [
+            ("L1", "硬规则", 100.0),
+            ("L2", "软规则", 100.0),
+            ("L3", "心理", 100.0),
+        ]
+        self.setMinimumSize(210, 190)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
+        self.setStyleSheet("background:transparent;")
+
+    def set_scores(self, scores: dict[str, float]) -> None:
+        updated = []
+        for key, label, _ in self.axes:
+            updated.append(
+                (key, label, max(0.0, min(float(scores.get(key, 100.0)), 100.0)))
+            )
+        self.axes = updated
+        self.update()
+
+    def set_dark_mode(self, enabled: bool) -> None:
+        self.dark_mode = bool(enabled)
+        self.update()
+
+    def sizeHint(self) -> QSize:  # noqa: N802
+        return QSize(240, 210)
+
+    def _point(self, center: QPointF, radius: float, index: int, ratio: float) -> QPointF:
+        angle = -math.pi / 2 + index * (2 * math.pi / 3)
+        distance = radius * max(0.0, min(ratio, 1.0))
+        return QPointF(
+            center.x() + distance * math.cos(angle),
+            center.y() + distance * math.sin(angle),
+        )
+
+    def paintEvent(self, event) -> None:  # noqa: N802
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        margin = 36
+        side = min(self.width(), self.height()) - margin * 2
+        center = QPointF(self.width() / 2, self.height() / 2 + 2)
+        radius = max(40.0, side / 2)
+        grid = QColor("#1a3a55" if self.dark_mode else "#d7e0ec")
+        axis = QColor("#6f91aa" if self.dark_mode else "#64748b")
+        fill = QColor(34, 211, 238, 70 if self.dark_mode else 90)
+        stroke = QColor("#22d3ee" if self.dark_mode else "#0891b2")
+        text = QColor("#dff6ff" if self.dark_mode else "#1e293b")
+
+        for ring in (0.33, 0.66, 1.0):
+            polygon = QPolygonF(
+                [self._point(center, radius, index, ring) for index in range(3)]
+            )
+            painter.setPen(QPen(grid, 1))
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.drawPolygon(polygon)
+
+        for index in range(3):
+            tip = self._point(center, radius, index, 1.0)
+            painter.setPen(QPen(grid, 1))
+            painter.drawLine(center, tip)
+
+        value_poly = QPolygonF(
+            [
+                self._point(center, radius, index, score / 100.0)
+                for index, (_, _, score) in enumerate(self.axes)
+            ]
+        )
+        painter.setBrush(fill)
+        painter.setPen(QPen(stroke, 2.4))
+        painter.drawPolygon(value_poly)
+
+        for index, (key, label, score) in enumerate(self.axes):
+            point = self._point(center, radius, index, score / 100.0)
+            painter.setBrush(stroke)
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.drawEllipse(point, 3.5, 3.5)
+
+            label_point = self._point(center, radius + 22, index, 1.0)
+            painter.setPen(text)
+            painter.setFont(QFont("", 11, QFont.Weight.Bold))
+            painter.drawText(
+                QRectF(label_point.x() - 30, label_point.y() - 20, 60, 18),
+                Qt.AlignmentFlag.AlignCenter,
+                key,
+            )
+            painter.setPen(axis)
+            painter.setFont(QFont("", 9, QFont.Weight.Medium))
+            painter.drawText(
+                QRectF(label_point.x() - 30, label_point.y() - 4, 60, 16),
+                Qt.AlignmentFlag.AlignCenter,
+                f"{label} {score:.0f}",
+            )
 
 
 class CandidateSlotCard(QFrame):
@@ -223,19 +337,21 @@ class CandidateSlotCard(QFrame):
         super().__init__()
         self.rank = rank
         self.setObjectName("candidateSlot")
+        self.setMinimumHeight(132)
+        self.setMaximumHeight(168)
         root = QVBoxLayout(self)
-        root.setContentsMargins(16, 14, 16, 14)
-        root.setSpacing(8)
+        root.setContentsMargins(14, 12, 14, 12)
+        root.setSpacing(6)
         top = QHBoxLayout()
         self.rank_label = QLabel(f"0{rank}")
         self.rank_label.setObjectName("candidateRank")
-        self.name = QLabel("等待外部 AI 候选")
+        self.name = QLabel("空席")
         self.name.setObjectName("candidateSlotName")
         top.addWidget(self.rank_label)
         top.addWidget(self.name)
         top.addStretch()
         root.addLayout(top)
-        self.code_sector = QLabel("空席位")
+        self.code_sector = QLabel("等待外部 AI 写入")
         self.code_sector.setObjectName("candidateSlotMeta")
         self.source = QLabel("—")
         self.source.setObjectName("candidateSlotMeta")
@@ -243,9 +359,11 @@ class CandidateSlotCard(QFrame):
         self.score.setRange(0, 100)
         self.score.setValue(0)
         self.score.setFormat("外部评分：未提供")
-        self.reason = QLabel("登记后展示外部 AI 入选摘要")
+        self.score.setMaximumHeight(22)
+        self.reason = QLabel("登记后展示入选摘要")
         self.reason.setObjectName("candidateSlotReason")
         self.reason.setWordWrap(True)
+        self.reason.setMaximumHeight(36)
         root.addWidget(self.code_sector)
         root.addWidget(self.source)
         root.addWidget(self.score)
@@ -253,12 +371,13 @@ class CandidateSlotCard(QFrame):
 
     def set_candidate(self, candidate: dict | None) -> None:
         if not candidate:
-            self.name.setText("等待外部 AI 候选")
-            self.code_sector.setText("空席位")
+            self.name.setText("空席")
+            self.code_sector.setText("等待外部 AI 写入")
             self.source.setText("—")
             self.score.setValue(0)
             self.score.setFormat("外部评分：未提供")
-            self.reason.setText("登记后展示外部 AI 入选摘要")
+            self.reason.setText("登记后展示入选摘要")
+            self.setProperty("occupied", False)
             return
         self.name.setText(candidate["stock_name"] or "未命名股票")
         self.code_sector.setText(
@@ -270,18 +389,23 @@ class CandidateSlotCard(QFrame):
         self.score.setFormat(
             f"外部评分 {score:g} / 100" if score is not None else "外部评分：未提供"
         )
-        self.reason.setText(candidate["selection_reason"] or "未填写入选理由")
+        reason = candidate["selection_reason"] or "未填写入选理由"
+        self.reason.setText(reason if len(reason) <= 42 else reason[:40] + "…")
+        self.setProperty("occupied", True)
 
 
 class CockpitCard(QFrame):
-    """White dashboard card with a title and optional subtitle."""
+    """Dashboard card with a title and optional subtitle."""
 
     def __init__(self, title: str, subtitle: str = "") -> None:
         super().__init__()
         self.setObjectName("cockpitCard")
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
         self.body = QVBoxLayout(self)
-        self.body.setContentsMargins(18, 16, 18, 16)
-        self.body.setSpacing(10)
+        self.body.setContentsMargins(16, 14, 16, 14)
+        self.body.setSpacing(8)
         heading = QLabel(title)
         heading.setObjectName("cockpitTitle")
         self.body.addWidget(heading)
@@ -423,6 +547,7 @@ __all__ = [
     "CockpitCard",
     "DonutChart",
     "HoldingCard",
+    "RadarChart",
     "RingGauge",
     "ScoreGauge",
     "StatusBadge",

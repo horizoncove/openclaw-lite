@@ -199,7 +199,8 @@ class WorkbenchSmokeTests(unittest.TestCase):
             self.assertIn("每日复盘", labels)
             self.assertIn("任务与资料", labels)
             window.tabs.setCurrentWidget(window.candidate_page)
-            self.assertFalse(window.trade_frame.isHidden())
+            self.assertTrue(window.trade_frame.isHidden())
+            self.assertTrue(window.metric_cards[0].isHidden())
             window.candidate_code.setText("002371")
             window.candidate_name.setText("北方华创")
             window.candidate_sector.setText("半导体")
@@ -214,6 +215,9 @@ class WorkbenchSmokeTests(unittest.TestCase):
             self.assertIn("候选池就绪", window.cockpit_candidate_badge.text())
             self.assertEqual(window.candidate_slots[0].name.text(), "中微公司")
             self.assertEqual(window.candidate_slots[1].name.text(), "北方华创")
+            self.assertEqual(
+                window.supervision_radar.axes[0][0], "L1"
+            )
 
             window.command_input.setText("买入 002371 10 100")
             window._enqueue_trade()

@@ -85,6 +85,7 @@ def render(output: Path) -> list[Path]:
     with tempfile.TemporaryDirectory() as directory:
         window = WorkbenchWindow(Path(directory) / "preview.db")
         seed_preview(window)
+        window.resize(1440, 960)
         window.show()
         app.processEvents()
         for index in range(window.tabs.count()):
@@ -96,6 +97,7 @@ def render(output: Path) -> list[Path]:
             widget = window.tabs.currentWidget()
             if isinstance(widget, QScrollArea):
                 widget.verticalScrollBar().setValue(0)
+            app.processEvents()
             app.processEvents()
             path = output / filename
             if not window.grab().save(str(path)):
