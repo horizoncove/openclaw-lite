@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
-from PyQt6.QtCore import QDate
+from PyQt6.QtCore import QDate, QDateTime, QTimer
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import (
     QComboBox,
@@ -12,12 +13,16 @@ from PyQt6.QtWidgets import (
     QDoubleSpinBox,
     QFileDialog,
     QFormLayout,
+    QFrame,
+    QGridLayout,
     QGroupBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QMessageBox,
     QPushButton,
+    QProgressBar,
+    QScrollArea,
     QTableWidget,
     QTableWidgetItem,
     QTextEdit,
@@ -26,11 +31,16 @@ from PyQt6.QtWidgets import (
 )
 
 from .account_engine import InvalidTradeError
+from .cockpit import CockpitCard, RingGauge, StatusBadge
 from .main_window import MainWindow, default_database_path
 from .system_engine import SystemEngine
 
 
 LIGHT_NAMES = {"green": "🟢 绿灯", "yellow": "🟡 黄灯", "red": "🔴 红灯"}
+
+
+def _wan(value: Decimal) -> str:
+    return f"{value / Decimal('10000'):,.2f} 万"
 
 
 class WorkbenchWindow(MainWindow):
@@ -41,15 +51,164 @@ class WorkbenchWindow(MainWindow):
         self.system = SystemEngine(resolved_path)
         super().__init__(resolved_path)
         self.setWindowTitle("Sharon 交易系统 v1.0 · 交易纪律 + AI 监督")
+        self.resize(1440, 900)
+        self.setMinimumSize(1120, 720)
         self._build_candidates_tab()
         self._build_intent_tab()
         self._build_supervision_tab()
         self._build_review_tab()
         self._build_tasks_tab()
+        self._build_cockpit_tab()
+        self.cockpit_timer = QTimer(self)
+        self.cockpit_timer.setInterval(1000)
+        self.cockpit_timer.timeout.connect(
+            lambda: self.cockpit_time.setText(
+                QDateTime.currentDateTime().toString("yyyy-MM-dd  HH:mm:ss")
+            )
+        )
+        self.cockpit_timer.start()
         self._refresh_extended()
+
+    def _build_cockpit_tab(self) -> None:
+        scroll = QScrollArea()
+        scroll.setObjectName("cockpitScroll")
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        page = QWidget()
+        page.setObjectName("cockpitPage")
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(14)
+
+        hero = QFrame()
+        hero.setObjectName("dashboardHero")
+        hero_layout = QHBoxLayout(hero)
+        hero_layout.setContentsMargins(24, 18, 24, 18)
+        hero_copy = QVBoxLayout()
+        hero_title = QLabel("交易驾驶舱")
+        hero_title.setObjectName("heroTitle")
+        hero_subtitle = QLabel("账户态势 · 风险纪律 · 候选池 · 执行状态")
+        hero_subtitle.setObjectName("heroSubtitle")
+        self.cockpit_time = QLabel()
+        self.cockpit_time.setObjectName("heroTime")
+        hero_copy.addWidget(hero_title)
+        hero_copy.addWidget(hero_subtitle)
+        hero_layout.addLayout(hero_copy)
+        hero_layout.addStretch()
+        self.cockpit_compliance = StatusBadge("系统正常", "green")
+        self.cockpit_sync = StatusBadge("同步队列 0", "blue")
+        hero_layout.addWidget(self.cockpit_compliance)
+        hero_layout.addWidget(self.cockpit_sync)
+        hero_layout.addWidget(self.cockpit_time)
+        layout.addWidget(hero)
+
+        kpis = QGridLayout()
+        kpis.setHorizontalSpacing(12)
+        self.cockpit_kpis: dict[str, QLabel] = {}
+        for column, (key, title, accent) in enumerate(
+            [
+                ("equity", "账户净值", "#2563eb"),
+                ("pnl", "累计盈亏", "#16a34a"),
+                ("market", "持仓市值", "#7c3aed"),
+                ("cash", "可用现金", "#0891b2"),
+            ]
+        ):
+            card = QFrame()
+            card.setObjectName("cockpitKpi")
+            card.setProperty("accent", accent)
+            card_layout = QVBoxLayout(card)
+            card_layout.setContentsMargins(18, 13, 18, 13)
+            label = QLabel(title)
+            label.setObjectName("kpiTitle")
+            value = QLabel("--")
+            value.setObjectName("kpiValue")
+            value.setStyleSheet(f"color:{accent};")
+            card_layout.addWidget(label)
+            card_layout.addWidget(value)
+            self.cockpit_kpis[key] = value
+            kpis.addWidget(card, 0, column)
+        layout.addLayout(kpis)
+
+        grid = QGridLayout()
+        grid.setHorizontalSpacing(14)
+        grid.setVerticalSpacing(14)
+        allocation = CockpitCard("资金仪表", "红线：总仓位 ≤60%，现金 ≥40%")
+        gauges = QHBoxLayout()
+        self.position_gauge = RingGauge("总仓位", threshold=0.60)
+        self.cash_gauge = RingGauge(
+            "现金比例", good_when_high=True, threshold=0.40
+        )
+        gauges.addWidget(self.position_gauge)
+        gauges.addWidget(self.cash_gauge)
+        allocation.body.addLayout(gauges)
+        grid.addWidget(allocation, 0, 0)
+
+        candidate_card = CockpitCard(
+            "外部 AI 候选池", "只记录最终 2–3 只，不在本软件选股"
+        )
+        self.cockpit_candidate_badge = StatusBadge("0 / 3", "yellow")
+        candidate_card.body.addWidget(self.cockpit_candidate_badge)
+        self.cockpit_candidates = self._table(["代码", "名称", "板块", "来源"])
+        self.cockpit_candidates.setMaximumHeight(155)
+        candidate_card.body.addWidget(self.cockpit_candidates)
+        grid.addWidget(candidate_card, 0, 1)
+
+        discipline = CockpitCard("纪律与监督", "L1 硬规则优先")
+        self.cockpit_risk_badge = StatusBadge("🟢 全部合规", "green")
+        self.cockpit_grade = QLabel("月度评分 A · 100 分")
+        self.cockpit_grade.setObjectName("cockpitBigText")
+        self.cockpit_penalty = QLabel("处罚状态：正常")
+        self.cockpit_findings = QLabel("未解决告警：0")
+        discipline.body.addWidget(self.cockpit_risk_badge)
+        discipline.body.addWidget(self.cockpit_grade)
+        discipline.body.addWidget(self.cockpit_penalty)
+        discipline.body.addWidget(self.cockpit_findings)
+        discipline.body.addStretch()
+        grid.addWidget(discipline, 0, 2)
+
+        sector_card = CockpitCard("板块资金分布", "按当前总资产计算")
+        self.sector_bars = QVBoxLayout()
+        self.sector_bars.setSpacing(8)
+        sector_card.body.addLayout(self.sector_bars)
+        sector_card.body.addStretch()
+        grid.addWidget(sector_card, 1, 0, 1, 2)
+
+        actions = CockpitCard("快捷操作", "从驾驶舱直接进入核心流程")
+        add_candidate = QPushButton("＋ 登记候选股票")
+        add_candidate.clicked.connect(
+            lambda: self.tabs.setCurrentWidget(self.candidate_page)
+        )
+        plan_trade = QPushButton("◎ 交易前纪律测算")
+        plan_trade.clicked.connect(
+            lambda: self.tabs.setCurrentWidget(self.intent_page)
+        )
+        review = QPushButton("✓ 完成每日复盘")
+        review.setObjectName("secondaryButton")
+        review.clicked.connect(
+            lambda: self.tabs.setCurrentWidget(self.review_page)
+        )
+        refresh = QPushButton("↻ 刷新驾驶舱")
+        refresh.setObjectName("secondaryButton")
+        refresh.clicked.connect(self._refresh_cockpit)
+        actions.body.addWidget(add_candidate)
+        actions.body.addWidget(plan_trade)
+        actions.body.addWidget(review)
+        actions.body.addWidget(refresh)
+        actions.body.addStretch()
+        grid.addWidget(actions, 1, 2)
+        grid.setColumnStretch(0, 4)
+        grid.setColumnStretch(1, 4)
+        grid.setColumnStretch(2, 3)
+        layout.addLayout(grid)
+        layout.addStretch()
+        scroll.setWidget(page)
+        self.cockpit_page = scroll
+        self.tabs.insertTab(0, scroll, "驾驶舱")
+        self.tabs.setCurrentWidget(scroll)
 
     def _build_candidates_tab(self) -> None:
         page = QWidget()
+        self.candidate_page = page
         layout = QVBoxLayout(page)
         note = QLabel(
             "SOP 选股由外部 AI 完成。本软件不评分、不推荐股票，"
@@ -98,6 +257,7 @@ class WorkbenchWindow(MainWindow):
 
     def _build_intent_tab(self) -> None:
         page = QWidget()
+        self.intent_page = page
         layout = QVBoxLayout(page)
         form_box = QGroupBox("交易前纪律检查")
         form = QFormLayout(form_box)
@@ -162,6 +322,7 @@ class WorkbenchWindow(MainWindow):
 
     def _build_review_tab(self) -> None:
         page = QWidget()
+        self.review_page = page
         layout = QHBoxLayout(page)
         editor = QGroupBox("15:30 每日纪律复盘")
         form = QFormLayout(editor)
@@ -255,6 +416,7 @@ class WorkbenchWindow(MainWindow):
             5000
         )
         self._refresh_candidates()
+        self._refresh_cockpit()
 
     def _archive_candidate(self) -> None:
         row = self.candidate_table.currentRow()
@@ -268,6 +430,7 @@ class WorkbenchWindow(MainWindow):
             QMessageBox.warning(self, "无法移出", str(exc))
             return
         self._refresh_candidates()
+        self._refresh_cockpit()
 
     def _validate_intent(self) -> None:
         command = self.intent_command.text().strip()
@@ -333,6 +496,7 @@ class WorkbenchWindow(MainWindow):
         self.sector_input.clear()
         count = len(self.system.pending_trades())
         self.queue_label.setText(f"待同步 {count} 笔；将在下一个 5 秒周期处理")
+        self.cockpit_sync.set_status(f"同步队列 {count}", "yellow")
 
     def _synchronize_pending(self) -> None:
         pending = self.system.pending_trades()
@@ -408,7 +572,143 @@ class WorkbenchWindow(MainWindow):
             self, "导出完成", "\n".join(str(path) for path in paths)
         )
 
+    def _save_capital(self) -> None:
+        super()._save_capital()
+        if hasattr(self, "cockpit_page"):
+            self._refresh_cockpit()
+
+    @staticmethod
+    def _clear_layout(layout: QVBoxLayout) -> None:
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            child_layout = item.layout()
+            if widget:
+                widget.deleteLater()
+            elif child_layout:
+                WorkbenchWindow._clear_layout(child_layout)
+
+    def _refresh_cockpit(self) -> None:
+        account = self.engine.load_account()
+        snapshot = self.engine.calculate_positions()
+        candidates = self.system.list_candidates()
+        findings = self.system.list_findings()
+        grade = self.system.monthly_grade()
+        violations = self.engine.check_risk_limits()
+        live_signals = self.system.position_discipline_signals(self.engine)
+        pending_count = len(self.system.pending_trades())
+
+        self.cockpit_time.setText(
+            QDateTime.currentDateTime().toString("yyyy-MM-dd  HH:mm:ss")
+        )
+        self.cockpit_kpis["equity"].setText(_wan(account.current_capital))
+        self.cockpit_kpis["pnl"].setText(
+            f"{'+' if account.total_pnl >= 0 else ''}{_wan(account.total_pnl)}"
+        )
+        self.cockpit_kpis["pnl"].setStyleSheet(
+            f"color:{'#16a34a' if account.total_pnl >= 0 else '#dc2626'};"
+        )
+        self.cockpit_kpis["market"].setText(
+            _wan(snapshot["total_market_value"])
+        )
+        self.cockpit_kpis["cash"].setText(_wan(snapshot["cash"]))
+        self.position_gauge.set_ratio(float(snapshot["total_position_ratio"]))
+        self.cash_gauge.set_ratio(float(snapshot["cash_ratio"]))
+
+        candidate_tone = "green" if 2 <= len(candidates) <= 3 else "yellow"
+        self.cockpit_candidate_badge.set_status(
+            f"{len(candidates)} / 3"
+            + (" · 候选池就绪" if candidate_tone == "green" else " · 建议 2–3 只"),
+            candidate_tone,
+        )
+        self.cockpit_candidates.setRowCount(len(candidates))
+        for row, candidate in enumerate(candidates):
+            values = [
+                candidate["stock_code"],
+                candidate["stock_name"] or "-",
+                candidate["sector"],
+                candidate["source_ai"],
+            ]
+            for column, value in enumerate(values):
+                self.cockpit_candidates.setItem(
+                    row, column, QTableWidgetItem(value)
+                )
+
+        red_messages = {
+            item["message"]
+            for item in findings
+            if item["severity"] == "red" and item["status"] == "open"
+        }
+        red_messages.update(item["message"] for item in violations)
+        red_messages.update(
+            signal["message"]
+            for signal in live_signals
+            if signal["severity"] == "red"
+        )
+        yellow_messages = {
+            item["message"]
+            for item in findings
+            if item["severity"] == "yellow" and item["status"] == "open"
+        }
+        yellow_messages.update(
+            signal["message"]
+            for signal in live_signals
+            if signal["severity"] == "yellow"
+        )
+        red_count = len(red_messages)
+        yellow_count = len(yellow_messages)
+        if red_count:
+            self.cockpit_risk_badge.set_status(
+                f"🔴 {red_count} 项硬规则风险", "red"
+            )
+            self.cockpit_compliance.set_status("风险待处理", "red")
+        elif yellow_count:
+            self.cockpit_risk_badge.set_status(
+                f"🟡 {yellow_count} 项待改进", "yellow"
+            )
+            self.cockpit_compliance.set_status("存在提醒", "yellow")
+        else:
+            self.cockpit_risk_badge.set_status("🟢 全部合规", "green")
+            self.cockpit_compliance.set_status("系统正常", "green")
+        self.cockpit_grade.setText(
+            f"月度评分 {grade['grade']} · {grade['score']} 分"
+        )
+        self.cockpit_penalty.setText(
+            f"处罚状态：{self.system.active_suspension() or '正常'}"
+        )
+        self.cockpit_findings.setText(
+            f"未解决告警：{red_count + yellow_count}"
+        )
+        self.cockpit_sync.set_status(
+            f"同步队列 {pending_count}",
+            "yellow" if pending_count else "blue",
+        )
+
+        self._clear_layout(self.sector_bars)
+        sectors = sorted(
+            snapshot["sector_values"].items(),
+            key=lambda item: item[1],
+            reverse=True,
+        )
+        if not sectors:
+            empty = QLabel("暂无持仓，资金分布将在成交后显示")
+            empty.setObjectName("cockpitHint")
+            self.sector_bars.addWidget(empty)
+        for sector, value in sectors:
+            row = QHBoxLayout()
+            name = QLabel(sector)
+            name.setMinimumWidth(90)
+            bar = QProgressBar()
+            bar.setRange(0, 1000)
+            ratio = value / snapshot["current_capital"]
+            bar.setValue(min(1000, int(ratio * 1000)))
+            bar.setFormat(f"{ratio:.1%}  ·  {_wan(value)}")
+            row.addWidget(name)
+            row.addWidget(bar, 1)
+            self.sector_bars.addLayout(row)
+
     def _refresh_extended(self) -> None:
+        self._refresh_cockpit()
         self._refresh_candidates()
         self._refresh_supervision()
         self._refresh_reviews()
@@ -527,6 +827,7 @@ class WorkbenchWindow(MainWindow):
                 self.tasks_table.setItem(row, column, cell)
 
     def closeEvent(self, event) -> None:  # noqa: N802
+        self.cockpit_timer.stop()
         self.sync_timer.stop()
         self.engine.close()
         self.system.close()

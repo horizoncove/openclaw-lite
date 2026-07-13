@@ -104,9 +104,9 @@ class MainWindow(QMainWindow):
 
         heading = QHBoxLayout()
         titles = QVBoxLayout()
-        title = QLabel("账户风险控制台")
+        title = QLabel("Sharon 交易控制台")
         title.setObjectName("pageTitle")
-        subtitle = QLabel("本地 SQLite · 每 5 秒同步 · 金额单位：人民币")
+        subtitle = QLabel("个人量化执行驾驶舱 · 本地 SQLite · 5 秒同步")
         subtitle.setObjectName("subtitle")
         titles.addWidget(title)
         titles.addWidget(subtitle)
@@ -134,18 +134,18 @@ class MainWindow(QMainWindow):
         self.pnl_card = MetricCard("累计盈亏", "#059669")
         self.position_card = MetricCard("总仓位", "#7c3aed")
         self.cash_card = MetricCard("可用现金", "#0891b2")
-        for column, card in enumerate(
-            [
-                self.capital_card,
-                self.pnl_card,
-                self.position_card,
-                self.cash_card,
-            ]
-        ):
+        self.metric_cards = [
+            self.capital_card,
+            self.pnl_card,
+            self.position_card,
+            self.cash_card,
+        ]
+        for column, card in enumerate(self.metric_cards):
             cards.addWidget(card, 0, column)
         root.addLayout(cards)
 
         trade_frame = QFrame()
+        self.trade_frame = trade_frame
         trade_frame.setObjectName("panel")
         trade_layout = QVBoxLayout(trade_frame)
         trade_title = QLabel("交易同步")
@@ -182,12 +182,19 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.positions_table, "实时持仓")
         self.tabs.addTab(self.trades_table, "交易流水")
         self.tabs.addTab(self.risk_table, "风险中心")
+        self.tabs.currentChanged.connect(self._toggle_context_panels)
         root.addWidget(self.tabs, 1)
 
         self.setCentralWidget(central)
         status = QStatusBar()
         self.setStatusBar(status)
         self.statusBar().showMessage("系统已就绪")
+
+    def _toggle_context_panels(self, index: int) -> None:
+        is_cockpit = self.tabs.tabText(index) == "驾驶舱"
+        for card in self.metric_cards:
+            card.setVisible(not is_cockpit)
+        self.trade_frame.setVisible(not is_cockpit)
 
     @staticmethod
     def _table(headers: list[str]) -> QTableWidget:
@@ -344,31 +351,96 @@ class MainWindow(QMainWindow):
     def _apply_style(self) -> None:
         self.setStyleSheet(
             """
-            QMainWindow, QWidget { background: #f4f7fb; color: #172033; }
-            QLabel#pageTitle { font-size: 26px; font-weight: 700; }
+            QMainWindow, QWidget {
+                background: #f3f6fb;
+                color: #14213d;
+                font-family: "Microsoft YaHei UI", "Segoe UI";
+            }
+            QLabel#pageTitle {
+                font-size: 27px;
+                font-weight: 700;
+                color: #14213d;
+            }
             QLabel#subtitle, QLabel#hint, QLabel#metricTitle {
-                color: #6b7280;
+                color: #718096;
             }
             QLabel#sectionTitle { font-size: 17px; font-weight: 600; }
             QFrame#metricCard, QFrame#panel {
                 background: white;
-                border: 1px solid #e5eaf2;
-                border-radius: 10px;
+                border: 1px solid #e4eaf3;
+                border-radius: 12px;
             }
-            QLineEdit, QDoubleSpinBox {
+            QFrame#dashboardHero {
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #14213d, stop:0.55 #1e3a8a, stop:1 #2563eb
+                );
+                border: 0;
+                border-radius: 16px;
+            }
+            QLabel#heroTitle {
+                background: transparent;
+                color: white;
+                font-size: 27px;
+                font-weight: 800;
+            }
+            QLabel#heroSubtitle, QLabel#heroTime {
+                background: transparent;
+                color: #dbeafe;
+                font-size: 13px;
+            }
+            QFrame#cockpitCard, QFrame#cockpitKpi {
                 background: white;
-                border: 1px solid #cfd7e6;
-                border-radius: 7px;
-                min-height: 36px;
+                border: 1px solid #e3e9f2;
+                border-radius: 14px;
+            }
+            QFrame#cockpitCard QLabel, QFrame#cockpitKpi QLabel {
+                background: transparent;
+                border: 0;
+            }
+            QLabel#cockpitTitle {
+                background: transparent;
+                font-size: 17px;
+                font-weight: 700;
+                color: #1e293b;
+            }
+            QLabel#cockpitHint, QLabel#kpiTitle {
+                background: transparent;
+                color: #7b879d;
+                font-size: 12px;
+            }
+            QLabel#cockpitBigText {
+                background: transparent;
+                font-size: 20px;
+                font-weight: 750;
+                color: #1e3a8a;
+            }
+            QLabel#kpiValue {
+                background: transparent;
+                font-size: 22px;
+                font-weight: 750;
+            }
+            QScrollArea#cockpitScroll, QWidget#cockpitPage {
+                border: 0;
+                background: #f3f6fb;
+            }
+            QLineEdit, QDoubleSpinBox, QSpinBox, QComboBox,
+            QDateEdit, QTimeEdit, QTextEdit {
+                background: white;
+                border: 1px solid #d1d9e6;
+                border-radius: 8px;
+                min-height: 37px;
                 padding: 0 10px;
             }
-            QLineEdit:focus, QDoubleSpinBox:focus { border-color: #2563eb; }
+            QLineEdit:focus, QDoubleSpinBox:focus, QSpinBox:focus,
+            QComboBox:focus, QDateEdit:focus, QTimeEdit:focus,
+            QTextEdit:focus { border-color: #2563eb; }
             QPushButton {
                 background: #2563eb;
                 color: white;
                 border: 0;
-                border-radius: 7px;
-                min-height: 38px;
+                border-radius: 8px;
+                min-height: 39px;
                 padding: 0 18px;
                 font-weight: 600;
             }
@@ -379,17 +451,25 @@ class MainWindow(QMainWindow):
             }
             QTabWidget::pane {
                 background: white;
-                border: 1px solid #e5eaf2;
-                border-radius: 8px;
+                border: 1px solid #e3e9f2;
+                border-radius: 12px;
+                top: -1px;
             }
             QTabBar::tab {
-                background: #e9eef7;
-                padding: 10px 22px;
-                margin-right: 3px;
-                border-top-left-radius: 6px;
-                border-top-right-radius: 6px;
+                background: #e8edf5;
+                color: #64748b;
+                padding: 11px 19px;
+                margin-right: 4px;
+                border-top-left-radius: 9px;
+                border-top-right-radius: 9px;
+                font-weight: 600;
             }
-            QTabBar::tab:selected { background: white; color: #2563eb; }
+            QTabBar::tab:selected {
+                background: white;
+                color: #1d4ed8;
+                font-weight: 700;
+            }
+            QTabBar::tab:hover { color: #2563eb; background: #f8fafc; }
             QTableWidget {
                 background: white;
                 alternate-background-color: #f8fafc;
@@ -402,6 +482,23 @@ class MainWindow(QMainWindow):
                 border-bottom: 1px solid #e2e8f0;
                 padding: 9px;
                 font-weight: 600;
+                color: #475569;
+            }
+            QProgressBar {
+                min-height: 24px;
+                border: 0;
+                border-radius: 7px;
+                background: #e8edf5;
+                color: #334155;
+                text-align: center;
+                font-weight: 600;
+            }
+            QProgressBar::chunk {
+                border-radius: 7px;
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #2563eb, stop:1 #38bdf8
+                );
             }
             QStatusBar { background: white; border-top: 1px solid #e5eaf2; }
             """

@@ -183,16 +183,28 @@ class WorkbenchSmokeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             window = WorkbenchWindow(Path(directory) / "workbench.db")
             labels = [window.tabs.tabText(i) for i in range(window.tabs.count())]
+            self.assertEqual(labels[0], "驾驶舱")
+            self.assertIs(window.tabs.currentWidget(), window.cockpit_page)
+            self.assertTrue(window.trade_frame.isHidden())
             self.assertIn("候选股票", labels)
             self.assertIn("交易计划", labels)
             self.assertIn("AI 监督", labels)
             self.assertIn("每日复盘", labels)
             self.assertIn("任务与资料", labels)
+            window.tabs.setCurrentWidget(window.candidate_page)
+            self.assertFalse(window.trade_frame.isHidden())
             window.candidate_code.setText("002371")
             window.candidate_name.setText("北方华创")
             window.candidate_sector.setText("半导体")
             window._save_candidate()
             self.assertEqual(window.candidate_table.rowCount(), 1)
+            self.assertEqual(window.cockpit_candidates.rowCount(), 1)
+            self.assertIn("建议", window.cockpit_candidate_badge.text())
+            window.system.add_candidate(
+                "688012", "中微公司", "半导体", source_ai="外部 AI"
+            )
+            window._refresh_extended()
+            self.assertIn("候选池就绪", window.cockpit_candidate_badge.text())
 
             window.command_input.setText("买入 002371 10 100")
             window._enqueue_trade()
@@ -200,6 +212,9 @@ class WorkbenchSmokeTests(unittest.TestCase):
             window._synchronize_pending()
             self.assertEqual(window.positions_table.rowCount(), 1)
             self.assertEqual(window.findings_table.rowCount(), 0)
+            self.assertGreater(window.position_gauge.ratio, 0)
+            self.assertLess(window.cash_gauge.ratio, 1)
+            self.assertEqual(window.cockpit_sync.text(), "同步队列 0")
             window.close()
 
 
