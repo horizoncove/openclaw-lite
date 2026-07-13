@@ -5,7 +5,7 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
-from PyQt6.QtCore import QSettings, QStandardPaths, QTimer
+from PyQt6.QtCore import QSettings, QStandardPaths, Qt, QTimer
 from PyQt6.QtGui import QColor, QFont
 from PyQt6.QtWidgets import (
     QAbstractItemView,
@@ -17,6 +17,8 @@ from PyQt6.QtWidgets import (
     QHeaderView,
     QLabel,
     QLineEdit,
+    QListWidget,
+    QListWidgetItem,
     QMainWindow,
     QMessageBox,
     QPushButton,
@@ -176,7 +178,34 @@ class MainWindow(QMainWindow):
         trade_layout.addWidget(self.queue_label)
         root.addWidget(trade_frame)
 
+        shell = QHBoxLayout()
+        shell.setSpacing(12)
+
+        nav_panel = QFrame()
+        nav_panel.setObjectName("sideNavPanel")
+        nav_panel.setFixedWidth(176)
+        nav_layout = QVBoxLayout(nav_panel)
+        nav_layout.setContentsMargins(10, 12, 10, 12)
+        nav_layout.setSpacing(8)
+        nav_title = QLabel("菜单")
+        nav_title.setObjectName("sideNavTitle")
+        nav_layout.addWidget(nav_title)
+        self.side_nav = QListWidget()
+        self.side_nav.setObjectName("sideNav")
+        self.side_nav.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.side_nav.setSelectionMode(
+            QAbstractItemView.SelectionMode.SingleSelection
+        )
+        self.side_nav.setVerticalScrollMode(
+            QAbstractItemView.ScrollMode.ScrollPerPixel
+        )
+        self.side_nav.currentRowChanged.connect(self._on_side_nav_changed)
+        nav_layout.addWidget(self.side_nav, 1)
+        shell.addWidget(nav_panel)
+
         self.tabs = QTabWidget()
+        self.tabs.tabBar().setVisible(False)
+        self.tabs.setDocumentMode(True)
         self.positions_table = self._table(
             ["股票代码", "板块", "数量", "平均成本", "最新价", "市值", "仓位"]
         )
@@ -189,18 +218,47 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.positions_table, "实时持仓")
         self.tabs.addTab(self.trades_table, "交易流水")
         self.tabs.addTab(self.risk_table, "风险中心")
-        self.tabs.currentChanged.connect(self._toggle_context_panels)
-        root.addWidget(self.tabs, 1)
+        self.tabs.currentChanged.connect(self._on_tabs_changed)
+        shell.addWidget(self.tabs, 1)
+        root.addLayout(shell, 1)
 
         self.setCentralWidget(central)
         status = QStatusBar()
         self.setStatusBar(status)
         self.statusBar().showMessage("系统已就绪")
+        self._sync_side_nav()
+
+    def _sync_side_nav(self) -> None:
+        current = self.tabs.currentIndex()
+        self.side_nav.blockSignals(True)
+        self.side_nav.clear()
+        for index in range(self.tabs.count()):
+            item = QListWidgetItem(self.tabs.tabText(index))
+            item.setTextAlignment(
+                int(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
+            )
+            self.side_nav.addItem(item)
+        if current >= 0 and current < self.side_nav.count():
+            self.side_nav.setCurrentRow(current)
+        self.side_nav.blockSignals(False)
+
+    def _on_side_nav_changed(self, row: int) -> None:
+        if row < 0 or row >= self.tabs.count():
+            return
+        if self.tabs.currentIndex() != row:
+            self.tabs.setCurrentIndex(row)
+
+    def _on_tabs_changed(self, index: int) -> None:
+        self._toggle_context_panels(index)
+        if self.side_nav.currentRow() != index and 0 <= index < self.side_nav.count():
+            self.side_nav.blockSignals(True)
+            self.side_nav.setCurrentRow(index)
+            self.side_nav.blockSignals(False)
 
     def _toggle_context_panels(self, index: int) -> None:
         title = self.tabs.tabText(index)
         is_cockpit = title == "驾驶舱"
-        analysis_pages = {"候选股票", "AI 监督", "每日复盘", "任务与资料"}
+        analysis_pages = {"候选股票", "交易计划", "AI 监督", "每日复盘", "任务与资料"}
         hide_metrics = is_cockpit or title in analysis_pages or title == "实时持仓"
         for card in self.metric_cards:
             card.setVisible(not hide_metrics)
@@ -559,6 +617,42 @@ class MainWindow(QMainWindow):
                 border-radius: 8px;
                 top: -1px;
             }}
+            QFrame#sideNavPanel {{
+                background: #ffffff;
+                border: 1px solid #d7dde5;
+                border-radius: 8px;
+            }}
+            QLabel#sideNavTitle {{
+                color: #6b7380;
+                font-size: 12px;
+                font-weight: 700;
+                letter-spacing: 1px;
+                padding: 0 8px 4px 8px;
+            }}
+            QListWidget#sideNav {{
+                background: transparent;
+                border: 0;
+                outline: 0;
+                padding: 0;
+            }}
+            QListWidget#sideNav::item {{
+                color: #4b5563;
+                padding: 11px 12px;
+                margin: 2px 0;
+                border-radius: 6px;
+                border-left: 3px solid transparent;
+                font-weight: 600;
+            }}
+            QListWidget#sideNav::item:hover {{
+                background: #f4efe6;
+                color: #1a1f26;
+            }}
+            QListWidget#sideNav::item:selected {{
+                background: #f0e6d2;
+                color: #6b5216;
+                border-left: 3px solid #c9a66b;
+                font-weight: 750;
+            }}
             QTabBar::tab {{
                 background: transparent;
                 color: #6b7380;
@@ -710,6 +804,36 @@ class MainWindow(QMainWindow):
             QTabWidget::pane {{
                 background: #171b22;
                 border: 1px solid #323b48;
+            }}
+            QFrame#sideNavPanel {{
+                background: #1b2028;
+                border: 1px solid #323b48;
+            }}
+            QLabel#sideNavTitle {{
+                color: #9aa3ad;
+            }}
+            QListWidget#sideNav {{
+                background: transparent;
+                border: 0;
+                outline: 0;
+            }}
+            QListWidget#sideNav::item {{
+                color: #9aa3ad;
+                padding: 11px 12px;
+                margin: 2px 0;
+                border-radius: 6px;
+                border-left: 3px solid transparent;
+                font-weight: 600;
+            }}
+            QListWidget#sideNav::item:hover {{
+                background: #242a33;
+                color: #ece8e1;
+            }}
+            QListWidget#sideNav::item:selected {{
+                background: #2a2418;
+                color: #e6d3a8;
+                border-left: 3px solid #c9a66b;
+                font-weight: 750;
             }}
             QTabBar::tab {{
                 background: transparent;

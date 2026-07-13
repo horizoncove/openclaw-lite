@@ -185,6 +185,9 @@ class WorkbenchSmokeTests(unittest.TestCase):
             labels = [window.tabs.tabText(i) for i in range(window.tabs.count())]
             self.assertEqual(labels[0], "驾驶舱")
             self.assertIs(window.tabs.currentWidget(), window.cockpit_page)
+            self.assertEqual(window.side_nav.count(), window.tabs.count())
+            self.assertEqual(window.side_nav.item(0).text(), "驾驶舱")
+            self.assertTrue(window.tabs.tabBar().isHidden())
             self.assertTrue(window.trade_frame.isHidden())
             self.assertIn("#e25555", window.cockpit_kpis["pnl"].styleSheet())
             original_theme = window.dark_mode
@@ -245,11 +248,16 @@ class WorkbenchSmokeTests(unittest.TestCase):
             window._refresh_cockpit()
             self.assertIn("#3fad7a", window.cockpit_kpis["pnl"].styleSheet())
 
-            window.intent_command.setText("买入 002371 12 100000")
+            window.intent_command.setText("买入 002371 12 200000")
             window.intent_sector.setText("半导体")
+            window.tabs.setCurrentWidget(window.intent_page)
+            self.assertTrue(window.trade_frame.isHidden())
+            self.assertTrue(window.metric_cards[0].isHidden())
             window._validate_intent()
             self.assertIn("警示", window.intent_ai_summary.text())
             self.assertGreater(window.intent_ai_list.count(), 1)
+            self.assertIn("红灯", window.intent_light_badge.text())
+            self.assertIn("禁止", window.intent_verdict.text())
             self.assertNotEqual(window.intent_projection.values["stock"].text(), "--")
             window.close()
 

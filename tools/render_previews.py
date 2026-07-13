@@ -69,7 +69,7 @@ def seed_preview(window: WorkbenchWindow) -> None:
     window.system.run_task("position_reminder")
     window.intent_command.setText("买入 002371 108.50 6000")
     window.intent_sector.setText("半导体设备")
-    window.intent_stage.setCurrentText("第二次25%")
+    window.intent_stage.setCurrentText("首次25%")
     window.intent_override.setText("等待回调确认后执行")
     window._validate_intent()
     window.review_summary.setPlainText("按计划完成候选股票建仓。")
