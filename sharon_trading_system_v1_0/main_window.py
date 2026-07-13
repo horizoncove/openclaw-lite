@@ -101,8 +101,8 @@ class MainWindow(QMainWindow):
     def _build_ui(self) -> None:
         central = QWidget()
         root = QVBoxLayout(central)
-        root.setContentsMargins(20, 14, 20, 12)
-        root.setSpacing(10)
+        root.setContentsMargins(24, 20, 24, 20)
+        root.setSpacing(16)
 
         heading = QHBoxLayout()
         titles = QVBoxLayout()
@@ -154,25 +154,24 @@ class MainWindow(QMainWindow):
         trade_frame = QFrame()
         self.trade_frame = trade_frame
         trade_frame.setObjectName("panel")
-        trade_layout = QHBoxLayout(trade_frame)
-        trade_layout.setContentsMargins(14, 10, 14, 10)
-        trade_layout.setSpacing(10)
-        trade_title = QLabel("同步")
+        trade_layout = QVBoxLayout(trade_frame)
+        trade_title = QLabel("交易同步")
         trade_title.setObjectName("sectionTitle")
+        trade_layout.addWidget(trade_title)
+        trade_row = QHBoxLayout()
         self.command_input = QLineEdit()
-        self.command_input.setPlaceholderText("买入 002371 350.00 3600")
+        self.command_input.setPlaceholderText("例如：买入 002371 350.00 3600")
         self.command_input.returnPressed.connect(self._enqueue_trade)
         self.sector_input = QLineEdit()
-        self.sector_input.setPlaceholderText("板块")
-        self.sector_input.setMaximumWidth(140)
-        enqueue_button = QPushButton("入队")
-        enqueue_button.setMaximumWidth(88)
+        self.sector_input.setPlaceholderText("板块（可选）")
+        self.sector_input.setMaximumWidth(180)
+        enqueue_button = QPushButton("加入同步队列")
         enqueue_button.clicked.connect(self._enqueue_trade)
-        trade_layout.addWidget(trade_title)
-        trade_layout.addWidget(self.command_input, 1)
-        trade_layout.addWidget(self.sector_input)
-        trade_layout.addWidget(enqueue_button)
-        self.queue_label = QLabel("5 秒同步")
+        trade_row.addWidget(self.command_input, 1)
+        trade_row.addWidget(self.sector_input)
+        trade_row.addWidget(enqueue_button)
+        trade_layout.addLayout(trade_row)
+        self.queue_label = QLabel("等待输入交易指令；队列每 5 秒同步一次")
         self.queue_label.setObjectName("hint")
         trade_layout.addWidget(self.queue_label)
         root.addWidget(trade_frame)
@@ -201,17 +200,11 @@ class MainWindow(QMainWindow):
     def _toggle_context_panels(self, index: int) -> None:
         title = self.tabs.tabText(index)
         is_cockpit = title == "驾驶舱"
-        # Keep the shell quiet: metrics only on ledger pages, sync only when executing.
-        metric_pages = {"交易流水", "风险中心"}
-        trade_pages = {"交易流水", "交易计划"}
+        analysis_pages = {"候选股票", "AI 监督", "每日复盘", "任务与资料"}
+        hide_metrics = is_cockpit or title in analysis_pages or title == "实时持仓"
         for card in self.metric_cards:
-            card.setVisible(title in metric_pages)
-        self.trade_frame.setVisible(title in trade_pages)
-        # Cockpit owns its own summary; never duplicate shell chrome there.
-        if is_cockpit:
-            for card in self.metric_cards:
-                card.setVisible(False)
-            self.trade_frame.setVisible(False)
+            card.setVisible(not hide_metrics)
+        self.trade_frame.setVisible(not is_cockpit and title not in analysis_pages)
 
     def _update_theme_button(self) -> None:
         self.theme_button.setText("☀ 浅色" if self.dark_mode else "◐ 深色")
@@ -412,18 +405,21 @@ class MainWindow(QMainWindow):
                 border-radius: 8px;
             }}
             QFrame#pageHeader {{
-                background: transparent;
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #1a1f26, stop:0.55 #2a313c, stop:1 #4a3b22
+                );
                 border: 0;
             }}
             QLabel#pageHeaderTitle {{
                 background: transparent;
-                color: #1a1f26;
-                font-size: 22px;
+                color: #f4efe6;
+                font-size: 24px;
                 font-weight: 750;
             }}
             QLabel#pageHeaderSubtitle {{
                 background: transparent;
-                color: #6b7380;
+                color: #d6c7a8;
                 font-size: 12px;
             }}
             QFrame#dashboardHero {{
@@ -636,11 +632,15 @@ class MainWindow(QMainWindow):
                 border: 1px solid #323b48;
             }}
             QFrame#pageHeader {{
-                background: transparent;
-                border: 0;
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #171b22, stop:0.45 #1f242d,
+                    stop:0.78 #2a2418, stop:1 #3d3220
+                );
+                border: 1px solid #3d3220;
             }}
-            QLabel#pageHeaderTitle {{ color: #f4efe6; font-size: 22px; }}
-            QLabel#pageHeaderSubtitle {{ color: #9aa3ad; }}
+            QLabel#pageHeaderTitle {{ color: #f4efe6; }}
+            QLabel#pageHeaderSubtitle {{ color: #d6c7a8; }}
             QFrame#dashboardHero {{
                 background: qlineargradient(
                     x1:0, y1:0, x2:1, y2:1,
