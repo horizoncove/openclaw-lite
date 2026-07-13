@@ -177,7 +177,7 @@ class WorkbenchWindow(MainWindow):
         self.sector_bars.setSpacing(8)
         sector_card.body.addLayout(self.sector_bars)
         sector_card.body.addStretch()
-        grid.addWidget(sector_card, 1, 0, 1, 2)
+        grid.addWidget(sector_card, 2, 0, 1, 3)
 
         actions = CockpitCard("快捷操作", "从驾驶舱直接进入核心流程")
         add_candidate = QPushButton("＋ 登记候选股票")
@@ -210,7 +210,7 @@ class WorkbenchWindow(MainWindow):
         self.holdings_cards = QHBoxLayout()
         self.holdings_cards.setSpacing(12)
         holdings.body.addLayout(self.holdings_cards)
-        grid.addWidget(holdings, 2, 0, 1, 3)
+        grid.addWidget(holdings, 1, 0, 1, 2)
         grid.setColumnStretch(0, 4)
         grid.setColumnStretch(1, 4)
         grid.setColumnStretch(2, 3)
