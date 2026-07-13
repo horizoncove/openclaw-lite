@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
+
 from PyQt6.QtCore import QRectF, Qt
 from PyQt6.QtGui import QColor, QFont, QPainter, QPen
 from PyQt6.QtWidgets import (
@@ -155,7 +157,7 @@ class HoldingCard(QFrame):
         last_price = item["last_price"]
         market_value = item["market_value"]
         ratio = item["position_ratio"]
-        pnl_rate = last_price / avg_cost - 1 if avg_cost else 0
+        pnl_rate = last_price / avg_cost - 1 if avg_cost else Decimal(0)
         pnl_amount = (last_price - avg_cost) * quantity
         self.code_name.setText(
             f"{item['stock_code']}  {name or '持仓股票'}"
@@ -179,7 +181,9 @@ class HoldingCard(QFrame):
             f"color:{'#ef4444' if pnl_amount >= 0 else '#22c55e'};"
             "font-weight:750; background:transparent;"
         )
-        self.metric_labels["stop_price"].setText(f"{avg_cost * 0.93:,.2f}")
+        self.metric_labels["stop_price"].setText(
+            f"{avg_cost * Decimal('0.93'):,.2f}"
+        )
         self.position_bar.setValue(min(250, int(ratio * 1000)))
         self.position_bar.setFormat(f"单票仓位 {ratio:.2%} / 红线 25%")
 
