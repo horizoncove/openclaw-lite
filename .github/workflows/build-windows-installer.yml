@@ -7,6 +7,7 @@ on:
       - "cursor/**"
     paths:
       - "sharon_trading_system_v1_0/**"
+      - "tests/**"
       - "installer/**"
       - "windows_launcher.py"
       - "SharonTradingSystem.spec"
