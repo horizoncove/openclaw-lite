@@ -199,7 +199,7 @@ class WorkbenchSmokeTests(unittest.TestCase):
             self.assertEqual(len(window.system.pending_trades()), 1)
             window._synchronize_pending()
             self.assertEqual(window.positions_table.rowCount(), 1)
-            self.assertGreaterEqual(window.findings_table.rowCount(), 1)
+            self.assertEqual(window.findings_table.rowCount(), 0)
             window.close()
 
 
