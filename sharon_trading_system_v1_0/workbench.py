@@ -5,11 +5,13 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-from PyQt6.QtCore import QDate
+from PyQt6.QtCore import QDate, QTime
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import (
     QComboBox,
+    QCheckBox,
     QDateEdit,
+    QDoubleSpinBox,
     QFileDialog,
     QFormLayout,
     QGridLayout,
@@ -23,13 +25,14 @@ from PyQt6.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QTextEdit,
+    QTimeEdit,
     QVBoxLayout,
     QWidget,
 )
 
 from .account_engine import InvalidTradeError
 from .main_window import MainWindow, default_database_path
-from .system_engine import DEFAULT_CRITERIA, SystemEngine
+from .system_engine import MARKET_STYLES, REFERENCE_POOL, SOP_CRITERIA, SystemEngine
 
 
 LIGHT_NAMES = {"green": "🟢 绿灯", "yellow": "🟡 黄灯", "red": "🔴 红灯"}
@@ -61,32 +64,78 @@ class WorkbenchWindow(MainWindow):
         self.sop_name.setPlaceholderText("股票名称")
         self.sop_sector = QLineEdit()
         self.sop_sector.setPlaceholderText("所属板块")
+        self.sop_source = QLineEdit()
+        self.sop_source.setPlaceholderText("东方财富/腾讯财经接口或数据链接")
+        self.sop_api_verified = QCheckBox("已通过 API 核验数字、价格和涨跌")
+        self.sop_market = QComboBox()
+        self.sop_market.addItems(MARKET_STYLES.keys())
         editor_layout.addWidget(QLabel("代码"), 0, 0)
         editor_layout.addWidget(self.sop_code, 0, 1)
         editor_layout.addWidget(QLabel("名称"), 0, 2)
         editor_layout.addWidget(self.sop_name, 0, 3)
         editor_layout.addWidget(QLabel("板块"), 0, 4)
         editor_layout.addWidget(self.sop_sector, 0, 5)
+        editor_layout.addWidget(QLabel("市场环境"), 0, 6)
+        editor_layout.addWidget(self.sop_market, 0, 7)
+        editor_layout.addWidget(QLabel("数据来源"), 1, 0)
+        editor_layout.addWidget(self.sop_source, 1, 1, 1, 4)
+        editor_layout.addWidget(self.sop_api_verified, 1, 5, 1, 3)
         self.sop_scores: list[QSpinBox] = []
-        for index, criterion in enumerate(DEFAULT_CRITERIA):
+        for index, (criterion, maximum, description) in enumerate(SOP_CRITERIA):
             score = QSpinBox()
-            score.setRange(0, 10)
+            score.setRange(0, maximum)
             score.setValue(0)
             self.sop_scores.append(score)
-            editor_layout.addWidget(QLabel(criterion), 1, index)
-            editor_layout.addWidget(score, 2, index)
+            label = QLabel(f"{criterion} / {maximum}\n{description}")
+            label.setWordWrap(True)
+            editor_layout.addWidget(label, 2, index)
+            editor_layout.addWidget(score, 3, index)
+        self.sop_continuous = QCheckBox("启用连续涨停五项筛选")
+        self.sop_boards = QSpinBox()
+        self.sop_boards.setRange(0, 20)
+        self.sop_cap = QDoubleSpinBox()
+        self.sop_cap.setRange(0, 10000)
+        self.sop_cap.setSuffix(" 亿")
+        self.sop_turnover = QDoubleSpinBox()
+        self.sop_turnover.setRange(0, 100)
+        self.sop_turnover.setSuffix("%")
+        self.sop_seal_time = QTimeEdit(QTime(13, 30))
+        self.sop_sector_count = QSpinBox()
+        self.sop_sector_count.setRange(0, 100)
+        editor_layout.addWidget(self.sop_continuous, 4, 0)
+        editor_layout.addWidget(QLabel("连板数"), 4, 1)
+        editor_layout.addWidget(self.sop_boards, 4, 2)
+        editor_layout.addWidget(QLabel("市值"), 4, 3)
+        editor_layout.addWidget(self.sop_cap, 4, 4)
+        editor_layout.addWidget(QLabel("换手率"), 4, 5)
+        editor_layout.addWidget(self.sop_turnover, 4, 6)
+        editor_layout.addWidget(QLabel("封板时间"), 5, 0)
+        editor_layout.addWidget(self.sop_seal_time, 5, 1)
+        editor_layout.addWidget(QLabel("板块涨停数"), 5, 2)
+        editor_layout.addWidget(self.sop_sector_count, 5, 3)
         self.sop_evidence = QTextEdit()
-        self.sop_evidence.setPlaceholderText("填写判断依据、数据来源或文档链接")
+        self.sop_evidence.setPlaceholderText("填写七星判断依据、交易计划和风险提示")
         self.sop_evidence.setMaximumHeight(70)
         save = QPushButton("保存 SOP 评估")
         save.clicked.connect(self._save_sop)
-        editor_layout.addWidget(self.sop_evidence, 3, 0, 1, 6)
-        editor_layout.addWidget(save, 3, 6)
+        editor_layout.addWidget(self.sop_evidence, 6, 0, 1, 7)
+        editor_layout.addWidget(save, 6, 7)
         layout.addWidget(editor)
         self.sop_table = self._table(
-            ["时间", "代码", "名称", "板块", "总分", "分类", "依据"]
+            [
+                "时间", "代码", "名称", "板块", "总分", "分类",
+                "API", "市场", "理论/游资", "连板筛选", "依据",
+            ]
         )
         layout.addWidget(self.sop_table)
+        pool_text = "手册参考池（2026-07-13，不代表实时推荐）：" + "；".join(
+            f"{name} {code} / {score}分 / {position}"
+            for code, name, score, position in REFERENCE_POOL
+        )
+        pool_label = QLabel(pool_text)
+        pool_label.setWordWrap(True)
+        pool_label.setObjectName("hint")
+        layout.addWidget(pool_label)
         self.tabs.addTab(page, "SOP 选股")
 
     def _build_intent_tab(self) -> None:
@@ -221,8 +270,10 @@ class WorkbenchWindow(MainWindow):
         layout.addWidget(self.tasks_table)
         layout.addLayout(controls)
         references = QLabel(
-            "文档索引：SOP v3.1 验证报告 · SOP 实战经验 · 7-1 涨停板分析 · "
-            "半导体板块监控 · 严格交易纪律手册 · AI 纪律监督员方案"
+            "7 大理论：进化论 · 场域论 · 显现论 · 统一论 · 协同论 · 分形论 · 连续论\n"
+            "14 位游资：炒股养家 · 赵老哥 · Asking · 退学炒股 · 瑞鹤仙 · "
+            "乔帮主 · 小鳄鱼 · 92科比 · 欢乐海岸 · 章盟主 · 孤独牛背 · "
+            "龙飞虎 · 著名刺客 · 浓汤野人"
         )
         references.setWordWrap(True)
         layout.addWidget(references)
@@ -236,6 +287,15 @@ class WorkbenchWindow(MainWindow):
                 self.sop_sector.text().strip(),
                 [score.value() for score in self.sop_scores],
                 evidence=self.sop_evidence.toPlainText(),
+                data_source=self.sop_source.text(),
+                api_verified=self.sop_api_verified.isChecked(),
+                market_environment=self.sop_market.currentText(),
+                continuous_mode=self.sop_continuous.isChecked(),
+                consecutive_boards=self.sop_boards.value(),
+                market_cap_yi=self.sop_cap.value(),
+                turnover_rate=self.sop_turnover.value(),
+                seal_time=self.sop_seal_time.time().toString("HH:mm"),
+                sector_limit_up_count=self.sop_sector_count.value(),
             )
         except ValueError as exc:
             QMessageBox.warning(self, "无法保存 SOP", str(exc))
@@ -398,6 +458,14 @@ class WorkbenchWindow(MainWindow):
                 item["sector"],
                 str(item["total_score"]),
                 item["classification"],
+                "已核验" if item["api_verified"] else "未核验",
+                item["market_environment"],
+                f"{item['theory']} / {item['masters']}",
+                (
+                    "通过" if item["screening_pass"] else "未通过"
+                )
+                if item["continuous_mode"]
+                else "未启用",
                 item["evidence"],
             ]
             for column, value in enumerate(values):
@@ -408,7 +476,7 @@ class WorkbenchWindow(MainWindow):
                             "#059669"
                             if value == "STRICT"
                             else "#d97706"
-                            if value == "NOISE"
+                            if value == "LOOSE"
                             else "#dc2626"
                         )
                     )

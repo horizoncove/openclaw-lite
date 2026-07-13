@@ -26,14 +26,34 @@ from .account_engine import (
 SHANGHAI = ZoneInfo("Asia/Shanghai")
 SOP_STRICT_SCORE = 65
 SOP_NOISE_SCORE = 50
-DEFAULT_CRITERIA = (
-    "七星条件 1",
-    "七星条件 2",
-    "七星条件 3",
-    "七星条件 4",
-    "七星条件 5",
-    "七星条件 6",
-    "七星条件 7",
+SOP_CRITERIA = (
+    ("天枢·资金流", 15, "主力资金净流入/净流出"),
+    ("天璇·板块轮动", 15, "板块联动与轮动节奏"),
+    ("天玑·情绪周期", 10, "市场情绪冰点/沸点"),
+    ("天权·多维验证", 15, "多指标共振确认"),
+    ("玉衡·龙头确认", 20, "板块龙头地位"),
+    ("开阳·买卖信号", 15, "具体入场点位"),
+    ("摇光·复盘进化", 10, "交易复盘与迭代"),
+)
+DEFAULT_CRITERIA = tuple(item[0] for item in SOP_CRITERIA)
+SOP_MAX_SCORES = tuple(item[1] for item in SOP_CRITERIA)
+
+MARKET_STYLES = {
+    "强势上涨": ("场域论", "赵老哥 / 小鳄鱼", "资金拉升"),
+    "情绪高潮": ("进化论", "炒股养家 / 欢乐海岸", "妖股模式"),
+    "板块轮动": ("协同论", "瑞鹤仙 / 92科比", "共振选股"),
+    "回调低吸": ("分形论", "乔帮主 / 孤独牛背", "分形买点"),
+    "超短快进": ("显现论", "Asking / 著名刺客", "时机优先"),
+    "稳健操作": ("协同论", "龙飞虎", "协同确认"),
+    "逻辑驱动": ("统一论", "浓汤野人", "逻辑买卖"),
+}
+
+REFERENCE_POOL = (
+    ("002371", "北方华创", 93, "25%"),
+    ("688012", "中微公司", 91, "20%"),
+    ("688072", "拓荆科技", 88, "20%"),
+    ("603986", "兆易创新", 86, "15%"),
+    ("600206", "有研新材", 82, "10%"),
 )
 
 TASKS = (
@@ -100,9 +120,23 @@ class SystemEngine:
                     sector TEXT NOT NULL DEFAULT '未分类',
                     scores_json TEXT NOT NULL,
                     criteria_json TEXT NOT NULL,
+                    max_scores_json TEXT NOT NULL DEFAULT '[15,15,10,15,20,15,10]',
                     total_score INTEGER NOT NULL,
                     classification TEXT NOT NULL,
                     evidence TEXT NOT NULL DEFAULT '',
+                    data_source TEXT NOT NULL DEFAULT '',
+                    api_verified INTEGER NOT NULL DEFAULT 0,
+                    market_environment TEXT NOT NULL DEFAULT '稳健操作',
+                    theory TEXT NOT NULL DEFAULT '',
+                    masters TEXT NOT NULL DEFAULT '',
+                    continuous_mode INTEGER NOT NULL DEFAULT 0,
+                    consecutive_boards INTEGER NOT NULL DEFAULT 0,
+                    market_cap_yi REAL NOT NULL DEFAULT 0,
+                    turnover_rate REAL NOT NULL DEFAULT 0,
+                    seal_time TEXT NOT NULL DEFAULT '',
+                    sector_limit_up_count INTEGER NOT NULL DEFAULT 0,
+                    screening_pass INTEGER NOT NULL DEFAULT 1,
+                    screening_json TEXT NOT NULL DEFAULT '{}',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
                 CREATE TABLE IF NOT EXISTS trade_intents (
@@ -184,6 +218,25 @@ class SystemEngine:
                 );
                 """
             )
+            self._ensure_columns(
+                "sop_evaluations",
+                {
+                    "max_scores_json": "TEXT NOT NULL DEFAULT '[15,15,10,15,20,15,10]'",
+                    "data_source": "TEXT NOT NULL DEFAULT ''",
+                    "api_verified": "INTEGER NOT NULL DEFAULT 0",
+                    "market_environment": "TEXT NOT NULL DEFAULT '稳健操作'",
+                    "theory": "TEXT NOT NULL DEFAULT ''",
+                    "masters": "TEXT NOT NULL DEFAULT ''",
+                    "continuous_mode": "INTEGER NOT NULL DEFAULT 0",
+                    "consecutive_boards": "INTEGER NOT NULL DEFAULT 0",
+                    "market_cap_yi": "REAL NOT NULL DEFAULT 0",
+                    "turnover_rate": "REAL NOT NULL DEFAULT 0",
+                    "seal_time": "TEXT NOT NULL DEFAULT ''",
+                    "sector_limit_up_count": "INTEGER NOT NULL DEFAULT 0",
+                    "screening_pass": "INTEGER NOT NULL DEFAULT 1",
+                    "screening_json": "TEXT NOT NULL DEFAULT '{}'",
+                },
+            )
             self._db.execute(
                 "INSERT OR IGNORE INTO schema_migrations(version) VALUES (1)"
             )
@@ -209,13 +262,63 @@ class SystemEngine:
                 ],
             )
 
+    def _ensure_columns(self, table: str, columns: dict[str, str]) -> None:
+        existing = {
+            row["name"]
+            for row in self._db.execute(f"PRAGMA table_info({table})").fetchall()
+        }
+        for name, definition in columns.items():
+            if name not in existing:
+                self._db.execute(
+                    f"ALTER TABLE {table} ADD COLUMN {name} {definition}"
+                )
+
     @staticmethod
     def classify_sop(total_score: int) -> str:
         if total_score >= SOP_STRICT_SCORE:
             return "STRICT"
         if total_score >= SOP_NOISE_SCORE:
-            return "NOISE"
+            return "LOOSE"
         return "REJECT"
+
+    @staticmethod
+    def screen_continuous_limit_up(
+        *,
+        consecutive_boards: int,
+        market_cap_yi: float,
+        turnover_rate: float,
+        seal_time: str,
+        sector_limit_up_count: int,
+    ) -> dict[str, Any]:
+        try:
+            hour, minute = (int(part) for part in seal_time.split(":", 1))
+            seal_minutes = hour * 60 + minute
+            valid_time = 0 <= hour <= 23 and 0 <= minute <= 59
+        except (ValueError, AttributeError):
+            seal_minutes = 24 * 60
+            valid_time = False
+        checks = {
+            "2连板及以上": consecutive_boards >= 2,
+            "市值不超过100亿": 0 < market_cap_yi <= 100,
+            "换手率不低于5%": turnover_rate >= 5,
+            "14:00前封板": valid_time and seal_minutes < 14 * 60,
+            "板块至少3只涨停": sector_limit_up_count >= 3,
+        }
+        warnings = []
+        if consecutive_boards >= 4:
+            warnings.append("4板以上处于高位，手册要求增加风险权重")
+        return {
+            "passed": all(checks.values()),
+            "checks": checks,
+            "warnings": warnings,
+        }
+
+    @staticmethod
+    def recommend_market_style(market_environment: str) -> dict[str, str]:
+        theory, masters, reason = MARKET_STYLES.get(
+            market_environment, MARKET_STYLES["稳健操作"]
+        )
+        return {"theory": theory, "masters": masters, "reason": reason}
 
     def save_sop_evaluation(
         self,
@@ -226,22 +329,51 @@ class SystemEngine:
         *,
         criteria: list[str] | tuple[str, ...] = DEFAULT_CRITERIA,
         evidence: str = "",
+        data_source: str = "",
+        api_verified: bool = False,
+        market_environment: str = "稳健操作",
+        continuous_mode: bool = False,
+        consecutive_boards: int = 0,
+        market_cap_yi: float = 0,
+        turnover_rate: float = 0,
+        seal_time: str = "",
+        sector_limit_up_count: int = 0,
     ) -> dict[str, Any]:
         if len(scores) != 7 or len(criteria) != 7:
             raise ValueError("七星评分必须正好包含 7 项")
         if not stock_code.isdigit() or len(stock_code) != 6:
             raise ValueError("股票代码必须是 6 位数字")
         normalized_scores = [int(score) for score in scores]
-        if any(score < 0 or score > 10 for score in normalized_scores):
-            raise ValueError("每项七星评分必须在 0 到 10 之间")
+        if any(
+            score < 0 or score > maximum
+            for score, maximum in zip(normalized_scores, SOP_MAX_SCORES)
+        ):
+            raise ValueError("七星评分超出该维度的权重上限")
         total = sum(normalized_scores)
         classification = self.classify_sop(total)
+        screening = self.screen_continuous_limit_up(
+            consecutive_boards=consecutive_boards,
+            market_cap_yi=market_cap_yi,
+            turnover_rate=turnover_rate,
+            seal_time=seal_time,
+            sector_limit_up_count=sector_limit_up_count,
+        )
+        if continuous_mode and not screening["passed"]:
+            classification = "REJECT"
+        if not api_verified:
+            classification = "UNVERIFIED"
+        style = self.recommend_market_style(market_environment)
         with self._lock, self._db:
             cursor = self._db.execute(
                 """
                 INSERT INTO sop_evaluations(stock_code, stock_name, sector,
-                    scores_json, criteria_json, total_score, classification,
-                    evidence) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    scores_json, criteria_json, max_scores_json, total_score,
+                    classification, evidence, data_source, api_verified,
+                    market_environment, theory, masters, continuous_mode,
+                    consecutive_boards, market_cap_yi, turnover_rate, seal_time,
+                    sector_limit_up_count, screening_pass, screening_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?)
                 """,
                 (
                     stock_code,
@@ -249,9 +381,23 @@ class SystemEngine:
                     sector.strip() or "未分类",
                     json.dumps(normalized_scores, ensure_ascii=False),
                     json.dumps(list(criteria), ensure_ascii=False),
+                    json.dumps(SOP_MAX_SCORES),
                     total,
                     classification,
                     evidence.strip(),
+                    data_source.strip(),
+                    int(api_verified),
+                    market_environment,
+                    style["theory"],
+                    style["masters"],
+                    int(continuous_mode),
+                    int(consecutive_boards),
+                    float(market_cap_yi),
+                    float(turnover_rate),
+                    seal_time.strip(),
+                    int(sector_limit_up_count),
+                    int(screening["passed"]),
+                    json.dumps(screening, ensure_ascii=False),
                 ),
             )
         return self.get_sop_evaluation(cursor.lastrowid)
@@ -266,6 +412,8 @@ class SystemEngine:
         result = dict(row)
         result["scores"] = json.loads(result.pop("scores_json"))
         result["criteria"] = json.loads(result.pop("criteria_json"))
+        result["max_scores"] = json.loads(result.pop("max_scores_json"))
+        result["screening"] = json.loads(result.pop("screening_json"))
         return result
 
     def latest_sop(self, stock_code: str) -> dict[str, Any] | None:
@@ -284,7 +432,9 @@ class SystemEngine:
             rows = self._db.execute(
                 """
                 SELECT id, stock_code, stock_name, sector, total_score,
-                    classification, evidence, created_at
+                    classification, evidence, data_source, api_verified,
+                    market_environment, theory, masters, continuous_mode,
+                    screening_pass, created_at
                 FROM sop_evaluations ORDER BY id DESC LIMIT ?
                 """,
                 (limit,),
@@ -858,8 +1008,12 @@ class SystemEngine:
 
 __all__ = [
     "DEFAULT_CRITERIA",
+    "MARKET_STYLES",
     "PreflightResult",
+    "REFERENCE_POOL",
     "SHANGHAI",
+    "SOP_CRITERIA",
+    "SOP_MAX_SCORES",
     "SOP_NOISE_SCORE",
     "SOP_STRICT_SCORE",
     "SystemEngine",

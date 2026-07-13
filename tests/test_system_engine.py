@@ -35,17 +35,70 @@ class SystemEngineTests(unittest.TestCase):
 
     def test_sop_classification_boundaries(self) -> None:
         strict = self.system.save_sop_evaluation(
-            "002371", "北方华创", "半导体", [10, 10, 10, 10, 10, 10, 5]
+            "002371",
+            "北方华创",
+            "半导体",
+            [14, 14, 9, 14, 19, 14, 9],
+            api_verified=True,
+            data_source="东方财富 API",
         )
-        noise = self.system.save_sop_evaluation(
-            "000001", "平安银行", "银行", [8, 7, 7, 7, 7, 7, 7]
+        loose = self.system.save_sop_evaluation(
+            "000001",
+            "平安银行",
+            "银行",
+            [8, 8, 5, 8, 10, 6, 5],
+            api_verified=True,
         )
         reject = self.system.save_sop_evaluation(
-            "600519", "贵州茅台", "食品饮料", [7, 7, 7, 7, 7, 7, 7]
+            "600519",
+            "贵州茅台",
+            "食品饮料",
+            [7, 7, 5, 7, 9, 7, 7],
+            api_verified=True,
         )
         self.assertEqual(strict["classification"], "STRICT")
-        self.assertEqual(noise["classification"], "NOISE")
+        self.assertEqual(strict["total_score"], 93)
+        self.assertEqual(loose["classification"], "LOOSE")
         self.assertEqual(reject["classification"], "REJECT")
+
+    def test_unverified_data_cannot_become_trade_candidate(self) -> None:
+        evaluation = self.system.save_sop_evaluation(
+            "688012", "中微公司", "半导体", [15, 15, 10, 15, 20, 15, 10]
+        )
+        self.assertEqual(evaluation["total_score"], 100)
+        self.assertEqual(evaluation["classification"], "UNVERIFIED")
+        with self.assertRaises(ValueError):
+            self.system.save_sop_evaluation(
+                "688072",
+                "拓荆科技",
+                "半导体",
+                [16, 15, 10, 15, 20, 15, 10],
+                api_verified=True,
+            )
+
+    def test_continuous_limit_up_five_step_filter(self) -> None:
+        passed = self.system.screen_continuous_limit_up(
+            consecutive_boards=2,
+            market_cap_yi=100,
+            turnover_rate=5,
+            seal_time="13:59",
+            sector_limit_up_count=3,
+        )
+        failed = self.system.screen_continuous_limit_up(
+            consecutive_boards=4,
+            market_cap_yi=101,
+            turnover_rate=4.99,
+            seal_time="14:00",
+            sector_limit_up_count=2,
+        )
+        self.assertTrue(passed["passed"])
+        self.assertFalse(failed["passed"])
+        self.assertTrue(failed["warnings"])
+
+    def test_market_environment_dispatches_theory_and_masters(self) -> None:
+        style = self.system.recommend_market_style("板块轮动")
+        self.assertEqual(style["theory"], "协同论")
+        self.assertIn("瑞鹤仙", style["masters"])
 
     def test_preflight_requires_strict_sop_and_checks_time(self) -> None:
         no_sop = self.system.validate_trade_intent(
@@ -57,7 +110,7 @@ class SystemEngineTests(unittest.TestCase):
         self.assertEqual(no_sop.light, "red")
 
         sop = self.system.save_sop_evaluation(
-            "002371", "北方华创", "半导体", [10] * 7
+            "002371", "北方华创", "半导体", [10] * 7, api_verified=True
         )
         allowed = self.system.validate_trade_intent(
             self.account,
@@ -78,7 +131,7 @@ class SystemEngineTests(unittest.TestCase):
 
     def test_yellow_and_red_single_stock_bands(self) -> None:
         sop = self.system.save_sop_evaluation(
-            "002371", "北方华创", "半导体", [10] * 7
+            "002371", "北方华创", "半导体", [10] * 7, api_verified=True
         )
         at = datetime(2026, 7, 13, 10, 0, tzinfo=SHANGHAI)
         yellow = self.system.validate_trade_intent(
@@ -129,7 +182,7 @@ class SystemEngineTests(unittest.TestCase):
 
     def test_cash_condition_blocks_buy_and_exit_signals_follow_rules(self) -> None:
         sop = self.system.save_sop_evaluation(
-            "002371", "北方华创", "半导体", [10] * 7
+            "002371", "北方华创", "半导体", [10] * 7, api_verified=True
         )
         self.system.set_cash_condition("cash_1", True, "市场异常")
         result = self.system.validate_trade_intent(
@@ -169,6 +222,10 @@ class WorkbenchSmokeTests(unittest.TestCase):
             self.assertIn("AI 监督", labels)
             self.assertIn("每日复盘", labels)
             self.assertIn("任务与资料", labels)
+            self.assertEqual(
+                [score.maximum() for score in window.sop_scores],
+                [15, 15, 10, 15, 20, 15, 10],
+            )
 
             window.command_input.setText("买入 002371 10 100")
             window._enqueue_trade()
