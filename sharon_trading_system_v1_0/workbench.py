@@ -32,6 +32,7 @@ from PyQt6.QtWidgets import (
 
 from .account_engine import InvalidTradeError
 from .main_window import MainWindow, default_database_path
+from .market_data import EastmoneyClient, MarketDataError, MarketQuote
 from .system_engine import MARKET_STYLES, REFERENCE_POOL, SOP_CRITERIA, SystemEngine
 
 
@@ -67,6 +68,11 @@ class WorkbenchWindow(MainWindow):
         self.sop_source = QLineEdit()
         self.sop_source.setPlaceholderText("东方财富/腾讯财经接口或数据链接")
         self.sop_api_verified = QCheckBox("已通过 API 核验数字、价格和涨跌")
+        self.sop_api_verified.setEnabled(False)
+        self.sop_verified_quote: MarketQuote | None = None
+        verify_api = QPushButton("调用东方财富 API")
+        verify_api.setObjectName("secondaryButton")
+        verify_api.clicked.connect(self._verify_market_data)
         self.sop_market = QComboBox()
         self.sop_market.addItems(MARKET_STYLES.keys())
         editor_layout.addWidget(QLabel("代码"), 0, 0)
@@ -79,7 +85,8 @@ class WorkbenchWindow(MainWindow):
         editor_layout.addWidget(self.sop_market, 0, 7)
         editor_layout.addWidget(QLabel("数据来源"), 1, 0)
         editor_layout.addWidget(self.sop_source, 1, 1, 1, 4)
-        editor_layout.addWidget(self.sop_api_verified, 1, 5, 1, 3)
+        editor_layout.addWidget(self.sop_api_verified, 1, 5, 1, 2)
+        editor_layout.addWidget(verify_api, 1, 7)
         self.sop_scores: list[QSpinBox] = []
         for index, (criterion, maximum, description) in enumerate(SOP_CRITERIA):
             score = QSpinBox()
@@ -279,16 +286,47 @@ class WorkbenchWindow(MainWindow):
         layout.addWidget(references)
         self.tabs.addTab(page, "任务与资料")
 
+    def _verify_market_data(self) -> None:
+        code = self.sop_code.text().strip()
+        try:
+            quote = EastmoneyClient().fetch_quote(code)
+        except MarketDataError as exc:
+            self.sop_verified_quote = None
+            self.sop_api_verified.setChecked(False)
+            QMessageBox.warning(self, "API 核验失败", str(exc))
+            return
+        self.sop_verified_quote = quote
+        self.sop_api_verified.setChecked(True)
+        self.sop_source.setText(f"{quote.source} · {quote.fetched_at}")
+        self.sop_name.setText(quote.stock_name)
+        self.sop_cap.setValue(float(quote.market_cap_yi))
+        self.sop_turnover.setValue(float(quote.turnover_rate))
+        existing = self.sop_evidence.toPlainText().strip()
+        api_note = (
+            f"API：现价 {quote.price} 元，涨跌 {quote.change_pct}%，"
+            f"总市值 {quote.market_cap_yi:.2f} 亿，换手率 {quote.turnover_rate}%"
+        )
+        self.sop_evidence.setPlainText(
+            f"{existing}\n{api_note}".strip()
+        )
+        self.statusBar().showMessage("东方财富行情核验成功", 5000)
+
     def _save_sop(self) -> None:
+        code = self.sop_code.text().strip()
+        api_verified = bool(
+            self.sop_verified_quote
+            and self.sop_verified_quote.stock_code == code
+            and self.sop_api_verified.isChecked()
+        )
         try:
             evaluation = self.system.save_sop_evaluation(
-                self.sop_code.text().strip(),
+                code,
                 self.sop_name.text().strip(),
                 self.sop_sector.text().strip(),
                 [score.value() for score in self.sop_scores],
                 evidence=self.sop_evidence.toPlainText(),
                 data_source=self.sop_source.text(),
-                api_verified=self.sop_api_verified.isChecked(),
+                api_verified=api_verified,
                 market_environment=self.sop_market.currentText(),
                 continuous_mode=self.sop_continuous.isChecked(),
                 consecutive_boards=self.sop_boards.value(),

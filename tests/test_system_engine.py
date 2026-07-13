@@ -9,6 +9,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from sharon_trading_system_v1_0.account_engine import AccountEngine
+from sharon_trading_system_v1_0.market_data import EastmoneyClient
 from sharon_trading_system_v1_0.system_engine import SystemEngine
 
 
@@ -99,6 +100,18 @@ class SystemEngineTests(unittest.TestCase):
         style = self.system.recommend_market_style("板块轮动")
         self.assertEqual(style["theory"], "协同论")
         self.assertIn("瑞鹤仙", style["masters"])
+
+    def test_eastmoney_quote_is_normalized_for_sop_evidence(self) -> None:
+        payload = (
+            '{"data":{"f57":"002371","f58":"北方华创","f43":35001,'
+            '"f170":966,"f116":12593000000,"f168":523}}'
+        )
+        quote = EastmoneyClient.parse_response(payload)
+        self.assertEqual(quote.stock_code, "002371")
+        self.assertEqual(quote.price, Decimal("350.01"))
+        self.assertEqual(quote.change_pct, Decimal("9.66"))
+        self.assertEqual(quote.market_cap_yi, Decimal("125.93"))
+        self.assertEqual(quote.turnover_rate, Decimal("5.23"))
 
     def test_preflight_requires_strict_sop_and_checks_time(self) -> None:
         no_sop = self.system.validate_trade_intent(
