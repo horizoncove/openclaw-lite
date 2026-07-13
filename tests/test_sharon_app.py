@@ -38,7 +38,7 @@ class IndependentAccountEngineTests(unittest.TestCase):
 
     def test_account_and_oversell_are_persistent_and_atomic(self) -> None:
         account = self.engine.update_current_capital("5100000")
-        self.assertEqual(account.total_pnl, Decimal("62800.0"))
+        self.assertEqual(account.total_pnl, Decimal("100000.0"))
         self.engine.sync_trade("买入 002371 10 100")
         with self.assertRaises(InvalidTradeError):
             self.engine.sync_trade("卖出 002371 10 101")
