@@ -1,4 +1,4 @@
-"""SOP、纪律监督、复盘、任务和持久化同步队列服务。"""
+"""External candidate pool, discipline, review, task, and trade queue services."""
 
 from __future__ import annotations
 
@@ -24,37 +24,6 @@ from .account_engine import (
 
 
 SHANGHAI = ZoneInfo("Asia/Shanghai")
-SOP_STRICT_SCORE = 65
-SOP_NOISE_SCORE = 50
-SOP_CRITERIA = (
-    ("天枢·资金流", 15, "主力资金净流入/净流出"),
-    ("天璇·板块轮动", 15, "板块联动与轮动节奏"),
-    ("天玑·情绪周期", 10, "市场情绪冰点/沸点"),
-    ("天权·多维验证", 15, "多指标共振确认"),
-    ("玉衡·龙头确认", 20, "板块龙头地位"),
-    ("开阳·买卖信号", 15, "具体入场点位"),
-    ("摇光·复盘进化", 10, "交易复盘与迭代"),
-)
-DEFAULT_CRITERIA = tuple(item[0] for item in SOP_CRITERIA)
-SOP_MAX_SCORES = tuple(item[1] for item in SOP_CRITERIA)
-
-MARKET_STYLES = {
-    "强势上涨": ("场域论", "赵老哥 / 小鳄鱼", "资金拉升"),
-    "情绪高潮": ("进化论", "炒股养家 / 欢乐海岸", "妖股模式"),
-    "板块轮动": ("协同论", "瑞鹤仙 / 92科比", "共振选股"),
-    "回调低吸": ("分形论", "乔帮主 / 孤独牛背", "分形买点"),
-    "超短快进": ("显现论", "Asking / 著名刺客", "时机优先"),
-    "稳健操作": ("协同论", "龙飞虎", "协同确认"),
-    "逻辑驱动": ("统一论", "浓汤野人", "逻辑买卖"),
-}
-
-REFERENCE_POOL = (
-    ("002371", "北方华创", 93, "25%"),
-    ("688012", "中微公司", 91, "20%"),
-    ("688072", "拓荆科技", 88, "20%"),
-    ("603986", "兆易创新", 86, "15%"),
-    ("600206", "有研新材", 82, "10%"),
-)
 
 TASKS = (
     ("us_preopen", "美股开盘前哨", "工作日 01:00", True),
@@ -113,46 +82,34 @@ class SystemEngine:
                     version INTEGER PRIMARY KEY,
                     applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
-                CREATE TABLE IF NOT EXISTS sop_evaluations (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    stock_code TEXT NOT NULL,
-                    stock_name TEXT NOT NULL DEFAULT '',
-                    sector TEXT NOT NULL DEFAULT '未分类',
-                    scores_json TEXT NOT NULL,
-                    criteria_json TEXT NOT NULL,
-                    max_scores_json TEXT NOT NULL DEFAULT '[15,15,10,15,20,15,10]',
-                    total_score INTEGER NOT NULL,
-                    classification TEXT NOT NULL,
-                    evidence TEXT NOT NULL DEFAULT '',
-                    data_source TEXT NOT NULL DEFAULT '',
-                    api_verified INTEGER NOT NULL DEFAULT 0,
-                    market_environment TEXT NOT NULL DEFAULT '稳健操作',
-                    theory TEXT NOT NULL DEFAULT '',
-                    masters TEXT NOT NULL DEFAULT '',
-                    continuous_mode INTEGER NOT NULL DEFAULT 0,
-                    consecutive_boards INTEGER NOT NULL DEFAULT 0,
-                    market_cap_yi REAL NOT NULL DEFAULT 0,
-                    turnover_rate REAL NOT NULL DEFAULT 0,
-                    seal_time TEXT NOT NULL DEFAULT '',
-                    sector_limit_up_count INTEGER NOT NULL DEFAULT 0,
-                    screening_pass INTEGER NOT NULL DEFAULT 1,
-                    screening_json TEXT NOT NULL DEFAULT '{}',
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                );
                 CREATE TABLE IF NOT EXISTS trade_intents (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     command TEXT NOT NULL,
                     stock_code TEXT NOT NULL,
                     sector TEXT NOT NULL,
-                    sop_evaluation_id INTEGER,
+                    candidate_id INTEGER,
                     build_stage TEXT NOT NULL,
                     light TEXT NOT NULL,
                     reasons_json TEXT NOT NULL,
                     status TEXT NOT NULL DEFAULT 'validated',
                     override_reason TEXT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY(sop_evaluation_id) REFERENCES sop_evaluations(id)
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
+                CREATE TABLE IF NOT EXISTS selected_candidates (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    stock_code TEXT NOT NULL,
+                    stock_name TEXT NOT NULL DEFAULT '',
+                    sector TEXT NOT NULL DEFAULT '未分类',
+                    source_ai TEXT NOT NULL,
+                    external_score REAL,
+                    selection_reason TEXT NOT NULL DEFAULT '',
+                    status TEXT NOT NULL DEFAULT 'active',
+                    selected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    archived_at TIMESTAMP
+                );
+                CREATE UNIQUE INDEX IF NOT EXISTS
+                    idx_selected_candidates_active_code
+                ON selected_candidates(stock_code) WHERE status='active';
                 CREATE TABLE IF NOT EXISTS trade_queue (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     command TEXT NOT NULL,
@@ -219,23 +176,8 @@ class SystemEngine:
                 """
             )
             self._ensure_columns(
-                "sop_evaluations",
-                {
-                    "max_scores_json": "TEXT NOT NULL DEFAULT '[15,15,10,15,20,15,10]'",
-                    "data_source": "TEXT NOT NULL DEFAULT ''",
-                    "api_verified": "INTEGER NOT NULL DEFAULT 0",
-                    "market_environment": "TEXT NOT NULL DEFAULT '稳健操作'",
-                    "theory": "TEXT NOT NULL DEFAULT ''",
-                    "masters": "TEXT NOT NULL DEFAULT ''",
-                    "continuous_mode": "INTEGER NOT NULL DEFAULT 0",
-                    "consecutive_boards": "INTEGER NOT NULL DEFAULT 0",
-                    "market_cap_yi": "REAL NOT NULL DEFAULT 0",
-                    "turnover_rate": "REAL NOT NULL DEFAULT 0",
-                    "seal_time": "TEXT NOT NULL DEFAULT ''",
-                    "sector_limit_up_count": "INTEGER NOT NULL DEFAULT 0",
-                    "screening_pass": "INTEGER NOT NULL DEFAULT 1",
-                    "screening_json": "TEXT NOT NULL DEFAULT '{}'",
-                },
+                "trade_intents",
+                {"candidate_id": "INTEGER"},
             )
             self._db.execute(
                 "INSERT OR IGNORE INTO schema_migrations(version) VALUES (1)"
@@ -273,173 +215,121 @@ class SystemEngine:
                     f"ALTER TABLE {table} ADD COLUMN {name} {definition}"
                 )
 
-    @staticmethod
-    def classify_sop(total_score: int) -> str:
-        if total_score >= SOP_STRICT_SCORE:
-            return "STRICT"
-        if total_score >= SOP_NOISE_SCORE:
-            return "LOOSE"
-        return "REJECT"
-
-    @staticmethod
-    def screen_continuous_limit_up(
-        *,
-        consecutive_boards: int,
-        market_cap_yi: float,
-        turnover_rate: float,
-        seal_time: str,
-        sector_limit_up_count: int,
-    ) -> dict[str, Any]:
-        try:
-            hour, minute = (int(part) for part in seal_time.split(":", 1))
-            seal_minutes = hour * 60 + minute
-            valid_time = 0 <= hour <= 23 and 0 <= minute <= 59
-        except (ValueError, AttributeError):
-            seal_minutes = 24 * 60
-            valid_time = False
-        checks = {
-            "2连板及以上": consecutive_boards >= 2,
-            "市值不超过100亿": 0 < market_cap_yi <= 100,
-            "换手率不低于5%": turnover_rate >= 5,
-            "14:00前封板": valid_time and seal_minutes < 14 * 60,
-            "板块至少3只涨停": sector_limit_up_count >= 3,
-        }
-        warnings = []
-        if consecutive_boards >= 4:
-            warnings.append("4板以上处于高位，手册要求增加风险权重")
-        return {
-            "passed": all(checks.values()),
-            "checks": checks,
-            "warnings": warnings,
-        }
-
-    @staticmethod
-    def recommend_market_style(market_environment: str) -> dict[str, str]:
-        theory, masters, reason = MARKET_STYLES.get(
-            market_environment, MARKET_STYLES["稳健操作"]
-        )
-        return {"theory": theory, "masters": masters, "reason": reason}
-
-    def save_sop_evaluation(
+    def add_candidate(
         self,
         stock_code: str,
         stock_name: str,
         sector: str,
-        scores: list[int] | tuple[int, ...],
         *,
-        criteria: list[str] | tuple[str, ...] = DEFAULT_CRITERIA,
-        evidence: str = "",
-        data_source: str = "",
-        api_verified: bool = False,
-        market_environment: str = "稳健操作",
-        continuous_mode: bool = False,
-        consecutive_boards: int = 0,
-        market_cap_yi: float = 0,
-        turnover_rate: float = 0,
-        seal_time: str = "",
-        sector_limit_up_count: int = 0,
+        source_ai: str,
+        external_score: float | None = None,
+        selection_reason: str = "",
     ) -> dict[str, Any]:
-        if len(scores) != 7 or len(criteria) != 7:
-            raise ValueError("七星评分必须正好包含 7 项")
+        """Record one stock selected by an external AI; never score it locally."""
         if not stock_code.isdigit() or len(stock_code) != 6:
             raise ValueError("股票代码必须是 6 位数字")
-        normalized_scores = [int(score) for score in scores]
-        if any(
-            score < 0 or score > maximum
-            for score, maximum in zip(normalized_scores, SOP_MAX_SCORES)
-        ):
-            raise ValueError("七星评分超出该维度的权重上限")
-        total = sum(normalized_scores)
-        classification = self.classify_sop(total)
-        screening = self.screen_continuous_limit_up(
-            consecutive_boards=consecutive_boards,
-            market_cap_yi=market_cap_yi,
-            turnover_rate=turnover_rate,
-            seal_time=seal_time,
-            sector_limit_up_count=sector_limit_up_count,
-        )
-        if continuous_mode and not screening["passed"]:
-            classification = "REJECT"
-        if not api_verified:
-            classification = "UNVERIFIED"
-        style = self.recommend_market_style(market_environment)
+        if not source_ai.strip():
+            raise ValueError("必须记录选股来源 AI")
+        if external_score is not None and not 0 <= external_score <= 100:
+            raise ValueError("外部评分必须在 0 到 100 之间")
         with self._lock, self._db:
-            cursor = self._db.execute(
+            existing = self._db.execute(
                 """
-                INSERT INTO sop_evaluations(stock_code, stock_name, sector,
-                    scores_json, criteria_json, max_scores_json, total_score,
-                    classification, evidence, data_source, api_verified,
-                    market_environment, theory, masters, continuous_mode,
-                    consecutive_boards, market_cap_yi, turnover_rate, seal_time,
-                    sector_limit_up_count, screening_pass, screening_json)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?)
+                SELECT id FROM selected_candidates
+                WHERE stock_code=? AND status='active'
                 """,
-                (
-                    stock_code,
-                    stock_name.strip(),
-                    sector.strip() or "未分类",
-                    json.dumps(normalized_scores, ensure_ascii=False),
-                    json.dumps(list(criteria), ensure_ascii=False),
-                    json.dumps(SOP_MAX_SCORES),
-                    total,
-                    classification,
-                    evidence.strip(),
-                    data_source.strip(),
-                    int(api_verified),
-                    market_environment,
-                    style["theory"],
-                    style["masters"],
-                    int(continuous_mode),
-                    int(consecutive_boards),
-                    float(market_cap_yi),
-                    float(turnover_rate),
-                    seal_time.strip(),
-                    int(sector_limit_up_count),
-                    int(screening["passed"]),
-                    json.dumps(screening, ensure_ascii=False),
-                ),
-            )
-        return self.get_sop_evaluation(cursor.lastrowid)
+                (stock_code,),
+            ).fetchone()
+            if existing:
+                self._db.execute(
+                    """
+                    UPDATE selected_candidates SET stock_name=?, sector=?,
+                        source_ai=?, external_score=?, selection_reason=?,
+                        selected_at=CURRENT_TIMESTAMP
+                    WHERE id=?
+                    """,
+                    (
+                        stock_name.strip(),
+                        sector.strip() or "未分类",
+                        source_ai.strip(),
+                        external_score,
+                        selection_reason.strip(),
+                        existing["id"],
+                    ),
+                )
+                candidate_id = existing["id"]
+            else:
+                count = self._db.execute(
+                    """
+                    SELECT COUNT(*) FROM selected_candidates
+                    WHERE status='active'
+                    """
+                ).fetchone()[0]
+                if count >= 3:
+                    raise ValueError("当前候选池最多只能保留 3 只股票")
+                cursor = self._db.execute(
+                    """
+                    INSERT INTO selected_candidates(stock_code, stock_name,
+                        sector, source_ai, external_score, selection_reason)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        stock_code,
+                        stock_name.strip(),
+                        sector.strip() or "未分类",
+                        source_ai.strip(),
+                        external_score,
+                        selection_reason.strip(),
+                    ),
+                )
+                candidate_id = cursor.lastrowid
+        return self.get_candidate(int(candidate_id))
 
-    def get_sop_evaluation(self, evaluation_id: int) -> dict[str, Any]:
+    def get_candidate(self, candidate_id: int) -> dict[str, Any]:
         with self._lock:
             row = self._db.execute(
-                "SELECT * FROM sop_evaluations WHERE id=?", (evaluation_id,)
+                "SELECT * FROM selected_candidates WHERE id=?",
+                (candidate_id,),
             ).fetchone()
         if row is None:
-            raise ValueError("SOP 评估不存在")
-        result = dict(row)
-        result["scores"] = json.loads(result.pop("scores_json"))
-        result["criteria"] = json.loads(result.pop("criteria_json"))
-        result["max_scores"] = json.loads(result.pop("max_scores_json"))
-        result["screening"] = json.loads(result.pop("screening_json"))
-        return result
+            raise ValueError("候选股票不存在")
+        return dict(row)
 
-    def latest_sop(self, stock_code: str) -> dict[str, Any] | None:
+    def active_candidate(self, stock_code: str) -> dict[str, Any] | None:
         with self._lock:
             row = self._db.execute(
                 """
-                SELECT id FROM sop_evaluations WHERE stock_code=?
+                SELECT * FROM selected_candidates
+                WHERE stock_code=? AND status='active'
                 ORDER BY id DESC LIMIT 1
                 """,
                 (stock_code,),
             ).fetchone()
-        return self.get_sop_evaluation(row["id"]) if row else None
+        return dict(row) if row else None
 
-    def list_sop_evaluations(self, limit: int = 200) -> list[dict[str, Any]]:
+    def list_candidates(
+        self, *, include_archived: bool = False
+    ) -> list[dict[str, Any]]:
+        query = "SELECT * FROM selected_candidates"
+        if not include_archived:
+            query += " WHERE status='active'"
+        query += " ORDER BY id DESC"
         with self._lock:
-            rows = self._db.execute(
-                """
-                SELECT id, stock_code, stock_name, sector, total_score,
-                    classification, evidence, data_source, api_verified,
-                    market_environment, theory, masters, continuous_mode,
-                    screening_pass, created_at
-                FROM sop_evaluations ORDER BY id DESC LIMIT ?
-                """,
-                (limit,),
-            ).fetchall()
+            rows = self._db.execute(query).fetchall()
         return [dict(row) for row in rows]
+
+    def archive_candidate(self, candidate_id: int) -> None:
+        with self._lock, self._db:
+            cursor = self._db.execute(
+                """
+                UPDATE selected_candidates SET status='archived',
+                    archived_at=CURRENT_TIMESTAMP
+                WHERE id=? AND status='active'
+                """,
+                (candidate_id,),
+            )
+            if cursor.rowcount != 1:
+                raise ValueError("候选股票不存在或已归档")
 
     @staticmethod
     def _restricted_buy_time(at: datetime) -> bool:
@@ -468,7 +358,7 @@ class SystemEngine:
         command: str,
         *,
         sector: str | None = None,
-        sop_evaluation_id: int | None = None,
+        candidate_id: int | None = None,
         build_stage: str = "首次25%",
         at: datetime | None = None,
     ) -> PreflightResult:
@@ -477,15 +367,20 @@ class SystemEngine:
         capital = snapshot["current_capital"]
         reasons: list[str] = []
         severity = 0  # green=0, yellow=1, red=2
-        evaluation = (
-            self.get_sop_evaluation(sop_evaluation_id)
-            if sop_evaluation_id
-            else self.latest_sop(trade.stock_code)
+        candidate = (
+            self.get_candidate(candidate_id)
+            if candidate_id
+            else self.active_candidate(trade.stock_code)
         )
+        if candidate and (
+            candidate["status"] != "active"
+            or candidate["stock_code"] != trade.stock_code
+        ):
+            candidate = None
 
         if trade.side == "buy":
-            if not evaluation or evaluation["classification"] != "STRICT":
-                reasons.append("新建或增加仓位必须关联 SOP 严格评分 ≥65")
+            if not candidate:
+                reasons.append("买入股票必须先由外部 AI 选入当前候选池")
                 severity = 2
             if self._restricted_buy_time(at or datetime.now(SHANGHAI)):
                 reasons.append("当前处于 09:30-09:45 或 14:30-15:00 禁止开仓时段")
@@ -508,7 +403,7 @@ class SystemEngine:
         )
         resolved_sector = (
             sector
-            or (evaluation["sector"] if evaluation else None)
+            or (candidate["sector"] if candidate else None)
             or (current["sector"] if current else "未分类")
         )
         old_sector = snapshot["sector_values"].get(resolved_sector, Decimal(0))
@@ -593,7 +488,7 @@ class SystemEngine:
         sector: str,
         result: PreflightResult,
         *,
-        sop_evaluation_id: int | None,
+        candidate_id: int | None = None,
         build_stage: str,
         override_reason: str = "",
     ) -> int:
@@ -604,15 +499,15 @@ class SystemEngine:
             cursor = self._db.execute(
                 """
                 INSERT INTO trade_intents(command, stock_code, sector,
-                    sop_evaluation_id, build_stage, light, reasons_json,
-                    status, override_reason)
+                    candidate_id, build_stage, light, reasons_json, status,
+                    override_reason)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     command,
                     stock_code,
                     sector,
-                    sop_evaluation_id,
+                    candidate_id,
                     build_stage,
                     result.light,
                     json.dumps(result.reasons, ensure_ascii=False),
@@ -683,13 +578,13 @@ class SystemEngine:
             )
         trade = result["trade"]
         if trade["side"] == "buy":
-            sop = self.latest_sop(trade["stock_code"])
-            if not sop or sop["classification"] != "STRICT":
+            candidate = self.active_candidate(trade["stock_code"])
+            if not candidate:
                 self.record_finding(
                     "L1",
                     "red",
-                    "sop_threshold",
-                    f"{trade['stock_code']} 买入未关联 ≥65 分 STRICT 评估",
+                    "candidate_pool",
+                    f"{trade['stock_code']} 买入时不在外部 AI 当前候选池",
                     related_type="trade",
                     related_id=result["trade_id"],
                 )
@@ -1007,14 +902,7 @@ class SystemEngine:
 
 
 __all__ = [
-    "DEFAULT_CRITERIA",
-    "MARKET_STYLES",
     "PreflightResult",
-    "REFERENCE_POOL",
     "SHANGHAI",
-    "SOP_CRITERIA",
-    "SOP_MAX_SCORES",
-    "SOP_NOISE_SCORE",
-    "SOP_STRICT_SCORE",
     "SystemEngine",
 ]

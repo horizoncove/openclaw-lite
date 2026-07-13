@@ -2,148 +2,99 @@
 
 from __future__ import annotations
 
-from datetime import date
 from pathlib import Path
 
-from PyQt6.QtCore import QDate, QTime
+from PyQt6.QtCore import QDate
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import (
     QComboBox,
-    QCheckBox,
     QDateEdit,
     QDoubleSpinBox,
     QFileDialog,
     QFormLayout,
-    QGridLayout,
     QGroupBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QMessageBox,
     QPushButton,
-    QSpinBox,
     QTableWidget,
     QTableWidgetItem,
     QTextEdit,
-    QTimeEdit,
     QVBoxLayout,
     QWidget,
 )
 
 from .account_engine import InvalidTradeError
 from .main_window import MainWindow, default_database_path
-from .market_data import EastmoneyClient, MarketDataError, MarketQuote
-from .system_engine import MARKET_STYLES, REFERENCE_POOL, SOP_CRITERIA, SystemEngine
+from .system_engine import SystemEngine
 
 
 LIGHT_NAMES = {"green": "🟢 绿灯", "yellow": "🟡 黄灯", "red": "🔴 红灯"}
 
 
 class WorkbenchWindow(MainWindow):
-    """完整 SOP、交易、监督、复盘和任务工作台。"""
+    """External-candidate, trade, supervision, review, and task workbench."""
 
     def __init__(self, db_path: str | Path | None = None) -> None:
         resolved_path = Path(db_path) if db_path else default_database_path()
         self.system = SystemEngine(resolved_path)
         super().__init__(resolved_path)
-        self.setWindowTitle("Sharon 交易系统 v1.0 · SOP + 纪律 + AI 监督")
-        self._build_sop_tab()
+        self.setWindowTitle("Sharon 交易系统 v1.0 · 交易纪律 + AI 监督")
+        self._build_candidates_tab()
         self._build_intent_tab()
         self._build_supervision_tab()
         self._build_review_tab()
         self._build_tasks_tab()
         self._refresh_extended()
 
-    def _build_sop_tab(self) -> None:
+    def _build_candidates_tab(self) -> None:
         page = QWidget()
         layout = QVBoxLayout(page)
-        editor = QGroupBox("七星 SOP 评估（每项 0-10，≥65 才可开仓）")
-        editor_layout = QGridLayout(editor)
-        self.sop_code = QLineEdit()
-        self.sop_code.setPlaceholderText("6 位股票代码")
-        self.sop_name = QLineEdit()
-        self.sop_name.setPlaceholderText("股票名称")
-        self.sop_sector = QLineEdit()
-        self.sop_sector.setPlaceholderText("所属板块")
-        self.sop_source = QLineEdit()
-        self.sop_source.setPlaceholderText("东方财富/腾讯财经接口或数据链接")
-        self.sop_api_verified = QCheckBox("已通过 API 核验数字、价格和涨跌")
-        self.sop_api_verified.setEnabled(False)
-        self.sop_verified_quote: MarketQuote | None = None
-        verify_api = QPushButton("调用东方财富 API")
-        verify_api.setObjectName("secondaryButton")
-        verify_api.clicked.connect(self._verify_market_data)
-        self.sop_market = QComboBox()
-        self.sop_market.addItems(MARKET_STYLES.keys())
-        editor_layout.addWidget(QLabel("代码"), 0, 0)
-        editor_layout.addWidget(self.sop_code, 0, 1)
-        editor_layout.addWidget(QLabel("名称"), 0, 2)
-        editor_layout.addWidget(self.sop_name, 0, 3)
-        editor_layout.addWidget(QLabel("板块"), 0, 4)
-        editor_layout.addWidget(self.sop_sector, 0, 5)
-        editor_layout.addWidget(QLabel("市场环境"), 0, 6)
-        editor_layout.addWidget(self.sop_market, 0, 7)
-        editor_layout.addWidget(QLabel("数据来源"), 1, 0)
-        editor_layout.addWidget(self.sop_source, 1, 1, 1, 4)
-        editor_layout.addWidget(self.sop_api_verified, 1, 5, 1, 2)
-        editor_layout.addWidget(verify_api, 1, 7)
-        self.sop_scores: list[QSpinBox] = []
-        for index, (criterion, maximum, description) in enumerate(SOP_CRITERIA):
-            score = QSpinBox()
-            score.setRange(0, maximum)
-            score.setValue(0)
-            self.sop_scores.append(score)
-            label = QLabel(f"{criterion} / {maximum}\n{description}")
-            label.setWordWrap(True)
-            editor_layout.addWidget(label, 2, index)
-            editor_layout.addWidget(score, 3, index)
-        self.sop_continuous = QCheckBox("启用连续涨停五项筛选")
-        self.sop_boards = QSpinBox()
-        self.sop_boards.setRange(0, 20)
-        self.sop_cap = QDoubleSpinBox()
-        self.sop_cap.setRange(0, 10000)
-        self.sop_cap.setSuffix(" 亿")
-        self.sop_turnover = QDoubleSpinBox()
-        self.sop_turnover.setRange(0, 100)
-        self.sop_turnover.setSuffix("%")
-        self.sop_seal_time = QTimeEdit(QTime(13, 30))
-        self.sop_sector_count = QSpinBox()
-        self.sop_sector_count.setRange(0, 100)
-        editor_layout.addWidget(self.sop_continuous, 4, 0)
-        editor_layout.addWidget(QLabel("连板数"), 4, 1)
-        editor_layout.addWidget(self.sop_boards, 4, 2)
-        editor_layout.addWidget(QLabel("市值"), 4, 3)
-        editor_layout.addWidget(self.sop_cap, 4, 4)
-        editor_layout.addWidget(QLabel("换手率"), 4, 5)
-        editor_layout.addWidget(self.sop_turnover, 4, 6)
-        editor_layout.addWidget(QLabel("封板时间"), 5, 0)
-        editor_layout.addWidget(self.sop_seal_time, 5, 1)
-        editor_layout.addWidget(QLabel("板块涨停数"), 5, 2)
-        editor_layout.addWidget(self.sop_sector_count, 5, 3)
-        self.sop_evidence = QTextEdit()
-        self.sop_evidence.setPlaceholderText("填写七星判断依据、交易计划和风险提示")
-        self.sop_evidence.setMaximumHeight(70)
-        save = QPushButton("保存 SOP 评估")
-        save.clicked.connect(self._save_sop)
-        editor_layout.addWidget(self.sop_evidence, 6, 0, 1, 7)
-        editor_layout.addWidget(save, 6, 7)
+        note = QLabel(
+            "SOP 选股由外部 AI 完成。本软件不评分、不推荐股票，"
+            "仅记录最终选出的 2–3 只股票并用于交易准入检查。"
+        )
+        note.setWordWrap(True)
+        note.setObjectName("hint")
+        layout.addWidget(note)
+        editor = QGroupBox("登记外部 AI 已选股票")
+        editor_layout = QFormLayout(editor)
+        self.candidate_code = QLineEdit()
+        self.candidate_code.setPlaceholderText("6 位股票代码")
+        self.candidate_name = QLineEdit()
+        self.candidate_name.setPlaceholderText("股票名称")
+        self.candidate_sector = QLineEdit()
+        self.candidate_sector.setPlaceholderText("所属板块")
+        self.candidate_source = QLineEdit("外部 AI")
+        self.candidate_score = QDoubleSpinBox()
+        self.candidate_score.setRange(0, 100)
+        self.candidate_score.setSpecialValueText("未提供")
+        self.candidate_reason = QTextEdit()
+        self.candidate_reason.setMaximumHeight(70)
+        self.candidate_reason.setPlaceholderText("粘贴外部 AI 的入选理由或摘要")
+        save = QPushButton("加入/更新候选池")
+        save.clicked.connect(self._save_candidate)
+        editor_layout.addRow("股票代码", self.candidate_code)
+        editor_layout.addRow("股票名称", self.candidate_name)
+        editor_layout.addRow("所属板块", self.candidate_sector)
+        editor_layout.addRow("选股来源", self.candidate_source)
+        editor_layout.addRow("外部评分（可选）", self.candidate_score)
+        editor_layout.addRow("入选理由", self.candidate_reason)
+        editor_layout.addRow(save)
         layout.addWidget(editor)
-        self.sop_table = self._table(
-            [
-                "时间", "代码", "名称", "板块", "总分", "分类",
-                "API", "市场", "理论/游资", "连板筛选", "依据",
-            ]
+        self.candidate_count_label = QLabel("当前候选池：0/3")
+        self.candidate_count_label.setStyleSheet("font-weight: 700;")
+        layout.addWidget(self.candidate_count_label)
+        self.candidate_table = self._table(
+            ["入选时间", "代码", "名称", "板块", "来源 AI", "外部评分", "理由"]
         )
-        layout.addWidget(self.sop_table)
-        pool_text = "手册参考池（2026-07-13，不代表实时推荐）：" + "；".join(
-            f"{name} {code} / {score}分 / {position}"
-            for code, name, score, position in REFERENCE_POOL
-        )
-        pool_label = QLabel(pool_text)
-        pool_label.setWordWrap(True)
-        pool_label.setObjectName("hint")
-        layout.addWidget(pool_label)
-        self.tabs.addTab(page, "SOP 选股")
+        layout.addWidget(self.candidate_table)
+        archive = QPushButton("移出选中的候选股票")
+        archive.setObjectName("secondaryButton")
+        archive.clicked.connect(self._archive_candidate)
+        layout.addWidget(archive)
+        self.tabs.addTab(page, "候选股票")
 
     def _build_intent_tab(self) -> None:
         page = QWidget()
@@ -175,7 +126,7 @@ class WorkbenchWindow(MainWindow):
         layout.addWidget(self.intent_light)
         layout.addWidget(self.intent_details, 1)
         discipline = QLabel(
-            "自动检查：SOP ≥65、单票/板块/总仓位/现金、禁买时段、"
+            "自动检查：外部 AI 候选池、单票/板块/总仓位/现金、禁买时段、"
             "浮盈 ≥10% 才加仓且仅一次。卖出始终允许用于止损止盈。"
         )
         discipline.setWordWrap(True)
@@ -202,7 +153,7 @@ class WorkbenchWindow(MainWindow):
         )
         layout.addWidget(self.findings_table)
         rules = QLabel(
-            "L1 硬规则：SOP、仓位、加仓、止损止盈、时间和处罚；"
+            "L1 硬规则：候选池准入、仓位、加仓、止损止盈、时间和处罚；"
             "L2 软规则：证据与数据一致性；L3 心理规则：亏损日不报复、盈利日不贪。"
         )
         rules.setWordWrap(True)
@@ -277,85 +228,63 @@ class WorkbenchWindow(MainWindow):
         layout.addWidget(self.tasks_table)
         layout.addLayout(controls)
         references = QLabel(
-            "7 大理论：进化论 · 场域论 · 显现论 · 统一论 · 协同论 · 分形论 · 连续论\n"
-            "14 位游资：炒股养家 · 赵老哥 · Asking · 退学炒股 · 瑞鹤仙 · "
-            "乔帮主 · 小鳄鱼 · 92科比 · 欢乐海岸 · 章盟主 · 孤独牛背 · "
-            "龙飞虎 · 著名刺客 · 浓汤野人"
+            "职责边界：外部 AI 负责 SOP 分析和选股；本软件只记录 2–3 只"
+            "最终候选股票，并负责交易计划、持仓纪律、风险监督和复盘。"
         )
         references.setWordWrap(True)
         layout.addWidget(references)
         self.tabs.addTab(page, "任务与资料")
 
-    def _verify_market_data(self) -> None:
-        code = self.sop_code.text().strip()
+    def _save_candidate(self) -> None:
+        score = self.candidate_score.value()
         try:
-            quote = EastmoneyClient().fetch_quote(code)
-        except MarketDataError as exc:
-            self.sop_verified_quote = None
-            self.sop_api_verified.setChecked(False)
-            QMessageBox.warning(self, "API 核验失败", str(exc))
-            return
-        self.sop_verified_quote = quote
-        self.sop_api_verified.setChecked(True)
-        self.sop_source.setText(f"{quote.source} · {quote.fetched_at}")
-        self.sop_name.setText(quote.stock_name)
-        self.sop_cap.setValue(float(quote.market_cap_yi))
-        self.sop_turnover.setValue(float(quote.turnover_rate))
-        existing = self.sop_evidence.toPlainText().strip()
-        api_note = (
-            f"API：现价 {quote.price} 元，涨跌 {quote.change_pct}%，"
-            f"总市值 {quote.market_cap_yi:.2f} 亿，换手率 {quote.turnover_rate}%"
-        )
-        self.sop_evidence.setPlainText(
-            f"{existing}\n{api_note}".strip()
-        )
-        self.statusBar().showMessage("东方财富行情核验成功", 5000)
-
-    def _save_sop(self) -> None:
-        code = self.sop_code.text().strip()
-        api_verified = bool(
-            self.sop_verified_quote
-            and self.sop_verified_quote.stock_code == code
-            and self.sop_api_verified.isChecked()
-        )
-        try:
-            evaluation = self.system.save_sop_evaluation(
-                code,
-                self.sop_name.text().strip(),
-                self.sop_sector.text().strip(),
-                [score.value() for score in self.sop_scores],
-                evidence=self.sop_evidence.toPlainText(),
-                data_source=self.sop_source.text(),
-                api_verified=api_verified,
-                market_environment=self.sop_market.currentText(),
-                continuous_mode=self.sop_continuous.isChecked(),
-                consecutive_boards=self.sop_boards.value(),
-                market_cap_yi=self.sop_cap.value(),
-                turnover_rate=self.sop_turnover.value(),
-                seal_time=self.sop_seal_time.time().toString("HH:mm"),
-                sector_limit_up_count=self.sop_sector_count.value(),
+            candidate = self.system.add_candidate(
+                self.candidate_code.text().strip(),
+                self.candidate_name.text().strip(),
+                self.candidate_sector.text().strip(),
+                source_ai=self.candidate_source.text(),
+                external_score=score if score else None,
+                selection_reason=self.candidate_reason.toPlainText(),
             )
         except ValueError as exc:
-            QMessageBox.warning(self, "无法保存 SOP", str(exc))
+            QMessageBox.warning(self, "无法保存候选股票", str(exc))
             return
         self.statusBar().showMessage(
-            f"SOP 已保存：{evaluation['total_score']} 分 "
-            f"{evaluation['classification']}",
-            5000,
+            f"候选股票已记录：{candidate['stock_code']} "
+            f"{candidate['stock_name']}",
+            5000
         )
-        self._refresh_sop()
+        self._refresh_candidates()
+
+    def _archive_candidate(self) -> None:
+        row = self.candidate_table.currentRow()
+        if row < 0:
+            QMessageBox.information(self, "选择股票", "请先选择一只候选股票")
+            return
+        candidate_id = self.candidate_table.item(row, 0).data(256)
+        try:
+            self.system.archive_candidate(candidate_id)
+        except ValueError as exc:
+            QMessageBox.warning(self, "无法移出", str(exc))
+            return
+        self._refresh_candidates()
 
     def _validate_intent(self) -> None:
         command = self.intent_command.text().strip()
-        sector = self.intent_sector.text().strip() or "未分类"
+        entered_sector = self.intent_sector.text().strip()
         try:
-            trade = self.engine.parse_trade(command, sector)
-            sop = self.system.latest_sop(trade.stock_code)
+            trade = self.engine.parse_trade(command, entered_sector or "未分类")
+            candidate = self.system.active_candidate(trade.stock_code)
+            sector = (
+                entered_sector
+                or (candidate["sector"] if candidate else None)
+                or "未分类"
+            )
             result = self.system.validate_trade_intent(
                 self.engine,
                 command,
                 sector=sector,
-                sop_evaluation_id=sop["id"] if sop else None,
+                candidate_id=candidate["id"] if candidate else None,
                 build_stage=self.intent_stage.currentText(),
             )
             self.system.save_trade_intent(
@@ -363,7 +292,7 @@ class WorkbenchWindow(MainWindow):
                 trade.stock_code,
                 sector,
                 result,
-                sop_evaluation_id=sop["id"] if sop else None,
+                candidate_id=candidate["id"] if candidate else None,
                 build_stage=self.intent_stage.currentText(),
                 override_reason=self.intent_override.text(),
             )
@@ -480,45 +409,37 @@ class WorkbenchWindow(MainWindow):
         )
 
     def _refresh_extended(self) -> None:
-        self._refresh_sop()
+        self._refresh_candidates()
         self._refresh_supervision()
         self._refresh_reviews()
         self._refresh_tasks()
 
-    def _refresh_sop(self) -> None:
-        rows = self.system.list_sop_evaluations()
-        self.sop_table.setRowCount(len(rows))
+    def _refresh_candidates(self) -> None:
+        rows = self.system.list_candidates()
+        self.candidate_count_label.setText(
+            f"当前候选池：{len(rows)}/3"
+            + ("（建议保持 2–3 只）" if len(rows) < 2 else "")
+        )
+        self.candidate_table.setRowCount(len(rows))
         for row, item in enumerate(rows):
             values = [
-                item["created_at"],
+                item["selected_at"],
                 item["stock_code"],
                 item["stock_name"],
                 item["sector"],
-                str(item["total_score"]),
-                item["classification"],
-                "已核验" if item["api_verified"] else "未核验",
-                item["market_environment"],
-                f"{item['theory']} / {item['masters']}",
+                item["source_ai"],
                 (
-                    "通过" if item["screening_pass"] else "未通过"
-                )
-                if item["continuous_mode"]
-                else "未启用",
-                item["evidence"],
+                    f"{item['external_score']:g}"
+                    if item["external_score"] is not None
+                    else "-"
+                ),
+                item["selection_reason"],
             ]
             for column, value in enumerate(values):
                 cell = QTableWidgetItem(value)
-                if column == 5:
-                    cell.setForeground(
-                        QColor(
-                            "#059669"
-                            if value == "STRICT"
-                            else "#d97706"
-                            if value == "LOOSE"
-                            else "#dc2626"
-                        )
-                    )
-                self.sop_table.setItem(row, column, cell)
+                if column == 0:
+                    cell.setData(256, item["id"])
+                self.candidate_table.setItem(row, column, cell)
 
     def _refresh_supervision(self) -> None:
         grade = self.system.monthly_grade()

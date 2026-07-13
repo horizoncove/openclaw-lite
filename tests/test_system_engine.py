@@ -9,7 +9,6 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from sharon_trading_system_v1_0.account_engine import AccountEngine
-from sharon_trading_system_v1_0.market_data import EastmoneyClient
 from sharon_trading_system_v1_0.system_engine import SystemEngine
 
 
@@ -34,131 +33,85 @@ class SystemEngineTests(unittest.TestCase):
         self.assertEqual(account.current_capital, Decimal("5037175.21"))
         self.assertEqual(account.total_pnl, Decimal("37175.21"))
 
-    def test_sop_classification_boundaries(self) -> None:
-        strict = self.system.save_sop_evaluation(
+    def test_candidate_pool_records_two_or_three_external_ai_stocks(self) -> None:
+        first = self.system.add_candidate(
             "002371",
             "北方华创",
             "半导体",
-            [14, 14, 9, 14, 19, 14, 9],
-            api_verified=True,
-            data_source="东方财富 API",
+            source_ai="选股 AI",
+            external_score=93,
+            selection_reason="外部 SOP 已通过",
         )
-        loose = self.system.save_sop_evaluation(
-            "000001",
-            "平安银行",
-            "银行",
-            [8, 8, 5, 8, 10, 6, 5],
-            api_verified=True,
+        self.system.add_candidate(
+            "688012", "中微公司", "半导体", source_ai="选股 AI"
         )
-        reject = self.system.save_sop_evaluation(
-            "600519",
-            "贵州茅台",
-            "食品饮料",
-            [7, 7, 5, 7, 9, 7, 7],
-            api_verified=True,
+        self.system.add_candidate(
+            "688072", "拓荆科技", "半导体", source_ai="选股 AI"
         )
-        self.assertEqual(strict["classification"], "STRICT")
-        self.assertEqual(strict["total_score"], 93)
-        self.assertEqual(loose["classification"], "LOOSE")
-        self.assertEqual(reject["classification"], "REJECT")
-
-    def test_unverified_data_cannot_become_trade_candidate(self) -> None:
-        evaluation = self.system.save_sop_evaluation(
-            "688012", "中微公司", "半导体", [15, 15, 10, 15, 20, 15, 10]
-        )
-        self.assertEqual(evaluation["total_score"], 100)
-        self.assertEqual(evaluation["classification"], "UNVERIFIED")
         with self.assertRaises(ValueError):
-            self.system.save_sop_evaluation(
-                "688072",
-                "拓荆科技",
-                "半导体",
-                [16, 15, 10, 15, 20, 15, 10],
-                api_verified=True,
+            self.system.add_candidate(
+                "603986", "兆易创新", "半导体", source_ai="选股 AI"
             )
+        self.assertEqual(len(self.system.list_candidates()), 3)
 
-    def test_continuous_limit_up_five_step_filter(self) -> None:
-        passed = self.system.screen_continuous_limit_up(
-            consecutive_boards=2,
-            market_cap_yi=100,
-            turnover_rate=5,
-            seal_time="13:59",
-            sector_limit_up_count=3,
+        updated = self.system.add_candidate(
+            "002371",
+            "北方华创",
+            "半导体设备",
+            source_ai="新版选股 AI",
+            external_score=95,
         )
-        failed = self.system.screen_continuous_limit_up(
-            consecutive_boards=4,
-            market_cap_yi=101,
-            turnover_rate=4.99,
-            seal_time="14:00",
-            sector_limit_up_count=2,
-        )
-        self.assertTrue(passed["passed"])
-        self.assertFalse(failed["passed"])
-        self.assertTrue(failed["warnings"])
+        self.assertEqual(updated["id"], first["id"])
+        self.assertEqual(len(self.system.list_candidates()), 3)
+        self.system.archive_candidate(first["id"])
+        self.assertEqual(len(self.system.list_candidates()), 2)
 
-    def test_market_environment_dispatches_theory_and_masters(self) -> None:
-        style = self.system.recommend_market_style("板块轮动")
-        self.assertEqual(style["theory"], "协同论")
-        self.assertIn("瑞鹤仙", style["masters"])
-
-    def test_eastmoney_quote_is_normalized_for_sop_evidence(self) -> None:
-        payload = (
-            '{"data":{"f57":"002371","f58":"北方华创","f43":35001,'
-            '"f170":966,"f116":12593000000,"f168":523}}'
-        )
-        quote = EastmoneyClient.parse_response(payload)
-        self.assertEqual(quote.stock_code, "002371")
-        self.assertEqual(quote.price, Decimal("350.01"))
-        self.assertEqual(quote.change_pct, Decimal("9.66"))
-        self.assertEqual(quote.market_cap_yi, Decimal("125.93"))
-        self.assertEqual(quote.turnover_rate, Decimal("5.23"))
-
-    def test_preflight_requires_strict_sop_and_checks_time(self) -> None:
-        no_sop = self.system.validate_trade_intent(
+    def test_preflight_requires_external_candidate_and_checks_time(self) -> None:
+        no_candidate = self.system.validate_trade_intent(
             self.account,
             "买入 002371 100 1000",
             sector="半导体",
             at=datetime(2026, 7, 13, 10, 0, tzinfo=SHANGHAI),
         )
-        self.assertEqual(no_sop.light, "red")
+        self.assertEqual(no_candidate.light, "red")
 
-        sop = self.system.save_sop_evaluation(
-            "002371", "北方华创", "半导体", [10] * 7, api_verified=True
+        candidate = self.system.add_candidate(
+            "002371", "北方华创", "半导体", source_ai="外部 AI"
         )
         allowed = self.system.validate_trade_intent(
             self.account,
             "买入 002371 100 1000",
             sector="半导体",
-            sop_evaluation_id=sop["id"],
+            candidate_id=candidate["id"],
             at=datetime(2026, 7, 13, 10, 0, tzinfo=SHANGHAI),
         )
         blocked_time = self.system.validate_trade_intent(
             self.account,
             "买入 002371 100 1000",
             sector="半导体",
-            sop_evaluation_id=sop["id"],
+            candidate_id=candidate["id"],
             at=datetime(2026, 7, 13, 9, 35, tzinfo=SHANGHAI),
         )
         self.assertEqual(allowed.light, "green")
         self.assertEqual(blocked_time.light, "red")
 
     def test_yellow_and_red_single_stock_bands(self) -> None:
-        sop = self.system.save_sop_evaluation(
-            "002371", "北方华创", "半导体", [10] * 7, api_verified=True
+        candidate = self.system.add_candidate(
+            "002371", "北方华创", "半导体", source_ai="外部 AI"
         )
         at = datetime(2026, 7, 13, 10, 0, tzinfo=SHANGHAI)
         yellow = self.system.validate_trade_intent(
             self.account,
             "买入 002371 100 13000",
             sector="半导体",
-            sop_evaluation_id=sop["id"],
+            candidate_id=candidate["id"],
             at=at,
         )
         red = self.system.validate_trade_intent(
             self.account,
             "买入 002371 100 16000",
             sector="半导体",
-            sop_evaluation_id=sop["id"],
+            candidate_id=candidate["id"],
             at=at,
         )
         self.assertEqual(yellow.light, "yellow")
@@ -194,15 +147,15 @@ class SystemEngineTests(unittest.TestCase):
         self.assertFalse(disabled["enabled"])
 
     def test_cash_condition_blocks_buy_and_exit_signals_follow_rules(self) -> None:
-        sop = self.system.save_sop_evaluation(
-            "002371", "北方华创", "半导体", [10] * 7, api_verified=True
+        candidate = self.system.add_candidate(
+            "002371", "北方华创", "半导体", source_ai="外部 AI"
         )
         self.system.set_cash_condition("cash_1", True, "市场异常")
         result = self.system.validate_trade_intent(
             self.account,
             "买入 002371 100 100",
             sector="半导体",
-            sop_evaluation_id=sop["id"],
+            candidate_id=candidate["id"],
             at=datetime(2026, 7, 13, 10, 0, tzinfo=SHANGHAI),
         )
         self.assertEqual(result.light, "red")
@@ -230,15 +183,16 @@ class WorkbenchSmokeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             window = WorkbenchWindow(Path(directory) / "workbench.db")
             labels = [window.tabs.tabText(i) for i in range(window.tabs.count())]
-            self.assertIn("SOP 选股", labels)
+            self.assertIn("候选股票", labels)
             self.assertIn("交易计划", labels)
             self.assertIn("AI 监督", labels)
             self.assertIn("每日复盘", labels)
             self.assertIn("任务与资料", labels)
-            self.assertEqual(
-                [score.maximum() for score in window.sop_scores],
-                [15, 15, 10, 15, 20, 15, 10],
-            )
+            window.candidate_code.setText("002371")
+            window.candidate_name.setText("北方华创")
+            window.candidate_sector.setText("半导体")
+            window._save_candidate()
+            self.assertEqual(window.candidate_table.rowCount(), 1)
 
             window.command_input.setText("买入 002371 10 100")
             window._enqueue_trade()
