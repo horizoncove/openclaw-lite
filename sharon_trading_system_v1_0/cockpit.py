@@ -121,10 +121,10 @@ class DonutChart(QWidget):
     def paintEvent(self, event) -> None:  # noqa: N802
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        size = min(self.width() - 20, self.height() - 36)
+        size = min(self.width() - 18, self.height() - 12)
         rect = QRectF(
             (self.width() - size) / 2,
-            8,
+            4,
             size,
             size,
         )
@@ -144,10 +144,15 @@ class DonutChart(QWidget):
                 start += span
         painter.setPen(QColor("#e0f2fe" if self.dark_mode else "#14213d"))
         painter.setFont(QFont("", 18, QFont.Weight.Bold))
-        painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, self.center_value)
+        value_rect = QRectF(
+            rect.left(), rect.center().y() - 22, rect.width(), 30
+        )
+        painter.drawText(
+            value_rect, Qt.AlignmentFlag.AlignCenter, self.center_value
+        )
         painter.setPen(QColor("#6f91aa" if self.dark_mode else "#6b7890"))
         painter.setFont(QFont("", 9, QFont.Weight.Medium))
-        title_rect = QRectF(rect.left(), rect.center().y() + 17, rect.width(), 22)
+        title_rect = QRectF(rect.left(), rect.center().y() + 5, rect.width(), 22)
         painter.drawText(title_rect, Qt.AlignmentFlag.AlignCenter, self.center_title)
 
 
@@ -175,7 +180,17 @@ class ScoreGauge(QWidget):
     def paintEvent(self, event) -> None:  # noqa: N802
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        rect = QRectF(28, 24, self.width() - 56, (self.width() - 56))
+        baseline = self.height() - 14
+        radius = max(
+            42.0,
+            min((self.width() - 48) / 2, self.height() - 36),
+        )
+        rect = QRectF(
+            self.width() / 2 - radius,
+            baseline - radius,
+            radius * 2,
+            radius * 2,
+        )
         track = QPen(QColor("#17324d" if self.dark_mode else "#e8edf5"), 16)
         track.setCapStyle(Qt.PenCapStyle.RoundCap)
         painter.setPen(track)
@@ -188,14 +203,14 @@ class ScoreGauge(QWidget):
         painter.setPen(QColor("#e0f2fe" if self.dark_mode else "#14213d"))
         painter.setFont(QFont("", 28, QFont.Weight.Bold))
         painter.drawText(
-            QRectF(0, 76, self.width(), 48),
+            QRectF(0, baseline - radius * 0.68, self.width(), 42),
             Qt.AlignmentFlag.AlignCenter,
             f"{self.grade} · {self.score}",
         )
         painter.setPen(QColor("#6f91aa" if self.dark_mode else "#6b7890"))
         painter.setFont(QFont("", 10, QFont.Weight.Medium))
         painter.drawText(
-            QRectF(0, 121, self.width(), 28),
+            QRectF(0, baseline - radius * 0.28, self.width(), 24),
             Qt.AlignmentFlag.AlignCenter,
             self.title,
         )
