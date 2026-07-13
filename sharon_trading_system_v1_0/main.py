@@ -6,14 +6,14 @@ import sys
 
 from PyQt6.QtWidgets import QApplication
 
-from .main_window import MainWindow
+from .workbench import WorkbenchWindow
 
 
 def main() -> int:
     app = QApplication(sys.argv)
     app.setApplicationName("Sharon Trading System")
     app.setOrganizationName("Sharon")
-    window = MainWindow()
+    window = WorkbenchWindow()
     window.show()
     return app.exec()
 

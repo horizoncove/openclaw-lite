@@ -12,7 +12,8 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_CAPITAL = Decimal("5037200")
+DEFAULT_INITIAL_CAPITAL = Decimal("5000000")
+DEFAULT_CAPITAL = Decimal("5037175.21")
 SINGLE_STOCK_LIMIT = Decimal("0.25")
 SECTOR_LIMIT = Decimal("0.30")
 TOTAL_POSITION_LIMIT = Decimal("0.60")
@@ -74,6 +75,7 @@ class AccountEngine:
         *,
         account_id: int = 1,
         default_capital: Any = DEFAULT_CAPITAL,
+        initial_capital: Any = DEFAULT_INITIAL_CAPITAL,
         sector_mapping: Mapping[str, str] | None = None,
     ) -> None:
         self.account_id = account_id
@@ -81,7 +83,8 @@ class AccountEngine:
         self._sectors = dict(sector_mapping or {})
         self._lock = threading.RLock()
         capital = _money(default_capital, "默认资金")
-        if account_id <= 0 or capital <= 0:
+        initial = _money(initial_capital, "起始资金")
+        if account_id <= 0 or capital <= 0 or initial <= 0:
             raise ValueError("账户编号和默认资金必须大于 0")
         if self.db_path != ":memory:":
             Path(self.db_path).expanduser().resolve().parent.mkdir(
@@ -95,9 +98,9 @@ class AccountEngine:
         self._db.execute("PRAGMA busy_timeout=30000")
         if self.db_path != ":memory:":
             self._db.execute("PRAGMA journal_mode=WAL")
-        self._create_schema(capital)
+        self._create_schema(initial, capital)
 
-    def _create_schema(self, capital: Decimal) -> None:
+    def _create_schema(self, initial: Decimal, capital: Decimal) -> None:
         with self._lock, self._db:
             self._db.executescript(
                 """
@@ -139,9 +142,14 @@ class AccountEngine:
                 """
                 INSERT OR IGNORE INTO accounts
                     (id, initial_capital, current_capital, total_pnl)
-                VALUES (?, ?, ?, 0)
+                VALUES (?, ?, ?, ?)
                 """,
-                (self.account_id, float(capital), float(capital)),
+                (
+                    self.account_id,
+                    float(initial),
+                    float(capital),
+                    float(capital - initial),
+                ),
             )
 
     @staticmethod
