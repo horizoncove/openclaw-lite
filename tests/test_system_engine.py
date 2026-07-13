@@ -186,7 +186,7 @@ class WorkbenchSmokeTests(unittest.TestCase):
             self.assertEqual(labels[0], "驾驶舱")
             self.assertIs(window.tabs.currentWidget(), window.cockpit_page)
             self.assertTrue(window.trade_frame.isHidden())
-            self.assertIn("#dc2626", window.cockpit_kpis["pnl"].styleSheet())
+            self.assertIn("#e25555", window.cockpit_kpis["pnl"].styleSheet())
             original_theme = window.dark_mode
             window.theme_button.click()
             self.assertNotEqual(window.dark_mode, original_theme)
@@ -236,14 +236,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
             self.assertEqual(len(window.supervision_donut.segments), 3)
             holding_card = window.holdings_cards.itemAt(0).widget()
             self.assertIn("002371", holding_card.code_name.text())
-            self.assertIn("#ef4444", holding_card.pnl.styleSheet())
+            self.assertIn("#e25555", holding_card.pnl.styleSheet())
             window.engine.sync_trade("卖出 002371 9 1", sector="半导体")
             window._refresh_cockpit()
             holding_card = window.holdings_cards.itemAt(0).widget()
-            self.assertIn("#22c55e", holding_card.pnl.styleSheet())
+            self.assertIn("#3fad7a", holding_card.pnl.styleSheet())
             window.engine.update_current_capital("4900000")
             window._refresh_cockpit()
-            self.assertIn("#16a34a", window.cockpit_kpis["pnl"].styleSheet())
+            self.assertIn("#3fad7a", window.cockpit_kpis["pnl"].styleSheet())
             window.close()
 
 

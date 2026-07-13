@@ -1,4 +1,4 @@
-"""Reusable visual widgets for the trading cockpit dashboard."""
+"""Reusable visual widgets for the Sharon trading desk."""
 
 from __future__ import annotations
 
@@ -17,6 +17,87 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
+# Ink-terminal palette: graphite surfaces, brass accent, A-share red/green.
+BRASS = "#c9a66b"
+BRASS_SOFT = "#e6d3a8"
+INK = "#ece8e1"
+MUTED = "#9aa3ad"
+TRACK_DARK = "#2c3440"
+TRACK_LIGHT = "#e4e8ee"
+PROFIT = "#e25555"
+LOSS = "#3fad7a"
+WARN = "#d4a017"
+
+
+def _mono(size: int, weight: QFont.Weight = QFont.Weight.Bold) -> QFont:
+    font = QFont("JetBrains Mono", size, weight)
+    font.setStyleHint(QFont.StyleHint.TypeWriter)
+    return font
+
+
+def _ui(size: int, weight: QFont.Weight = QFont.Weight.Medium) -> QFont:
+    font = QFont("Public Sans", size, weight)
+    if not font.exactMatch():
+        font = QFont("WenQuanYi Micro Hei", size, weight)
+    return font
+
+
+class PageHeader(QFrame):
+    """Single-purpose page masthead: title + one supporting line."""
+
+    def __init__(self, title: str, subtitle: str = "") -> None:
+        super().__init__()
+        self.setObjectName("pageHeader")
+        root = QVBoxLayout(self)
+        root.setContentsMargins(22, 16, 22, 16)
+        root.setSpacing(4)
+        heading = QLabel(title)
+        heading.setObjectName("pageHeaderTitle")
+        root.addWidget(heading)
+        if subtitle:
+            hint = QLabel(subtitle)
+            hint.setObjectName("pageHeaderSubtitle")
+            hint.setWordWrap(True)
+            root.addWidget(hint)
+
+
+class MetricStrip(QFrame):
+    """Inline metrics without dashboard-card chrome."""
+
+    def __init__(self, items: list[tuple[str, str]]) -> None:
+        super().__init__()
+        self.setObjectName("metricStrip")
+        self.values: dict[str, QLabel] = {}
+        row = QHBoxLayout(self)
+        row.setContentsMargins(18, 12, 18, 12)
+        row.setSpacing(0)
+        for index, (key, title) in enumerate(items):
+            if index:
+                divider = QFrame()
+                divider.setObjectName("metricDivider")
+                divider.setFixedWidth(1)
+                divider.setMinimumHeight(28)
+                row.addWidget(divider)
+            cell = QVBoxLayout()
+            cell.setSpacing(2)
+            cell.setContentsMargins(16, 0, 16, 0)
+            label = QLabel(title)
+            label.setObjectName("kpiTitle")
+            value = QLabel("--")
+            value.setObjectName("stripValue")
+            cell.addWidget(label)
+            cell.addWidget(value)
+            self.values[key] = value
+            row.addLayout(cell, 1)
+
+    def set_value(self, key: str, text: str, color: str | None = None) -> None:
+        label = self.values[key]
+        label.setText(text)
+        if color:
+            label.setStyleSheet(f"color:{color}; background:transparent;")
+        else:
+            label.setStyleSheet("background:transparent;")
 
 
 class RingGauge(QWidget):
@@ -53,7 +134,7 @@ class RingGauge(QWidget):
             if self.good_when_high
             else self.ratio <= self.threshold
         )
-        return QColor("#22c55e" if safe else "#ef4444")
+        return QColor(LOSS if safe else PROFIT)
 
     def paintEvent(self, event) -> None:  # noqa: N802 - Qt API
         painter = QPainter(self)
@@ -65,7 +146,7 @@ class RingGauge(QWidget):
             side,
             side,
         )
-        pen = QPen(QColor("#17324d" if self.dark_mode else "#e8edf5"), 12)
+        pen = QPen(QColor(TRACK_DARK if self.dark_mode else TRACK_LIGHT), 11)
         pen.setCapStyle(Qt.PenCapStyle.RoundCap)
         painter.setPen(pen)
         painter.drawArc(rect, 90 * 16, -360 * 16)
@@ -73,23 +154,23 @@ class RingGauge(QWidget):
         painter.setPen(pen)
         painter.drawArc(rect, 90 * 16, int(-360 * 16 * self.ratio))
 
-        painter.setPen(QColor("#e0f2fe" if self.dark_mode else "#14213d"))
-        painter.setFont(QFont("", 19, QFont.Weight.Bold))
+        painter.setPen(QColor(INK if self.dark_mode else "#1a1f26"))
+        painter.setFont(_mono(18))
         painter.drawText(
             rect,
             Qt.AlignmentFlag.AlignCenter,
             f"{self.ratio * 100:.1f}%",
         )
-        painter.setPen(QColor("#6f91aa" if self.dark_mode else "#6b7890"))
-        painter.setFont(QFont("", 10, QFont.Weight.Medium))
-        title_rect = QRectF(rect.left(), rect.bottom() - 35, rect.width(), 24)
+        painter.setPen(QColor(MUTED))
+        painter.setFont(_ui(10))
+        title_rect = QRectF(rect.left(), rect.bottom() - 34, rect.width(), 22)
         painter.drawText(title_rect, Qt.AlignmentFlag.AlignCenter, self.title)
 
 
 class DonutChart(QWidget):
     """Multi-segment allocation donut with a center summary."""
 
-    COLORS = ["#22d3ee", "#8b5cf6", "#f43f5e", "#f59e0b", "#10b981"]
+    COLORS = ["#c9a66b", "#e25555", "#3fad7a", "#6f8fad", "#d4a017"]
 
     def __init__(self, center_title: str = "") -> None:
         super().__init__()
@@ -134,7 +215,7 @@ class DonutChart(QWidget):
             size,
         )
         total = sum(value for _, value, _ in self.segments)
-        track = QPen(QColor("#17324d" if self.dark_mode else "#e8edf5"), 22)
+        track = QPen(QColor(TRACK_DARK if self.dark_mode else TRACK_LIGHT), 20)
         track.setCapStyle(Qt.PenCapStyle.FlatCap)
         painter.setPen(track)
         painter.drawArc(rect, 90 * 16, -360 * 16)
@@ -142,22 +223,22 @@ class DonutChart(QWidget):
             start = 90 * 16
             for _, value, color in self.segments:
                 span = int(-360 * 16 * value / total)
-                pen = QPen(color, 22)
+                pen = QPen(color, 20)
                 pen.setCapStyle(Qt.PenCapStyle.FlatCap)
                 painter.setPen(pen)
                 painter.drawArc(rect, start, span)
                 start += span
-        painter.setPen(QColor("#e0f2fe" if self.dark_mode else "#14213d"))
-        painter.setFont(QFont("", 18, QFont.Weight.Bold))
+        painter.setPen(QColor(INK if self.dark_mode else "#1a1f26"))
+        painter.setFont(_mono(16))
         value_rect = QRectF(
-            rect.left(), rect.center().y() - 22, rect.width(), 30
+            rect.left(), rect.center().y() - 20, rect.width(), 28
         )
         painter.drawText(
             value_rect, Qt.AlignmentFlag.AlignCenter, self.center_value
         )
-        painter.setPen(QColor("#6f91aa" if self.dark_mode else "#6b7890"))
-        painter.setFont(QFont("", 9, QFont.Weight.Medium))
-        title_rect = QRectF(rect.left(), rect.center().y() + 5, rect.width(), 22)
+        painter.setPen(QColor(MUTED))
+        painter.setFont(_ui(9))
+        title_rect = QRectF(rect.left(), rect.center().y() + 6, rect.width(), 20)
         painter.drawText(title_rect, Qt.AlignmentFlag.AlignCenter, self.center_title)
 
 
@@ -199,32 +280,33 @@ class ScoreGauge(QWidget):
             radius * 2,
             radius * 2,
         )
-        track = QPen(QColor("#17324d" if self.dark_mode else "#e8edf5"), 14)
+        track = QPen(QColor(TRACK_DARK if self.dark_mode else TRACK_LIGHT), 13)
         track.setCapStyle(Qt.PenCapStyle.RoundCap)
         painter.setPen(track)
         painter.drawArc(rect, 0, 180 * 16)
-        color = (
-            "#22d3ee"
-            if self.score >= 90
-            else "#f59e0b"
-            if self.score >= 70
-            else "#ef4444"
-        )
-        pen = QPen(QColor(color), 14)
+        color = BRASS if self.score >= 90 else WARN if self.score >= 70 else PROFIT
+        pen = QPen(QColor(color), 13)
         pen.setCapStyle(Qt.PenCapStyle.RoundCap)
         painter.setPen(pen)
         painter.drawArc(rect, 180 * 16, int(-180 * 16 * self.score / 100))
-        painter.setPen(QColor("#e0f2fe" if self.dark_mode else "#14213d"))
-        painter.setFont(QFont("", 26, QFont.Weight.Bold))
+        painter.setPen(QColor(BRASS_SOFT if self.dark_mode else "#6b5216"))
+        painter.setFont(_mono(28))
         painter.drawText(
-            QRectF(0, baseline - radius * 0.72, self.width(), 40),
+            QRectF(0, baseline - radius * 0.78, self.width(), 42),
             Qt.AlignmentFlag.AlignCenter,
-            f"{self.grade} · {self.score}",
+            self.grade,
         )
-        painter.setPen(QColor("#6f91aa" if self.dark_mode else "#6b7890"))
-        painter.setFont(QFont("", 10, QFont.Weight.Medium))
+        painter.setPen(QColor(INK if self.dark_mode else "#1a1f26"))
+        painter.setFont(_mono(14, QFont.Weight.Medium))
         painter.drawText(
-            QRectF(0, baseline - radius * 0.32, self.width(), 22),
+            QRectF(0, baseline - radius * 0.42, self.width(), 22),
+            Qt.AlignmentFlag.AlignCenter,
+            f"{self.score} 分",
+        )
+        painter.setPen(QColor(MUTED))
+        painter.setFont(_ui(10))
+        painter.drawText(
+            QRectF(0, baseline - radius * 0.18, self.width(), 20),
             Qt.AlignmentFlag.AlignCenter,
             self.title,
         )
@@ -274,15 +356,15 @@ class RadarChart(QWidget):
     def paintEvent(self, event) -> None:  # noqa: N802
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        margin = 36
+        margin = 38
         side = min(self.width(), self.height()) - margin * 2
         center = QPointF(self.width() / 2, self.height() / 2 + 2)
         radius = max(40.0, side / 2)
-        grid = QColor("#1a3a55" if self.dark_mode else "#d7e0ec")
-        axis = QColor("#6f91aa" if self.dark_mode else "#64748b")
-        fill = QColor(34, 211, 238, 70 if self.dark_mode else 90)
-        stroke = QColor("#22d3ee" if self.dark_mode else "#0891b2")
-        text = QColor("#dff6ff" if self.dark_mode else "#1e293b")
+        grid = QColor("#3a4350" if self.dark_mode else "#d5dae2")
+        axis = QColor(MUTED)
+        fill = QColor(201, 166, 107, 55 if self.dark_mode else 80)
+        stroke = QColor(BRASS)
+        text = QColor(INK if self.dark_mode else "#1a1f26")
 
         for ring in (0.33, 0.66, 1.0):
             polygon = QPolygonF(
@@ -304,52 +386,51 @@ class RadarChart(QWidget):
             ]
         )
         painter.setBrush(fill)
-        painter.setPen(QPen(stroke, 2.4))
+        painter.setPen(QPen(stroke, 2.2))
         painter.drawPolygon(value_poly)
 
         for index, (key, label, score) in enumerate(self.axes):
             point = self._point(center, radius, index, score / 100.0)
             painter.setBrush(stroke)
             painter.setPen(Qt.PenStyle.NoPen)
-            painter.drawEllipse(point, 3.5, 3.5)
+            painter.drawEllipse(point, 3.2, 3.2)
 
             label_point = self._point(center, radius + 22, index, 1.0)
             painter.setPen(text)
-            painter.setFont(QFont("", 11, QFont.Weight.Bold))
+            painter.setFont(_mono(11))
             painter.drawText(
-                QRectF(label_point.x() - 30, label_point.y() - 20, 60, 18),
+                QRectF(label_point.x() - 30, label_point.y() - 18, 60, 18),
                 Qt.AlignmentFlag.AlignCenter,
                 key,
             )
             painter.setPen(axis)
-            painter.setFont(QFont("", 9, QFont.Weight.Medium))
+            painter.setFont(_ui(9))
             painter.drawText(
-                QRectF(label_point.x() - 30, label_point.y() - 4, 60, 16),
+                QRectF(label_point.x() - 34, label_point.y() - 2, 68, 16),
                 Qt.AlignmentFlag.AlignCenter,
                 f"{label} {score:.0f}",
             )
 
 
 class CandidateSlotCard(QFrame):
-    """One of three externally selected candidate slots."""
+    """One of three externally selected candidate seats."""
 
     def __init__(self, rank: int) -> None:
         super().__init__()
         self.rank = rank
         self.setObjectName("candidateSlot")
-        self.setMinimumHeight(132)
-        self.setMaximumHeight(168)
+        self.setMinimumHeight(148)
+        self.setMaximumHeight(178)
         root = QVBoxLayout(self)
-        root.setContentsMargins(14, 12, 14, 12)
-        root.setSpacing(6)
+        root.setContentsMargins(16, 14, 16, 14)
+        root.setSpacing(7)
         top = QHBoxLayout()
-        self.rank_label = QLabel(f"0{rank}")
+        self.rank_label = QLabel(f"{rank:02d}")
         self.rank_label.setObjectName("candidateRank")
         self.name = QLabel("空席")
         self.name.setObjectName("candidateSlotName")
         top.addWidget(self.rank_label)
-        top.addWidget(self.name)
-        top.addStretch()
+        top.addWidget(self.name, 1)
         root.addLayout(top)
         self.code_sector = QLabel("等待外部 AI 写入")
         self.code_sector.setObjectName("candidateSlotMeta")
@@ -358,16 +439,17 @@ class CandidateSlotCard(QFrame):
         self.score = QProgressBar()
         self.score.setRange(0, 100)
         self.score.setValue(0)
-        self.score.setFormat("外部评分：未提供")
-        self.score.setMaximumHeight(22)
+        self.score.setFormat("外部评分 未提供")
+        self.score.setMaximumHeight(20)
         self.reason = QLabel("登记后展示入选摘要")
         self.reason.setObjectName("candidateSlotReason")
         self.reason.setWordWrap(True)
-        self.reason.setMaximumHeight(36)
+        self.reason.setMaximumHeight(34)
         root.addWidget(self.code_sector)
         root.addWidget(self.source)
         root.addWidget(self.score)
         root.addWidget(self.reason)
+        self.setProperty("occupied", False)
 
     def set_candidate(self, candidate: dict | None) -> None:
         if not candidate:
@@ -375,27 +457,31 @@ class CandidateSlotCard(QFrame):
             self.code_sector.setText("等待外部 AI 写入")
             self.source.setText("—")
             self.score.setValue(0)
-            self.score.setFormat("外部评分：未提供")
+            self.score.setFormat("外部评分 未提供")
             self.reason.setText("登记后展示入选摘要")
             self.setProperty("occupied", False)
+            self.style().unpolish(self)
+            self.style().polish(self)
             return
         self.name.setText(candidate["stock_name"] or "未命名股票")
         self.code_sector.setText(
             f"{candidate['stock_code']}  ·  {candidate['sector']}"
         )
-        self.source.setText(f"来源：{candidate['source_ai']}")
+        self.source.setText(f"来源  {candidate['source_ai']}")
         score = candidate["external_score"]
         self.score.setValue(int(score or 0))
         self.score.setFormat(
-            f"外部评分 {score:g} / 100" if score is not None else "外部评分：未提供"
+            f"外部评分  {score:g} / 100" if score is not None else "外部评分 未提供"
         )
         reason = candidate["selection_reason"] or "未填写入选理由"
-        self.reason.setText(reason if len(reason) <= 42 else reason[:40] + "…")
+        self.reason.setText(reason if len(reason) <= 40 else reason[:38] + "…")
         self.setProperty("occupied", True)
+        self.style().unpolish(self)
+        self.style().polish(self)
 
 
 class CockpitCard(QFrame):
-    """Dashboard card with a title and optional subtitle."""
+    """Surface panel with title and optional subtitle."""
 
     def __init__(self, title: str, subtitle: str = "") -> None:
         super().__init__()
@@ -404,7 +490,7 @@ class CockpitCard(QFrame):
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
         )
         self.body = QVBoxLayout(self)
-        self.body.setContentsMargins(16, 14, 16, 14)
+        self.body.setContentsMargins(18, 15, 18, 15)
         self.body.setSpacing(8)
         heading = QLabel(title)
         heading.setObjectName("cockpitTitle")
@@ -417,14 +503,14 @@ class CockpitCard(QFrame):
 
 
 class HoldingCard(QFrame):
-    """Data-rich card for one currently held A-share position."""
+    """Dense card for one currently held A-share position."""
 
     def __init__(self) -> None:
         super().__init__()
         self.setObjectName("holdingCard")
         root = QVBoxLayout(self)
         root.setContentsMargins(16, 14, 16, 14)
-        root.setSpacing(9)
+        root.setSpacing(8)
         header = QHBoxLayout()
         self.code_name = QLabel("--")
         self.code_name.setObjectName("holdingName")
@@ -439,15 +525,17 @@ class HoldingCard(QFrame):
         root.addLayout(header)
 
         metrics = QGridLayout()
+        metrics.setHorizontalSpacing(12)
+        metrics.setVerticalSpacing(4)
         self.metric_labels: dict[str, QLabel] = {}
         for index, (key, title) in enumerate(
             [
-                ("quantity", "持仓数量"),
-                ("avg_cost", "平均成本"),
-                ("last_price", "最新价格"),
-                ("market_value", "持仓市值"),
-                ("pnl_amount", "浮动盈亏"),
-                ("stop_price", "-7% 止损价"),
+                ("quantity", "数量"),
+                ("avg_cost", "成本"),
+                ("last_price", "现价"),
+                ("market_value", "市值"),
+                ("pnl_amount", "浮盈"),
+                ("stop_price", "止损"),
             ]
         ):
             title_label = QLabel(title)
@@ -462,6 +550,7 @@ class HoldingCard(QFrame):
         root.addLayout(metrics)
         self.position_bar = QProgressBar()
         self.position_bar.setRange(0, 250)
+        self.position_bar.setMaximumHeight(18)
         root.addWidget(self.position_bar)
 
     def set_data(self, item: dict, name: str = "") -> None:
@@ -478,45 +567,47 @@ class HoldingCard(QFrame):
         self.sector.setText(item["sector"])
         self.pnl.setText(f"{pnl_rate:+.2%}")
         self.pnl.setStyleSheet(
-            f"color:{'#ef4444' if pnl_rate >= 0 else '#22c55e'};"
+            f"color:{PROFIT if pnl_rate >= 0 else LOSS};"
             "font-size:18px; font-weight:800; background:transparent;"
+            "font-family:'JetBrains Mono';"
         )
-        self.metric_labels["quantity"].setText(f"{quantity:,} 股")
+        self.metric_labels["quantity"].setText(f"{quantity:,}")
         self.metric_labels["avg_cost"].setText(f"{avg_cost:,.2f}")
         self.metric_labels["last_price"].setText(f"{last_price:,.2f}")
         self.metric_labels["market_value"].setText(
-            f"{market_value / 10000:,.2f} 万"
+            f"{market_value / 10000:,.2f}万"
         )
         self.metric_labels["pnl_amount"].setText(
-            f"{pnl_amount / 10000:+,.2f} 万"
+            f"{pnl_amount / 10000:+,.2f}万"
         )
         self.metric_labels["pnl_amount"].setStyleSheet(
-            f"color:{'#ef4444' if pnl_amount >= 0 else '#22c55e'};"
+            f"color:{PROFIT if pnl_amount >= 0 else LOSS};"
             "font-weight:750; background:transparent;"
+            "font-family:'JetBrains Mono';"
         )
         self.metric_labels["stop_price"].setText(
             f"{avg_cost * Decimal('0.93'):,.2f}"
         )
         self.position_bar.setValue(min(250, int(ratio * 1000)))
-        self.position_bar.setFormat(f"单票仓位 {ratio:.2%} / 红线 25%")
+        self.position_bar.setFormat(f"仓位 {ratio:.2%} / 25%")
 
 
 class StatusBadge(QLabel):
-    """Pill badge used for compliance and synchronization state."""
+    """Compact status chip — square corners, not rounded pills."""
 
     COLORS = {
-        "green": ("#dcfce7", "#15803d"),
-        "yellow": ("#fef3c7", "#b45309"),
-        "red": ("#fee2e2", "#b91c1c"),
-        "blue": ("#dbeafe", "#1d4ed8"),
-        "slate": ("#e9eef5", "#475569"),
+        "green": ("#e8f6ee", "#1f7a4d"),
+        "yellow": ("#f8efd6", "#8a6a12"),
+        "red": ("#f8e6e6", "#a33333"),
+        "blue": ("#ece7dc", "#6b5216"),
+        "slate": ("#eceff2", "#4b5563"),
     }
     DARK_COLORS = {
-        "green": ("#052e2b", "#5eead4"),
-        "yellow": ("#3b2607", "#fbbf24"),
-        "red": ("#3b0a16", "#fb7185"),
-        "blue": ("#082f49", "#67e8f9"),
-        "slate": ("#152638", "#94a3b8"),
+        "green": ("#1a2b22", "#7dcca0"),
+        "yellow": ("#2c2412", "#e0bf5a"),
+        "red": ("#2c1717", "#e88a8a"),
+        "blue": ("#2a2418", BRASS_SOFT),
+        "slate": ("#242a33", "#aeb6c0"),
     }
 
     def __init__(self, text: str = "", tone: str = "slate") -> None:
@@ -524,7 +615,7 @@ class StatusBadge(QLabel):
         self.dark_mode = False
         self.tone = tone
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setMinimumHeight(32)
+        self.setMinimumHeight(28)
         self.set_status(text, tone)
 
     def set_status(self, text: str, tone: str = "slate") -> None:
@@ -534,7 +625,7 @@ class StatusBadge(QLabel):
         self.setText(text)
         self.setStyleSheet(
             f"background:{background}; color:{foreground}; "
-            "border-radius:16px; padding:5px 12px; font-weight:700;"
+            "border-radius:4px; padding:4px 10px; font-weight:700;"
         )
 
     def set_dark_mode(self, enabled: bool) -> None:
@@ -547,6 +638,8 @@ __all__ = [
     "CockpitCard",
     "DonutChart",
     "HoldingCard",
+    "MetricStrip",
+    "PageHeader",
     "RadarChart",
     "RingGauge",
     "ScoreGauge",
