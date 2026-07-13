@@ -81,6 +81,8 @@ class WorkbenchWindow(MainWindow):
             )
         )
         self.cockpit_timer.start()
+        self._sync_side_nav()
+        self._toggle_context_panels(self.tabs.currentIndex())
         self._refresh_extended()
 
     def _upgrade_positions_tab(self) -> None:

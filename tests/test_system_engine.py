@@ -185,6 +185,9 @@ class WorkbenchSmokeTests(unittest.TestCase):
             labels = [window.tabs.tabText(i) for i in range(window.tabs.count())]
             self.assertEqual(labels[0], "驾驶舱")
             self.assertIs(window.tabs.currentWidget(), window.cockpit_page)
+            self.assertEqual(window.side_nav.count(), window.tabs.count())
+            self.assertEqual(window.side_nav.item(0).text(), "驾驶舱")
+            self.assertTrue(window.tabs.tabBar().isHidden())
             self.assertTrue(window.trade_frame.isHidden())
             self.assertIn("#e25555", window.cockpit_kpis["pnl"].styleSheet())
             original_theme = window.dark_mode
