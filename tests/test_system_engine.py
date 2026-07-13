@@ -186,6 +186,13 @@ class WorkbenchSmokeTests(unittest.TestCase):
             self.assertEqual(labels[0], "驾驶舱")
             self.assertIs(window.tabs.currentWidget(), window.cockpit_page)
             self.assertTrue(window.trade_frame.isHidden())
+            self.assertIn("#dc2626", window.cockpit_kpis["pnl"].styleSheet())
+            original_theme = window.dark_mode
+            window.theme_button.click()
+            self.assertNotEqual(window.dark_mode, original_theme)
+            self.assertEqual(window.position_gauge.dark_mode, window.dark_mode)
+            window.theme_button.click()
+            self.assertEqual(window.dark_mode, original_theme)
             self.assertIn("候选股票", labels)
             self.assertIn("交易计划", labels)
             self.assertIn("AI 监督", labels)
@@ -215,6 +222,9 @@ class WorkbenchSmokeTests(unittest.TestCase):
             self.assertGreater(window.position_gauge.ratio, 0)
             self.assertLess(window.cash_gauge.ratio, 1)
             self.assertEqual(window.cockpit_sync.text(), "同步队列 0")
+            window.engine.update_current_capital("4900000")
+            window._refresh_cockpit()
+            self.assertIn("#16a34a", window.cockpit_kpis["pnl"].styleSheet())
             window.close()
 
 

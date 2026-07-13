@@ -22,12 +22,17 @@ class RingGauge(QWidget):
         self.ratio = 0.0
         self.good_when_high = good_when_high
         self.threshold = threshold
+        self.dark_mode = False
         self.setMinimumSize(150, 150)
         self.setMaximumHeight(180)
         self.setStyleSheet("background: transparent;")
 
     def set_ratio(self, ratio: float) -> None:
         self.ratio = max(0.0, min(float(ratio), 1.0))
+        self.update()
+
+    def set_dark_mode(self, enabled: bool) -> None:
+        self.dark_mode = bool(enabled)
         self.update()
 
     def _color(self) -> QColor:
@@ -48,7 +53,7 @@ class RingGauge(QWidget):
             side,
             side,
         )
-        pen = QPen(QColor("#e8edf5"), 12)
+        pen = QPen(QColor("#17324d" if self.dark_mode else "#e8edf5"), 12)
         pen.setCapStyle(Qt.PenCapStyle.RoundCap)
         painter.setPen(pen)
         painter.drawArc(rect, 90 * 16, -360 * 16)
@@ -56,14 +61,14 @@ class RingGauge(QWidget):
         painter.setPen(pen)
         painter.drawArc(rect, 90 * 16, int(-360 * 16 * self.ratio))
 
-        painter.setPen(QColor("#14213d"))
+        painter.setPen(QColor("#e0f2fe" if self.dark_mode else "#14213d"))
         painter.setFont(QFont("", 19, QFont.Weight.Bold))
         painter.drawText(
             rect,
             Qt.AlignmentFlag.AlignCenter,
             f"{self.ratio * 100:.1f}%",
         )
-        painter.setPen(QColor("#6b7890"))
+        painter.setPen(QColor("#6f91aa" if self.dark_mode else "#6b7890"))
         painter.setFont(QFont("", 10, QFont.Weight.Medium))
         title_rect = QRectF(rect.left(), rect.bottom() - 35, rect.width(), 24)
         painter.drawText(title_rect, Qt.AlignmentFlag.AlignCenter, self.title)
@@ -98,20 +103,35 @@ class StatusBadge(QLabel):
         "blue": ("#dbeafe", "#1d4ed8"),
         "slate": ("#e9eef5", "#475569"),
     }
+    DARK_COLORS = {
+        "green": ("#052e2b", "#5eead4"),
+        "yellow": ("#3b2607", "#fbbf24"),
+        "red": ("#3b0a16", "#fb7185"),
+        "blue": ("#082f49", "#67e8f9"),
+        "slate": ("#152638", "#94a3b8"),
+    }
 
     def __init__(self, text: str = "", tone: str = "slate") -> None:
         super().__init__()
+        self.dark_mode = False
+        self.tone = tone
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setMinimumHeight(32)
         self.set_status(text, tone)
 
     def set_status(self, text: str, tone: str = "slate") -> None:
-        background, foreground = self.COLORS.get(tone, self.COLORS["slate"])
+        self.tone = tone
+        palette = self.DARK_COLORS if self.dark_mode else self.COLORS
+        background, foreground = palette.get(tone, palette["slate"])
         self.setText(text)
         self.setStyleSheet(
             f"background:{background}; color:{foreground}; "
             "border-radius:16px; padding:5px 12px; font-weight:700;"
         )
+
+    def set_dark_mode(self, enabled: bool) -> None:
+        self.dark_mode = bool(enabled)
+        self.set_status(self.text(), self.tone)
 
 
 __all__ = ["CockpitCard", "RingGauge", "StatusBadge"]

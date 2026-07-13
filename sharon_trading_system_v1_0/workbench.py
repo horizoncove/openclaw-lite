@@ -97,6 +97,8 @@ class WorkbenchWindow(MainWindow):
         hero_layout.addStretch()
         self.cockpit_compliance = StatusBadge("系统正常", "green")
         self.cockpit_sync = StatusBadge("同步队列 0", "blue")
+        self.cockpit_compliance.set_dark_mode(self.dark_mode)
+        self.cockpit_sync.set_dark_mode(self.dark_mode)
         hero_layout.addWidget(self.cockpit_compliance)
         hero_layout.addWidget(self.cockpit_sync)
         hero_layout.addWidget(self.cockpit_time)
@@ -108,7 +110,7 @@ class WorkbenchWindow(MainWindow):
         for column, (key, title, accent) in enumerate(
             [
                 ("equity", "账户净值", "#2563eb"),
-                ("pnl", "累计盈亏", "#16a34a"),
+                ("pnl", "累计盈亏", "#dc2626"),
                 ("market", "持仓市值", "#7c3aed"),
                 ("cash", "可用现金", "#0891b2"),
             ]
@@ -138,6 +140,8 @@ class WorkbenchWindow(MainWindow):
         self.cash_gauge = RingGauge(
             "现金比例", good_when_high=True, threshold=0.40
         )
+        self.position_gauge.set_dark_mode(self.dark_mode)
+        self.cash_gauge.set_dark_mode(self.dark_mode)
         gauges.addWidget(self.position_gauge)
         gauges.addWidget(self.cash_gauge)
         allocation.body.addLayout(gauges)
@@ -147,6 +151,7 @@ class WorkbenchWindow(MainWindow):
             "外部 AI 候选池", "只记录最终 2–3 只，不在本软件选股"
         )
         self.cockpit_candidate_badge = StatusBadge("0 / 3", "yellow")
+        self.cockpit_candidate_badge.set_dark_mode(self.dark_mode)
         candidate_card.body.addWidget(self.cockpit_candidate_badge)
         self.cockpit_candidates = self._table(["代码", "名称", "板块", "来源"])
         self.cockpit_candidates.setMaximumHeight(155)
@@ -155,6 +160,7 @@ class WorkbenchWindow(MainWindow):
 
         discipline = CockpitCard("纪律与监督", "L1 硬规则优先")
         self.cockpit_risk_badge = StatusBadge("🟢 全部合规", "green")
+        self.cockpit_risk_badge.set_dark_mode(self.dark_mode)
         self.cockpit_grade = QLabel("月度评分 A · 100 分")
         self.cockpit_grade.setObjectName("cockpitBigText")
         self.cockpit_penalty = QLabel("处罚状态：正常")
@@ -577,6 +583,19 @@ class WorkbenchWindow(MainWindow):
         if hasattr(self, "cockpit_page"):
             self._refresh_cockpit()
 
+    def _toggle_theme(self) -> None:
+        super()._toggle_theme()
+        if hasattr(self, "position_gauge"):
+            self.position_gauge.set_dark_mode(self.dark_mode)
+            self.cash_gauge.set_dark_mode(self.dark_mode)
+            for badge in (
+                self.cockpit_compliance,
+                self.cockpit_sync,
+                self.cockpit_candidate_badge,
+                self.cockpit_risk_badge,
+            ):
+                badge.set_dark_mode(self.dark_mode)
+
     @staticmethod
     def _clear_layout(layout: QVBoxLayout) -> None:
         while layout.count():
@@ -606,7 +625,7 @@ class WorkbenchWindow(MainWindow):
             f"{'+' if account.total_pnl >= 0 else ''}{_wan(account.total_pnl)}"
         )
         self.cockpit_kpis["pnl"].setStyleSheet(
-            f"color:{'#16a34a' if account.total_pnl >= 0 else '#dc2626'};"
+            f"color:{'#dc2626' if account.total_pnl >= 0 else '#16a34a'};"
         )
         self.cockpit_kpis["market"].setText(
             _wan(snapshot["total_market_value"])

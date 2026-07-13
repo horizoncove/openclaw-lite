@@ -5,7 +5,7 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
-from PyQt6.QtCore import QStandardPaths, QTimer
+from PyQt6.QtCore import QSettings, QStandardPaths, QTimer
 from PyQt6.QtGui import QColor, QFont
 from PyQt6.QtWidgets import (
     QAbstractItemView,
@@ -74,6 +74,8 @@ class MainWindow(QMainWindow):
 
     def __init__(self, db_path: str | Path | None = None) -> None:
         super().__init__()
+        self.settings = QSettings("Sharon", "TradingSystem")
+        self.dark_mode = self.settings.value("dark_mode", False, type=bool)
         data_path = db_path or default_database_path()
         self.engine = AccountEngine(
             data_path,
@@ -113,6 +115,10 @@ class MainWindow(QMainWindow):
         heading.addLayout(titles)
         heading.addStretch()
 
+        self.theme_button = QPushButton()
+        self.theme_button.setObjectName("themeButton")
+        self.theme_button.clicked.connect(self._toggle_theme)
+        self._update_theme_button()
         capital_label = QLabel("当前总额")
         self.capital_input = QDoubleSpinBox()
         self.capital_input.setRange(0, 999_999_999)
@@ -123,6 +129,7 @@ class MainWindow(QMainWindow):
         save_capital = QPushButton("更新净值")
         save_capital.setObjectName("secondaryButton")
         save_capital.clicked.connect(self._save_capital)
+        heading.addWidget(self.theme_button)
         heading.addWidget(capital_label)
         heading.addWidget(self.capital_input)
         heading.addWidget(save_capital)
@@ -131,7 +138,7 @@ class MainWindow(QMainWindow):
         cards = QGridLayout()
         cards.setHorizontalSpacing(12)
         self.capital_card = MetricCard("当前总额")
-        self.pnl_card = MetricCard("累计盈亏", "#059669")
+        self.pnl_card = MetricCard("累计盈亏", "#dc2626")
         self.position_card = MetricCard("总仓位", "#7c3aed")
         self.cash_card = MetricCard("可用现金", "#0891b2")
         self.metric_cards = [
@@ -195,6 +202,15 @@ class MainWindow(QMainWindow):
         for card in self.metric_cards:
             card.setVisible(not is_cockpit)
         self.trade_frame.setVisible(not is_cockpit)
+
+    def _update_theme_button(self) -> None:
+        self.theme_button.setText("☀ 浅色" if self.dark_mode else "◐ 深色")
+
+    def _toggle_theme(self) -> None:
+        self.dark_mode = not self.dark_mode
+        self.settings.setValue("dark_mode", self.dark_mode)
+        self._update_theme_button()
+        self._apply_style()
 
     @staticmethod
     def _table(headers: list[str]) -> QTableWidget:
@@ -260,7 +276,7 @@ class MainWindow(QMainWindow):
         self.capital_input.setValue(float(account.current_capital))
         self.capital_input.blockSignals(False)
         self.capital_card.set_value(_wan(account.current_capital))
-        pnl_color = "#059669" if account.total_pnl >= 0 else "#dc2626"
+        pnl_color = "#dc2626" if account.total_pnl >= 0 else "#16a34a"
         self.pnl_card.set_value(_wan(account.total_pnl), pnl_color)
         position_safe = snapshot["total_position_ratio"] <= Decimal("0.60")
         self.position_card.set_value(
@@ -349,8 +365,7 @@ class MainWindow(QMainWindow):
         event.accept()
 
     def _apply_style(self) -> None:
-        self.setStyleSheet(
-            """
+        light_style = """
             QMainWindow, QWidget {
                 background: #f3f6fb;
                 color: #14213d;
@@ -445,7 +460,7 @@ class MainWindow(QMainWindow):
                 font-weight: 600;
             }
             QPushButton:hover { background: #1d4ed8; }
-            QPushButton#secondaryButton {
+            QPushButton#secondaryButton, QPushButton#themeButton {
                 background: #e8efff;
                 color: #1d4ed8;
             }
@@ -502,7 +517,130 @@ class MainWindow(QMainWindow):
             }
             QStatusBar { background: white; border-top: 1px solid #e5eaf2; }
             """
-        )
+        dark_style = """
+            QMainWindow, QWidget {
+                background: #050b14;
+                color: #d9e7f5;
+            }
+            QLabel#pageTitle { color: #e8f4ff; }
+            QLabel#subtitle, QLabel#hint, QLabel#metricTitle {
+                color: #7190aa;
+            }
+            QFrame#metricCard, QFrame#panel {
+                background: #0a1626;
+                border: 1px solid #17324d;
+            }
+            QFrame#dashboardHero {
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #071426, stop:0.42 #0a2850,
+                    stop:0.78 #064e78, stop:1 #0891b2
+                );
+                border: 1px solid #0e7490;
+            }
+            QFrame#cockpitCard, QFrame#cockpitKpi {
+                background: #091827;
+                border: 1px solid #173853;
+            }
+            QLabel#cockpitTitle { color: #dff6ff; }
+            QLabel#cockpitHint, QLabel#kpiTitle { color: #6f91aa; }
+            QLabel#cockpitBigText { color: #38bdf8; }
+            QScrollArea#cockpitScroll, QWidget#cockpitPage {
+                background: #050b14;
+            }
+            QLineEdit, QDoubleSpinBox, QSpinBox, QComboBox,
+            QDateEdit, QTimeEdit, QTextEdit {
+                background: #081522;
+                color: #dbeafe;
+                border: 1px solid #1d405c;
+                selection-background-color: #0e7490;
+            }
+            QLineEdit:focus, QDoubleSpinBox:focus, QSpinBox:focus,
+            QComboBox:focus, QDateEdit:focus, QTimeEdit:focus,
+            QTextEdit:focus { border: 1px solid #22d3ee; }
+            QPushButton {
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #0369a1, stop:1 #0891b2
+                );
+                color: #ecfeff;
+                border: 1px solid #0e7490;
+            }
+            QPushButton:hover {
+                background: #0e7490;
+                border-color: #22d3ee;
+            }
+            QPushButton#secondaryButton, QPushButton#themeButton {
+                background: #0b2235;
+                color: #67e8f9;
+                border: 1px solid #155e75;
+            }
+            QTabWidget::pane {
+                background: #07111f;
+                border: 1px solid #153650;
+            }
+            QTabBar::tab {
+                background: #0a1726;
+                color: #6e8ca5;
+                border: 1px solid #102a40;
+            }
+            QTabBar::tab:selected {
+                background: #0b2235;
+                color: #67e8f9;
+                border-bottom-color: #22d3ee;
+            }
+            QTabBar::tab:hover {
+                color: #a5f3fc;
+                background: #0d293d;
+            }
+            QTableWidget {
+                background: #07111f;
+                alternate-background-color: #0a1827;
+                color: #c9dceb;
+                gridline-color: #132d43;
+                selection-background-color: #0e4f6c;
+            }
+            QHeaderView::section {
+                background: #0d2132;
+                color: #7dd3fc;
+                border-bottom: 1px solid #155e75;
+            }
+            QProgressBar {
+                background: #0c2233;
+                color: #dff6ff;
+            }
+            QProgressBar::chunk {
+                background: qlineargradient(
+                    x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #0891b2, stop:1 #22d3ee
+                );
+            }
+            QGroupBox {
+                background: #081522;
+                border: 1px solid #173853;
+                border-radius: 10px;
+                margin-top: 12px;
+                padding-top: 12px;
+                font-weight: 700;
+                color: #bae6fd;
+            }
+            QStatusBar {
+                background: #06101c;
+                color: #7dd3fc;
+                border-top: 1px solid #153650;
+            }
+            QScrollBar:vertical {
+                background: #07111f;
+                width: 10px;
+                margin: 0;
+            }
+            QScrollBar::handle:vertical {
+                background: #155e75;
+                border-radius: 5px;
+                min-height: 28px;
+            }
+        """
+        self.setStyleSheet(light_style + (dark_style if self.dark_mode else ""))
 
 
 def create_window(db_path: str | Path | None = None) -> MainWindow:
