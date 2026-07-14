@@ -49,7 +49,11 @@ from .cockpit import (
     StatusBadge,
 )
 from .main_window import MainWindow, default_database_path
-from .market_data import EastMoneyQuoteProvider, Quote
+from .market_data import (
+    EastMoneyQuoteProvider,
+    Quote,
+    normalize_stock_code,
+)
 from .network_settings import (
     NetworkSettings,
     load_network_settings,
@@ -107,6 +111,7 @@ class WorkbenchWindow(MainWindow):
         self._build_cockpit_tab()
         self.network_settings = load_network_settings(self.settings)
         self.quote_provider = EastMoneyQuoteProvider()
+        self._live_quotes: dict[str, Quote] = {}
         self._agent_worker: _AgentWorker | None = None
         self.cockpit_timer = QTimer(self)
         self.cockpit_timer.setInterval(1000)
@@ -277,7 +282,9 @@ class WorkbenchWindow(MainWindow):
         self.cockpit_candidate_badge = StatusBadge("0 / 3", "yellow")
         self.cockpit_candidate_badge.set_dark_mode(self.dark_mode)
         candidate_card.body.addWidget(self.cockpit_candidate_badge)
-        self.cockpit_candidates = self._table(["代码", "名称", "板块", "来源"])
+        self.cockpit_candidates = self._table(
+            ["代码", "名称", "现价", "涨跌", "板块", "来源"]
+        )
         self.cockpit_candidates.setMaximumHeight(155)
         candidate_card.body.addWidget(self.cockpit_candidates)
         grid.addWidget(candidate_card, 0, 1)
@@ -358,7 +365,7 @@ class WorkbenchWindow(MainWindow):
         layout.addWidget(
             PageHeader(
                 "候选股票",
-                "外部 AI 完成 SOP 选股 · 本页只登记最终 2–3 只并做买入准入",
+                "登记买入名单时同步显示实时行情 · 最多 2–3 只准入",
             )
         )
 
@@ -371,17 +378,20 @@ class WorkbenchWindow(MainWindow):
 
         lower = QHBoxLayout()
         lower.setSpacing(12)
-        editor = CockpitCard("登记入池", "代码 / 名称 / 板块 / 来源 / 评分 / 理由")
-        editor.setMaximumWidth(380)
+        editor = CockpitCard(
+            "登记入池", "输入代码即可查询实时行情，名称可自动回填"
+        )
+        editor.setMaximumWidth(400)
         editor.setSizePolicy(
             QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum
         )
         form = QFormLayout()
         form.setSpacing(8)
         self.candidate_code = QLineEdit()
-        self.candidate_code.setPlaceholderText("6 位股票代码")
+        self.candidate_code.setPlaceholderText("6 位股票代码，回车查行情")
+        self.candidate_code.editingFinished.connect(self._lookup_candidate_quote)
         self.candidate_name = QLineEdit()
-        self.candidate_name.setPlaceholderText("股票名称")
+        self.candidate_name.setPlaceholderText("股票名称（可自动回填）")
         self.candidate_sector = QLineEdit()
         self.candidate_sector.setPlaceholderText("所属板块")
         self.candidate_source = QLineEdit("外部 AI")
@@ -391,9 +401,17 @@ class WorkbenchWindow(MainWindow):
         self.candidate_reason = QTextEdit()
         self.candidate_reason.setMaximumHeight(64)
         self.candidate_reason.setPlaceholderText("粘贴外部 AI 入选摘要")
+        self.candidate_quote_label = QLabel("输入 6 位代码后自动显示实时行情")
+        self.candidate_quote_label.setObjectName("hint")
+        self.candidate_quote_label.setWordWrap(True)
+        lookup = QPushButton("查询实时行情")
+        lookup.setObjectName("secondaryButton")
+        lookup.clicked.connect(self._lookup_candidate_quote)
         save = QPushButton("加入 / 更新候选池")
         save.clicked.connect(self._save_candidate)
         form.addRow("股票代码", self.candidate_code)
+        form.addRow("实时行情", self.candidate_quote_label)
+        form.addRow(lookup)
         form.addRow("股票名称", self.candidate_name)
         form.addRow("所属板块", self.candidate_sector)
         form.addRow("选股来源", self.candidate_source)
@@ -403,22 +421,32 @@ class WorkbenchWindow(MainWindow):
         editor.body.addLayout(form)
         lower.addWidget(editor, 2)
 
-        pool = CockpitCard("候选池记录", "最多 3 只 · 选中后可归档替换")
+        pool = CockpitCard("候选池记录", "最多 3 只 · 含实时价与涨跌幅")
         self.candidate_count_label = QLabel("当前 0 / 3")
         self.candidate_count_label.setObjectName("sectionTitle")
         pool.body.addWidget(self.candidate_count_label)
         self.candidate_table = self._table(
-            ["入选时间", "代码", "名称", "板块", "来源 AI", "外部评分", "理由"]
+            [
+                "入选时间",
+                "代码",
+                "名称",
+                "最新价",
+                "涨跌幅",
+                "板块",
+                "来源 AI",
+                "外部评分",
+                "理由",
+            ]
         )
         self.candidate_table.setMinimumHeight(120)
-        self.candidate_table.setMaximumHeight(160)
+        self.candidate_table.setMaximumHeight(180)
         self.candidate_table.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Maximum
         )
         header = self.candidate_table.horizontalHeader()
-        for column in range(6):
+        for column in range(8):
             header.setSectionResizeMode(column, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(6, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(8, QHeaderView.ResizeMode.Stretch)
         pool.body.addWidget(self.candidate_table, 0)
         archive = QPushButton("移出选中候选")
         archive.setObjectName("secondaryButton")
@@ -868,6 +896,7 @@ class WorkbenchWindow(MainWindow):
             code: quote.last_price for code, quote in quotes.items()
         }
         updated = self.engine.update_last_prices(price_map)
+        self._live_quotes.update(quotes)
         self._fill_quote_table(quotes)
         stamp = QDateTime.currentDateTime().toString("HH:mm:ss")
         self.quote_status.setText(
@@ -1033,12 +1062,68 @@ class WorkbenchWindow(MainWindow):
         self.agent_status.setText(f"Agent：失败 · {message[:80]}")
         QMessageBox.warning(self, "AI Agent 失败", message)
 
-    def _save_candidate(self) -> None:
-        score = self.candidate_score.value()
+    def _lookup_candidate_quote(self) -> None:
+        raw = self.candidate_code.text().strip()
+        if not raw:
+            self.candidate_quote_label.setText("输入 6 位代码后自动显示实时行情")
+            self.candidate_quote_label.setStyleSheet("")
+            return
         try:
+            code = normalize_stock_code(raw)
+        except ValueError:
+            self.candidate_quote_label.setText("股票代码无效，请输入 6 位 A 股代码")
+            self.candidate_quote_label.setStyleSheet("color:#e25555;")
+            return
+        try:
+            quotes = self.quote_provider.fetch_quotes([code])
+        except Exception as exc:  # noqa: BLE001
+            self.candidate_quote_label.setText(f"行情查询失败：{exc}")
+            self.candidate_quote_label.setStyleSheet("color:#e25555;")
+            return
+        quote = quotes.get(code)
+        if not quote:
+            self.candidate_quote_label.setText(f"{code} 未查到实时行情")
+            self.candidate_quote_label.setStyleSheet("color:#d4a017;")
+            return
+        self._live_quotes[code] = quote
+        change = (
+            f"{quote.change_pct:+.2f}%"
+            if quote.change_pct is not None
+            else "--"
+        )
+        color = (
+            "#e25555"
+            if quote.change_pct is not None and quote.change_pct >= 0
+            else "#3fad7a"
+        )
+        if quote.change_pct is None:
+            color = "#9aa3ad"
+        self.candidate_quote_label.setText(
+            f"{quote.stock_name}  现价 {quote.last_price:.2f}  涨跌 {change}"
+        )
+        self.candidate_quote_label.setStyleSheet(
+            f"color:{color}; font-weight:700;"
+        )
+        if not self.candidate_name.text().strip():
+            self.candidate_name.setText(quote.stock_name)
+        self.statusBar().showMessage(
+            f"已获取 {code} 实时行情 {quote.last_price:.2f}", 4000
+        )
+
+    def _save_candidate(self) -> None:
+        self._lookup_candidate_quote()
+        score = self.candidate_score.value()
+        name = self.candidate_name.text().strip()
+        code = self.candidate_code.text().strip()
+        try:
+            normalized = normalize_stock_code(code)
+            quote = self._live_quotes.get(normalized)
+            if quote and not name:
+                name = quote.stock_name
+                self.candidate_name.setText(name)
             candidate = self.system.add_candidate(
-                self.candidate_code.text().strip(),
-                self.candidate_name.text().strip(),
+                code,
+                name,
                 self.candidate_sector.text().strip(),
                 source_ai=self.candidate_source.text(),
                 external_score=score if score else None,
@@ -1047,12 +1132,18 @@ class WorkbenchWindow(MainWindow):
         except ValueError as exc:
             QMessageBox.warning(self, "无法保存候选股票", str(exc))
             return
+        quote = self._live_quotes.get(candidate["stock_code"])
+        quote_text = (
+            f" · 现价 {quote.last_price:.2f}"
+            if quote is not None
+            else ""
+        )
         self.statusBar().showMessage(
             f"候选股票已记录：{candidate['stock_code']} "
-            f"{candidate['stock_name']}",
-            5000
+            f"{candidate['stock_name']}{quote_text}",
+            5000,
         )
-        self._refresh_candidates()
+        self._refresh_candidates(fetch_quotes=True)
         self._refresh_cockpit()
 
     def _archive_candidate(self) -> None:
@@ -1531,16 +1622,32 @@ class WorkbenchWindow(MainWindow):
         )
         self.cockpit_candidates.setRowCount(len(candidates))
         for row, candidate in enumerate(candidates):
+            quote = self._live_quotes.get(candidate["stock_code"])
+            price_text = f"{quote.last_price:.2f}" if quote else "—"
+            change_text = (
+                f"{quote.change_pct:+.2f}%"
+                if quote and quote.change_pct is not None
+                else "—"
+            )
             values = [
                 candidate["stock_code"],
                 candidate["stock_name"] or "-",
+                price_text,
+                change_text,
                 candidate["sector"],
                 candidate["source_ai"],
             ]
             for column, value in enumerate(values):
-                self.cockpit_candidates.setItem(
-                    row, column, QTableWidgetItem(value)
-                )
+                cell = QTableWidgetItem(value)
+                if column == 3 and quote and quote.change_pct is not None:
+                    cell.setForeground(
+                        QColor(
+                            "#e25555"
+                            if quote.change_pct >= 0
+                            else "#3fad7a"
+                        )
+                    )
+                self.cockpit_candidates.setItem(row, column, cell)
 
         red_messages = {
             item["message"]
@@ -1641,8 +1748,14 @@ class WorkbenchWindow(MainWindow):
         self._refresh_reviews()
         self._refresh_tasks()
 
-    def _refresh_candidates(self) -> None:
+    def _refresh_candidates(self, *, fetch_quotes: bool = False) -> None:
         rows = self.system.list_candidates()
+        codes = [item["stock_code"] for item in rows]
+        if fetch_quotes and codes:
+            try:
+                self._live_quotes.update(self.quote_provider.fetch_quotes(codes))
+            except Exception:
+                pass
         ranked = sorted(
             rows,
             key=lambda item: (
@@ -1652,17 +1765,32 @@ class WorkbenchWindow(MainWindow):
             ),
         )
         for index, slot in enumerate(self.candidate_slots):
-            slot.set_candidate(ranked[index] if index < len(ranked) else None)
+            candidate = ranked[index] if index < len(ranked) else None
+            quote = (
+                self._live_quotes.get(candidate["stock_code"])
+                if candidate
+                else None
+            )
+            slot.set_candidate(candidate, quote)
         self.candidate_count_label.setText(
             f"当前 {len(rows)} / 3"
             + (" · 建议保持 2–3 只" if len(rows) < 2 else "")
         )
         self.candidate_table.setRowCount(len(rows))
         for row, item in enumerate(rows):
+            quote = self._live_quotes.get(item["stock_code"])
+            price_text = f"{quote.last_price:.2f}" if quote else "—"
+            change_text = (
+                f"{quote.change_pct:+.2f}%"
+                if quote and quote.change_pct is not None
+                else "—"
+            )
             values = [
                 item["selected_at"],
                 item["stock_code"],
                 item["stock_name"],
+                price_text,
+                change_text,
                 item["sector"],
                 item["source_ai"],
                 (
@@ -1676,6 +1804,14 @@ class WorkbenchWindow(MainWindow):
                 cell = QTableWidgetItem(value)
                 if column == 0:
                     cell.setData(256, item["id"])
+                if column == 4 and quote and quote.change_pct is not None:
+                    cell.setForeground(
+                        QColor(
+                            "#e25555"
+                            if quote.change_pct >= 0
+                            else "#3fad7a"
+                        )
+                    )
                 self.candidate_table.setItem(row, column, cell)
 
     def _refresh_supervision(self) -> None:

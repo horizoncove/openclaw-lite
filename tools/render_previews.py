@@ -47,6 +47,36 @@ def seed_preview(window: WorkbenchWindow) -> None:
         external_score=91,
         selection_reason="外部 AI 选入的第二优先级候选。",
     )
+    try:
+        window._live_quotes.update(
+            window.quote_provider.fetch_quotes(["002371", "688012"])
+        )
+    except Exception:
+        from sharon_trading_system_v1_0.market_data import Quote
+        from decimal import Decimal
+
+        window._live_quotes.update(
+            {
+                "002371": Quote(
+                    "002371", "北方华创", Decimal("108.50"), Decimal("1.20")
+                ),
+                "688012": Quote(
+                    "688012", "中微公司", Decimal("190.00"), Decimal("-0.80")
+                ),
+            }
+        )
+    window.candidate_code.setText("002371")
+    quote = window._live_quotes["002371"]
+    window.candidate_quote_label.setText(
+        f"{quote.stock_name}  现价 {quote.last_price:.2f}  涨跌 "
+        f"{quote.change_pct:+.2f}%"
+    )
+    window.candidate_quote_label.setStyleSheet(
+        "color:#e25555; font-weight:700;"
+        if quote.change_pct >= 0
+        else "color:#3fad7a; font-weight:700;"
+    )
+    window._refresh_candidates()
     for command, sector in [
         ("买入 002371 100 5000", "半导体设备"),
         ("买入 002371 110 1000", "半导体设备"),
