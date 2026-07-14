@@ -26,6 +26,7 @@ PAGE_FILES = {
     "AI 监督": "07-supervision.png",
     "每日复盘": "08-daily-review.png",
     "任务与资料": "09-tasks.png",
+    "联网 AI": "10-network-ai.png",
 }
 
 
@@ -74,6 +75,16 @@ def seed_preview(window: WorkbenchWindow) -> None:
     window._validate_intent()
     window.review_summary.setPlainText("按计划完成候选股票建仓。")
     window.review_lessons.setPlainText("控制节奏，不在禁买时段追涨。")
+    window.market_enabled.setChecked(True)
+    window.agent_enabled.setChecked(False)
+    window.agent_base_url.setText("https://api.deepseek.com/v1")
+    window.agent_model.setText("deepseek-chat")
+    window.quote_status.setText("行情：预览模式 · 保存设置后将定时刷新东财报价")
+    window.agent_status.setText("Agent：预览模式 · 填写 API Key 后可联网对话")
+    window.agent_chat.setPlainText(
+        "Agent 示例：已读取持仓与候选池。002371 单票仓位接近纪律带，"
+        "建议先完成交易计划测算，再决定是否分批。"
+    )
     window.refresh()
     window._refresh_extended()
 

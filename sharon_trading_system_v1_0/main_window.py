@@ -258,7 +258,14 @@ class MainWindow(QMainWindow):
     def _toggle_context_panels(self, index: int) -> None:
         title = self.tabs.tabText(index)
         is_cockpit = title == "驾驶舱"
-        analysis_pages = {"候选股票", "交易计划", "AI 监督", "每日复盘", "任务与资料"}
+        analysis_pages = {
+            "候选股票",
+            "交易计划",
+            "AI 监督",
+            "每日复盘",
+            "任务与资料",
+            "联网 AI",
+        }
         hide_metrics = is_cockpit or title in analysis_pages or title == "实时持仓"
         for card in self.metric_cards:
             card.setVisible(not hide_metrics)

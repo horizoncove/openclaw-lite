@@ -201,6 +201,7 @@ class WorkbenchSmokeTests(unittest.TestCase):
             self.assertIn("AI 监督", labels)
             self.assertIn("每日复盘", labels)
             self.assertIn("任务与资料", labels)
+            self.assertIn("联网 AI", labels)
             window.tabs.setCurrentWidget(window.candidate_page)
             self.assertTrue(window.trade_frame.isHidden())
             self.assertTrue(window.metric_cards[0].isHidden())

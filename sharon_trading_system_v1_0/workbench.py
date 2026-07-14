@@ -5,9 +5,10 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
-from PyQt6.QtCore import QDate, QDateTime, Qt, QTimer
+from PyQt6.QtCore import QDate, QDateTime, QThread, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import (
+    QCheckBox,
     QComboBox,
     QDateEdit,
     QDoubleSpinBox,
@@ -25,6 +26,7 @@ from PyQt6.QtWidgets import (
     QProgressBar,
     QScrollArea,
     QSizePolicy,
+    QSpinBox,
     QTableWidget,
     QTableWidgetItem,
     QTextEdit,
@@ -33,6 +35,7 @@ from PyQt6.QtWidgets import (
 )
 
 from .account_engine import InvalidTradeError
+from .ai_agent import AgentMessage, OpenAICompatibleAgent, sharon_tool_specs
 from .cockpit import (
     CandidateSlotCard,
     CockpitCard,
@@ -46,7 +49,35 @@ from .cockpit import (
     StatusBadge,
 )
 from .main_window import MainWindow, default_database_path
+from .market_data import EastMoneyQuoteProvider, Quote
+from .network_settings import (
+    NetworkSettings,
+    load_network_settings,
+    save_network_settings,
+)
 from .system_engine import SystemEngine
+
+
+class _AgentWorker(QThread):
+    finished_ok = pyqtSignal(str)
+    finished_err = pyqtSignal(str)
+
+    def __init__(self, agent: OpenAICompatibleAgent, prompt: str, handlers: dict) -> None:
+        super().__init__()
+        self._agent = agent
+        self._prompt = prompt
+        self._handlers = handlers
+
+    def run(self) -> None:
+        try:
+            reply = self._agent.chat(
+                [AgentMessage("user", self._prompt)],
+                tools=sharon_tool_specs(),
+                tool_handlers=self._handlers,
+            )
+            self.finished_ok.emit(reply.content or "（Agent 未返回文本）")
+        except Exception as exc:  # noqa: BLE001 - surface in UI
+            self.finished_err.emit(str(exc))
 
 
 LIGHT_NAMES = {"green": "🟢 绿灯", "yellow": "🟡 黄灯", "red": "🔴 红灯"}
@@ -72,7 +103,11 @@ class WorkbenchWindow(MainWindow):
         self._build_supervision_tab()
         self._build_review_tab()
         self._build_tasks_tab()
+        self._build_network_tab()
         self._build_cockpit_tab()
+        self.network_settings = load_network_settings(self.settings)
+        self.quote_provider = EastMoneyQuoteProvider()
+        self._agent_worker: _AgentWorker | None = None
         self.cockpit_timer = QTimer(self)
         self.cockpit_timer.setInterval(1000)
         self.cockpit_timer.timeout.connect(
@@ -81,9 +116,15 @@ class WorkbenchWindow(MainWindow):
             )
         )
         self.cockpit_timer.start()
+        self.quote_timer = QTimer(self)
+        self.quote_timer.timeout.connect(self._refresh_market_quotes)
+        self._apply_network_settings_to_ui()
+        self._restart_quote_timer()
         self._sync_side_nav()
         self._toggle_context_panels(self.tabs.currentIndex())
         self._refresh_extended()
+        if self.network_settings.market_enabled:
+            QTimer.singleShot(800, self._refresh_market_quotes)
 
     def _upgrade_positions_tab(self) -> None:
         index = self.tabs.indexOf(self.positions_table)
@@ -653,12 +694,344 @@ class WorkbenchWindow(MainWindow):
         layout.addWidget(self.tasks_table)
         layout.addLayout(controls)
         references = QLabel(
-            "职责边界：外部 AI 负责 SOP 分析和选股；本软件只记录 2–3 只"
-            "最终候选股票，并负责交易计划、持仓纪律、风险监督和复盘。"
+            "职责边界：外部 AI / 联网 Agent 负责分析与建议；本软件记录 2–3 只"
+            "最终候选股票，并负责交易计划、持仓纪律、风险监督和复盘。不下单。"
         )
         references.setWordWrap(True)
         layout.addWidget(references)
         self.tabs.addTab(page, "任务与资料")
+
+    def _build_network_tab(self) -> None:
+        page = QWidget()
+        page.setObjectName("visualPage")
+        self.network_page = page
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(14, 14, 14, 14)
+        layout.setSpacing(10)
+        layout.addWidget(
+            PageHeader(
+                "联网 AI",
+                "实时行情估值持仓 · OpenAI 兼容 Agent 分析建议 · 仍不自动下单",
+            )
+        )
+
+        columns = QHBoxLayout()
+        columns.setSpacing(12)
+
+        settings_card = CockpitCard("联网设置", "行情源默认东财 · Agent 需填写 API Key")
+        settings_card.setMaximumWidth(420)
+        form = QFormLayout()
+        form.setSpacing(8)
+        self.market_enabled = QCheckBox("启用实时行情刷新")
+        self.market_interval = QSpinBox()
+        self.market_interval.setRange(5, 300)
+        self.market_interval.setSuffix(" 秒")
+        self.agent_enabled = QCheckBox("启用 AI Agent")
+        self.agent_base_url = QLineEdit()
+        self.agent_base_url.setPlaceholderText("https://api.deepseek.com/v1")
+        self.agent_api_key = QLineEdit()
+        self.agent_api_key.setEchoMode(QLineEdit.EchoMode.Password)
+        self.agent_api_key.setPlaceholderText("sk-...")
+        self.agent_model = QLineEdit()
+        self.agent_model.setPlaceholderText("deepseek-chat")
+        form.addRow(self.market_enabled)
+        form.addRow("刷新间隔", self.market_interval)
+        form.addRow(self.agent_enabled)
+        form.addRow("Base URL", self.agent_base_url)
+        form.addRow("API Key", self.agent_api_key)
+        form.addRow("模型", self.agent_model)
+        settings_card.body.addLayout(form)
+        save_settings = QPushButton("保存联网设置")
+        save_settings.clicked.connect(self._save_network_settings)
+        refresh_quotes = QPushButton("立即刷新行情")
+        refresh_quotes.setObjectName("secondaryButton")
+        refresh_quotes.clicked.connect(self._refresh_market_quotes)
+        settings_card.body.addWidget(save_settings)
+        settings_card.body.addWidget(refresh_quotes)
+        self.quote_status = QLabel("行情：尚未刷新")
+        self.quote_status.setObjectName("hint")
+        self.quote_status.setWordWrap(True)
+        settings_card.body.addWidget(self.quote_status)
+        self.quote_table = self._table(
+            ["代码", "名称", "最新价", "涨跌幅", "来源"]
+        )
+        self.quote_table.setMaximumHeight(180)
+        settings_card.body.addWidget(self.quote_table)
+        settings_card.body.addStretch(1)
+        columns.addWidget(settings_card, 2)
+
+        agent_card = CockpitCard(
+            "AI Agent 对话",
+            "可读取行情/持仓/候选池，并可写入候选建议（需你确认后交易）",
+        )
+        self.agent_chat = QTextEdit()
+        self.agent_chat.setReadOnly(True)
+        self.agent_chat.setPlaceholderText(
+            "Agent 回复将显示在这里。示例：分析当前持仓风险，并建议是否调仓。"
+        )
+        self.agent_input = QTextEdit()
+        self.agent_input.setMaximumHeight(90)
+        self.agent_input.setPlaceholderText(
+            "向 Agent 提问，例如：根据实时行情评估 002371 是否触及纪律红线"
+        )
+        ask_row = QHBoxLayout()
+        ask = QPushButton("发送给 Agent")
+        ask.clicked.connect(self._ask_agent)
+        analyze = QPushButton("一键持仓分析")
+        analyze.setObjectName("secondaryButton")
+        analyze.clicked.connect(self._ask_agent_position_review)
+        ask_row.addWidget(ask)
+        ask_row.addWidget(analyze)
+        ask_row.addStretch()
+        agent_card.body.addWidget(self.agent_chat, 1)
+        agent_card.body.addWidget(self.agent_input)
+        agent_card.body.addLayout(ask_row)
+        self.agent_status = QLabel("Agent：未启用")
+        self.agent_status.setObjectName("hint")
+        agent_card.body.addWidget(self.agent_status)
+        columns.addWidget(agent_card, 5)
+
+        layout.addLayout(columns, 1)
+        self.tabs.addTab(page, "联网 AI")
+
+    def _apply_network_settings_to_ui(self) -> None:
+        cfg = self.network_settings
+        self.market_enabled.setChecked(cfg.market_enabled)
+        self.market_interval.setValue(cfg.market_interval_sec)
+        self.agent_enabled.setChecked(cfg.agent_enabled)
+        self.agent_base_url.setText(cfg.agent_base_url)
+        self.agent_api_key.setText(cfg.agent_api_key)
+        self.agent_model.setText(cfg.agent_model)
+        if cfg.agent_enabled and cfg.agent_api_key:
+            self.agent_status.setText(
+                f"Agent：已配置 · {cfg.agent_model} · {cfg.masked_api_key()}"
+            )
+        elif cfg.agent_enabled:
+            self.agent_status.setText("Agent：已启用但缺少 API Key")
+        else:
+            self.agent_status.setText("Agent：未启用")
+
+    def _collect_network_settings(self) -> NetworkSettings:
+        return NetworkSettings(
+            market_enabled=self.market_enabled.isChecked(),
+            market_interval_sec=self.market_interval.value(),
+            agent_enabled=self.agent_enabled.isChecked(),
+            agent_base_url=self.agent_base_url.text().strip(),
+            agent_api_key=self.agent_api_key.text().strip(),
+            agent_model=self.agent_model.text().strip() or "deepseek-chat",
+        )
+
+    def _save_network_settings(self) -> None:
+        self.network_settings = self._collect_network_settings()
+        save_network_settings(self.network_settings, self.settings)
+        self._apply_network_settings_to_ui()
+        self._restart_quote_timer()
+        self.statusBar().showMessage("联网设置已保存", 4000)
+        if self.network_settings.market_enabled:
+            self._refresh_market_quotes()
+
+    def _restart_quote_timer(self) -> None:
+        self.quote_timer.stop()
+        if not self.network_settings.market_enabled:
+            self.quote_status.setText("行情：已关闭")
+            return
+        self.quote_timer.setInterval(
+            max(5, self.network_settings.market_interval_sec) * 1000
+        )
+        self.quote_timer.start()
+
+    def _watched_stock_codes(self) -> list[str]:
+        codes = {
+            item["stock_code"]
+            for item in self.engine.calculate_positions()["positions"]
+        }
+        for candidate in self.system.list_candidates():
+            codes.add(candidate["stock_code"])
+        return sorted(codes)
+
+    def _refresh_market_quotes(self) -> None:
+        if not getattr(self, "network_settings", None):
+            return
+        if not self.network_settings.market_enabled:
+            return
+        codes = self._watched_stock_codes()
+        if not codes:
+            self.quote_status.setText("行情：无持仓/候选，跳过刷新")
+            return
+        try:
+            quotes = self.quote_provider.fetch_quotes(codes)
+        except Exception as exc:  # noqa: BLE001
+            self.quote_status.setText(f"行情失败：{exc}")
+            self.statusBar().showMessage(f"行情刷新失败：{exc}", 6000)
+            return
+        price_map = {
+            code: quote.last_price for code, quote in quotes.items()
+        }
+        updated = self.engine.update_last_prices(price_map)
+        self._fill_quote_table(quotes)
+        stamp = QDateTime.currentDateTime().toString("HH:mm:ss")
+        self.quote_status.setText(
+            f"行情：{stamp} 更新 {len(quotes)} 只 · 持仓估值写入 {updated} 条"
+        )
+        self.refresh()
+        self._refresh_extended()
+
+    def _fill_quote_table(self, quotes: dict[str, Quote]) -> None:
+        rows = sorted(quotes.values(), key=lambda item: item.stock_code)
+        self.quote_table.setRowCount(len(rows))
+        for row, quote in enumerate(rows):
+            change = (
+                f"{quote.change_pct:+.2f}%"
+                if quote.change_pct is not None
+                else "-"
+            )
+            values = [
+                quote.stock_code,
+                quote.stock_name,
+                f"{quote.last_price:.2f}",
+                change,
+                quote.source,
+            ]
+            for column, value in enumerate(values):
+                cell = QTableWidgetItem(value)
+                if column == 3 and quote.change_pct is not None:
+                    cell.setForeground(
+                        QColor(
+                            "#e25555" if quote.change_pct >= 0 else "#3fad7a"
+                        )
+                    )
+                self.quote_table.setItem(row, column, cell)
+
+    def _build_agent(self) -> OpenAICompatibleAgent:
+        cfg = self._collect_network_settings()
+        if not cfg.agent_enabled:
+            raise ValueError("请先勾选「启用 AI Agent」并保存设置")
+        return OpenAICompatibleAgent(
+            base_url=cfg.agent_base_url,
+            api_key=cfg.agent_api_key,
+            model=cfg.agent_model,
+        )
+
+    def _agent_tool_handlers(self) -> dict:
+        def get_market_quotes(args: dict) -> dict:
+            codes = args.get("stock_codes") or self._watched_stock_codes()
+            quotes = self.quote_provider.fetch_quotes(list(codes))
+            self.engine.update_last_prices(
+                {code: quote.last_price for code, quote in quotes.items()}
+            )
+            return {
+                code: {
+                    "name": quote.stock_name,
+                    "last_price": float(quote.last_price),
+                    "change_pct": (
+                        float(quote.change_pct)
+                        if quote.change_pct is not None
+                        else None
+                    ),
+                }
+                for code, quote in quotes.items()
+            }
+
+        def get_account_snapshot(_args: dict) -> dict:
+            snapshot = self.engine.calculate_positions()
+            account = self.engine.load_account()
+            return {
+                "current_capital": float(account.current_capital),
+                "total_pnl": float(account.total_pnl),
+                "total_market_value": float(snapshot["total_market_value"]),
+                "cash": float(snapshot["cash"]),
+                "position_ratio": float(snapshot["position_ratio"]),
+                "cash_ratio": float(snapshot["cash_ratio"]),
+                "positions": [
+                    {
+                        "stock_code": item["stock_code"],
+                        "sector": item["sector"],
+                        "quantity": int(item["quantity"]),
+                        "avg_cost": float(item["avg_cost"]),
+                        "last_price": float(item["last_price"]),
+                        "position_ratio": float(item["position_ratio"]),
+                    }
+                    for item in snapshot["positions"]
+                ],
+                "risk_violations": self.engine.check_risk_limits(),
+            }
+
+        def list_candidates(_args: dict) -> dict:
+            return {"candidates": self.system.list_candidates()}
+
+        def propose_candidates(args: dict) -> dict:
+            created = []
+            errors = []
+            for item in args.get("candidates") or []:
+                try:
+                    candidate = self.system.add_candidate(
+                        str(item.get("stock_code") or ""),
+                        str(item.get("stock_name") or ""),
+                        str(item.get("sector") or "未分类"),
+                        source_ai="联网 AI Agent",
+                        external_score=item.get("external_score"),
+                        selection_reason=str(
+                            item.get("selection_reason") or ""
+                        ),
+                    )
+                    created.append(candidate["stock_code"])
+                except ValueError as exc:
+                    errors.append(str(exc))
+            self._refresh_candidates()
+            self._refresh_cockpit()
+            return {
+                "written": created,
+                "errors": errors,
+                "active_count": len(self.system.list_candidates()),
+            }
+
+        return {
+            "get_market_quotes": get_market_quotes,
+            "get_account_snapshot": get_account_snapshot,
+            "list_candidates": list_candidates,
+            "propose_candidates": propose_candidates,
+        }
+
+    def _ask_agent(self) -> None:
+        prompt = self.agent_input.toPlainText().strip()
+        if not prompt:
+            QMessageBox.information(self, "输入问题", "请先填写要询问 Agent 的内容")
+            return
+        self._start_agent_job(prompt)
+
+    def _ask_agent_position_review(self) -> None:
+        self._start_agent_job(
+            "请读取实时行情与当前持仓，按 Sharon 纪律评估风险，"
+            "给出是否减仓/止损/观望的建议，并列出关键红黄灯。"
+        )
+
+    def _start_agent_job(self, prompt: str) -> None:
+        if self._agent_worker and self._agent_worker.isRunning():
+            QMessageBox.information(self, "请稍候", "Agent 正在回答上一个问题")
+            return
+        try:
+            agent = self._build_agent()
+        except ValueError as exc:
+            QMessageBox.warning(self, "Agent 未就绪", str(exc))
+            return
+        self.agent_status.setText("Agent：思考中…")
+        self.agent_chat.append(f"\n你：{prompt}\n")
+        self._agent_worker = _AgentWorker(
+            agent, prompt, self._agent_tool_handlers()
+        )
+        self._agent_worker.finished_ok.connect(self._on_agent_ok)
+        self._agent_worker.finished_err.connect(self._on_agent_err)
+        self._agent_worker.start()
+
+    def _on_agent_ok(self, content: str) -> None:
+        self.agent_chat.append(f"Agent：{content}\n")
+        self.agent_status.setText("Agent：完成")
+        self.statusBar().showMessage("AI Agent 回复完成", 4000)
+
+    def _on_agent_err(self, message: str) -> None:
+        self.agent_chat.append(f"Agent 错误：{message}\n")
+        self.agent_status.setText(f"Agent：失败 · {message[:80]}")
+        QMessageBox.warning(self, "AI Agent 失败", message)
 
     def _save_candidate(self) -> None:
         score = self.candidate_score.value()
