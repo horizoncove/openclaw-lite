@@ -1,16 +1,5 @@
-"""Historical market-data and backtesting tools."""
+"""Historical market-data and backtesting tools.
 
-from .limit_up_backtest import (
-    BacktestConfig,
-    BacktestReport,
-    DailyBarLimitUpBacktester,
-)
-from .market_database import AShareHistoryDownloader, DownloadSummary
-
-__all__ = [
-    "AShareHistoryDownloader",
-    "BacktestConfig",
-    "BacktestReport",
-    "DailyBarLimitUpBacktester",
-    "DownloadSummary",
-]
+Modules are intentionally not imported eagerly so both command-line entry
+points can be executed with ``python -m`` without duplicate-module warnings.
+"""

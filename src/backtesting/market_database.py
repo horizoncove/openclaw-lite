@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import multiprocessing
 import sqlite3
 import time
 from dataclasses import dataclass
@@ -42,10 +43,12 @@ class AShareHistoryDownloader:
         *,
         retry_count: int = 3,
         retry_delay: float = 1.0,
+        workers: int = 1,
     ) -> None:
         self.database = Path(database)
         self.retry_count = retry_count
         self.retry_delay = retry_delay
+        self.workers = max(1, workers)
 
     def download(self, start_date: date, end_date: date) -> DownloadSummary:
         if start_date > end_date:
@@ -78,30 +81,77 @@ class AShareHistoryDownloader:
             self._set_metadata(connection, "requested_end", end_date.isoformat())
 
             total = len(stocks)
-            for index, stock in enumerate(stocks, start=1):
-                code = stock["code"]
-                if self._already_complete(connection, code, start_date, end_date):
+            pending = []
+            for stock in stocks:
+                if self._already_complete(
+                    connection, stock["code"], start_date, end_date
+                ):
                     completed += 1
-                    continue
-                try:
-                    rows = self._fetch_bars_with_retry(
-                        bs, code, start_date, end_date
+                else:
+                    pending.append(stock["code"])
+
+            if self.workers == 1:
+                for processed, code in enumerate(pending, start=1):
+                    try:
+                        rows = self._fetch_bars_with_retry(
+                            bs, code, start_date, end_date
+                        )
+                        self._save_bars(
+                            connection, code, start_date, end_date, rows
+                        )
+                        completed += 1
+                    except Exception as exc:
+                        failed += 1
+                        self._mark_failed(
+                            connection, code, start_date, end_date, str(exc)
+                        )
+                    self._print_progress(
+                        completed + failed, total, completed, failed, code
                     )
-                    self._save_bars(
-                        connection, code, start_date, end_date, rows
+            else:
+                tasks = [
+                    (
+                        code,
+                        start_date.isoformat(),
+                        end_date.isoformat(),
+                        self.retry_count,
+                        self.retry_delay,
                     )
-                    completed += 1
-                except Exception as exc:
-                    failed += 1
-                    self._mark_failed(
-                        connection, code, start_date, end_date, str(exc)
+                    for code in pending
+                ]
+                context = multiprocessing.get_context("spawn")
+                with context.Pool(
+                    processes=self.workers, initializer=_worker_login
+                ) as pool:
+                    results = pool.imap_unordered(
+                        _worker_fetch_bars, tasks, chunksize=1
                     )
-                if index == 1 or index % 50 == 0 or index == total:
-                    print(
-                        f"[{index}/{total}] 已完成 {completed}，失败 {failed}，"
-                        f"当前 {code}",
-                        flush=True,
-                    )
+                    for code, rows, error in results:
+                        if error:
+                            failed += 1
+                            self._mark_failed(
+                                connection,
+                                code,
+                                start_date,
+                                end_date,
+                                error,
+                            )
+                        else:
+                            self._save_bars(
+                                connection,
+                                code,
+                                start_date,
+                                end_date,
+                                rows,
+                            )
+                            completed += 1
+                        self._print_progress(
+                            completed + failed,
+                            total,
+                            completed,
+                            failed,
+                            code,
+                        )
         finally:
             bs.logout()
 
@@ -116,6 +166,21 @@ class AShareHistoryDownloader:
             failed_count=failed,
             bar_count=bar_count,
         )
+
+    @staticmethod
+    def _print_progress(
+        processed: int,
+        total: int,
+        completed: int,
+        failed: int,
+        code: str,
+    ) -> None:
+        if processed == 1 or processed % 50 == 0 or processed == total:
+            print(
+                f"[{processed}/{total}] 已完成 {completed}，失败 {failed}，"
+                f"当前 {code}",
+                flush=True,
+            )
 
     @staticmethod
     def _create_schema(connection: sqlite3.Connection) -> None:
@@ -388,6 +453,45 @@ def _parse_bar(raw: list[str]) -> tuple[Any, ...]:
     )
 
 
+def _worker_login() -> None:
+    import baostock as bs
+
+    login = bs.login()
+    if login.error_code != "0":
+        raise RuntimeError(f"BaoStock 工作进程登录失败: {login.error_msg}")
+
+
+def _worker_fetch_bars(
+    task: tuple[str, str, str, int, float],
+) -> tuple[str, list[tuple[Any, ...]], str]:
+    import baostock as bs
+
+    code, start_date, end_date, retry_count, retry_delay = task
+    last_error = ""
+    for attempt in range(retry_count):
+        try:
+            result = bs.query_history_k_data_plus(
+                code,
+                BAR_FIELDS,
+                start_date=start_date,
+                end_date=end_date,
+                frequency="d",
+                adjustflag="3",
+            )
+            _raise_baostock_error(result, f"{code} 日线")
+            rows = []
+            while result.next():
+                raw = result.get_row_data()
+                if raw and raw[0] and raw[2]:
+                    rows.append(_parse_bar(raw))
+            return code, rows, ""
+        except Exception as exc:
+            last_error = str(exc)
+            if attempt + 1 < retry_count:
+                time.sleep(retry_delay * (2**attempt))
+    return code, [], last_error or "未知下载错误"
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="下载沪深A股历史日线到SQLite")
     parser.add_argument("--start", required=True, type=date.fromisoformat)
@@ -397,12 +501,20 @@ def build_parser() -> argparse.ArgumentParser:
         default="data/backtest/a_share_daily.sqlite",
         type=Path,
     )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=8,
+        help="并行下载进程数（默认8）",
+    )
     return parser
 
 
 def main(argv: Iterable[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    summary = AShareHistoryDownloader(args.database).download(args.start, args.end)
+    summary = AShareHistoryDownloader(
+        args.database, workers=args.workers
+    ).download(args.start, args.end)
     print(
         f"下载完成：{summary.completed_count}/{summary.stock_count} 只，"
         f"失败 {summary.failed_count} 只，共 {summary.bar_count:,} 条日线，"
