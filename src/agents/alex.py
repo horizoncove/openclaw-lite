@@ -5,8 +5,6 @@ Alex - 量化交易助手
 import json
 import os
 from datetime import datetime, timedelta
-import pandas as pd
-import matplotlib.pyplot as plt
 import yaml
 
 from strategies.limit_up_continuation import (
@@ -179,6 +177,8 @@ class Alex:
     
     def generate_portfolio_chart(self):
         """生成持仓图表"""
+        import matplotlib.pyplot as plt
+
         analysis = self.analyze_portfolio()
         
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))

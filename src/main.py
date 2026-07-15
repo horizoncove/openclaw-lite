@@ -13,7 +13,6 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from agents.alex import Alex
 from agents.shakespeare import Shakespeare
-from core.scheduler import TaskScheduler
 
 class OpenClawLite:
     """OpenClaw Lite 主控制器"""
@@ -21,7 +20,7 @@ class OpenClawLite:
     def __init__(self):
         self.alex = Alex()
         self.shakespeare = Shakespeare()
-        self.scheduler = TaskScheduler()
+        self.scheduler = None
         
     def start_all(self):
         """启动所有服务"""
@@ -29,6 +28,8 @@ class OpenClawLite:
         print("="*50)
         
         # 启动定时任务
+        from core.scheduler import TaskScheduler
+        self.scheduler = TaskScheduler()
         self.scheduler.start()
         
         print("✅ 所有服务已启动")
