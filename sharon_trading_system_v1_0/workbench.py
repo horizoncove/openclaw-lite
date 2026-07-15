@@ -49,6 +49,7 @@ from .cockpit import (
     StatusBadge,
 )
 from .main_window import MainWindow, default_database_path
+from .limit_up_strategy import LimitUpScreener, default_trade_date
 from .market_data import (
     EastMoneyQuoteProvider,
     Quote,
@@ -84,6 +85,31 @@ class _AgentWorker(QThread):
             self.finished_err.emit(str(exc))
 
 
+class _LimitUpWorker(QThread):
+    finished_ok = pyqtSignal(dict)
+    finished_err = pyqtSignal(str)
+
+    def __init__(self, trade_date: str, top_n: int) -> None:
+        super().__init__()
+        self._trade_date = trade_date
+        self._top_n = top_n
+
+    def run(self) -> None:
+        try:
+            result = LimitUpScreener().screen(
+                trade_date=self._trade_date, top_n=self._top_n
+            )
+            # pick_objects are not Qt-serializable across threads via dict copy needs
+            result = {
+                key: value
+                for key, value in result.items()
+                if key != "pick_objects"
+            }
+            self.finished_ok.emit(result)
+        except Exception as exc:  # noqa: BLE001
+            self.finished_err.emit(str(exc))
+
+
 LIGHT_NAMES = {"green": "🟢 绿灯", "yellow": "🟡 黄灯", "red": "🔴 红灯"}
 
 
@@ -111,8 +137,11 @@ class WorkbenchWindow(MainWindow):
         self._build_cockpit_tab()
         self.network_settings = load_network_settings(self.settings)
         self.quote_provider = EastMoneyQuoteProvider()
+        self.limit_up_screener = LimitUpScreener()
         self._live_quotes: dict[str, Quote] = {}
+        self._limit_up_result: dict | None = None
         self._agent_worker: _AgentWorker | None = None
+        self._limit_up_worker: _LimitUpWorker | None = None
         self.cockpit_timer = QTimer(self)
         self.cockpit_timer.setInterval(1000)
         self.cockpit_timer.timeout.connect(
@@ -739,7 +768,7 @@ class WorkbenchWindow(MainWindow):
         layout.addWidget(
             PageHeader(
                 "联网 AI",
-                "实时行情估值持仓 · OpenAI 兼容 Agent 分析建议 · 仍不自动下单",
+                "收盘涨停接力选股 · 实时行情 · Agent 建议 · 仍不自动下单",
             )
         )
 
@@ -747,7 +776,7 @@ class WorkbenchWindow(MainWindow):
         columns.setSpacing(12)
 
         settings_card = CockpitCard("联网设置", "行情源默认东财 · Agent 需填写 API Key")
-        settings_card.setMaximumWidth(420)
+        settings_card.setMaximumWidth(360)
         form = QFormLayout()
         form.setSpacing(8)
         self.market_enabled = QCheckBox("启用实时行情刷新")
@@ -783,7 +812,7 @@ class WorkbenchWindow(MainWindow):
         self.quote_table = self._table(
             ["代码", "名称", "最新价", "涨跌幅", "来源"]
         )
-        self.quote_table.setMaximumHeight(180)
+        self.quote_table.setMaximumHeight(120)
         settings_card.body.addWidget(self.quote_table)
         settings_card.body.addStretch(1)
         columns.addWidget(settings_card, 2)
@@ -798,7 +827,7 @@ class WorkbenchWindow(MainWindow):
             "Agent 回复将显示在这里。示例：分析当前持仓风险，并建议是否调仓。"
         )
         self.agent_input = QTextEdit()
-        self.agent_input.setMaximumHeight(90)
+        self.agent_input.setMaximumHeight(72)
         self.agent_input.setPlaceholderText(
             "向 Agent 提问，例如：根据实时行情评估 002371 是否触及纪律红线"
         )
@@ -817,9 +846,61 @@ class WorkbenchWindow(MainWindow):
         self.agent_status = QLabel("Agent：未启用")
         self.agent_status.setObjectName("hint")
         agent_card.body.addWidget(self.agent_status)
-        columns.addWidget(agent_card, 5)
+        columns.addWidget(agent_card, 3)
+        layout.addLayout(columns, 2)
 
-        layout.addLayout(columns, 1)
+        strategy = CockpitCard(
+            "涨停接力选股",
+            "收盘后扫描全市场涨停池 · 结合热门板块评分 · 选出次日可能继续涨停的标的",
+        )
+        controls = QHBoxLayout()
+        controls.setSpacing(10)
+        self.limit_up_date = QLineEdit(default_trade_date())
+        self.limit_up_date.setPlaceholderText("YYYYMMDD")
+        self.limit_up_date.setMaximumWidth(120)
+        self.limit_up_top_n = QSpinBox()
+        self.limit_up_top_n.setRange(1, 3)
+        self.limit_up_top_n.setValue(3)
+        run_scan = QPushButton("收盘扫描涨停池")
+        run_scan.clicked.connect(self._run_limit_up_screen)
+        write_picks = QPushButton("写入候选池")
+        write_picks.setObjectName("secondaryButton")
+        write_picks.clicked.connect(self._write_limit_up_picks)
+        controls.addWidget(QLabel("交易日"))
+        controls.addWidget(self.limit_up_date)
+        controls.addWidget(QLabel("选取"))
+        controls.addWidget(self.limit_up_top_n)
+        controls.addWidget(run_scan)
+        controls.addWidget(write_picks)
+        controls.addStretch()
+        strategy.body.addLayout(controls)
+        self.limit_up_status = QLabel(
+            "建议 15:05 后运行：拉取当日涨停板，按板块热度/封板时间/连板/炸板/封单评分。"
+        )
+        self.limit_up_status.setObjectName("hint")
+        self.limit_up_status.setWordWrap(True)
+        strategy.body.addWidget(self.limit_up_status)
+        self.limit_up_sectors = QLabel("热门板块：—")
+        self.limit_up_sectors.setObjectName("sectionTitle")
+        self.limit_up_sectors.setWordWrap(True)
+        strategy.body.addWidget(self.limit_up_sectors)
+        self.limit_up_table = self._table(
+            [
+                "评分",
+                "代码",
+                "名称",
+                "板块",
+                "连板",
+                "封板",
+                "炸板",
+                "现价",
+                "理由",
+            ]
+        )
+        self.limit_up_table.setMinimumHeight(160)
+        strategy.body.addWidget(self.limit_up_table, 1)
+        layout.addWidget(strategy, 3)
+
         self.tabs.addTab(page, "联网 AI")
 
     def _apply_network_settings_to_ui(self) -> None:
@@ -838,6 +919,108 @@ class WorkbenchWindow(MainWindow):
             self.agent_status.setText("Agent：已启用但缺少 API Key")
         else:
             self.agent_status.setText("Agent：未启用")
+
+    def _run_limit_up_screen(self) -> None:
+        if self._limit_up_worker and self._limit_up_worker.isRunning():
+            QMessageBox.information(self, "请稍候", "涨停扫描正在进行")
+            return
+        trade_date = self.limit_up_date.text().strip() or default_trade_date()
+        if len(trade_date) != 8 or not trade_date.isdigit():
+            QMessageBox.warning(self, "日期无效", "请输入 YYYYMMDD 交易日")
+            return
+        self.limit_up_status.setText(f"正在扫描 {trade_date} 涨停池与热门板块…")
+        self._limit_up_worker = _LimitUpWorker(
+            trade_date, self.limit_up_top_n.value()
+        )
+        self._limit_up_worker.finished_ok.connect(self._on_limit_up_ok)
+        self._limit_up_worker.finished_err.connect(self._on_limit_up_err)
+        self._limit_up_worker.start()
+
+    def _on_limit_up_ok(self, result: dict) -> None:
+        self._limit_up_result = result
+        self.limit_up_date.setText(str(result.get("trade_date") or ""))
+        self.limit_up_status.setText(str(result.get("message") or "扫描完成"))
+        sectors = result.get("hot_sectors") or []
+        if sectors:
+            self.limit_up_sectors.setText(
+                "热门板块："
+                + "  ·  ".join(
+                    f"{item['rank']}.{item['name']}({item['limit_up_count']})"
+                    for item in sectors[:6]
+                )
+            )
+        else:
+            self.limit_up_sectors.setText("热门板块：—")
+        picks = result.get("picks") or []
+        self.limit_up_table.setRowCount(len(picks))
+        for row, item in enumerate(picks):
+            reasons = item.get("reasons") or []
+            values = [
+                f"{float(item.get('score') or 0):.1f}",
+                item.get("stock_code") or "",
+                item.get("stock_name") or "",
+                item.get("sector") or "",
+                str(item.get("board_count") or ""),
+                item.get("first_limit_time") or "",
+                str(item.get("open_count") or 0),
+                f"{float(item.get('last_price') or 0):.2f}",
+                "；".join(reasons),
+            ]
+            for column, value in enumerate(values):
+                cell = QTableWidgetItem(str(value))
+                if column == 0:
+                    cell.setForeground(QColor("#c9a66b"))
+                self.limit_up_table.setItem(row, column, cell)
+        self.statusBar().showMessage(
+            f"涨停接力扫描完成：入选 {len(picks)} / 池内 {result.get('pool_size', 0)}",
+            6000,
+        )
+
+    def _on_limit_up_err(self, message: str) -> None:
+        self.limit_up_status.setText(f"扫描失败：{message}")
+        QMessageBox.warning(self, "涨停扫描失败", message)
+
+    def _write_limit_up_picks(self) -> None:
+        result = self._limit_up_result or {}
+        picks = result.get("picks") or []
+        if not picks:
+            QMessageBox.information(self, "无结果", "请先运行「收盘扫描涨停池」")
+            return
+        written: list[str] = []
+        errors: list[str] = []
+        for item in picks:
+            try:
+                reason = "；".join(item.get("reasons") or [])
+                candidate = self.system.add_candidate(
+                    str(item.get("stock_code") or ""),
+                    str(item.get("stock_name") or ""),
+                    str(item.get("sector") or "涨停题材"),
+                    source_ai="涨停接力策略",
+                    external_score=float(item.get("score") or 0),
+                    selection_reason=(
+                        f"[{item.get('trade_date')}] 涨停接力 "
+                        f"{float(item.get('score') or 0):.1f} 分。{reason}"
+                    ),
+                )
+                written.append(candidate["stock_code"])
+                quote = Quote(
+                    stock_code=candidate["stock_code"],
+                    stock_name=candidate["stock_name"],
+                    last_price=Decimal(str(item.get("last_price") or 0)),
+                    change_pct=Decimal(str(item.get("change_pct") or 0)),
+                    source="limit_up_pool",
+                )
+                if quote.last_price > 0:
+                    self._live_quotes[quote.stock_code] = quote
+            except ValueError as exc:
+                errors.append(str(exc))
+        self._refresh_candidates(fetch_quotes=True)
+        self._refresh_cockpit()
+        detail = f"已写入候选：{', '.join(written) or '无'}"
+        if errors:
+            detail += "\n" + "\n".join(errors[:3])
+        QMessageBox.information(self, "写入候选池", detail)
+        self.statusBar().showMessage(detail.split("\n")[0], 6000)
 
     def _collect_network_settings(self) -> NetworkSettings:
         return NetworkSettings(
@@ -1431,6 +1614,10 @@ class WorkbenchWindow(MainWindow):
         except ValueError as exc:
             QMessageBox.warning(self, "无法运行", str(exc))
             return
+        if task_key == "limit_up_relay":
+            self.tabs.setCurrentWidget(self.network_page)
+            self.limit_up_date.setText(default_trade_date())
+            self._run_limit_up_screen()
         self._refresh_tasks()
 
     def _toggle_cash_condition(self) -> None:

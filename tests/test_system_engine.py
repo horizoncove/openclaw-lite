@@ -142,7 +142,10 @@ class SystemEngineTests(unittest.TestCase):
         )
         self.assertEqual(review["grade"], "A")
         tasks = self.system.list_tasks()
-        self.assertEqual(len(tasks), 10)
+        self.assertEqual(len(tasks), 11)
+        self.assertTrue(
+            any(item["task_key"] == "limit_up_relay" for item in tasks)
+        )
         disabled = next(item for item in tasks if item["task_key"] == "daily_update")
         self.assertFalse(disabled["enabled"])
 

@@ -115,6 +115,15 @@ def seed_preview(window: WorkbenchWindow) -> None:
         "Agent 示例：已读取持仓与候选池。002371 单票仓位接近纪律带，"
         "建议先完成交易计划测算，再决定是否分批。"
     )
+    try:
+        zt = window.limit_up_screener.screen(top_n=3)
+        window._on_limit_up_ok(
+            {key: value for key, value in zt.items() if key != "pick_objects"}
+        )
+    except Exception:
+        window.limit_up_status.setText(
+            "涨停接力：预览模式 · 收盘后点击「收盘扫描涨停池」"
+        )
     window.refresh()
     window._refresh_extended()
 
