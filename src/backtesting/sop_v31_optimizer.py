@@ -56,6 +56,17 @@ class WalkForwardPeriod:
 
 
 @dataclass(frozen=True)
+class DeploymentDecision:
+    approved: bool
+    minimum_out_of_sample_trades: int
+    minimum_win_probability_after_cost: float
+    minimum_average_net_return_pct: float
+    maximum_drawdown_pct: float
+    reasons: tuple[str, ...]
+    next_step: str
+
+
+@dataclass(frozen=True)
 class OptimizationReport:
     generated_at: str
     model: str
@@ -64,6 +75,7 @@ class OptimizationReport:
     static_in_sample: OptimizedMetrics
     walk_forward_out_of_sample: OptimizedMetrics
     walk_forward_periods: tuple[WalkForwardPeriod, ...]
+    deployment_decision: DeploymentDecision
     deployment_rules: tuple[str, ...]
     warnings: tuple[str, ...]
 
@@ -128,16 +140,20 @@ class SOPV31Optimizer:
             if out_of_sample_frames
             else frame.iloc[0:0].copy()
         )
+        out_of_sample_metrics = _optimized_metrics(
+            combined, self.one_way_cost_bps
+        )
         report = OptimizationReport(
             generated_at=datetime.now(SHANGHAI).isoformat(timespec="seconds"),
             model="sharon_sop_v31_walk_forward_guardrails",
             one_way_cost_bps=self.one_way_cost_bps,
             static_parameters=static_parameters,
             static_in_sample=static_metrics,
-            walk_forward_out_of_sample=_optimized_metrics(
-                combined, self.one_way_cost_bps
-            ),
+            walk_forward_out_of_sample=out_of_sample_metrics,
             walk_forward_periods=tuple(periods),
+            deployment_decision=_deployment_decision(
+                out_of_sample_metrics
+            ),
             deployment_rules=(
                 "收盘候选优先三连板，流通市值不超过70亿元",
                 "换手率5%至30%，板块至少3只涨停",
@@ -341,6 +357,59 @@ def _optimized_metrics(
         cumulative_net_return_pct=round((cumulative - 1) * 100, 4),
         max_drawdown_pct=round(max_drawdown * 100, 4),
         annual=annual,
+    )
+
+
+def _deployment_decision(
+    metrics: OptimizedMetrics,
+    *,
+    minimum_trades: int = 200,
+    minimum_win_probability: float = 55.0,
+    minimum_average_return: float = 0.3,
+    maximum_drawdown: float = -20.0,
+) -> DeploymentDecision:
+    reasons = []
+    if metrics.trades < minimum_trades:
+        reasons.append(
+            f"样本外交易仅{metrics.trades}笔，低于{minimum_trades}笔门槛"
+        )
+    if metrics.win_probability_after_cost < minimum_win_probability:
+        reasons.append(
+            f"扣费后胜率{metrics.win_probability_after_cost:.2f}%，"
+            f"低于{minimum_win_probability:.2f}%门槛"
+        )
+    if metrics.average_net_return_pct < minimum_average_return:
+        reasons.append(
+            f"平均净收益{metrics.average_net_return_pct:.2f}%，"
+            f"低于{minimum_average_return:.2f}%门槛"
+        )
+    if metrics.max_drawdown_pct < maximum_drawdown:
+        reasons.append(
+            f"最大回撤{metrics.max_drawdown_pct:.2f}%，"
+            f"超过{abs(maximum_drawdown):.2f}%限制"
+        )
+    negative_years = [
+        year
+        for year, values in metrics.annual.items()
+        if values["average_net_return_pct"] <= 0
+    ]
+    if negative_years:
+        reasons.append(
+            f"存在平均净收益不为正的样本外年度: {', '.join(negative_years)}"
+        )
+    approved = not reasons
+    return DeploymentDecision(
+        approved=approved,
+        minimum_out_of_sample_trades=minimum_trades,
+        minimum_win_probability_after_cost=minimum_win_probability,
+        minimum_average_net_return_pct=minimum_average_return,
+        maximum_drawdown_pct=maximum_drawdown,
+        reasons=tuple(reasons),
+        next_step=(
+            "可以进入小仓位人工确认阶段，仍不得自动下单"
+            if approved
+            else "禁止实盘；补充封板、竞价和资金流数据后，用全新连续样本纸面验证"
+        ),
     )
 
 

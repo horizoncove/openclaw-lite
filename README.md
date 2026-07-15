@@ -129,6 +129,11 @@ python3 -m src.backtesting.limit_up_backtest \
   --start 2021-07-15 --end 2026-07-15 \
   --database data/backtest/a_share_5y.sqlite \
   --output-dir data/backtest/results
+
+python3 -m src.backtesting.sop_v31_optimizer \
+  --start 2021-07-15 --end 2026-07-15 \
+  --database data/backtest/a_share_5y.sqlite \
+  --output-dir data/backtest/results
 ```
 
 数据库和回测结果默认不提交到 Git。回测在收盘选出候选，按次日开盘等权买入、
@@ -140,6 +145,11 @@ python3 -m src.backtesting.limit_up_backtest \
 `daily_bar_proxy_v1` 代理评分，不能宣称为实时策略的完全复现；BaoStock 不覆盖
 北交所，历史行业使用下载时的证监会分类。若配置有权限的 Tushare
 `limit_list_d` 数据，才能完整复现封板质量维度。
+
+优化器使用以前年度训练、下一年度验证的滚动方式，并将全样本静态结果与样本外
+结果分开。只有样本外交易数、扣费胜率、平均净收益和最大回撤全部达到门槛时，
+报告中的 `deployment_decision.approved` 才可能为 `true`；否则系统明确禁止
+实盘，不会为了得到“好看结果”继续在同一批历史数据上追逐参数。
 
 ## 🎬 Shakespeare - 剧本创作助手
 

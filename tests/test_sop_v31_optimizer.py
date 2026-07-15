@@ -75,6 +75,8 @@ class SOPV31OptimizerTests(unittest.TestCase):
         self.assertGreater(
             report.walk_forward_out_of_sample.average_net_return_pct, 0
         )
+        self.assertFalse(report.deployment_decision.approved)
+        self.assertTrue(report.deployment_decision.reasons)
 
 
 if __name__ == "__main__":
