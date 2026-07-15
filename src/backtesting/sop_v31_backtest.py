@@ -41,12 +41,14 @@ class SOPSelection:
     industry: str
     board_count: int
     sector_limit_up_count: int
+    market_limit_up_count: int
     float_market_cap_yi: float
     turnover_rate: float
     ranking_strength: float
     next_trade_date: str
     next_limit_up: bool
     next_open_buyable: bool
+    next_open_gap_pct: float
     next_open_to_close_pct: float | None
 
 
@@ -189,6 +191,7 @@ class SOPV31Backtester:
                     board_count,
                     float_cap,
                     sector_counts[row["industry"]],
+                    len(day_rows),
                     score,
                 )
                 if selection:
@@ -302,6 +305,7 @@ class SOPV31Backtester:
         board_count: int,
         float_cap: float,
         sector_count: int,
+        market_limit_up_count: int,
         score: float,
     ) -> SOPSelection | None:
         if not row["next_open"] or not row["next_trade_date"]:
@@ -321,6 +325,7 @@ class SOPV31Backtester:
             industry=row["industry"],
             board_count=board_count,
             sector_limit_up_count=sector_count,
+            market_limit_up_count=market_limit_up_count,
             float_market_cap_yi=round(float_cap / 100_000_000, 4),
             turnover_rate=round(row["turnover_rate"], 4),
             ranking_strength=score,
@@ -329,6 +334,7 @@ class SOPV31Backtester:
                 row["code"], row["next_pct_change"]
             ),
             next_open_buyable=buyable,
+            next_open_gap_pct=round(open_gap, 4),
             next_open_to_close_pct=(
                 round(open_to_close, 4) if open_to_close is not None else None
             ),
