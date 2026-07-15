@@ -1,11 +1,21 @@
 from __future__ import annotations
 
+import importlib.util
 import json
 import tempfile
 import unittest
 from pathlib import Path
 
-from tools.compile_knowledge import compile_bundle, parse_document
+
+COMPILER_PATH = (
+    Path(__file__).resolve().parents[1] / "tools" / "compile_knowledge.py"
+)
+SPEC = importlib.util.spec_from_file_location("sharon_knowledge_compiler", COMPILER_PATH)
+assert SPEC and SPEC.loader
+COMPILER = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(COMPILER)
+compile_bundle = COMPILER.compile_bundle
+parse_document = COMPILER.parse_document
 
 
 class KnowledgeCompilerTests(unittest.TestCase):
