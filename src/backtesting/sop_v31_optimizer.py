@@ -95,7 +95,7 @@ class SOPV31Optimizer:
         static = self._select(frame, static_parameters)
         static_metrics = _optimized_metrics(static, self.one_way_cost_bps)
 
-        years = sorted(frame["year"].unique())
+        years = sorted(int(value) for value in frame["year"].unique())
         periods: list[WalkForwardPeriod] = []
         out_of_sample_frames = []
         out_of_sample_selections: list[SOPSelection] = []
