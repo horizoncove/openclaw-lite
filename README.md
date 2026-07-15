@@ -151,6 +151,33 @@ python3 -m src.backtesting.sop_v31_optimizer \
 报告中的 `deployment_decision.approved` 才可能为 `true`；否则系统明确禁止
 实盘，不会为了得到“好看结果”继续在同一批历史数据上追逐参数。
 
+### 配置 Tushare 增强数据
+
+1. 在 [Tushare](https://tushare.pro/) 注册并复制个人 Token。
+2. 本地开发可复制 `.env.example` 为 `.env`；Cursor Cloud 应在环境的
+   Secrets 中新增 `TUSHARE_TOKEN`。不要把真实 Token 写入 YAML、Git 或聊天。
+3. 安装依赖并运行权限检查：
+
+```bash
+pip install -r requirements.txt
+python3 -m src.tools.tushare_data
+```
+
+诊断会验证交易日历以及以下接口，但不会输出 Token：
+
+- `limit_list_d`：2020 年后的封板时间、封单金额和炸板次数，需约 5000 积分。
+- `moneyflow`：2010 年后的大小单和净流入数据，需约 2000 积分。
+- `stk_auction`：2025 年后的集合竞价数据，需单独开通竞价权限。
+
+如果暂时没有竞价权限，可只检查前两个接口：
+
+```bash
+python3 -m src.tools.tushare_data --require limit_list_d,moneyflow
+```
+
+返回 JSON 中 `ready: true` 才表示所有指定权限都已验证。历史下载必须先读取
+交易日历，避免 `limit_list_d` 在非交易日返回上一交易日重复数据的问题。
+
 ## 🎬 Shakespeare - 剧本创作助手
 
 ### 功能

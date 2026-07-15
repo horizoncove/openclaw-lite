@@ -34,6 +34,9 @@ ENV/
 *~
 
 # Config (含敏感信息)
+.env
+.env.*
+!.env.example
 config/config.yaml
 config/*.local.yaml
 
