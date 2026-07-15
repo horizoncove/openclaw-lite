@@ -107,6 +107,8 @@ class DailyBarLimitUpBacktester:
                     (start_date.isoformat(), end_date.isoformat()),
                 )
             ]
+            if not trading_dates:
+                raise ValueError("指定区间内没有可用日线数据")
             date_index = {value: index for index, value in enumerate(trading_dates)}
             rows = connection.execute(
                 f"""
@@ -190,7 +192,9 @@ class DailyBarLimitUpBacktester:
             for score, board_count, row in scored[: self.config.max_candidates]:
                 selections.append(self._selection(score, board_count, row))
 
-        return self._report(start_date, end_date, selections), selections
+        actual_start = date.fromisoformat(trading_dates[0])
+        actual_end = date.fromisoformat(trading_dates[-1])
+        return self._report(actual_start, actual_end, selections), selections
 
     def _eligible(self, row: sqlite3.Row) -> bool:
         return (

@@ -68,6 +68,7 @@ class AShareHistoryDownloader:
             connection.close()
             raise RuntimeError(f"BaoStock 登录失败: {login.error_msg}")
 
+        logged_in = True
         failed = 0
         completed = 0
         try:
@@ -109,6 +110,11 @@ class AShareHistoryDownloader:
                         completed + failed, total, completed, failed, code
                     )
             else:
+                # The parent connection would otherwise sit idle for the whole
+                # parallel download and can hang while logging out after the
+                # server has timed it out.
+                bs.logout()
+                logged_in = False
                 tasks = [
                     (
                         code,
@@ -153,7 +159,8 @@ class AShareHistoryDownloader:
                             code,
                         )
         finally:
-            bs.logout()
+            if logged_in:
+                bs.logout()
 
         bar_count = connection.execute("SELECT COUNT(*) FROM daily_bars").fetchone()[0]
         connection.close()
