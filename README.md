@@ -115,6 +115,32 @@ python src/main.py --task limit_up_screening
 变更或限流；生产使用建议替换为有授权的数据源。评分只用于研究和观察，
 不构成投资建议，也不保证次日涨停。
 
+### 五年历史数据与回测
+
+历史下载器使用 BaoStock 的沪深 A 股不复权日线，包含已退市股票并支持断点
+续传。必须使用不复权价格，才能正确识别当时的涨停幅度：
+
+```bash
+python3 -m src.backtesting.market_database \
+  --start 2021-07-15 --end 2026-07-15 \
+  --database data/backtest/a_share_5y.sqlite
+
+python3 -m src.backtesting.limit_up_backtest \
+  --start 2021-07-15 --end 2026-07-15 \
+  --database data/backtest/a_share_5y.sqlite \
+  --output-dir data/backtest/results
+```
+
+数据库和回测结果默认不提交到 Git。回测在收盘选出候选，按次日开盘等权买入、
+收盘卖出，开盘涨停视为无法成交，并扣除双边成本。报告同时给出次日继续涨停
+命中率、可成交收益、分年度结果和最大回撤。
+
+需要注意：免费日线没有历史封单金额、首次封板时间和精确炸板次数，因此该回测
+使用板块涨停宽度、连板高度、换手、成交额和开盘形态构建
+`daily_bar_proxy_v1` 代理评分，不能宣称为实时策略的完全复现；BaoStock 不覆盖
+北交所，历史行业使用下载时的证监会分类。若配置有权限的 Tushare
+`limit_list_d` 数据，才能完整复现封板质量维度。
+
 ## 🎬 Shakespeare - 剧本创作助手
 
 ### 功能

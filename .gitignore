@@ -41,6 +41,7 @@ config/*.local.yaml
 data/*.db
 data/*.json
 data/*.log
+data/backtest/
 logs/
 
 # Reports
