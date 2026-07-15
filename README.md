@@ -93,6 +93,28 @@ alex.generate_weekly_report()  # 生成周报
 alex.start_monitoring()        # 启动监控
 ```
 
+### 收盘涨停延续候选
+
+工作日 15:30，Alex 会拉取当日完整涨停池和行业板块涨幅榜，综合以下
+可解释指标生成最多 3 只次日观察候选：
+
+- 板块涨停家数与行业涨幅榜共振（30 分）
+- 封单金额/流通市值（25 分）
+- 首次封板时间（15 分）
+- 换手率、开板次数和连板高度（30 分）
+
+默认排除 ST/退市风险股、低换手一字板、封单过弱和开板过多的股票。
+参数可在 `config/config.yaml` 的 `limit_up_strategy` 中调整。手动运行：
+
+```bash
+python src/main.py --task limit_up_screening
+```
+
+结果保存在 `~/.openclaw/workspace/data/limit_up_candidates_YYYYMMDD.json`
+对应目录中，包含总分、分项得分、入选理由和风险提示。东方财富公共接口可能
+变更或限流；生产使用建议替换为有授权的数据源。评分只用于研究和观察，
+不构成投资建议，也不保证次日涨停。
+
 ## 🎬 Shakespeare - 剧本创作助手
 
 ### 功能
@@ -162,6 +184,7 @@ openclaw-lite/
 ```bash
 # 添加到crontab
 0 9 * * 1-5 python src/main.py --task morning_report
+30 15 * * 1-5 python src/main.py --task limit_up_screening
 0 16 * * 1-5 python src/main.py --task daily_review
 0 */2 * * * python src/tools/rss_monitor.py
 ```

@@ -7,13 +7,23 @@ import os
 from datetime import datetime, timedelta
 import pandas as pd
 import matplotlib.pyplot as plt
+import yaml
+
+from strategies.limit_up_continuation import (
+    LimitUpContinuationStrategy,
+    StrategyConfig,
+)
+from tools.market_data import EastmoneyMarketData
 
 class Alex:
     """量化交易AI助手"""
     
     def __init__(self, config_path=None):
         self.config = self._load_config(config_path)
-        self.data_dir = "/root/.openclaw/workspace/data"
+        self.data_dir = os.environ.get(
+            "OPENCLAW_DATA_DIR",
+            os.path.expanduser("~/.openclaw/workspace/data"),
+        )
         os.makedirs(self.data_dir, exist_ok=True)
         
     def _load_config(self, config_path):
@@ -25,8 +35,17 @@ class Alex:
                 {"code": "300502", "name": "新易盛", "shares": 500, "cost": 118.00},
                 {"code": "688027", "name": "国盾量子", "shares": 300, "cost": 625.00},
             ],
-            "alert_threshold": 0.03
+            "alert_threshold": 0.03,
+            "limit_up_strategy": {},
         }
+        path = config_path or os.environ.get("OPENCLAW_CONFIG", "config/config.yaml")
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as config_file:
+                loaded = yaml.safe_load(config_file) or {}
+            default_config.update(loaded)
+            for stock in default_config.get("stocks", []):
+                if "cost" not in stock and "cost_price" in stock:
+                    stock["cost"] = stock["cost_price"]
         return default_config
     
     def get_stock_price(self, code):
@@ -121,6 +140,42 @@ class Alex:
         print(f"📊 收盘复盘 - {datetime.now().strftime('%Y-%m-%d')}")
         # 实际使用接入当日成交数据
         print("✅ 收盘复盘已生成")
+
+    def run_limit_up_screening(self, provider=None):
+        """收盘后筛选次日可能延续的涨停股，并保存可解释报告。"""
+        options = self.config.get("limit_up_strategy", {})
+        config = StrategyConfig(
+            max_candidates=int(options.get("max_candidates", 3)),
+            min_score=float(options.get("min_score", 55)),
+            hot_sector_top_n=int(options.get("hot_sector_top_n", 20)),
+            min_turnover_rate=float(options.get("min_turnover_rate", 1)),
+            max_turnover_rate=float(options.get("max_turnover_rate", 35)),
+            max_open_count=int(options.get("max_open_count", 3)),
+            min_seal_ratio=float(options.get("min_seal_ratio", 0.001)),
+        )
+        strategy = LimitUpContinuationStrategy(config)
+        result = strategy.run(provider or EastmoneyMarketData())
+
+        report_file = os.path.join(
+            self.data_dir,
+            f"limit_up_candidates_{result.trading_date.strftime('%Y%m%d')}.json",
+        )
+        with open(report_file, "w", encoding="utf-8") as report:
+            json.dump(result.to_dict(), report, ensure_ascii=False, indent=2)
+
+        print(
+            f"📈 涨停延续筛选：涨停{result.limit_up_count}只，"
+            f"合格{result.eligible_count}只，入选{len(result.candidates)}只"
+        )
+        for index, candidate in enumerate(result.candidates, start=1):
+            print(
+                f"{index}. {candidate.name}({candidate.code}) "
+                f"{candidate.score:.2f}分 | {candidate.sector} | "
+                f"{candidate.board_count}连板"
+            )
+        print(f"✅ 筛选报告已保存: {report_file}")
+        print("⚠️ 结果仅用于研究和次日观察，不构成投资建议。")
+        return result
     
     def generate_portfolio_chart(self):
         """生成持仓图表"""

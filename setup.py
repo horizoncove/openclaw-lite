@@ -55,6 +55,7 @@ def setup_cron():
     if choice == 'y':
         cron_content = """# OpenClaw Lite 定时任务
 0 9 * * 1-5 cd {cwd} && {python} src/main.py --task morning_report
+30 15 * * 1-5 cd {cwd} && {python} src/main.py --task limit_up_screening
 0 16 * * 1-5 cd {cwd} && {python} src/main.py --task daily_review
 0 21 * * 5 cd {cwd} && {python} src/main.py --task weekly_report
 0 */2 * * * cd {cwd} && {python} src/tools/rss_monitor.py

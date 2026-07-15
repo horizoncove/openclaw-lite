@@ -22,6 +22,16 @@ class TaskScheduler:
         
         # 收盘复盘 - 每天16:00
         schedule.every().day.at("16:00").do(self._daily_review)
+
+        # 涨停延续筛选 - 工作日收盘后15:30
+        for weekday in (
+            schedule.every().monday,
+            schedule.every().tuesday,
+            schedule.every().wednesday,
+            schedule.every().thursday,
+            schedule.every().friday,
+        ):
+            weekday.at("15:30").do(self._limit_up_screening)
         
         # RSS监控 - 每2小时
         schedule.every(2).hours.do(self._rss_monitor)
@@ -47,6 +57,16 @@ class TaskScheduler:
             alex.generate_daily_review()
         except Exception as e:
             print(f"❌ 收盘复盘失败: {e}")
+
+    def _limit_up_screening(self):
+        """收盘后涨停延续候选筛选。"""
+        print(f"[{datetime.now()}] 执行涨停延续筛选...")
+        try:
+            from agents.alex import Alex
+            alex = Alex()
+            alex.run_limit_up_screening()
+        except Exception as e:
+            print(f"❌ 涨停延续筛选失败: {e}")
     
     def _rss_monitor(self):
         """RSS监控任务"""

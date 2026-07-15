@@ -14,7 +14,6 @@ sys.path.insert(0, str(Path(__file__).parent))
 from agents.alex import Alex
 from agents.shakespeare import Shakespeare
 from core.scheduler import TaskScheduler
-from core.notifier import Notifier
 
 class OpenClawLite:
     """OpenClaw Lite 主控制器"""
@@ -23,7 +22,6 @@ class OpenClawLite:
         self.alex = Alex()
         self.shakespeare = Shakespeare()
         self.scheduler = TaskScheduler()
-        self.notifier = Notifier()
         
     def start_all(self):
         """启动所有服务"""
@@ -49,6 +47,7 @@ class OpenClawLite:
         tasks = {
             'morning_report': self.alex.generate_morning_report,
             'daily_review': self.alex.generate_daily_review,
+            'limit_up_screening': self.alex.run_limit_up_screening,
             'weekly_report': self.alex.generate_weekly_report,
             'portfolio_chart': self.alex.generate_portfolio_chart,
             'rss_summary': self._run_rss_summary,
