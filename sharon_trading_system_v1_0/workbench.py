@@ -90,7 +90,7 @@ class _LimitUpWorker(QThread):
     finished_err = pyqtSignal(str)
 
     def __init__(
-        self, trade_date: str, top_n: int, mode: ScoreMode = "relay"
+        self, trade_date: str, top_n: int, mode: ScoreMode = "sop_v31"
     ) -> None:
         super().__init__()
         self._trade_date = trade_date
@@ -856,7 +856,7 @@ class WorkbenchWindow(MainWindow):
 
         strategy = CockpitCard(
             "涨停接力选股",
-            "收盘扫描涨停池 · 经典接力或 V31反向多因子评分 · 仅建议不落单",
+            "收盘扫描涨停池 · SOP v3.1七星 / V31反向 / 经典接力 · 仅建议不落单",
         )
         controls = QHBoxLayout()
         controls.setSpacing(10)
@@ -864,10 +864,11 @@ class WorkbenchWindow(MainWindow):
         self.limit_up_date.setPlaceholderText("YYYYMMDD")
         self.limit_up_date.setMaximumWidth(120)
         self.limit_up_mode = QComboBox()
+        self.limit_up_mode.addItem("SOP v3.1七星", "sop_v31")
         self.limit_up_mode.addItem("V31反向版", "v31_reverse")
         self.limit_up_mode.addItem("经典涨停接力", "relay")
         self.limit_up_mode.setCurrentIndex(0)
-        self.limit_up_mode.setMinimumWidth(130)
+        self.limit_up_mode.setMinimumWidth(140)
         self.limit_up_top_n = QSpinBox()
         self.limit_up_top_n.setRange(1, 3)
         self.limit_up_top_n.setValue(3)
@@ -887,8 +888,8 @@ class WorkbenchWindow(MainWindow):
         controls.addStretch()
         strategy.body.addLayout(controls)
         self.limit_up_status = QLabel(
-            "建议 15:05 后运行。V31反向版：涨停家数≥30、评分≥75、排除7连板以上；"
-            "高波动/放量/强封/正乖离加分；计划提示含 -2.8%止损/+6%卖半/+18%清仓。"
+            "建议 15:05 后运行。默认 SOP v3.1：2–4连板、流通市值≤100亿、换手≥5%、"
+            "14:00前封板、板块≥3只涨停、七星≥65；也可切换 V31反向或经典接力。"
         )
         self.limit_up_status.setObjectName("hint")
         self.limit_up_status.setWordWrap(True)
@@ -935,7 +936,11 @@ class WorkbenchWindow(MainWindow):
 
     def _selected_limit_up_mode(self) -> ScoreMode:
         mode = self.limit_up_mode.currentData()
-        return "v31_reverse" if mode == "v31_reverse" else "relay"
+        if mode == "v31_reverse":
+            return "v31_reverse"
+        if mode == "relay":
+            return "relay"
+        return "sop_v31"
 
     def _run_limit_up_screen(self) -> None:
         if self._limit_up_worker and self._limit_up_worker.isRunning():
@@ -946,7 +951,12 @@ class WorkbenchWindow(MainWindow):
             QMessageBox.warning(self, "日期无效", "请输入 YYYYMMDD 交易日")
             return
         mode = self._selected_limit_up_mode()
-        label = "V31反向版" if mode == "v31_reverse" else "经典涨停接力"
+        labels = {
+            "sop_v31": "SOP v3.1七星",
+            "v31_reverse": "V31反向版",
+            "relay": "经典涨停接力",
+        }
+        label = labels.get(mode, "涨停策略")
         self.limit_up_status.setText(
             f"正在用{label}扫描 {trade_date} 涨停池与热门板块…"
         )
@@ -992,8 +1002,13 @@ class WorkbenchWindow(MainWindow):
                 if column == 0:
                     cell.setForeground(QColor("#c9a66b"))
                 self.limit_up_table.setItem(row, column, cell)
-        mode = result.get("strategy_mode") or "relay"
-        label = "V31反向版" if mode == "v31_reverse" else "涨停接力"
+        mode = result.get("strategy_mode") or "sop_v31"
+        labels = {
+            "sop_v31": "SOP v3.1七星",
+            "v31_reverse": "V31反向版",
+            "relay": "涨停接力",
+        }
+        label = labels.get(str(mode), "涨停策略")
         self.statusBar().showMessage(
             f"{label}扫描完成：入选 {len(picks)} / 池内 {result.get('pool_size', 0)}",
             6000,

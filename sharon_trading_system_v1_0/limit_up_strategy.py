@@ -1,13 +1,18 @@
 """After-close limit-up continuation screener (涨停接力选股).
 
-Supports two score modes:
-1. ``relay`` — original hot-sector / seal-quality continuation ranker
-2. ``v31_reverse`` — JoinQuant V31 reverse multi-factor scorer adapted to the
+Supports three score modes:
+1. ``sop_v31`` — Sharon SOP v3.1 seven-star hard filters + proxy score (≥65)
+2. ``relay`` — original hot-sector / seal-quality continuation ranker
+3. ``v31_reverse`` — JoinQuant V31 reverse multi-factor scorer adapted to the
    East Money limit-up pool (no external XGBoost / money-flow APIs)
 
-Sharon never auto-orders; V31 exit/position rules are emitted as plan hints.
+Sharon never auto-orders; strategy exit/position rules are plan hints.
 When they conflict with Sharon L1 hard rules (单票≤25%、总仓≤60%、-7%止损),
 execution pre-checks still use the stricter L1 limits.
+
+SOP v3.1 methodology source: knowledge/skills/sharon-trading-sop-v31.md
+(from the user complete manual v1.0). Seven-star dimension formulas below are
+deterministic proxies — the handbook did not publish exact 0–满分 rubrics.
 """
 
 from __future__ import annotations
@@ -27,7 +32,8 @@ from .market_data import USER_AGENT, normalize_stock_code
 
 
 SHANGHAI = ZoneInfo("Asia/Shanghai")
-ScoreMode = Literal["relay", "v31_reverse"]
+ScoreMode = Literal["relay", "v31_reverse", "sop_v31"]
+YI = Decimal("100000000")
 
 
 @dataclass(frozen=True)
@@ -67,6 +73,37 @@ DEFAULT_V31_PARAMS = V31ReverseParams()
 
 
 @dataclass(frozen=True)
+class SOPv31Params:
+    """Sharon SOP v3.1 hard filters + seven-star threshold."""
+
+    score_threshold: float = 65.0
+    min_board_count: int = 2
+    max_board_count: int = 4
+    max_float_market_cap_yi: float = 100.0
+    hard_exclude_float_market_cap_yi: float = 300.0
+    min_turnover_pct: float = 5.0
+    small_cap_yi: float = 30.0
+    small_cap_max_turnover_pct: float = 30.0
+    min_sector_limit_ups: int = 3
+    latest_seal_minute: int = 14 * 60  # 14:00
+    stop_loss: float = -0.07
+    single_position: float = 0.25
+    total_position_cap: float = 0.60
+
+    def plan_hints(self) -> tuple[str, ...]:
+        return (
+            "Sharon SOP v3.1：2–4连板 · 流通市值≤100亿 · 换手≥5% · 14:00前封板 · 板块≥3只涨停",
+            f"七星总分≥{self.score_threshold:.0f} 才进候选（手册声明待独立复验）",
+            f"硬止损 {self.stop_loss:.0%} · 单票≤{self.single_position:.0%} · "
+            f"总仓≤{self.total_position_cap:.0%}",
+            "5连板及以上不追高；理由失效即退出",
+        )
+
+
+DEFAULT_SOP_V31_PARAMS = SOPv31Params()
+
+
+@dataclass(frozen=True)
 class LimitUpStock:
     stock_code: str
     stock_name: str
@@ -81,6 +118,7 @@ class LimitUpStock:
     open_count: int
     turnover_pct: Decimal | None
     trade_date: str
+    float_market_cap_yi: Decimal | None = None
 
 
 @dataclass(frozen=True)
@@ -179,6 +217,13 @@ def parse_limit_up_pool(
         board = int(row.get("lbc") or 1)
         open_count = int(row.get("zbc") or 0)
         turnover = row.get("hs")
+        float_yi: Decimal | None = None
+        ltsz = row.get("ltsz")
+        if ltsz not in (None, "", 0, "0"):
+            try:
+                float_yi = Decimal(str(ltsz)) / YI
+            except Exception:  # noqa: BLE001 - keep pool parse resilient
+                float_yi = None
         stocks.append(
             LimitUpStock(
                 stock_code=normalize_stock_code(code),
@@ -196,6 +241,7 @@ def parse_limit_up_pool(
                     Decimal(str(turnover)) if turnover not in (None, "") else None
                 ),
                 trade_date=trade_date,
+                float_market_cap_yi=float_yi,
             )
         )
     return stocks
@@ -457,6 +503,187 @@ def score_v31_reverse(
     )
 
 
+def passes_sop_v31_hard_filters(
+    stock: LimitUpStock,
+    *,
+    hot_sectors: list[HotSector],
+    params: SOPv31Params | None = None,
+) -> tuple[bool, str]:
+    """Return (ok, reject_reason) for SOP v3.1 hard matrix."""
+    cfg = params or DEFAULT_SOP_V31_PARAMS
+    if not (cfg.min_board_count <= stock.board_count <= cfg.max_board_count):
+        return False, f"连板{stock.board_count}不在{cfg.min_board_count}-{cfg.max_board_count}"
+    if stock.turnover_pct is None or float(stock.turnover_pct) < cfg.min_turnover_pct:
+        return False, "换手不足5%"
+    if _minutes_from_open(stock.first_limit_time) >= cfg.latest_seal_minute:
+        return False, f"封板过晚 {stock.first_limit_time}"
+    if stock.float_market_cap_yi is None:
+        return False, "缺少流通市值无法核验"
+    cap = float(stock.float_market_cap_yi)
+    if cap > cfg.hard_exclude_float_market_cap_yi:
+        return False, f"流通市值{cap:.0f}亿过大"
+    if cap > cfg.max_float_market_cap_yi:
+        return False, f"流通市值{cap:.0f}亿超过首选100亿"
+    if (
+        cap <= cfg.small_cap_yi
+        and float(stock.turnover_pct) > cfg.small_cap_max_turnover_pct
+    ):
+        return False, "小市值高换手流动性风险"
+    sector_map = {item.name: item for item in hot_sectors}
+    hot = sector_map.get(stock.sector)
+    if not hot or hot.limit_up_count < cfg.min_sector_limit_ups:
+        return False, "板块涨停不足3只"
+    return True, ""
+
+
+def score_sop_v31(
+    stock: LimitUpStock,
+    *,
+    hot_sectors: list[HotSector],
+    pool_stocks: list[LimitUpStock],
+    market_limit_up_count: int,
+    params: SOPv31Params | None = None,
+) -> LimitUpPick:
+    """Deterministic seven-star proxy score for SOP v3.1 (max 100)."""
+    cfg = params or DEFAULT_SOP_V31_PARAMS
+    sector_map = {item.name: item for item in hot_sectors}
+    hot = sector_map.get(stock.sector)
+    sector_rank = hot.rank if hot else 99
+    sector_count = hot.limit_up_count if hot else 0
+    seal_ratio = (
+        float(stock.seal_fund / stock.amount) if stock.amount > 0 else 0.0
+    )
+    turn = float(stock.turnover_pct or 0)
+    first_min = _minutes_from_open(stock.first_limit_time)
+    peers = [item for item in pool_stocks if item.sector == stock.sector]
+    max_peer_amount = max((float(item.amount) for item in peers), default=1.0)
+    amount_lead = float(stock.amount) / max_peer_amount if max_peer_amount > 0 else 0.0
+
+    # 天枢 15 · 资金流（封单强度 proxy）
+    if seal_ratio >= 0.8:
+        tian_shu = 15.0
+    elif seal_ratio >= 0.35:
+        tian_shu = 12.0
+    elif seal_ratio >= 0.15:
+        tian_shu = 8.0
+    else:
+        tian_shu = 4.0
+
+    # 天璇 15 · 板块轮动
+    if sector_count >= 6:
+        tian_xuan = 15.0
+    elif sector_count >= 4:
+        tian_xuan = 12.0
+    elif sector_count >= 3:
+        tian_xuan = 9.0
+    else:
+        tian_xuan = 3.0
+    if sector_rank <= 2:
+        tian_xuan = min(15.0, tian_xuan + 1.0)
+
+    # 天玑 10 · 情绪周期（市场广度 + 分歧）
+    if market_limit_up_count >= 80:
+        tian_ji = 8.0
+    elif market_limit_up_count >= 50:
+        tian_ji = 9.0
+    elif market_limit_up_count >= 30:
+        tian_ji = 7.0
+    else:
+        tian_ji = 3.0
+    if stock.open_count == 0:
+        tian_ji = min(10.0, tian_ji + 1.0)
+    elif stock.open_count >= 2:
+        tian_ji = max(0.0, tian_ji - 3.0)
+
+    # 天权 15 · 多维验证（换手/封板/时间共振，不重复计同一因子满分）
+    resonance = 0
+    if 5.0 <= turn <= 25.0:
+        resonance += 1
+    if seal_ratio >= 0.35:
+        resonance += 1
+    if first_min < 14 * 60:
+        resonance += 1
+    if stock.open_count <= 1:
+        resonance += 1
+    tian_quan = {0: 3.0, 1: 6.0, 2: 10.0, 3: 13.0, 4: 15.0}[resonance]
+
+    # 玉衡 20 · 龙头确认（最高权重）
+    if stock.board_count == 2:
+        yu_heng = 16.0
+    elif stock.board_count == 3:
+        yu_heng = 14.0
+    elif stock.board_count == 4:
+        yu_heng = 10.0  # 高位额外风控
+    else:
+        yu_heng = 4.0
+    if amount_lead >= 0.9:
+        yu_heng = min(20.0, yu_heng + 4.0)
+    elif amount_lead >= 0.6:
+        yu_heng = min(20.0, yu_heng + 2.0)
+    if sector_rank == 1 and sector_count >= 3:
+        yu_heng = min(20.0, yu_heng + 1.0)
+
+    # 开阳 15 · 买卖信号（14:00前封板）
+    if first_min <= 600:  # ≤10:00
+        kai_yang = 15.0
+    elif first_min <= 660:  # ≤11:00
+        kai_yang = 12.0
+    elif first_min < 14 * 60:
+        kai_yang = 8.0
+    else:
+        kai_yang = 2.0
+    if stock.open_count == 0:
+        kai_yang = min(15.0, kai_yang + 0.0)
+
+    # 摇光 10 · 复盘/稳定性 proxy
+    if stock.open_count == 0 and stock.board_count in (2, 3):
+        yao_guang = 9.0
+    elif stock.open_count <= 1:
+        yao_guang = 7.0
+    else:
+        yao_guang = 3.0
+    if stock.float_market_cap_yi is not None:
+        cap = float(stock.float_market_cap_yi)
+        if 30.0 < cap <= 100.0:
+            yao_guang = min(10.0, yao_guang + 1.0)
+
+    breakdown = {
+        "天枢": round(tian_shu, 1),
+        "天璇": round(tian_xuan, 1),
+        "天玑": round(tian_ji, 1),
+        "天权": round(tian_quan, 1),
+        "玉衡": round(yu_heng, 1),
+        "开阳": round(kai_yang, 1),
+        "摇光": round(yao_guang, 1),
+    }
+    score = sum(breakdown.values())
+    score = max(1.0, min(100.0, score))
+    reasons = [
+        f"七星 {score:.0f}=天枢{breakdown['天枢']:.0f}/天璇{breakdown['天璇']:.0f}/"
+        f"天玑{breakdown['天玑']:.0f}/天权{breakdown['天权']:.0f}/"
+        f"玉衡{breakdown['玉衡']:.0f}/开阳{breakdown['开阳']:.0f}/"
+        f"摇光{breakdown['摇光']:.0f}",
+        f"{stock.board_count}连板",
+        f"板块「{stock.sector}」涨停{sector_count}家",
+        f"封板 {stock.first_limit_time}",
+        f"换手 {turn:.1f}%",
+    ]
+    if stock.float_market_cap_yi is not None:
+        reasons.append(f"流通市值 {float(stock.float_market_cap_yi):.0f}亿")
+    if seal_ratio > 0:
+        reasons.append(f"封单比 {seal_ratio:.0%}")
+    return LimitUpPick(
+        stock=stock,
+        score=score,
+        reasons=tuple(reasons),
+        sector_rank=sector_rank,
+        sector_limit_up_count=sector_count,
+        strategy_mode="sop_v31",
+        strategy_label="SOP v3.1七星",
+        plan_hints=cfg.plan_hints(),
+    )
+
+
 class LimitUpScreener:
     """Fetch East Money limit-up pool and rank next-day continuation candidates."""
 
@@ -497,10 +724,12 @@ class LimitUpScreener:
         trade_date: str | None = None,
         top_n: int = 3,
         hot_sector_n: int = 8,
-        mode: ScoreMode = "relay",
+        mode: ScoreMode = "sop_v31",
         v31_params: V31ReverseParams | None = None,
+        sop_params: SOPv31Params | None = None,
     ) -> dict[str, Any]:
-        cfg = v31_params or DEFAULT_V31_PARAMS
+        reverse_cfg = v31_params or DEFAULT_V31_PARAMS
+        sop_cfg = sop_params or DEFAULT_SOP_V31_PARAMS
         stocks = self.fetch_limit_up_pool(trade_date)
         used_date = (
             stocks[0].trade_date if stocks else (trade_date or default_trade_date())
@@ -517,7 +746,7 @@ class LimitUpScreener:
             }
 
         # V31 reverse: weak-market empty when limit-up breadth is too thin.
-        if mode == "v31_reverse" and len(stocks) < cfg.weak_zt_threshold:
+        if mode == "v31_reverse" and len(stocks) < reverse_cfg.weak_zt_threshold:
             hot_sectors = build_hot_sectors(stocks, top_n=hot_sector_n)
             return {
                 "trade_date": used_date,
@@ -527,26 +756,73 @@ class LimitUpScreener:
                 "pick_objects": [],
                 "strategy_mode": mode,
                 "market_state": "weak",
-                "plan_hints": list(cfg.plan_hints()),
+                "plan_hints": list(reverse_cfg.plan_hints()),
                 "message": (
                     f"弱市空仓：涨停 {len(stocks)} 家 < 阈值 "
-                    f"{cfg.weak_zt_threshold} 家（V31反向版）"
+                    f"{reverse_cfg.weak_zt_threshold} 家（V31反向版）"
                 ),
             }
 
         hot_sectors = build_hot_sectors(stocks, top_n=hot_sector_n)
+        plan_hints: list[str] = []
         if mode == "v31_reverse":
             eligible = [
                 stock
                 for stock in stocks
-                if stock.board_count <= cfg.max_board_count
+                if stock.board_count <= reverse_cfg.max_board_count
             ]
             scored = [
-                score_v31_reverse(stock, hot_sectors=hot_sectors, params=cfg)
+                score_v31_reverse(
+                    stock, hot_sectors=hot_sectors, params=reverse_cfg
+                )
                 for stock in eligible
             ]
-            scored = [item for item in scored if item.score >= cfg.score_threshold]
+            scored = [
+                item
+                for item in scored
+                if item.score >= reverse_cfg.score_threshold
+            ]
             label = "V31反向版"
+            plan_hints = list(reverse_cfg.plan_hints())
+        elif mode == "sop_v31":
+            eligible = []
+            for stock in stocks:
+                ok, _reason = passes_sop_v31_hard_filters(
+                    stock, hot_sectors=hot_sectors, params=sop_cfg
+                )
+                if ok:
+                    eligible.append(stock)
+            scored = [
+                score_sop_v31(
+                    stock,
+                    hot_sectors=hot_sectors,
+                    pool_stocks=stocks,
+                    market_limit_up_count=len(stocks),
+                    params=sop_cfg,
+                )
+                for stock in eligible
+            ]
+            scored = [
+                item for item in scored if item.score >= sop_cfg.score_threshold
+            ]
+            label = "SOP v3.1七星"
+            plan_hints = list(sop_cfg.plan_hints())
+            if not scored:
+                return {
+                    "trade_date": used_date,
+                    "pool_size": len(stocks),
+                    "hot_sectors": [asdict(item) for item in hot_sectors],
+                    "picks": [],
+                    "pick_objects": [],
+                    "strategy_mode": mode,
+                    "market_state": "normal",
+                    "eligible_count": len(eligible),
+                    "plan_hints": plan_hints,
+                    "message": (
+                        f"{used_date} 涨停 {len(stocks)} 只 · SOP硬过滤后 "
+                        f"{len(eligible)} 只 · 无七星≥{sop_cfg.score_threshold:.0f}"
+                    ),
+                }
         else:
             scored = [
                 score_limit_up_continuation(stock, hot_sectors=hot_sectors)
@@ -564,7 +840,7 @@ class LimitUpScreener:
             "pick_objects": top,
             "strategy_mode": mode,
             "market_state": "normal",
-            "plan_hints": list(cfg.plan_hints()) if mode == "v31_reverse" else [],
+            "plan_hints": plan_hints,
             "message": (
                 f"{used_date} 涨停 {len(stocks)} 只 · {label}入选 {len(top)}；"
                 + (
@@ -593,16 +869,20 @@ class LimitUpScreener:
 
 
 __all__ = [
+    "DEFAULT_SOP_V31_PARAMS",
     "DEFAULT_V31_PARAMS",
     "HotSector",
     "LimitUpPick",
     "LimitUpScreener",
     "LimitUpStock",
+    "SOPv31Params",
     "ScoreMode",
     "V31ReverseParams",
     "build_hot_sectors",
     "default_trade_date",
     "parse_limit_up_pool",
+    "passes_sop_v31_hard_filters",
     "score_limit_up_continuation",
+    "score_sop_v31",
     "score_v31_reverse",
 ]

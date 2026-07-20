@@ -13,7 +13,9 @@ from sharon_trading_system_v1_0.limit_up_strategy import (
     build_hot_sectors,
     default_trade_date,
     parse_limit_up_pool,
+    passes_sop_v31_hard_filters,
     score_limit_up_continuation,
+    score_sop_v31,
     score_v31_reverse,
 )
 
@@ -35,6 +37,7 @@ SAMPLE_PAYLOAD = {
                 "fund": 211548352,
                 "zbc": 0,
                 "hybk": "医疗器械",
+                "ltsz": 8_000_000_000,
             },
             {
                 "c": "300001",
@@ -49,6 +52,7 @@ SAMPLE_PAYLOAD = {
                 "fund": 80000000,
                 "zbc": 2,
                 "hybk": "电力设备",
+                "ltsz": 12_000_000_000,
             },
             {
                 "c": "600000",
@@ -63,6 +67,7 @@ SAMPLE_PAYLOAD = {
                 "fund": 20000000,
                 "zbc": 0,
                 "hybk": "银行",
+                "ltsz": 200_000_000_000,
             },
             {
                 "c": "000001",
@@ -76,6 +81,7 @@ SAMPLE_PAYLOAD = {
                 "fund": 1000,
                 "zbc": 0,
                 "hybk": "银行",
+                "ltsz": 5_000_000_000,
             },
             {
                 "c": "002001",
@@ -90,6 +96,7 @@ SAMPLE_PAYLOAD = {
                 "fund": 180000000,
                 "zbc": 0,
                 "hybk": "医疗器械",
+                "ltsz": 6_500_000_000,
             },
             {
                 "c": "002002",
@@ -104,6 +111,7 @@ SAMPLE_PAYLOAD = {
                 "fund": 150000000,
                 "zbc": 0,
                 "hybk": "医疗器械",
+                "ltsz": 7_000_000_000,
             },
         ]
     }
@@ -125,6 +133,7 @@ def _stock(**overrides: object) -> LimitUpStock:
         open_count=0,
         turnover_pct=Decimal("12.0"),
         trade_date="20260715",
+        float_market_cap_yi=Decimal("65"),
     )
     base.update(overrides)
     return LimitUpStock(**base)  # type: ignore[arg-type]
@@ -141,6 +150,7 @@ class LimitUpStrategyTests(unittest.TestCase):
         self.assertNotIn("000001", codes)
         self.assertEqual(len(stocks), 5)
         self.assertEqual(stocks[0].last_price, Decimal("5.96"))
+        self.assertEqual(stocks[0].float_market_cap_yi, Decimal("80"))
 
         hot = build_hot_sectors(stocks, top_n=3)
         self.assertEqual(hot[0].name, "医疗器械")
@@ -242,6 +252,90 @@ class LimitUpStrategyTests(unittest.TestCase):
         for item in result["picks"]:
             self.assertGreaterEqual(item["score"], 75)
             self.assertEqual(item["strategy_mode"], "v31_reverse")
+
+    def test_sop_v31_hard_filters_and_seven_star(self) -> None:
+        pool = [
+            _stock(
+                stock_code="002001",
+                board_count=2,
+                turnover_pct=Decimal("8"),
+                first_limit_time="09:40:00",
+                float_market_cap_yi=Decimal("60"),
+                amount=Decimal("300000000"),
+                seal_fund=Decimal("250000000"),
+                sector="医疗器械",
+            ),
+            _stock(
+                stock_code="002002",
+                board_count=2,
+                turnover_pct=Decimal("7"),
+                first_limit_time="10:10:00",
+                float_market_cap_yi=Decimal("70"),
+                amount=Decimal("180000000"),
+                seal_fund=Decimal("90000000"),
+                sector="医疗器械",
+            ),
+            _stock(
+                stock_code="002003",
+                board_count=3,
+                turnover_pct=Decimal("9"),
+                first_limit_time="09:50:00",
+                float_market_cap_yi=Decimal("55"),
+                amount=Decimal("160000000"),
+                seal_fund=Decimal("80000000"),
+                sector="医疗器械",
+            ),
+            _stock(
+                stock_code="600000",
+                stock_name="大盘银行",
+                sector="银行",
+                board_count=2,
+                turnover_pct=Decimal("6"),
+                first_limit_time="09:35:00",
+                float_market_cap_yi=Decimal("400"),
+                amount=Decimal("500000000"),
+                seal_fund=Decimal("100000000"),
+            ),
+            _stock(
+                stock_code="000002",
+                stock_name="首板样例",
+                sector="医疗器械",
+                board_count=1,
+                turnover_pct=Decimal("8"),
+                first_limit_time="09:30:00",
+                float_market_cap_yi=Decimal("50"),
+            ),
+        ]
+        hot = build_hot_sectors(pool, top_n=5)
+        ok, reason = passes_sop_v31_hard_filters(pool[0], hot_sectors=hot)
+        self.assertTrue(ok, reason)
+        reject_cap, why_cap = passes_sop_v31_hard_filters(pool[3], hot_sectors=hot)
+        self.assertFalse(reject_cap)
+        self.assertIn("过大", why_cap)
+        reject_board, _ = passes_sop_v31_hard_filters(pool[4], hot_sectors=hot)
+        self.assertFalse(reject_board)
+
+        pick = score_sop_v31(
+            pool[0],
+            hot_sectors=hot,
+            pool_stocks=pool,
+            market_limit_up_count=40,
+        )
+        self.assertGreaterEqual(pick.score, 65)
+        self.assertEqual(pick.strategy_mode, "sop_v31")
+        self.assertIn("七星", pick.reasons[0])
+        self.assertEqual(pick.to_candidate_payload()["source_ai"], "SOP v3.1七星")
+
+        screener = LimitUpScreener()
+        with patch.object(screener, "fetch_limit_up_pool", return_value=pool):
+            result = screener.screen(trade_date="20260715", top_n=3, mode="sop_v31")
+        codes = [item["stock_code"] for item in result["picks"]]
+        self.assertIn("002001", codes)
+        self.assertNotIn("600000", codes)
+        self.assertNotIn("000002", codes)
+        for item in result["picks"]:
+            self.assertGreaterEqual(item["score"], 65)
+            self.assertEqual(item["strategy_label"], "SOP v3.1七星")
 
 
 if __name__ == "__main__":

@@ -216,11 +216,12 @@ sharon_trading_system_v1_0/
 1. ~~合并 PR #5 并发布 v1.0.1~~ **已完成（2026-07-20）**。  
 2. Actions 排队结束后，用带 1.0.1 元数据的 main 构建 **覆盖** Release 资产（可选）。  
 3. 涨停策略增强：炸板池/跌停池对照、概念板块接口、历史连板胜率回测、收盘自动定时。  
-   - **V31反向版（本会话）**：分支 `cursor/v31-reverse-strategy-0fdb`  
-     - Sharon：`limit_up_strategy.score_v31_reverse` + UI 策略切换（默认 V31）  
-     - 弱市：涨停家数不足 30 空仓；评分门槛 75；排除 7 连板以上  
-     - 计划提示：-2.8% / +6%卖半 / +18%清仓等（不改 L1 硬红线）  
-     - 聚宽原稿：`strategies/joinquant_v31_reverse.py`（仅供粘贴到聚宽，不 import）  
+   - **本会话分支** `cursor/v31-reverse-strategy-0fdb`（PR #8）  
+     - **SOP v3.1七星**（手册完整内容）：硬过滤 + 七星代理评分≥65；默认策略  
+     - 知识：`knowledge/skills/sharon-trading-sop-v31.md`  
+     - **V31反向版**：弱市涨停不足30空仓；评分≥75；排除7连板以上  
+     - 聚宽原稿：`strategies/joinquant_v31_reverse.py`  
+     - L1 硬红线未改；手册胜率声明标注“尚未独立验证”  
 4. 候选页：板块辅助填写；行情失败更稳降级。  
 5. Agent：流式输出、对话历史持久化、密钥钥匙串。  
 6. 根目录遗留 `account_engine.py` 与包内版本不同——改动时别改错文件。

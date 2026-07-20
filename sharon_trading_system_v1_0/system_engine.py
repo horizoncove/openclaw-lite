@@ -34,7 +34,7 @@ TASKS = (
     ("us_morning", "美国股市早报", "工作日 08:00", True),
     ("stock_analysis", "今日股票分析", "工作日 09:00", True),
     ("position_reminder", "持仓调整提醒", "工作日 09:15", True),
-    ("limit_up_relay", "涨停接力/V31反向选股", "交易日 15:05", True),
+    ("limit_up_relay", "SOP七星/涨停接力选股", "交易日 15:05", True),
     ("semiconductor_report", "半导体板块日报", "工作日 15:30", True),
     ("daily_review", "纪律每日复盘", "交易日 15:30", True),
 )
