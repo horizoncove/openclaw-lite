@@ -3,12 +3,18 @@ from __future__ import annotations
 import unittest
 from datetime import date
 from decimal import Decimal
+from unittest.mock import patch
 
 from sharon_trading_system_v1_0.limit_up_strategy import (
+    DEFAULT_V31_PARAMS,
+    LimitUpScreener,
+    LimitUpStock,
+    V31ReverseParams,
     build_hot_sectors,
     default_trade_date,
     parse_limit_up_pool,
     score_limit_up_continuation,
+    score_v31_reverse,
 )
 
 
@@ -104,6 +110,26 @@ SAMPLE_PAYLOAD = {
 }
 
 
+def _stock(**overrides: object) -> LimitUpStock:
+    base = dict(
+        stock_code="002001",
+        stock_name="医疗甲",
+        sector="医疗器械",
+        last_price=Decimal("15"),
+        change_pct=Decimal("10"),
+        amount=Decimal("200000000"),
+        seal_fund=Decimal("180000000"),
+        board_count=2,
+        first_limit_time="09:30:00",
+        last_limit_time="10:00:00",
+        open_count=0,
+        turnover_pct=Decimal("12.0"),
+        trade_date="20260715",
+    )
+    base.update(overrides)
+    return LimitUpStock(**base)  # type: ignore[arg-type]
+
+
 class LimitUpStrategyTests(unittest.TestCase):
     def test_default_trade_date_skips_weekend(self) -> None:
         # 2026-07-12 was Sunday.
@@ -132,7 +158,90 @@ class LimitUpStrategyTests(unittest.TestCase):
         self.assertNotEqual(picks[0].stock.stock_code, "600000")
         payload = picks[0].to_candidate_payload()
         self.assertEqual(payload["source_ai"], "涨停接力策略")
-        self.assertIn("涨停接力评分", payload["selection_reason"])
+        self.assertIn("涨停接力策略评分", payload["selection_reason"])
+
+    def test_v31_reverse_rewards_volume_and_hot_sector(self) -> None:
+        stocks = parse_limit_up_pool(SAMPLE_PAYLOAD, trade_date="20260715")
+        hot = build_hot_sectors(stocks, top_n=3)
+        strong = score_v31_reverse(
+            _stock(
+                stock_code="002001",
+                sector="医疗器械",
+                turnover_pct=Decimal("16"),
+                seal_fund=Decimal("180000000"),
+                amount=Decimal("200000000"),
+                board_count=2,
+                open_count=0,
+                first_limit_time="09:30:00",
+            ),
+            hot_sectors=hot,
+        )
+        weak = score_v31_reverse(
+            _stock(
+                stock_code="600000",
+                stock_name="浦发银行",
+                sector="银行",
+                turnover_pct=Decimal("1.2"),
+                seal_fund=Decimal("20000000"),
+                amount=Decimal("300000000"),
+                board_count=1,
+                open_count=0,
+                first_limit_time="14:00:00",
+            ),
+            hot_sectors=hot,
+        )
+        self.assertGreaterEqual(strong.score, DEFAULT_V31_PARAMS.score_threshold)
+        self.assertGreater(strong.score, weak.score)
+        self.assertEqual(strong.strategy_mode, "v31_reverse")
+        self.assertEqual(strong.strategy_label, "V31反向版")
+        self.assertTrue(any("止损" in tip for tip in strong.plan_hints))
+        payload = strong.to_candidate_payload()
+        self.assertEqual(payload["source_ai"], "V31反向版")
+        self.assertIn("计划：", payload["selection_reason"])
+
+    def test_v31_screen_weak_market_returns_empty(self) -> None:
+        stocks = parse_limit_up_pool(SAMPLE_PAYLOAD, trade_date="20260715")
+        screener = LimitUpScreener()
+        with patch.object(screener, "fetch_limit_up_pool", return_value=stocks):
+            result = screener.screen(
+                trade_date="20260715",
+                top_n=3,
+                mode="v31_reverse",
+                v31_params=V31ReverseParams(weak_zt_threshold=30, score_threshold=75),
+            )
+        self.assertEqual(result["market_state"], "weak")
+        self.assertEqual(result["picks"], [])
+        self.assertIn("弱市空仓", result["message"])
+
+    def test_v31_screen_filters_high_boards_and_threshold(self) -> None:
+        hot_pool = [
+            _stock(
+                stock_code=f"{i:06d}",
+                stock_name=f"样例{i}",
+                sector="医疗器械" if i < 25 else "银行",
+                board_count=2 if i != 0 else 9,
+                turnover_pct=Decimal("14"),
+                seal_fund=Decimal("200000000"),
+                amount=Decimal("250000000"),
+                open_count=0,
+                first_limit_time="09:32:00",
+            )
+            for i in range(35)
+        ]
+        screener = LimitUpScreener()
+        with patch.object(screener, "fetch_limit_up_pool", return_value=hot_pool):
+            result = screener.screen(
+                trade_date="20260715",
+                top_n=3,
+                mode="v31_reverse",
+            )
+        self.assertEqual(result["market_state"], "normal")
+        self.assertGreaterEqual(len(result["picks"]), 1)
+        codes = {item["stock_code"] for item in result["picks"]}
+        self.assertNotIn("000000", codes)  # 9-board excluded
+        for item in result["picks"]:
+            self.assertGreaterEqual(item["score"], 75)
+            self.assertEqual(item["strategy_mode"], "v31_reverse")
 
 
 if __name__ == "__main__":

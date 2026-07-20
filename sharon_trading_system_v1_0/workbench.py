@@ -49,7 +49,7 @@ from .cockpit import (
     StatusBadge,
 )
 from .main_window import MainWindow, default_database_path
-from .limit_up_strategy import LimitUpScreener, default_trade_date
+from .limit_up_strategy import LimitUpScreener, ScoreMode, default_trade_date
 from .market_data import (
     EastMoneyQuoteProvider,
     Quote,
@@ -89,15 +89,20 @@ class _LimitUpWorker(QThread):
     finished_ok = pyqtSignal(dict)
     finished_err = pyqtSignal(str)
 
-    def __init__(self, trade_date: str, top_n: int) -> None:
+    def __init__(
+        self, trade_date: str, top_n: int, mode: ScoreMode = "relay"
+    ) -> None:
         super().__init__()
         self._trade_date = trade_date
         self._top_n = top_n
+        self._mode = mode
 
     def run(self) -> None:
         try:
             result = LimitUpScreener().screen(
-                trade_date=self._trade_date, top_n=self._top_n
+                trade_date=self._trade_date,
+                top_n=self._top_n,
+                mode=self._mode,
             )
             # pick_objects are not Qt-serializable across threads via dict copy needs
             result = {
@@ -851,13 +856,18 @@ class WorkbenchWindow(MainWindow):
 
         strategy = CockpitCard(
             "涨停接力选股",
-            "收盘后扫描全市场涨停池 · 结合热门板块评分 · 选出次日可能继续涨停的标的",
+            "收盘扫描涨停池 · 经典接力或 V31反向多因子评分 · 仅建议不落单",
         )
         controls = QHBoxLayout()
         controls.setSpacing(10)
         self.limit_up_date = QLineEdit(default_trade_date())
         self.limit_up_date.setPlaceholderText("YYYYMMDD")
         self.limit_up_date.setMaximumWidth(120)
+        self.limit_up_mode = QComboBox()
+        self.limit_up_mode.addItem("V31反向版", "v31_reverse")
+        self.limit_up_mode.addItem("经典涨停接力", "relay")
+        self.limit_up_mode.setCurrentIndex(0)
+        self.limit_up_mode.setMinimumWidth(130)
         self.limit_up_top_n = QSpinBox()
         self.limit_up_top_n.setRange(1, 3)
         self.limit_up_top_n.setValue(3)
@@ -868,6 +878,8 @@ class WorkbenchWindow(MainWindow):
         write_picks.clicked.connect(self._write_limit_up_picks)
         controls.addWidget(QLabel("交易日"))
         controls.addWidget(self.limit_up_date)
+        controls.addWidget(QLabel("策略"))
+        controls.addWidget(self.limit_up_mode)
         controls.addWidget(QLabel("选取"))
         controls.addWidget(self.limit_up_top_n)
         controls.addWidget(run_scan)
@@ -875,7 +887,8 @@ class WorkbenchWindow(MainWindow):
         controls.addStretch()
         strategy.body.addLayout(controls)
         self.limit_up_status = QLabel(
-            "建议 15:05 后运行：拉取当日涨停板，按板块热度/封板时间/连板/炸板/封单评分。"
+            "建议 15:05 后运行。V31反向版：涨停家数≥30、评分≥75、排除7连板以上；"
+            "高波动/放量/强封/正乖离加分；计划提示含 -2.8%止损/+6%卖半/+18%清仓。"
         )
         self.limit_up_status.setObjectName("hint")
         self.limit_up_status.setWordWrap(True)
@@ -920,6 +933,10 @@ class WorkbenchWindow(MainWindow):
         else:
             self.agent_status.setText("Agent：未启用")
 
+    def _selected_limit_up_mode(self) -> ScoreMode:
+        mode = self.limit_up_mode.currentData()
+        return "v31_reverse" if mode == "v31_reverse" else "relay"
+
     def _run_limit_up_screen(self) -> None:
         if self._limit_up_worker and self._limit_up_worker.isRunning():
             QMessageBox.information(self, "请稍候", "涨停扫描正在进行")
@@ -928,9 +945,13 @@ class WorkbenchWindow(MainWindow):
         if len(trade_date) != 8 or not trade_date.isdigit():
             QMessageBox.warning(self, "日期无效", "请输入 YYYYMMDD 交易日")
             return
-        self.limit_up_status.setText(f"正在扫描 {trade_date} 涨停池与热门板块…")
+        mode = self._selected_limit_up_mode()
+        label = "V31反向版" if mode == "v31_reverse" else "经典涨停接力"
+        self.limit_up_status.setText(
+            f"正在用{label}扫描 {trade_date} 涨停池与热门板块…"
+        )
         self._limit_up_worker = _LimitUpWorker(
-            trade_date, self.limit_up_top_n.value()
+            trade_date, self.limit_up_top_n.value(), mode
         )
         self._limit_up_worker.finished_ok.connect(self._on_limit_up_ok)
         self._limit_up_worker.finished_err.connect(self._on_limit_up_err)
@@ -971,8 +992,10 @@ class WorkbenchWindow(MainWindow):
                 if column == 0:
                     cell.setForeground(QColor("#c9a66b"))
                 self.limit_up_table.setItem(row, column, cell)
+        mode = result.get("strategy_mode") or "relay"
+        label = "V31反向版" if mode == "v31_reverse" else "涨停接力"
         self.statusBar().showMessage(
-            f"涨停接力扫描完成：入选 {len(picks)} / 池内 {result.get('pool_size', 0)}",
+            f"{label}扫描完成：入选 {len(picks)} / 池内 {result.get('pool_size', 0)}",
             6000,
         )
 
@@ -991,15 +1014,19 @@ class WorkbenchWindow(MainWindow):
         for item in picks:
             try:
                 reason = "；".join(item.get("reasons") or [])
+                plan_hints = item.get("plan_hints") or result.get("plan_hints") or []
+                plan_text = ("｜".join(plan_hints) + "。") if plan_hints else ""
+                label = str(item.get("strategy_label") or "涨停接力策略")
                 candidate = self.system.add_candidate(
                     str(item.get("stock_code") or ""),
                     str(item.get("stock_name") or ""),
                     str(item.get("sector") or "涨停题材"),
-                    source_ai="涨停接力策略",
+                    source_ai=label,
                     external_score=float(item.get("score") or 0),
                     selection_reason=(
-                        f"[{item.get('trade_date')}] 涨停接力 "
+                        f"[{item.get('trade_date')}] {label} "
                         f"{float(item.get('score') or 0):.1f} 分。{reason}"
+                        + (f" 计划：{plan_text}" if plan_text else "")
                     ),
                 )
                 written.append(candidate["stock_code"])
