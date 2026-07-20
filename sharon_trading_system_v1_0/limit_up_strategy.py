@@ -1,18 +1,19 @@
 """After-close limit-up continuation screener (涨停接力选股).
 
-Supports three score modes:
-1. ``sop_v31`` — Sharon SOP v3.1 seven-star hard filters + proxy score (≥65)
-2. ``relay`` — original hot-sector / seal-quality continuation ranker
-3. ``v31_reverse`` — JoinQuant V31 reverse multi-factor scorer adapted to the
-   East Money limit-up pool (no external XGBoost / money-flow APIs)
+Default mode ``fused`` merges three strategies into one pipeline:
 
-Sharon never auto-orders; strategy exit/position rules are plan hints.
-When they conflict with Sharon L1 hard rules (单票≤25%、总仓≤60%、-7%止损),
-execution pre-checks still use the stricter L1 limits.
+1. **Gate (V31)** — weak market empty when limit-up breadth < 30
+2. **Hard filters (SOP v3.1)** — 2–4 boards, float ≤100亿, turnover ≥5%,
+   seal before 14:00, sector ≥3 limit-ups
+3. **Score blend** — SOP七星 50% + 经典接力 25% + V31反向 25%
+4. **Plan hints** — L1/SOP risk first; V31 tactical ladder as soft overlays
 
-SOP v3.1 methodology source: knowledge/skills/sharon-trading-sop-v31.md
-(from the user complete manual v1.0). Seven-star dimension formulas below are
-deterministic proxies — the handbook did not publish exact 0–满分 rubrics.
+Legacy single modes (``sop_v31`` / ``relay`` / ``v31_reverse``) remain for tests.
+
+Sharon never auto-orders. When plan hints conflict with L1 hard rules
+(单票≤25%、总仓≤60%、-7%止损), preflight still uses the stricter L1 limits.
+
+SOP methodology: knowledge/skills/sharon-trading-sop-v31.md
 """
 
 from __future__ import annotations
@@ -32,7 +33,7 @@ from .market_data import USER_AGENT, normalize_stock_code
 
 
 SHANGHAI = ZoneInfo("Asia/Shanghai")
-ScoreMode = Literal["relay", "v31_reverse", "sop_v31"]
+ScoreMode = Literal["fused", "relay", "v31_reverse", "sop_v31"]
 YI = Decimal("100000000")
 
 
@@ -101,6 +102,57 @@ class SOPv31Params:
 
 
 DEFAULT_SOP_V31_PARAMS = SOPv31Params()
+
+
+@dataclass(frozen=True)
+class FusedStrategyParams:
+    """Fusion weights / floors for the three-strategy blend."""
+
+    weak_zt_threshold: int = 30
+    score_threshold: float = 70.0
+    sop_weight: float = 0.50
+    relay_weight: float = 0.25
+    reverse_weight: float = 0.25
+    sop_floor: float = 60.0
+    relay_floor: float = 50.0
+    reverse_floor: float = 55.0
+
+    def __post_init__(self) -> None:
+        total = self.sop_weight + self.relay_weight + self.reverse_weight
+        if abs(total - 1.0) > 1e-6:
+            raise ValueError("融合权重之和必须为 1.0")
+
+    def plan_hints(
+        self,
+        *,
+        sop: SOPv31Params | None = None,
+        reverse: V31ReverseParams | None = None,
+    ) -> tuple[str, ...]:
+        sop_cfg = sop or DEFAULT_SOP_V31_PARAMS
+        rev = reverse or DEFAULT_V31_PARAMS
+        return (
+            "三策略融合：SOP硬过滤 + 七星50% + 经典接力25% + V31反向25%",
+            (
+                f"入场门槛：涨停家数≥{self.weak_zt_threshold} · "
+                f"融合分≥{self.score_threshold:.0f} · "
+                f"分项底线 SOP{self.sop_floor:.0f}/接力{self.relay_floor:.0f}/"
+                f"反向{self.reverse_floor:.0f}"
+            ),
+            (
+                f"风控以 L1/SOP 为准：硬止损 {sop_cfg.stop_loss:.0%} · "
+                f"单票≤{sop_cfg.single_position:.0%} · "
+                f"总仓≤{sop_cfg.total_position_cap:.0%}"
+            ),
+            (
+                f"战术止盈参考 V31：+{rev.take_profit_half:.0%}卖半 / "
+                f"+{rev.take_profit_full:.0%}清仓；"
+                "周一至周四建仓、每日最多1只、周五清仓、最多持有5个交易日"
+            ),
+            "开盘涨幅建议落在 [-3%, +5%]；落单仍经候选池与预检",
+        )
+
+
+DEFAULT_FUSED_PARAMS = FusedStrategyParams()
 
 
 @dataclass(frozen=True)
@@ -684,6 +736,78 @@ def score_sop_v31(
     )
 
 
+def score_fused(
+    stock: LimitUpStock,
+    *,
+    hot_sectors: list[HotSector],
+    pool_stocks: list[LimitUpStock],
+    market_limit_up_count: int,
+    fused_params: FusedStrategyParams | None = None,
+    sop_params: SOPv31Params | None = None,
+    reverse_params: V31ReverseParams | None = None,
+) -> LimitUpPick | None:
+    """Blend SOP / relay / V31 reverse scores; return None if component floors fail."""
+    fused = fused_params or DEFAULT_FUSED_PARAMS
+    sop_cfg = sop_params or DEFAULT_SOP_V31_PARAMS
+    rev_cfg = reverse_params or DEFAULT_V31_PARAMS
+
+    sop_pick = score_sop_v31(
+        stock,
+        hot_sectors=hot_sectors,
+        pool_stocks=pool_stocks,
+        market_limit_up_count=market_limit_up_count,
+        params=sop_cfg,
+    )
+    relay_pick = score_limit_up_continuation(stock, hot_sectors=hot_sectors)
+    reverse_pick = score_v31_reverse(
+        stock, hot_sectors=hot_sectors, params=rev_cfg
+    )
+
+    if (
+        sop_pick.score < fused.sop_floor
+        or relay_pick.score < fused.relay_floor
+        or reverse_pick.score < fused.reverse_floor
+    ):
+        return None
+
+    blend = (
+        sop_pick.score * fused.sop_weight
+        + relay_pick.score * fused.relay_weight
+        + reverse_pick.score * fused.reverse_weight
+    )
+    blend = max(1.0, min(100.0, blend))
+    reverse_extra = [
+        tip
+        for tip in reverse_pick.reasons
+        if any(key in tip for key in ("放量", "高波动", "正乖离", "突破"))
+    ][:2]
+    relay_extra = [
+        tip
+        for tip in relay_pick.reasons
+        if any(key in tip for key in ("早盘", "未炸板", "封单"))
+    ][:2]
+    reasons = (
+        (
+            f"融合 {blend:.0f} = SOP{sop_pick.score:.0f}×{fused.sop_weight:.0%} + "
+            f"接力{relay_pick.score:.0f}×{fused.relay_weight:.0%} + "
+            f"反向{reverse_pick.score:.0f}×{fused.reverse_weight:.0%}"
+        ),
+        *sop_pick.reasons[:3],
+        *reverse_extra,
+        *relay_extra,
+    )
+    return LimitUpPick(
+        stock=stock,
+        score=blend,
+        reasons=reasons,
+        sector_rank=sop_pick.sector_rank,
+        sector_limit_up_count=sop_pick.sector_limit_up_count,
+        strategy_mode="fused",
+        strategy_label="三策略融合",
+        plan_hints=fused.plan_hints(sop=sop_cfg, reverse=rev_cfg),
+    )
+
+
 class LimitUpScreener:
     """Fetch East Money limit-up pool and rank next-day continuation candidates."""
 
@@ -724,12 +848,14 @@ class LimitUpScreener:
         trade_date: str | None = None,
         top_n: int = 3,
         hot_sector_n: int = 8,
-        mode: ScoreMode = "sop_v31",
+        mode: ScoreMode = "fused",
         v31_params: V31ReverseParams | None = None,
         sop_params: SOPv31Params | None = None,
+        fused_params: FusedStrategyParams | None = None,
     ) -> dict[str, Any]:
         reverse_cfg = v31_params or DEFAULT_V31_PARAMS
         sop_cfg = sop_params or DEFAULT_SOP_V31_PARAMS
+        fused_cfg = fused_params or DEFAULT_FUSED_PARAMS
         stocks = self.fetch_limit_up_pool(trade_date)
         used_date = (
             stocks[0].trade_date if stocks else (trade_date or default_trade_date())
@@ -745,9 +871,19 @@ class LimitUpScreener:
                 "message": "未获取到涨停池数据（可能非交易日或接口暂不可用）",
             }
 
-        # V31 reverse: weak-market empty when limit-up breadth is too thin.
-        if mode == "v31_reverse" and len(stocks) < reverse_cfg.weak_zt_threshold:
+        weak_threshold = (
+            fused_cfg.weak_zt_threshold
+            if mode in ("fused", "v31_reverse")
+            else None
+        )
+        if weak_threshold is not None and len(stocks) < weak_threshold:
             hot_sectors = build_hot_sectors(stocks, top_n=hot_sector_n)
+            label = "三策略融合" if mode == "fused" else "V31反向版"
+            hints = (
+                list(fused_cfg.plan_hints(sop=sop_cfg, reverse=reverse_cfg))
+                if mode == "fused"
+                else list(reverse_cfg.plan_hints())
+            )
             return {
                 "trade_date": used_date,
                 "pool_size": len(stocks),
@@ -756,16 +892,57 @@ class LimitUpScreener:
                 "pick_objects": [],
                 "strategy_mode": mode,
                 "market_state": "weak",
-                "plan_hints": list(reverse_cfg.plan_hints()),
+                "plan_hints": hints,
                 "message": (
                     f"弱市空仓：涨停 {len(stocks)} 家 < 阈值 "
-                    f"{reverse_cfg.weak_zt_threshold} 家（V31反向版）"
+                    f"{weak_threshold} 家（{label}）"
                 ),
             }
 
         hot_sectors = build_hot_sectors(stocks, top_n=hot_sector_n)
         plan_hints: list[str] = []
-        if mode == "v31_reverse":
+        if mode == "fused":
+            eligible = [
+                stock
+                for stock in stocks
+                if passes_sop_v31_hard_filters(
+                    stock, hot_sectors=hot_sectors, params=sop_cfg
+                )[0]
+            ]
+            scored: list[LimitUpPick] = []
+            for stock in eligible:
+                pick = score_fused(
+                    stock,
+                    hot_sectors=hot_sectors,
+                    pool_stocks=stocks,
+                    market_limit_up_count=len(stocks),
+                    fused_params=fused_cfg,
+                    sop_params=sop_cfg,
+                    reverse_params=reverse_cfg,
+                )
+                if pick is not None and pick.score >= fused_cfg.score_threshold:
+                    scored.append(pick)
+            label = "三策略融合"
+            plan_hints = list(
+                fused_cfg.plan_hints(sop=sop_cfg, reverse=reverse_cfg)
+            )
+            if not scored:
+                return {
+                    "trade_date": used_date,
+                    "pool_size": len(stocks),
+                    "hot_sectors": [asdict(item) for item in hot_sectors],
+                    "picks": [],
+                    "pick_objects": [],
+                    "strategy_mode": mode,
+                    "market_state": "normal",
+                    "eligible_count": len(eligible),
+                    "plan_hints": plan_hints,
+                    "message": (
+                        f"{used_date} 涨停 {len(stocks)} 只 · SOP硬过滤 "
+                        f"{len(eligible)} 只 · 无融合分≥{fused_cfg.score_threshold:.0f}"
+                    ),
+                }
+        elif mode == "v31_reverse":
             eligible = [
                 stock
                 for stock in stocks
@@ -785,13 +962,13 @@ class LimitUpScreener:
             label = "V31反向版"
             plan_hints = list(reverse_cfg.plan_hints())
         elif mode == "sop_v31":
-            eligible = []
-            for stock in stocks:
-                ok, _reason = passes_sop_v31_hard_filters(
+            eligible = [
+                stock
+                for stock in stocks
+                if passes_sop_v31_hard_filters(
                     stock, hot_sectors=hot_sectors, params=sop_cfg
-                )
-                if ok:
-                    eligible.append(stock)
+                )[0]
+            ]
             scored = [
                 score_sop_v31(
                     stock,
@@ -869,8 +1046,10 @@ class LimitUpScreener:
 
 
 __all__ = [
+    "DEFAULT_FUSED_PARAMS",
     "DEFAULT_SOP_V31_PARAMS",
     "DEFAULT_V31_PARAMS",
+    "FusedStrategyParams",
     "HotSector",
     "LimitUpPick",
     "LimitUpScreener",
@@ -882,6 +1061,7 @@ __all__ = [
     "default_trade_date",
     "parse_limit_up_pool",
     "passes_sop_v31_hard_filters",
+    "score_fused",
     "score_limit_up_continuation",
     "score_sop_v31",
     "score_v31_reverse",

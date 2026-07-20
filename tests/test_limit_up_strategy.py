@@ -14,6 +14,7 @@ from sharon_trading_system_v1_0.limit_up_strategy import (
     default_trade_date,
     parse_limit_up_pool,
     passes_sop_v31_hard_filters,
+    score_fused,
     score_limit_up_continuation,
     score_sop_v31,
     score_v31_reverse,
@@ -336,6 +337,71 @@ class LimitUpStrategyTests(unittest.TestCase):
         for item in result["picks"]:
             self.assertGreaterEqual(item["score"], 65)
             self.assertEqual(item["strategy_label"], "SOP v3.1七星")
+
+    def test_fused_blends_three_scores_and_gates_weak_market(self) -> None:
+        # Build a broad pool so weak-market gate passes (≥30).
+        pool = [
+            _stock(
+                stock_code=f"{i:06d}",
+                stock_name=f"样例{i}",
+                sector="医疗器械" if i < 28 else "电力设备",
+                board_count=2 if i % 5 else 3,
+                turnover_pct=Decimal("10"),
+                seal_fund=Decimal("180000000"),
+                amount=Decimal("220000000"),
+                open_count=0,
+                first_limit_time="09:35:00",
+                float_market_cap_yi=Decimal("55"),
+            )
+            for i in range(36)
+        ]
+        # Contaminants that must be filtered by SOP hard rules.
+        pool[0] = _stock(
+            stock_code="000000",
+            board_count=1,
+            sector="医疗器械",
+            float_market_cap_yi=Decimal("50"),
+        )
+        pool[1] = _stock(
+            stock_code="000001",
+            board_count=2,
+            sector="银行",
+            float_market_cap_yi=Decimal("400"),
+            turnover_pct=Decimal("6"),
+            first_limit_time="09:30:00",
+        )
+
+        hot = build_hot_sectors(pool, top_n=5)
+        fused = score_fused(
+            pool[5],
+            hot_sectors=hot,
+            pool_stocks=pool,
+            market_limit_up_count=len(pool),
+        )
+        self.assertIsNotNone(fused)
+        assert fused is not None
+        self.assertEqual(fused.strategy_mode, "fused")
+        self.assertEqual(fused.strategy_label, "三策略融合")
+        self.assertIn("融合", fused.reasons[0])
+        self.assertGreaterEqual(fused.score, 70)
+
+        screener = LimitUpScreener()
+        with patch.object(screener, "fetch_limit_up_pool", return_value=pool[:20]):
+            weak = screener.screen(trade_date="20260715", top_n=3, mode="fused")
+        self.assertEqual(weak["market_state"], "weak")
+        self.assertEqual(weak["picks"], [])
+
+        with patch.object(screener, "fetch_limit_up_pool", return_value=pool):
+            result = screener.screen(trade_date="20260715", top_n=3, mode="fused")
+        self.assertEqual(result["strategy_mode"], "fused")
+        self.assertGreaterEqual(len(result["picks"]), 1)
+        codes = {item["stock_code"] for item in result["picks"]}
+        self.assertNotIn("000000", codes)
+        self.assertNotIn("000001", codes)
+        for item in result["picks"]:
+            self.assertGreaterEqual(item["score"], 70)
+            self.assertEqual(item["strategy_label"], "三策略融合")
+            self.assertTrue(any("止损" in tip for tip in item["plan_hints"]))
 
 
 if __name__ == "__main__":
