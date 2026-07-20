@@ -217,10 +217,12 @@ sharon_trading_system_v1_0/
 2. Actions 排队结束后，用带 1.0.1 元数据的 main 构建 **覆盖** Release 资产（可选）。  
 3. 涨停策略增强：炸板池/跌停池对照、概念板块接口、历史连板胜率回测、收盘自动定时。  
    - **本会话分支** `cursor/v31-reverse-strategy-0fdb`（PR #8）  
-     - **因子评审**：`knowledge/research/fused_factor_scoring_review.md`  
-     - **融合修订**：SOP硬过滤 + 七星主分≥65 + 质量附加 − 过热罚分；**去掉 V31 正向加权**  
-     - 聚宽 PY：按用户要求停止维护（`strategies/joinquant_*.py` 仅存档）  
-     - L1 硬红线未改；手册胜率仍标未独立验证  
+     - **评估文档（现行）**：`knowledge/skills/sharon-factor-strategy-evaluation-v1.md`  
+     （市场门 → 硬过滤 → 七星≥65 → 质量附加/过热罚分 → S/A/B/C 评级）  
+   - **因子评审**：`knowledge/research/fused_factor_scoring_review.md`  
+   - **融合实现**：SOP硬过滤 + 七星主分 + 质量附加 − 过热罚分；去掉 V31 正向加权  
+   - 聚宽 PY：停止维护（存档）  
+   - L1 硬红线未改；手册胜率仍标未独立验证  
 4. 候选页：板块辅助填写；行情失败更稳降级。  
 5. Agent：流式输出、对话历史持久化、密钥钥匙串。  
 6. 根目录遗留 `account_engine.py` 与包内版本不同——改动时别改错文件。
