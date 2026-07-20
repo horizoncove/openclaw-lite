@@ -1,7 +1,9 @@
 # Sharon Knowledge
 
-Methodology skills used by Sharon Trading System.
+Methodology skills and research notes used by Sharon Trading System.
 
-| Skill | Path |
+| Item | Path |
 |---|---|
 | SOP v3.1 | `knowledge/skills/sharon-trading-sop-v31.md` |
+| 融合因子评分评审 | `knowledge/research/fused_factor_scoring_review.md` |
+

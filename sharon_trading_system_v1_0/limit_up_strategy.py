@@ -1,19 +1,16 @@
 """After-close limit-up continuation screener (涨停接力选股).
 
-Default mode ``fused`` merges three strategies into one pipeline:
+Default mode ``fused`` (post factor-review):
 
-1. **Gate (V31)** — weak market empty when limit-up breadth < 30
+1. **Gate** — weak market empty when limit-up breadth < 30
 2. **Hard filters (SOP v3.1)** — 2–4 boards, float ≤100亿, turnover ≥5%,
    seal before 14:00, sector ≥3 limit-ups
-3. **Score blend** — SOP七星 50% + 经典接力 25% + V31反向 25%
-4. **Plan hints** — L1/SOP risk first; V31 tactical ladder as soft overlays
+3. **Score** — cleaned seven-star main score + seal-quality bonus − overheat penalty
+4. **V31 reverse** — kept as a standalone mode for research only; NOT a positive
+   weight inside fusion (conflicts with SOP risk tilt)
 
-Legacy single modes (``sop_v31`` / ``relay`` / ``v31_reverse``) remain for tests.
-
-Sharon never auto-orders. When plan hints conflict with L1 hard rules
-(单票≤25%、总仓≤60%、-7%止损), preflight still uses the stricter L1 limits.
-
-SOP methodology: knowledge/skills/sharon-trading-sop-v31.md
+Legacy modes (``sop_v31`` / ``relay`` / ``v31_reverse``) remain for tests.
+Research note: knowledge/research/fused_factor_scoring_review.md
 """
 
 from __future__ import annotations
@@ -106,21 +103,18 @@ DEFAULT_SOP_V31_PARAMS = SOPv31Params()
 
 @dataclass(frozen=True)
 class FusedStrategyParams:
-    """Fusion weights / floors for the three-strategy blend."""
+    """Post-review fusion: SOP hard gate + cleaned seven-star + small quality add-on.
+
+    V31 reverse is NOT a positive weight in the blend (conflicts with SOP risk tilt).
+    See knowledge/research/fused_factor_scoring_review.md.
+    """
 
     weak_zt_threshold: int = 30
-    score_threshold: float = 70.0
-    sop_weight: float = 0.50
-    relay_weight: float = 0.25
-    reverse_weight: float = 0.25
-    sop_floor: float = 60.0
-    relay_floor: float = 50.0
-    reverse_floor: float = 55.0
-
-    def __post_init__(self) -> None:
-        total = self.sop_weight + self.relay_weight + self.reverse_weight
-        if abs(total - 1.0) > 1e-6:
-            raise ValueError("融合权重之和必须为 1.0")
+    score_threshold: float = 65.0
+    quality_bonus_cap: float = 10.0
+    hot_turnover_penalty: float = 4.0  # turnover > 25%
+    multi_open_penalty: float = 5.0  # open_count >= 2
+    board4_penalty: float = 3.0
 
     def plan_hints(
         self,
@@ -131,12 +125,10 @@ class FusedStrategyParams:
         sop_cfg = sop or DEFAULT_SOP_V31_PARAMS
         rev = reverse or DEFAULT_V31_PARAMS
         return (
-            "三策略融合：SOP硬过滤 + 七星50% + 经典接力25% + V31反向25%",
+            "融合(修订)：SOP硬过滤 + 七星主分 + 封板质量附加 − 过热风险罚分",
             (
-                f"入场门槛：涨停家数≥{self.weak_zt_threshold} · "
-                f"融合分≥{self.score_threshold:.0f} · "
-                f"分项底线 SOP{self.sop_floor:.0f}/接力{self.relay_floor:.0f}/"
-                f"反向{self.reverse_floor:.0f}"
+                f"入场：涨停家数≥{self.weak_zt_threshold} · "
+                f"七星主分≥{self.score_threshold:.0f}（手册严格组对齐）"
             ),
             (
                 f"风控以 L1/SOP 为准：硬止损 {sop_cfg.stop_loss:.0%} · "
@@ -144,11 +136,11 @@ class FusedStrategyParams:
                 f"总仓≤{sop_cfg.total_position_cap:.0%}"
             ),
             (
-                f"战术止盈参考 V31：+{rev.take_profit_half:.0%}卖半 / "
+                f"战术止盈参考：+{rev.take_profit_half:.0%}卖半 / "
                 f"+{rev.take_profit_full:.0%}清仓；"
                 "周一至周四建仓、每日最多1只、周五清仓、最多持有5个交易日"
             ),
-            "开盘涨幅建议落在 [-3%, +5%]；落单仍经候选池与预检",
+            "V31反向正权已移出融合（与SOP风控冲突）；详见因子评审文档",
         )
 
 
@@ -647,17 +639,27 @@ def score_sop_v31(
     elif stock.open_count >= 2:
         tian_ji = max(0.0, tian_ji - 3.0)
 
-    # 天权 15 · 多维验证（换手/封板/时间共振，不重复计同一因子满分）
-    resonance = 0
-    if 5.0 <= turn <= 25.0:
-        resonance += 1
-    if seal_ratio >= 0.35:
-        resonance += 1
-    if first_min < 14 * 60:
-        resonance += 1
-    if stock.open_count <= 1:
-        resonance += 1
-    tian_quan = {0: 3.0, 1: 6.0, 2: 10.0, 3: 13.0, 4: 15.0}[resonance]
+    # 天权 15 · 多维强度（硬过滤后不再用「是否及格」二项计数）
+    tian_quan = 3.0
+    if 8.0 <= turn <= 18.0:
+        tian_quan += 5.0
+    elif 5.0 <= turn < 8.0 or 18.0 < turn <= 25.0:
+        tian_quan += 3.0
+    elif turn > 25.0:
+        tian_quan += 0.0
+    else:
+        tian_quan += 1.0
+    if seal_ratio >= 0.8:
+        tian_quan += 4.0
+    elif seal_ratio >= 0.35:
+        tian_quan += 2.5
+    elif seal_ratio >= 0.15:
+        tian_quan += 1.0
+    if stock.open_count == 0:
+        tian_quan += 3.0
+    elif stock.open_count == 1:
+        tian_quan += 1.0
+    tian_quan = min(15.0, tian_quan)
 
     # 玉衡 20 · 龙头确认（最高权重）
     if stock.board_count == 2:
@@ -675,29 +677,29 @@ def score_sop_v31(
     if sector_rank == 1 and sector_count >= 3:
         yu_heng = min(20.0, yu_heng + 1.0)
 
-    # 开阳 15 · 买卖信号（14:00前封板）
+    # 开阳 15 · 买卖信号强度（在已通过 14:00 过滤后，主要区分「多早」）
     if first_min <= 600:  # ≤10:00
         kai_yang = 15.0
     elif first_min <= 660:  # ≤11:00
         kai_yang = 12.0
-    elif first_min < 14 * 60:
-        kai_yang = 8.0
+    elif first_min <= 780:  # ≤13:00
+        kai_yang = 9.0
     else:
-        kai_yang = 2.0
-    if stock.open_count == 0:
-        kai_yang = min(15.0, kai_yang + 0.0)
+        kai_yang = 6.0  # 仍早于 14:00，但偏晚
 
-    # 摇光 10 · 复盘/稳定性 proxy
+    # 摇光 10 · 稳定性 proxy（非真实复盘进化；名称保留七星结构）
     if stock.open_count == 0 and stock.board_count in (2, 3):
-        yao_guang = 9.0
-    elif stock.open_count <= 1:
-        yao_guang = 7.0
+        yao_guang = 8.0
+    elif stock.open_count == 0:
+        yao_guang = 6.0
+    elif stock.open_count == 1:
+        yao_guang = 4.0
     else:
-        yao_guang = 3.0
+        yao_guang = 2.0
     if stock.float_market_cap_yi is not None:
         cap = float(stock.float_market_cap_yi)
         if 30.0 < cap <= 100.0:
-            yao_guang = min(10.0, yao_guang + 1.0)
+            yao_guang = min(10.0, yao_guang + 2.0)
 
     breakdown = {
         "天枢": round(tian_shu, 1),
@@ -746,7 +748,10 @@ def score_fused(
     sop_params: SOPv31Params | None = None,
     reverse_params: V31ReverseParams | None = None,
 ) -> LimitUpPick | None:
-    """Blend SOP / relay / V31 reverse scores; return None if component floors fail."""
+    """Revised fusion: cleaned SOP seven-star + quality bonus − risk penalties.
+
+    V31 reverse positive weight removed after factor review (conflicts with SOP).
+    """
     fused = fused_params or DEFAULT_FUSED_PARAMS
     sop_cfg = sop_params or DEFAULT_SOP_V31_PARAMS
     rev_cfg = reverse_params or DEFAULT_V31_PARAMS
@@ -758,44 +763,52 @@ def score_fused(
         market_limit_up_count=market_limit_up_count,
         params=sop_cfg,
     )
-    relay_pick = score_limit_up_continuation(stock, hot_sectors=hot_sectors)
-    reverse_pick = score_v31_reverse(
-        stock, hot_sectors=hot_sectors, params=rev_cfg
-    )
-
-    if (
-        sop_pick.score < fused.sop_floor
-        or relay_pick.score < fused.relay_floor
-        or reverse_pick.score < fused.reverse_floor
-    ):
+    if sop_pick.score < fused.score_threshold:
         return None
 
-    blend = (
-        sop_pick.score * fused.sop_weight
-        + relay_pick.score * fused.relay_weight
-        + reverse_pick.score * fused.reverse_weight
+    # Continuity quality add-on (0..cap), not a parallel 25% strategy weight.
+    quality = 0.0
+    first_min = _minutes_from_open(stock.first_limit_time)
+    seal_ratio = (
+        float(stock.seal_fund / stock.amount) if stock.amount > 0 else 0.0
     )
-    blend = max(1.0, min(100.0, blend))
-    reverse_extra = [
-        tip
-        for tip in reverse_pick.reasons
-        if any(key in tip for key in ("放量", "高波动", "正乖离", "突破"))
-    ][:2]
-    relay_extra = [
-        tip
-        for tip in relay_pick.reasons
-        if any(key in tip for key in ("早盘", "未炸板", "封单"))
-    ][:2]
+    if stock.open_count == 0:
+        quality += 4.0
+    if first_min <= 600:
+        quality += 3.0
+    elif first_min <= 660:
+        quality += 2.0
+    if seal_ratio >= 0.8:
+        quality += 3.0
+    elif seal_ratio >= 0.35:
+        quality += 1.5
+    if stock.board_count == 2:
+        quality += 2.0
+    quality = min(fused.quality_bonus_cap, quality)
+
+    # Risk penalties inspired by V31 conflict review (subtract, don't reward).
+    penalty = 0.0
+    turn = float(stock.turnover_pct or 0)
+    if turn > 25.0:
+        penalty += fused.hot_turnover_penalty
+    if stock.open_count >= 2:
+        penalty += fused.multi_open_penalty
+    if stock.board_count >= 4:
+        penalty += fused.board4_penalty
+
+    blend = max(1.0, min(100.0, sop_pick.score + quality - penalty))
     reasons = (
         (
-            f"融合 {blend:.0f} = SOP{sop_pick.score:.0f}×{fused.sop_weight:.0%} + "
-            f"接力{relay_pick.score:.0f}×{fused.relay_weight:.0%} + "
-            f"反向{reverse_pick.score:.0f}×{fused.reverse_weight:.0%}"
+            f"融合 {blend:.0f} = 七星{sop_pick.score:.0f} + 质量{quality:.0f} "
+            f"- 罚分{penalty:.0f}"
         ),
         *sop_pick.reasons[:3],
-        *reverse_extra,
-        *relay_extra,
     )
+    if quality > 0:
+        reasons = (*reasons, f"封板质量附加 +{quality:.0f}")
+    if penalty > 0:
+        reasons = (*reasons, f"过热风险罚分 -{penalty:.0f}")
+
     return LimitUpPick(
         stock=stock,
         score=blend,

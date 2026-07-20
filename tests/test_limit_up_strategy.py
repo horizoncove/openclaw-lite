@@ -383,7 +383,10 @@ class LimitUpStrategyTests(unittest.TestCase):
         self.assertEqual(fused.strategy_mode, "fused")
         self.assertEqual(fused.strategy_label, "三策略融合")
         self.assertIn("融合", fused.reasons[0])
-        self.assertGreaterEqual(fused.score, 70)
+        self.assertIn("七星", fused.reasons[0])
+        self.assertGreaterEqual(fused.score, 65)
+        # Revised fusion must not embed V31 reverse positive weight text.
+        self.assertNotIn("反向", fused.reasons[0])
 
         screener = LimitUpScreener()
         with patch.object(screener, "fetch_limit_up_pool", return_value=pool[:20]):
@@ -399,9 +402,13 @@ class LimitUpStrategyTests(unittest.TestCase):
         self.assertNotIn("000000", codes)
         self.assertNotIn("000001", codes)
         for item in result["picks"]:
-            self.assertGreaterEqual(item["score"], 70)
+            self.assertGreaterEqual(item["score"], 65)
             self.assertEqual(item["strategy_label"], "三策略融合")
             self.assertTrue(any("止损" in tip for tip in item["plan_hints"]))
+            self.assertTrue(
+                any("七星主分" in tip or "七星" in tip for tip in item["plan_hints"])
+                or any("七星" in r for r in item["reasons"])
+            )
 
 
 if __name__ == "__main__":

@@ -853,7 +853,7 @@ class WorkbenchWindow(MainWindow):
 
         strategy = CockpitCard(
             "三策略融合选股",
-            "SOP硬过滤 + 七星50% + 经典接力25% + V31反向25% · 仅建议不落单",
+            "SOP硬过滤 + 七星主分 + 封板质量附加 − 过热罚分 · 仅建议不落单",
         )
         controls = QHBoxLayout()
         controls.setSpacing(10)
@@ -877,9 +877,9 @@ class WorkbenchWindow(MainWindow):
         controls.addStretch()
         strategy.body.addLayout(controls)
         self.limit_up_status = QLabel(
-            "建议 15:05 后运行。融合流程：涨停家数≥30 → SOP硬过滤"
-            "（2–4连板/≤100亿/换手≥5%/14:00前/板块≥3）→ "
-            "七星50%+接力25%+反向25%，融合分≥70 且分项过底线。"
+            "建议 15:05 后运行。融合(修订)：涨停≥30 → SOP硬过滤 → "
+            "七星主分≥65 + 封板质量附加 − 过热罚分。"
+            "V31反向正权已移出（详见 knowledge/research/fused_factor_scoring_review.md）。"
         )
         self.limit_up_status.setObjectName("hint")
         self.limit_up_status.setWordWrap(True)
