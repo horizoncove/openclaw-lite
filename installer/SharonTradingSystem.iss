@@ -1,5 +1,5 @@
 #define AppName "Sharon Trading System"
-#define AppVersion "1.0.0"
+#define AppVersion "1.0.1"
 #define AppPublisher "Sharon"
 #define AppExeName "SharonTradingSystem.exe"
 
