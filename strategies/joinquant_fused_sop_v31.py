@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-三策略融合版 - 聚宽(JoinQuant)量化平台策略
+三策略融合版 - 聚宽(JoinQuant)量化平台策略  (rev:20260720c)
 ==========================================
 融合：
   1) Sharon SOP v3.1 硬过滤 + 七星代理评分（权重 50%）
@@ -34,11 +34,17 @@
 import numpy as np
 import pandas as pd
 from collections import Counter
+from datetime import datetime, timedelta
 from jqdata import *
-# jqdata 的 import * 会覆盖标准库 time 模块名，须在其后重新导入 datetime.time
-from datetime import datetime, timedelta, time as dt_time
+
+
+def _hm(text):
+    """'HH:MM' -> datetime.time；避免使用被 jqdata 覆盖的 time 名称。"""
+    return datetime.strptime(text, '%H:%M').time()
+
 
 # ===================== 策略参数 =====================
+# 时间一律用 'HH:MM' 字符串，initialize 里再转成 time 对象
 PARAMS = {
     # 资金 / 仓位（SOP/L1）
     '初始资金': 3000000,
@@ -71,17 +77,17 @@ PARAMS = {
     '小市值亿': 30,
     '小市值换手上限': 30.0,
     '板块最少涨停': 3,
-    '最晚封板时点': dt_time(14, 0),
+    '最晚封板时点': '14:00',
 
     # 盯盘买入窗口（按现价，非整日收盘价）
-    '买入窗口开始': dt_time(9, 30),
-    '买入窗口结束': dt_time(9, 45),
+    '买入窗口开始': '09:30',
+    '买入窗口结束': '09:45',
     '开盘买入上限': 0.05,
     '开盘买入下限': -0.03,
     'ST排除': True,
 
     # 周五强制清仓起点（此前仍实时止盈止损）
-    '周五清仓时点': dt_time(14, 50),
+    '周五清仓时点': '14:50',
 
     # 冷却
     '连亏冷却天数': 3,
@@ -100,7 +106,15 @@ def initialize(context):
         min_commission=5
     ), type='stock')
 
-    context.p = PARAMS
+    # 拷贝参数并把时间字符串转为 time 对象
+    context.p = dict(PARAMS)
+    for key in ('最晚封板时点', '买入窗口开始', '买入窗口结束', '周五清仓时点'):
+        context.p[key] = _hm(context.p[key])
+    context.session_am_open = _hm('09:30')
+    context.session_am_close = _hm('11:30')
+    context.session_pm_open = _hm('13:00')
+    context.session_pm_close = _hm('14:57')
+
     context.last_buy_date = None
     context.consecutive_losses = 0
     context.cooldown_days = 0
@@ -130,15 +144,14 @@ def initialize(context):
         )
     )
     log.info(
-        '盯盘: 买入%02d:%02d-%02d:%02d按现价; 持仓每分钟检查止盈止损; 周五%02d:%02d强制清仓' % (
-            context.p['买入窗口开始'].hour, context.p['买入窗口开始'].minute,
-            context.p['买入窗口结束'].hour, context.p['买入窗口结束'].minute,
-            context.p['周五清仓时点'].hour, context.p['周五清仓时点'].minute,
+        '盯盘: 买入%s-%s按现价; 持仓每分钟检查止盈止损; 周五%s强制清仓' % (
+            PARAMS['买入窗口开始'], PARAMS['买入窗口结束'], PARAMS['周五清仓时点'],
         )
     )
     log.info('=' * 60)
 
     # 盘前选股仍按日切；买卖全部走 handle_data 分钟盯盘
+    # 注意：run_daily 的关键字参数名是 time=，与标准库无关
     run_daily(before_market_open, time='09:00')
     run_daily(after_trading_end, time='15:30')
 
@@ -151,9 +164,9 @@ def handle_data(context, data):
     now_t = context.current_dt.time()
 
     # 非连续竞价时段不交易（含午休）
-    if now_t < dt_time(9, 30) or now_t > dt_time(14, 57):
+    if now_t < context.session_am_open or now_t > context.session_pm_close:
         return
-    if dt_time(11, 30) < now_t < dt_time(13, 0):
+    if context.session_am_close < now_t < context.session_pm_open:
         return
 
     # 1) 持仓：每分钟按最新价检查止损/止盈/到期/周五清仓
