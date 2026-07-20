@@ -33,9 +33,10 @@
 
 import numpy as np
 import pandas as pd
-from datetime import datetime, time, timedelta
 from collections import Counter
 from jqdata import *
+# jqdata 的 import * 会覆盖标准库 time 模块名，须在其后重新导入 datetime.time
+from datetime import datetime, timedelta, time as dt_time
 
 # ===================== 策略参数 =====================
 PARAMS = {
@@ -70,17 +71,17 @@ PARAMS = {
     '小市值亿': 30,
     '小市值换手上限': 30.0,
     '板块最少涨停': 3,
-    '最晚封板时点': time(14, 0),
+    '最晚封板时点': dt_time(14, 0),
 
     # 盯盘买入窗口（按现价，非整日收盘价）
-    '买入窗口开始': time(9, 30),
-    '买入窗口结束': time(9, 45),
+    '买入窗口开始': dt_time(9, 30),
+    '买入窗口结束': dt_time(9, 45),
     '开盘买入上限': 0.05,
     '开盘买入下限': -0.03,
     'ST排除': True,
 
     # 周五强制清仓起点（此前仍实时止盈止损）
-    '周五清仓时点': time(14, 50),
+    '周五清仓时点': dt_time(14, 50),
 
     # 冷却
     '连亏冷却天数': 3,
@@ -150,9 +151,9 @@ def handle_data(context, data):
     now_t = context.current_dt.time()
 
     # 非连续竞价时段不交易（含午休）
-    if now_t < time(9, 30) or now_t > time(14, 57):
+    if now_t < dt_time(9, 30) or now_t > dt_time(14, 57):
         return
-    if time(11, 30) < now_t < time(13, 0):
+    if dt_time(11, 30) < now_t < dt_time(13, 0):
         return
 
     # 1) 持仓：每分钟按最新价检查止损/止盈/到期/周五清仓
