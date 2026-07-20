@@ -218,7 +218,7 @@ sharon_trading_system_v1_0/
 3. 涨停策略增强：炸板池/跌停池对照、概念板块接口、历史连板胜率回测、收盘自动定时。  
    - **V31反向版（本会话）**：分支 `cursor/v31-reverse-strategy-0fdb`  
      - Sharon：`limit_up_strategy.score_v31_reverse` + UI 策略切换（默认 V31）  
-     - 弱市：涨停家数 &lt;30 空仓；评分门槛 75；排除 &gt;7 连板  
+     - 弱市：涨停家数不足 30 空仓；评分门槛 75；排除 7 连板以上  
      - 计划提示：-2.8% / +6%卖半 / +18%清仓等（不改 L1 硬红线）  
      - 聚宽原稿：`strategies/joinquant_v31_reverse.py`（仅供粘贴到聚宽，不 import）  
 4. 候选页：板块辅助填写；行情失败更稳降级。  
