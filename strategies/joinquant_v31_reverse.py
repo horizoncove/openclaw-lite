@@ -3,10 +3,11 @@
 """
 V31反向版 - 聚宽(JoinQuant)量化平台策略（参考原稿）
 =================================================
-本文件供在聚宽研究/回测环境直接粘贴运行，不由 Sharon 桌面端 import。
+注意：盯盘实时（分钟盘中止盈止损）请用 joinquant_fused_sop_v31.py。
+本文件为 V31 单策略原稿存档，可在聚宽粘贴运行；不由 Sharon 桌面端 import。
 
 Sharon 侧对应实现：
-  sharon_trading_system_v1_0/limit_up_strategy.py  → score_v31_reverse / mode=v31_reverse
+  sharon_trading_system_v1_0/limit_up_strategy.py  → score_v31_reverse
   （东财涨停池适配版：建议层，不自动下单）
 
 策略核心:
