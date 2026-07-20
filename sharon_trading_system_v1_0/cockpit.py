@@ -419,8 +419,8 @@ class CandidateSlotCard(QFrame):
         super().__init__()
         self.rank = rank
         self.setObjectName("candidateSlot")
-        self.setMinimumHeight(148)
-        self.setMaximumHeight(178)
+        self.setMinimumHeight(168)
+        self.setMaximumHeight(198)
         root = QVBoxLayout(self)
         root.setContentsMargins(16, 14, 16, 14)
         root.setSpacing(7)
@@ -434,6 +434,8 @@ class CandidateSlotCard(QFrame):
         root.addLayout(top)
         self.code_sector = QLabel("等待外部 AI 写入")
         self.code_sector.setObjectName("candidateSlotMeta")
+        self.quote = QLabel("行情 —")
+        self.quote.setObjectName("candidateSlotMeta")
         self.source = QLabel("—")
         self.source.setObjectName("candidateSlotMeta")
         self.score = QProgressBar()
@@ -446,15 +448,20 @@ class CandidateSlotCard(QFrame):
         self.reason.setWordWrap(True)
         self.reason.setMaximumHeight(34)
         root.addWidget(self.code_sector)
+        root.addWidget(self.quote)
         root.addWidget(self.source)
         root.addWidget(self.score)
         root.addWidget(self.reason)
         self.setProperty("occupied", False)
 
-    def set_candidate(self, candidate: dict | None) -> None:
+    def set_candidate(
+        self, candidate: dict | None, quote: object | None = None
+    ) -> None:
         if not candidate:
             self.name.setText("空席")
             self.code_sector.setText("等待外部 AI 写入")
+            self.quote.setText("行情 —")
+            self.quote.setStyleSheet("background:transparent; border:0;")
             self.source.setText("—")
             self.score.setValue(0)
             self.score.setFormat("外部评分 未提供")
@@ -467,6 +474,7 @@ class CandidateSlotCard(QFrame):
         self.code_sector.setText(
             f"{candidate['stock_code']}  ·  {candidate['sector']}"
         )
+        self.set_quote(quote)
         self.source.setText(f"来源  {candidate['source_ai']}")
         score = candidate["external_score"]
         self.score.setValue(int(score or 0))
@@ -478,6 +486,30 @@ class CandidateSlotCard(QFrame):
         self.setProperty("occupied", True)
         self.style().unpolish(self)
         self.style().polish(self)
+
+    def set_quote(self, quote: object | None) -> None:
+        if quote is None:
+            self.quote.setText("行情等待刷新")
+            self.quote.setStyleSheet(
+                "background:transparent; border:0; color:#9aa3ad;"
+            )
+            return
+        change = getattr(quote, "change_pct", None)
+        price = getattr(quote, "last_price", None)
+        if price is None:
+            self.quote.setText("行情等待刷新")
+            self.quote.setStyleSheet(
+                "background:transparent; border:0; color:#9aa3ad;"
+            )
+            return
+        change_text = f"{change:+.2f}%" if change is not None else "--"
+        color = "#e25555" if change is not None and change >= 0 else "#3fad7a"
+        if change is None:
+            color = "#9aa3ad"
+        self.quote.setText(f"现价 {price:.2f}  ·  {change_text}")
+        self.quote.setStyleSheet(
+            f"background:transparent; border:0; color:{color}; font-weight:700;"
+        )
 
 
 class CockpitCard(QFrame):

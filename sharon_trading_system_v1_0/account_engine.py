@@ -465,6 +465,34 @@ class AccountEngine:
     def check_risk_limits(self) -> list[dict[str, Any]]:
         return self._risk_violations(self.calculate_positions())
 
+    def update_last_prices(self, quotes: dict[str, Any]) -> int:
+        """Update position valuations from a live quote feed.
+
+        This does not create trades; it only refreshes ``last_price`` for
+        existing holdings so P/L and risk gauges track the market.
+        """
+        if not quotes:
+            return 0
+        updated = 0
+        with self._lock, self._db:
+            for code, price in quotes.items():
+                stock_code = str(code).strip()
+                if not stock_code:
+                    continue
+                money = _money(price, "最新价")
+                if money <= 0:
+                    continue
+                cursor = self._db.execute(
+                    """
+                    UPDATE positions
+                    SET last_price=?, update_time=CURRENT_TIMESTAMP
+                    WHERE account_id=? AND stock_code=? AND quantity>0
+                    """,
+                    (float(money), self.account_id, stock_code),
+                )
+                updated += int(cursor.rowcount)
+        return updated
+
     def list_trades(self, limit: int = 100) -> list[dict[str, Any]]:
         if limit <= 0:
             raise ValueError("数量必须大于 0")

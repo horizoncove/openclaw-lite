@@ -26,6 +26,7 @@ PAGE_FILES = {
     "AI 监督": "07-supervision.png",
     "每日复盘": "08-daily-review.png",
     "任务与资料": "09-tasks.png",
+    "联网 AI": "10-network-ai.png",
 }
 
 
@@ -46,6 +47,36 @@ def seed_preview(window: WorkbenchWindow) -> None:
         external_score=91,
         selection_reason="外部 AI 选入的第二优先级候选。",
     )
+    try:
+        window._live_quotes.update(
+            window.quote_provider.fetch_quotes(["002371", "688012"])
+        )
+    except Exception:
+        from sharon_trading_system_v1_0.market_data import Quote
+        from decimal import Decimal
+
+        window._live_quotes.update(
+            {
+                "002371": Quote(
+                    "002371", "北方华创", Decimal("108.50"), Decimal("1.20")
+                ),
+                "688012": Quote(
+                    "688012", "中微公司", Decimal("190.00"), Decimal("-0.80")
+                ),
+            }
+        )
+    window.candidate_code.setText("002371")
+    quote = window._live_quotes["002371"]
+    window.candidate_quote_label.setText(
+        f"{quote.stock_name}  现价 {quote.last_price:.2f}  涨跌 "
+        f"{quote.change_pct:+.2f}%"
+    )
+    window.candidate_quote_label.setStyleSheet(
+        "color:#e25555; font-weight:700;"
+        if quote.change_pct >= 0
+        else "color:#3fad7a; font-weight:700;"
+    )
+    window._refresh_candidates()
     for command, sector in [
         ("买入 002371 100 5000", "半导体设备"),
         ("买入 002371 110 1000", "半导体设备"),
@@ -74,6 +105,25 @@ def seed_preview(window: WorkbenchWindow) -> None:
     window._validate_intent()
     window.review_summary.setPlainText("按计划完成候选股票建仓。")
     window.review_lessons.setPlainText("控制节奏，不在禁买时段追涨。")
+    window.market_enabled.setChecked(True)
+    window.agent_enabled.setChecked(False)
+    window.agent_base_url.setText("https://api.deepseek.com/v1")
+    window.agent_model.setText("deepseek-chat")
+    window.quote_status.setText("行情：预览模式 · 保存设置后将定时刷新东财报价")
+    window.agent_status.setText("Agent：预览模式 · 填写 API Key 后可联网对话")
+    window.agent_chat.setPlainText(
+        "Agent 示例：已读取持仓与候选池。002371 单票仓位接近纪律带，"
+        "建议先完成交易计划测算，再决定是否分批。"
+    )
+    try:
+        zt = window.limit_up_screener.screen(top_n=3)
+        window._on_limit_up_ok(
+            {key: value for key, value in zt.items() if key != "pick_objects"}
+        )
+    except Exception:
+        window.limit_up_status.setText(
+            "涨停接力：预览模式 · 收盘后点击「收盘扫描涨停池」"
+        )
     window.refresh()
     window._refresh_extended()
 

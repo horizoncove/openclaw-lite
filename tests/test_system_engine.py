@@ -142,7 +142,10 @@ class SystemEngineTests(unittest.TestCase):
         )
         self.assertEqual(review["grade"], "A")
         tasks = self.system.list_tasks()
-        self.assertEqual(len(tasks), 10)
+        self.assertEqual(len(tasks), 11)
+        self.assertTrue(
+            any(item["task_key"] == "limit_up_relay" for item in tasks)
+        )
         disabled = next(item for item in tasks if item["task_key"] == "daily_update")
         self.assertFalse(disabled["enabled"])
 
@@ -201,14 +204,36 @@ class WorkbenchSmokeTests(unittest.TestCase):
             self.assertIn("AI 监督", labels)
             self.assertIn("每日复盘", labels)
             self.assertIn("任务与资料", labels)
+            self.assertIn("联网 AI", labels)
             window.tabs.setCurrentWidget(window.candidate_page)
             self.assertTrue(window.trade_frame.isHidden())
             self.assertTrue(window.metric_cards[0].isHidden())
             window.candidate_code.setText("002371")
             window.candidate_name.setText("北方华创")
             window.candidate_sector.setText("半导体")
+            from sharon_trading_system_v1_0.market_data import (
+                Quote,
+                StaticQuoteProvider,
+            )
+
+            window.quote_provider = StaticQuoteProvider(
+                {
+                    "002371": Quote(
+                        "002371",
+                        "北方华创",
+                        Decimal("108.50"),
+                        Decimal("1.25"),
+                    )
+                }
+            )
             window._save_candidate()
             self.assertEqual(window.candidate_table.rowCount(), 1)
+            self.assertEqual(
+                window.candidate_table.item(0, 3).text(), "108.50"
+            )
+            self.assertIn("+1.25%", window.candidate_table.item(0, 4).text())
+            self.assertIn("108.50", window.candidate_slots[0].quote.text())
+            self.assertIn("现价", window.candidate_quote_label.text())
             self.assertEqual(window.cockpit_candidates.rowCount(), 1)
             self.assertIn("建议", window.cockpit_candidate_badge.text())
             window.system.add_candidate(
