@@ -18,11 +18,17 @@
 仓位与风控（以 SOP/L1 为准，V31 止盈作战术）：
   单只≤25%，最多3只，总仓≤60%
   止损 -7%；+6%卖半；+18%清仓
-  开盘涨幅落在 [-3%, +5%]
+  买入窗口内现价涨跌幅落在 [-3%, +5%]
+
+★ 回测交易模式 = 盯盘实时（务必选「分钟」频率）：
+  - handle_data 每分钟调用：盘中按最新价实时检查止损/止盈/到期
+  - 买入：09:30–09:45 窗口内盯盘，现价落入区间即买（不是收盘后一次性撮合）
+  - 周五：盘中照常止盈止损，14:50 起强制清仓
+  - 日线回测无法模拟盯盘，结果会失真
 
 使用方法：
-  复制本文件全部代码到聚宽「策略研究 / 回测」编辑器运行。
-  不依赖 Sharon 桌面端。
+  复制本文件全部代码到聚宽「策略研究 / 回测」编辑器；
+  回测频率选择「分钟」，再运行。不依赖 Sharon 桌面端。
 """
 
 import numpy as np
@@ -66,10 +72,15 @@ PARAMS = {
     '板块最少涨停': 3,
     '最晚封板时点': time(14, 0),
 
-    # 开盘买入窗口
+    # 盯盘买入窗口（按现价，非整日收盘价）
+    '买入窗口开始': time(9, 30),
+    '买入窗口结束': time(9, 45),
     '开盘买入上限': 0.05,
     '开盘买入下限': -0.03,
     'ST排除': True,
+
+    # 周五强制清仓起点（此前仍实时止盈止损）
+    '周五清仓时点': time(14, 50),
 
     # 冷却
     '连亏冷却天数': 3,
@@ -98,8 +109,9 @@ def initialize(context):
     context.holdings = {}
     context.market_state = 'normal'
     context.zt_count = 0
+    context.buy_attempted_today = False  # 窗口内失败也只盯当天
 
-    log.info('三策略融合版 - 聚宽启动')
+    log.info('三策略融合版 - 聚宽启动（盯盘实时 / 请用分钟回测）')
     log.info(
         '硬过滤:SOP | 评分:七星50%+接力25%+反向25% | '
         '融合门槛:%s | 弱市涨停<%s空仓' % (
@@ -116,18 +128,49 @@ def initialize(context):
             context.p['止盈线2'] * 100,
         )
     )
+    log.info(
+        '盯盘: 买入%02d:%02d-%02d:%02d按现价; 持仓每分钟检查止盈止损; 周五%02d:%02d强制清仓' % (
+            context.p['买入窗口开始'].hour, context.p['买入窗口开始'].minute,
+            context.p['买入窗口结束'].hour, context.p['买入窗口结束'].minute,
+            context.p['周五清仓时点'].hour, context.p['周五清仓时点'].minute,
+        )
+    )
     log.info('=' * 60)
 
+    # 盘前选股仍按日切；买卖全部走 handle_data 分钟盯盘
     run_daily(before_market_open, time='09:00')
-    run_daily(handle_buy, time='09:30')
-    run_daily(handle_sell, time='14:50')
     run_daily(after_trading_end, time='15:30')
+
+
+def handle_data(context, data):
+    """
+    分钟回测：每根分钟K线调用一次，模拟盯盘实时交易。
+    日线回测：每天只调用一次，无法还原盘中止盈止损路径。
+    """
+    now_t = context.current_dt.time()
+
+    # 非连续竞价时段不交易（含午休）
+    if now_t < time(9, 30) or now_t > time(14, 57):
+        return
+    if time(11, 30) < now_t < time(13, 0):
+        return
+
+    # 1) 持仓：每分钟按最新价检查止损/止盈/到期/周五清仓
+    monitor_positions(context)
+
+    # 2) 买入窗口内盯盘尝试建仓（现价落入区间才买）
+    if context.p['买入窗口开始'] <= now_t <= context.p['买入窗口结束']:
+        try_buy_intraday(context)
 
 
 # ===================== 选股 =====================
 def before_market_open(context):
     if context.cooldown_days > 0:
         context.cooldown_days -= 1
+    context.buy_attempted_today = False
+    context.selected_stock = None
+    context.selected_score = 0
+    context.selected_detail = ''
 
     yesterday = context.previous_date
     zt_stocks = get_zt_stocks(context, yesterday)
@@ -714,23 +757,26 @@ def calc_fused_score(context, stock, date, sector_counts, market_zt_count):
     }
 
 
-# ===================== 交易 =====================
-def handle_buy(context):
+# ===================== 盯盘实时交易 =====================
+def _trading_hold_days(context, buy_date):
+    """按交易日计持有天数（买入日=0）。"""
+    try:
+        days = get_trade_days(start_date=buy_date, end_date=context.current_dt.date())
+        return max(0, len(days) - 1)
+    except Exception:
+        return max(0, (context.current_dt.date() - buy_date).days)
+
+
+def try_buy_intraday(context):
+    """买入窗口内按最新价盯盘建仓（可多分钟重试，直到买到或窗口结束）。"""
     weekday = context.current_dt.weekday()
     if weekday not in (0, 1, 2, 3):
         return
     if context.market_state == 'weak':
         return
     if context.cooldown_days > 0:
-        log.info('冷却中,剩余%d天' % context.cooldown_days)
         return
     if len(context.holdings) >= context.p['最大持仓数']:
-        return
-
-    portfolio_value = context.portfolio.total_value
-    current_position_value = portfolio_value - context.portfolio.available_cash
-    if portfolio_value > 0 and current_position_value / portfolio_value >= context.p['总仓位上限']:
-        log.info('总仓位已达上限')
         return
 
     today_str = context.current_dt.strftime('%Y-%m-%d')
@@ -739,14 +785,21 @@ def handle_buy(context):
     if not context.selected_stock:
         return
 
+    portfolio_value = context.portfolio.total_value
+    current_position_value = portfolio_value - context.portfolio.available_cash
+    if portfolio_value > 0 and current_position_value / portfolio_value >= context.p['总仓位上限']:
+        return
+
     stock = context.selected_stock
     try:
         current_data = get_current_data()[stock]
         if current_data.paused:
-            log.info('%s 停牌,跳过' % stock)
             return
-        open_price = current_data.day_open
-        if open_price <= 0:
+        # 盯盘用最新价；开盘瞬间 last_price 可能仍接近开盘价
+        px = float(current_data.last_price or 0)
+        if px <= 0:
+            px = float(current_data.day_open or 0)
+        if px <= 0:
             return
 
         try:
@@ -755,22 +808,26 @@ def handle_buy(context):
                 frequency='daily', fields=['close'],
                 count=1, skip_paused=True
             )
-            pre_close = float(price_df['close'][-1]) if price_df is not None and len(price_df) else open_price / 1.05
+            pre_close = float(price_df['close'][-1]) if price_df is not None and len(price_df) else px / 1.05
         except Exception:
-            pre_close = open_price / 1.05
+            pre_close = px / 1.05
 
-        open_pct = (open_price - pre_close) / pre_close
-        if open_pct > context.p['开盘买入上限'] or open_pct < context.p['开盘买入下限']:
-            log.info('%s 开盘涨幅%.2f%%不符合,跳过' % (stock, open_pct * 100))
+        chg = (px - pre_close) / pre_close
+        if chg > context.p['开盘买入上限'] or chg < context.p['开盘买入下限']:
+            # 窗口内继续盯，下一分钟可能回落到区间
+            return
+
+        # 涨停买不进则放弃本分钟
+        if getattr(current_data, 'high_limit', None) and px >= float(current_data.high_limit) * 0.999:
             return
 
         available_cash = context.portfolio.available_cash * 0.98
         target_value = min(portfolio_value * context.p['单只仓位'], available_cash)
-        buy_price = open_price * 1.005
+        buy_price = px * 1.002  # 轻微滑点
         shares = int(target_value / buy_price / 100) * 100
         if shares <= 0:
             return
-        actual_value = shares * open_price * 1.003
+        actual_value = shares * buy_price
         if actual_value > context.portfolio.available_cash:
             shares = int(context.portfolio.available_cash * 0.97 / buy_price / 100) * 100
             if shares <= 0:
@@ -785,15 +842,17 @@ def handle_buy(context):
             'initial_shares': shares,
         }
         context.last_buy_date = today_str
+        context.buy_attempted_today = True
         log.info(
-            '★ 买入 %s @ %.2f 股数:%d 金额:%.0f %s (持仓%d/%d)' % (
-                stock, buy_price, shares, actual_value,
+            '★ 盯盘买入 %s @ %.2f (现价涨跌%.2f%%) 股数:%d 金额:%.0f %s 时间:%s (持仓%d/%d)' % (
+                stock, buy_price, chg * 100, shares, actual_value,
                 context.selected_detail,
+                context.current_dt.strftime('%H:%M'),
                 len(context.holdings), context.p['最大持仓数']
             )
         )
     except Exception as e:
-        log.error('买入失败 %s: %s' % (stock, e))
+        log.error('盯盘买入失败 %s: %s' % (stock, e))
 
 
 def sync_holdings(context):
@@ -824,28 +883,25 @@ def _mark_loss_and_maybe_cooldown(context, pnl_pct):
         context.consecutive_losses = 0
 
 
-def handle_sell(context):
+def monitor_positions(context):
+    """每分钟盯盘：按最新价触发止损/止盈/到期；周五指定时点后强制清仓。"""
+    if not context.holdings and not context.portfolio.positions:
+        return
     sync_holdings(context)
-    is_friday = context.current_dt.weekday() == 4
+    if not context.holdings:
+        return
 
+    now_t = context.current_dt.time()
+    is_friday = context.current_dt.weekday() == 4
+    force_friday_clear = is_friday and now_t >= context.p['周五清仓时点']
+
+    # 冷却：一旦触发，盘中立即清仓（不等到收盘）
     if context.cooldown_days > 0 and len(context.holdings) > 0:
-        log.info('⚡ 冷却触发,强制清仓%d只' % len(context.holdings))
+        log.info('⚡ 冷却盯盘清仓 %d只 @ %s' % (
+            len(context.holdings), context.current_dt.strftime('%H:%M')
+        ))
         for stock in list(context.holdings.keys()):
-            try:
-                current_data = get_current_data()[stock]
-                if current_data.paused:
-                    continue
-                pos = context.portfolio.positions.get(stock)
-                if pos is None or pos.total_amount == 0:
-                    context.holdings.pop(stock, None)
-                    continue
-                if pos.sellable_amount <= 0:
-                    continue
-                order_target(stock, 0)
-                log.info('  ⚡ 冷却清仓 %s' % stock)
-                context.holdings.pop(stock, None)
-            except Exception as e:
-                log.error('冷却清仓失败 %s: %s' % (stock, e))
+            _force_exit(context, stock, '冷却清仓')
         return
 
     for stock in list(context.holdings.keys()):
@@ -854,32 +910,44 @@ def handle_sell(context):
             current_data = get_current_data()[stock]
             if current_data.paused:
                 continue
-            current_price = current_data.last_price
+            current_price = float(current_data.last_price or 0)
             if current_price <= 0:
                 continue
             pos = context.portfolio.positions.get(stock)
             if pos is None or pos.total_amount == 0:
                 context.holdings.pop(stock, None)
                 continue
+            # T+1：当日买入不可卖
             sellable = pos.sellable_amount
             if sellable <= 0:
                 continue
 
             cost = pos.avg_cost
-            pnl_pct = (current_price - cost) / cost
+            pnl_pct = (current_price - cost) / cost if cost else 0.0
             holding['cost'] = cost
-            hold_days = (context.current_dt.date() - holding['buy_date']).days
+            hold_days = _trading_hold_days(context, holding['buy_date'])
 
-            if is_friday:
+            # 周五尾盘强制清仓（盘中仍优先走止盈止损）
+            if force_friday_clear:
                 order_target(stock, 0)
-                log.info('□ 周五清仓 %s 盈亏:%.2f%% 持有%d天' % (stock, pnl_pct * 100, hold_days))
+                log.info(
+                    '□ 周五盯盘清仓 %s @ %.2f 盈亏:%.2f%% 持有%d日 %s' % (
+                        stock, current_price, pnl_pct * 100, hold_days,
+                        context.current_dt.strftime('%H:%M')
+                    )
+                )
                 _mark_loss_and_maybe_cooldown(context, pnl_pct)
                 context.holdings.pop(stock, None)
                 continue
 
             if pnl_pct <= context.p['止损线']:
                 order_target(stock, 0)
-                log.info('× 止损清仓 %s 盈亏:%.2f%%' % (stock, pnl_pct * 100))
+                log.info(
+                    '× 盯盘止损 %s @ %.2f 盈亏:%.2f%% %s' % (
+                        stock, current_price, pnl_pct * 100,
+                        context.current_dt.strftime('%H:%M')
+                    )
+                )
                 _mark_loss_and_maybe_cooldown(context, pnl_pct)
                 context.holdings.pop(stock, None)
                 continue
@@ -889,24 +957,60 @@ def handle_sell(context):
                 if half_shares > 0:
                     order(stock, -half_shares)
                     holding['half_sold'] = True
-                    log.info('◇ 止盈卖半 %s 盈亏:%.2f%%' % (stock, pnl_pct * 100))
+                    log.info(
+                        '◇ 盯盘止盈卖半 %s @ %.2f 盈亏:%.2f%% %s' % (
+                            stock, current_price, pnl_pct * 100,
+                            context.current_dt.strftime('%H:%M')
+                        )
+                    )
                 continue
 
             if pnl_pct >= context.p['止盈线2']:
                 order_target(stock, 0)
-                log.info('○ 止盈清仓 %s 盈亏:%.2f%%' % (stock, pnl_pct * 100))
+                log.info(
+                    '○ 盯盘止盈清仓 %s @ %.2f 盈亏:%.2f%% %s' % (
+                        stock, current_price, pnl_pct * 100,
+                        context.current_dt.strftime('%H:%M')
+                    )
+                )
                 context.consecutive_losses = 0
                 context.holdings.pop(stock, None)
                 continue
 
             if hold_days >= context.p['最大持有交易日']:
                 order_target(stock, 0)
-                log.info('□ 到期清仓 %s 盈亏:%.2f%% 持有%d天' % (stock, pnl_pct * 100, hold_days))
+                log.info(
+                    '□ 盯盘到期清仓 %s @ %.2f 盈亏:%.2f%% 持有%d日 %s' % (
+                        stock, current_price, pnl_pct * 100, hold_days,
+                        context.current_dt.strftime('%H:%M')
+                    )
+                )
                 _mark_loss_and_maybe_cooldown(context, pnl_pct)
                 context.holdings.pop(stock, None)
                 continue
         except Exception as e:
-            log.error('卖出检查失败 %s: %s' % (stock, e))
+            log.error('盯盘卖出检查失败 %s: %s' % (stock, e))
+
+
+def _force_exit(context, stock, tag):
+    try:
+        current_data = get_current_data()[stock]
+        if current_data.paused:
+            return
+        pos = context.portfolio.positions.get(stock)
+        if pos is None or pos.total_amount == 0:
+            context.holdings.pop(stock, None)
+            return
+        if pos.sellable_amount <= 0:
+            return
+        px = float(current_data.last_price or 0)
+        order_target(stock, 0)
+        log.info('  ⚡ %s %s @ %.2f %s' % (
+            tag, stock, px, context.current_dt.strftime('%H:%M')
+        ))
+        context.holdings.pop(stock, None)
+    except Exception as e:
+        log.error('%s失败 %s: %s' % (tag, stock, e))
 
 
 def after_trading_end(context):
