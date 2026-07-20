@@ -1,7 +1,7 @@
 # Sharon Trading System — Session Handoff
 
 > **下一个会话第一件事：阅读本文件 `handoff.md`，再决定分支与任务。**  
-> 最后更新：2026-07-15（涨停接力选股已接入 PR #5 分支）
+> 最后更新：2026-07-20（已部署：PR #5 合入 main，Release **v1.0.1** 已发布）
 
 ---
 
@@ -48,10 +48,11 @@
 
 | 分支 | 状态 | 说明 |
 |---|---|---|
-| `main` | 已含 PR #2、#4 | 侧边栏菜单 + 交易计划左写右读已合入 |
-| `cursor/network-ai-market-data-ff7e` | **当前工作尖端** | 联网行情 + AI Agent + 候选实时价；**未合入 main** |
-| `cursor/implement-account-engine-ff7e` | 历史 | 早期主开发支，已通过 PR #2 合入 |
-| `cursor/optimize-trade-plan-layout-ff7e` | 已合入 | PR #4 |
+| `main` | **当前部署尖端** | 已含 PR #2/#4/#5/#7（联网 AI + 涨停接力 + 安装包 1.0.1 元数据） |
+| `cursor/network-ai-market-data-ff7e` | 已合入 | PR #5 |
+| `cursor/release-v1-0-1-ff7e` | 已合入 | PR #7 版本号 bump |
+| `cursor/implement-account-engine-ff7e` | 历史 | PR #2 |
+| `cursor/optimize-trade-plan-layout-ff7e` | 历史 | PR #4 |
 
 云代理分支命名规则：`cursor/<descriptive-name>-ff7e`（小写）。
 
@@ -59,24 +60,25 @@
 
 | PR | 标题 | 状态 |
 |---|---|---|
-| [#5](https://github.com/horizoncove/openclaw-lite/pull/5) | Add networked A-share quotes and embedded AI agent | **OPEN / DRAFT**，CI 绿，待合并 |
+| [#7](https://github.com/horizoncove/openclaw-lite/pull/7) | Bump installer to v1.0.1 | **MERGED** |
+| [#5](https://github.com/horizoncove/openclaw-lite/pull/5) | Networked quotes + AI agent + limit-up screener | **MERGED** |
 | [#4](https://github.com/horizoncove/openclaw-lite/pull/4) | Optimize trade plan + left sidebar | **MERGED** |
 | [#2](https://github.com/horizoncove/openclaw-lite/pull/2) | Graphite-brass UI + account engine | **MERGED** |
-| #3 | setup-dev-environment | DRAFT（无关/可忽略） |
 
 ### Release / EXE
 
-- Tag：**v1.0.0** → https://github.com/horizoncove/openclaw-lite/releases/tag/v1.0.0  
+- **最新 Tag：v1.0.1** → https://github.com/horizoncove/openclaw-lite/releases/tag/v1.0.1  
 - 资产：`SharonTradingSystem-Setup.exe`、`SharonTradingSystem.exe`  
-- 注意：Release 资产是 **PR #4 合并前后** 的构建；**尚未包含 PR #5 的联网 AI / 候选实时价**。  
-  用户若要最新 EXE：合并 #5 → 等 Windows Installer workflow → 更新 Release 或发 v1.0.1。
+- 本机副本：`/opt/cursor/artifacts/sharon-v1.0.1/`  
+- 旧版：v1.0.0 仍保留  
+- 说明：v1.0.1 功能包来自 PR #5 最终绿构建；installer 元数据 1.0.1 已合入 main。
 
 本地产物目录（环境内）：
 
-- `/opt/cursor/artifacts/sharon-exe/` — 上一轮 EXE 副本  
+- `/opt/cursor/artifacts/sharon-v1.0.1/` — **当前部署 EXE**  
+- `/opt/cursor/artifacts/sharon-exe/` — 更早 EXE 副本  
 - `/opt/cursor/artifacts/sharon-candidate-quotes/` — 含候选实时价的全页预览  
-- `/opt/cursor/artifacts/sharon-network-ai/` — 联网 AI 页预览  
-- `/opt/cursor/artifacts/sharon-all-pages-sidebar/` — 左侧菜单后的全页预览  
+- `/opt/cursor/artifacts/sharon-network-ai/` / `sharon-limit-up/` — 联网/涨停页预览  
 
 构建：`.github/workflows/build-windows-installer.yml`（`main` / `cursor/**` / `v*`）  
 入口：`windows_launcher.py` + `SharonTradingSystem.spec` + `installer/SharonTradingSystem.iss`
@@ -211,11 +213,11 @@ sharon_trading_system_v1_0/
 
 按优先级建议与用户确认：
 
-1. **合并 PR #5** → 重建 Windows EXE → 更新 Release（v1.0.0 覆盖或 v1.0.1）。  
-2. 涨停策略增强：炸板池/跌停池对照、概念板块接口、历史连板胜率回测、收盘自动定时（需软件常开）。  
-3. 候选页：板块辅助填写；行情失败更稳降级。  
-4. Agent：流式输出、对话历史持久化、密钥钥匙串。  
-5. 清理无关 Draft PR #3。  
+1. ~~合并 PR #5 并发布 v1.0.1~~ **已完成（2026-07-20）**。  
+2. Actions 排队结束后，用带 1.0.1 元数据的 main 构建 **覆盖** Release 资产（可选）。  
+3. 涨停策略增强：炸板池/跌停池对照、概念板块接口、历史连板胜率回测、收盘自动定时。  
+4. 候选页：板块辅助填写；行情失败更稳降级。  
+5. Agent：流式输出、对话历史持久化、密钥钥匙串。  
 6. 根目录遗留 `account_engine.py` 与包内版本不同——改动时别改错文件。
 
 ---
@@ -244,6 +246,6 @@ PY
 
 ## 10. 一句话现状
 
-**Sharon 已是可发布的纪律交易桌面端（侧栏 + 石墨黄铜 + 交易计划警示）；联网行情与内嵌 AI Agent、以及候选名单实时价在 PR #5，CI 已通过，等待合并后打新 EXE。**
+**Sharon v1.0.1 已部署：main 含联网行情、AI Agent、候选实时价、涨停接力选股；GitHub Release v1.0.1 可下载 EXE。**
 
-下一会话：先读本文件 → 处理 PR #5 / 按用户新需求继续。
+下一会话：先读本文件 → 按用户新需求继续；可选刷新 Release 构建元数据。

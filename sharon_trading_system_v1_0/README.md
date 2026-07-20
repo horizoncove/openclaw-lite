@@ -2,7 +2,8 @@
 
 个人量化交易助手桌面应用，使用 Python 3.11+、PyQt6 和 SQLite。账户与纪律数据保存在本机；可选联网读取 A 股实时行情，并嵌入 OpenAI 兼容 AI Agent 做分析建议。不连接券商，不会自动下单。
 
-**正式发布：v1.0.0**（石墨 + 黄铜界面 · 交易纪律 · 联网行情 / AI Agent · Windows 安装包）
+**正式发布：v1.0.1**（石墨 + 黄铜界面 · 交易纪律 · 联网行情 / AI Agent · 涨停接力选股 · Windows 安装包）  
+下载：https://github.com/horizoncove/openclaw-lite/releases/tag/v1.0.1
 
 ## Windows 安装版
 
