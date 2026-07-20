@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-三策略融合版 - 聚宽(JoinQuant)量化平台策略  (rev:20260720c)
+三策略融合版 - 聚宽(JoinQuant)量化平台策略  (rev:20260720d)
 ==========================================
 融合：
   1) Sharon SOP v3.1 硬过滤 + 七星代理评分（权重 50%）
@@ -34,13 +34,14 @@
 import numpy as np
 import pandas as pd
 from collections import Counter
-from datetime import datetime, timedelta
 from jqdata import *
+# 必须放在 jqdata 之后：import * 会把 datetime 覆盖成标准库模块
+import datetime as _dt
 
 
 def _hm(text):
-    """'HH:MM' -> datetime.time；避免使用被 jqdata 覆盖的 time 名称。"""
-    return datetime.strptime(text, '%H:%M').time()
+    """'HH:MM' -> datetime.time；不依赖可能被 jqdata 覆盖的名称。"""
+    return _dt.datetime.strptime(str(text), '%H:%M').time()
 
 
 # ===================== 策略参数 =====================
