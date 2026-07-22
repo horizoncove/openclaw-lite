@@ -906,3 +906,53 @@ button {
     width: 100%;
   }
 }
+
+/* —— Print / PDF —— */
+@media print {
+  .site-nav,
+  .nav-toggle,
+  .hero-scroll {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #1a1512;
+  }
+
+  .hero {
+    min-height: auto;
+    page-break-after: always;
+  }
+
+  .hero-content {
+    padding: 2rem 0 2.5rem;
+  }
+
+  .section {
+    padding: 2rem 0;
+    page-break-inside: avoid;
+  }
+
+  .centers-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .center-tabs {
+    display: none;
+  }
+
+  .center-panel {
+    display: block;
+  }
+
+  .alliance-grid,
+  .contact-inner,
+  .center-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .journey-steps::before {
+    display: none;
+  }
+}
