@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "export:pdf": "node scripts/export-pdf.mjs",
-    "export:briefing": "node scripts/export-briefing-pdf.mjs"
+    "export:briefing": "node scripts/export-briefing-pdf.mjs",
+    "export:annex": "node scripts/export-annex-pdf.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",
