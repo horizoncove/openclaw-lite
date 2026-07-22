@@ -8,11 +8,23 @@
 | [`docs/西安微短剧产业服务中心建设汇报方案.pdf`](./docs/西安微短剧产业服务中心建设汇报方案.pdf) | 主文：深度分析与落地路径 |
 | [`docs/西安微短剧产业服务中心完整详细资料包.pdf`](./docs/西安微短剧产业服务中心完整详细资料包.pdf) | 附件包：章程/产品/预算/SOP/KPI 等 |
 
-## 附件明细（A–J）
+## 附件明细（A–K，均已独立 PDF）
 
-见 [`docs/attachments/README.md`](./docs/attachments/README.md)
+见 [`docs/attachments/`](./docs/attachments/)：
 
-含：组织章程与会员办法、服务产品与收费边界、90 天甘特与岗位说明书、预算与采购、数据安全、六大板块 SOP、KPI 与周报模板、试点遴选台账、联席会议权责、风险应急预案，以及可复制的 [`表格模板.md`](./docs/attachments/表格模板.md)。
+- A 组织章程与会员管理办法  
+- B 服务产品目录与收费/公益边界  
+- C 90 天甘特图与岗位说明书  
+- D 预算明细与采购清单  
+- E 数据安全与脱敏管理办法  
+- F 六大板块 SOP  
+- G KPI 评分与周报月报模板  
+- H 试点遴选与台账  
+- I 联席会议与权责边界  
+- J 风险应急与合规底线  
+- K 可执行表格模板  
+
+索引：[`docs/attachments/README.md`](./docs/attachments/README.md)
 
 ## 重新导出
 
