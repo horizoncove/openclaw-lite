@@ -11,7 +11,8 @@
     "export:pdf": "node scripts/export-pdf.mjs",
     "export:briefing": "node scripts/export-briefing-pdf.mjs",
     "export:annex": "node scripts/export-annex-pdf.mjs",
-    "export:split": "python3 scripts/split-annex-pdfs.py"
+    "export:split": "python3 scripts/split-annex-pdfs.py",
+    "export:annexes": "python3 scripts/extract-annex-html.py && node scripts/export-annexes-individual.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",

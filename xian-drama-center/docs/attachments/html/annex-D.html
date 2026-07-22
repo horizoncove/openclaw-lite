@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<title>附件 D 预算明细表与采购清单</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink:#1c1917; --muted:#57534e; --line:#d6d3d1; --bg:#fafaf9;
+  --accent:#9a3412; --accent-soft:#fed7aa; --blue:#1e3a5f; --ok:#166534; --warn:#92400e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+@page{size:A4;margin:14mm 12mm}
+body{font-family:"Noto Sans SC",sans-serif;color:var(--ink);font-size:10pt;line-height:1.6;padding:2mm}
+h1,h2,h3,h4{font-family:"Noto Serif SC",serif;font-weight:700;line-height:1.35}
+.section>h2, h2.doc-title{
+  font-size:15pt;color:var(--blue);border-bottom:2px solid var(--accent);
+  padding-bottom:2mm;margin-bottom:4mm;
+}
+h3{font-size:12pt;color:var(--accent);margin:5mm 0 2mm}
+h4{font-size:10.5pt;color:var(--blue);margin:3.5mm 0 1.5mm}
+p{margin-bottom:2mm}
+ul,ol{padding-left:5mm;margin-bottom:2.5mm}
+li{margin-bottom:1mm}
+.lead{background:var(--bg);border-left:3px solid var(--accent);padding:3mm 3.5mm;margin:2.5mm 0 4mm;color:var(--muted)}
+table{width:100%;border-collapse:collapse;margin:2.5mm 0 4mm;font-size:9pt}
+th,td{border:1px solid var(--line);padding:1.8mm 2mm;vertical-align:top;text-align:left}
+th{background:#f5f5f4;color:var(--blue);font-weight:600}
+.tag{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:8pt;padding:.3mm 1.8mm;margin-right:1mm}
+.muted{color:var(--muted)}
+.ok{color:var(--ok);font-weight:600}
+.warn{color:var(--warn);font-weight:600}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin:2mm 0}
+.card{border:1px solid var(--line);background:var(--bg);padding:2.5mm}
+.card h4{margin-top:0}
+.footer-note{margin-top:6mm;padding-top:2.5mm;border-top:1px solid var(--line);font-size:8pt;color:var(--muted)}
+.small{font-size:8.5pt}
+.meta{font-size:9pt;color:var(--muted);margin-bottom:4mm}
+</style>
+</head>
+<body>
+<p class="meta">西安微短剧产业服务中心建设汇报方案 · 附件 D · V1.0</p>
+<h2 class="doc-title">附件 D 预算明细表与采购清单</h2>
+<p class="lead">以下为<strong>起步年参考口径</strong>（可按场地是否已有、编制是否派驻大幅调整）。单位：人民币万元。</p>
+
+  <h3>D.1 起步年预算总表（示例：480 万）</h3>
+  <table>
+    <tr><th>科目</th><th>金额</th><th>占比</th><th>说明</th></tr>
+    <tr><td>人员经费（含社保公积金、兼职专家）</td><td>210</td><td>43.8%</td><td>全职+派驻差额+专家劳务</td></tr>
+    <tr><td>活动与撮合（对接会/路演/出海洽谈）</td><td>72</td><td>15.0%</td><td>含场地、物料、差旅</td></tr>
+    <tr><td>数字化系统与数据治理</td><td>55</td><td>11.5%</td><td>工单 CRM、知识库、看板</td></tr>
+    <tr><td>AI 工具、算力与训战</td><td>58</td><td>12.1%</td><td>SaaS、小规模微调、培训</td></tr>
+    <tr><td>法务版权与监测</td><td>28</td><td>5.8%</td><td>范本、监测工具、援助</td></tr>
+    <tr><td>试点补贴/配套（出海/精品辅导）</td><td>30</td><td>6.3%</td><td>以结果验收拨付</td></tr>
+    <tr><td>办公运营与不可预见费</td><td>27</td><td>5.6%</td><td>房租若已有可下调</td></tr>
+    <tr><td><strong>合计</strong></td><td><strong>480</strong></td><td>100%</td><td>可按 300/480/650 三档缩放</td></tr>
+  </table>
+
+  <h3>D.2 三档预算缩放建议</h3>
+  <table>
+    <tr><th>档位</th><th>总预算</th><th>适用</th><th>必保能力</th></tr>
+    <tr><td>紧凑档</td><td>300 万</td><td>场地与部分编制已具备</td><td>联盟+审批+出海 MVP</td></tr>
+    <tr><td>标准档</td><td>480 万</td><td>独立运转一年</td><td>六大板块齐备</td></tr>
+    <tr><td>加强档</td><td>650 万</td><td>强调出海与 AI</td><td>增加试点补贴与算力</td></tr>
+  </table>
+
+  <h3>D.3 采购清单（第一优先级）</h3>
+  <table>
+    <tr><th>品类</th><th>规格/内容</th><th>方式</th><th>预估</th></tr>
+    <tr><td>工单/CRM</td><td>低代码或成熟 SaaS，含权限与超时预警</td><td>采购/订阅</td><td>8–15 万/年</td></tr>
+    <tr><td>知识库</td><td>政策、范本、驳回原因、渠道库</td><td>自建+订阅</td><td>3–8 万</td></tr>
+    <tr><td>会议与直播设备</td><td>对接会/培训</td><td>采购</td><td>5–10 万</td></tr>
+    <tr><td>AI 工具包</td><td>剧本/字幕/素材生成等企业版</td><td>订阅</td><td>15–30 万/年</td></tr>
+    <tr><td>侵权监测</td><td>基础监测账号</td><td>订阅</td><td>5–12 万/年</td></tr>
+    <tr><td>法律顾问</td><td>年度顾问 + 案件转介</td><td>服务采购</td><td>10–20 万/年</td></tr>
+    <tr><td>翻译/本地化短名单</td><td>框架协议（按单结算）</td><td>入围</td><td>按项目</td></tr>
+    <tr><td>设计与物料</td><td>VI、手册、活动物料</td><td>采购</td><td>6–12 万</td></tr>
+  </table>
+
+  <h3>D.4 资金拨付与绩效挂钩</h3>
+  <ul>
+    <li>人员与固定运营：按季拨付；</li>
+    <li>活动与试点：事前备案 + 事后验收；</li>
+    <li>未完成核心 KPI 的科目，下季压减 10%–30%；</li>
+    <li>结余优先用于出海试点与复盘库建设。</li>
+  </ul>
+</section>
+
+<!-- ===================== E ===================== -->
+</body>
+</html>

@@ -1,31 +1,31 @@
-# 附件 PDF 清单（逐份独立文件）
+# 附件下载与预览（推荐英文文件名）
 
-目录：`xian-drama-center/docs/attachments/`
+> 若中文文件名 PDF 在 GitHub 无法预览，请使用下方 `annex-A.pdf` … `annex-K.pdf`，或打开 HTML 预览。
 
-| 编号 | 文件名 | 页数 |
-|------|--------|------|
-| A | [附件A-组织章程与会员管理办法.pdf](./附件A-组织章程与会员管理办法.pdf) | 2 |
-| B | [附件B-服务产品目录与收费公益边界.pdf](./附件B-服务产品目录与收费公益边界.pdf) | 2 |
-| C | [附件C-90天甘特图与岗位说明书.pdf](./附件C-90天甘特图与岗位说明书.pdf) | 2 |
-| D | [附件D-预算明细表与采购清单.pdf](./附件D-预算明细表与采购清单.pdf) | 2 |
-| E | [附件E-数据安全与脱敏管理办法.pdf](./附件E-数据安全与脱敏管理办法.pdf) | 1 |
-| F | [附件F-六大板块SOP操作手册.pdf](./附件F-六大板块SOP操作手册.pdf) | 2 |
-| G | [附件G-KPI考核评分表与周报月报模板.pdf](./附件G-KPI考核评分表与周报月报模板.pdf) | 2 |
-| H | [附件H-试点项目遴选标准与台账模板.pdf](./附件H-试点项目遴选标准与台账模板.pdf) | 1 |
-| I | [附件I-联席会议制度与权责边界说明书.pdf](./附件I-联席会议制度与权责边界说明书.pdf) | 1 |
-| J | [附件J-风险应急预案与合规底线清单.pdf](./附件J-风险应急预案与合规底线清单.pdf) | 1 |
-| K | [附件K-可执行表格模板.pdf](./附件K-可执行表格模板.pdf) | 2 |
+## 独立 PDF（推荐）
 
-## 合订本（可选）
+| 编号 | 内容 | PDF |
+|------|------|-----|
+| A | 组织章程与会员管理办法 | [annex-A.pdf](./annex-A.pdf) |
+| B | 服务产品目录与收费公益边界 | [annex-B.pdf](./annex-B.pdf) |
+| C | 90天甘特图与岗位说明书 | [annex-C.pdf](./annex-C.pdf) |
+| D | 预算明细表与采购清单 | [annex-D.pdf](./annex-D.pdf) |
+| E | 数据安全与脱敏管理办法 | [annex-E.pdf](./annex-E.pdf) |
+| F | 六大板块SOP操作手册 | [annex-F.pdf](./annex-F.pdf) |
+| G | KPI考核评分表与周报月报模板 | [annex-G.pdf](./annex-G.pdf) |
+| H | 试点项目遴选标准与台账模板 | [annex-H.pdf](./annex-H.pdf) |
+| I | 联席会议制度与权责边界说明书 | [annex-I.pdf](./annex-I.pdf) |
+| J | 风险应急预案与合规底线清单 | [annex-J.pdf](./annex-J.pdf) |
+| K | 可执行表格模板 | [annex-K.pdf](./annex-K.pdf) |
 
-- 主文：`../西安微短剧产业服务中心建设汇报方案.pdf`
-- 附件合集：`../西安微短剧产业服务中心完整详细资料包.pdf`
-- 主文+附件：`../西安微短剧产业服务中心完整汇报资料（主文+附件）.pdf`
+## HTML 在线预览（不依赖 PDF 阅读器）
 
-## 重新拆分
+打开 [`html/index.html`](./html/index.html)，可逐份阅读附件正文。
+
+## 重新导出
 
 ```bash
 cd xian-drama-center
-npm run export:annex
-python3 scripts/split-annex-pdfs.py
+python3 scripts/extract-annex-html.py
+node scripts/export-annexes-individual.mjs
 ```
