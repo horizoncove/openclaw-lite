@@ -47,6 +47,8 @@ logs/
 *.pdf
 *.xlsx
 !examples/*.xlsx
+!xian-drama-center/*.pdf
+!xian-drama-center/docs/*.pdf
 
 # OS
 .DS_Store
