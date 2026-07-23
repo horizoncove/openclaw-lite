@@ -1,5 +1,7 @@
 # 西安微短剧产业服务中心 · SaaS 云服务器部署指南
 
+> **只想付款、不想管服务器？** 请直接用 PaaS 一键部署 → [`PAAS.md`](./PAAS.md)（Render / Railway）
+
 本文档说明如何在云服务器（阿里云 / 腾讯云 / 华为云等）上使用 **Docker Compose** 一键部署运营 SaaS 平台，含 **PostgreSQL 16** 数据库。
 
 ## 一、服务器要求

@@ -26,7 +26,18 @@ npm run dev
 
 ## 生产部署
 
-### Docker Compose（推荐，含 PostgreSQL）
+### PaaS 一键部署（推荐 · 只需付款）
+
+无需买服务器，连接 GitHub 自动上线：
+
+| 平台 | 操作 |
+|------|------|
+| **Render** | [一键部署按钮](https://render.com/deploy?repo=https://github.com/horizoncove/openclaw-lite) |
+| **Railway** | 见 [`deploy/PAAS.md`](./deploy/PAAS.md) |
+
+详细图文步骤：**[`deploy/PAAS.md`](./deploy/PAAS.md)**（约 $10–15/月）
+
+### Docker Compose（自建服务器）
 
 ```bash
 cp .env.example .env   # 修改数据库密码
