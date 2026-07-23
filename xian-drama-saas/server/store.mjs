@@ -1,9 +1,33 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import * as jsonDb from "./db.mjs";
 import * as repo from "./db/repo.mjs";
 import { checkDb } from "./db/pool.mjs";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+function loadCenterSeed() {
+  return JSON.parse(readFileSync(join(__dirname, "data", "center-seed.json"), "utf8"));
+}
+
+function mergeCenterExtras(base, seed) {
+  return {
+    ...base,
+    tokenModels: seed.tokenModels ?? [],
+    tokenPackages: seed.tokenPackages ?? [],
+    tokenWallet: base.tokenWallet ?? seed.tokenWallet ?? {
+      balance: 0,
+      usedThisMonth: 0,
+      monthlyQuota: 100000,
+      apiKey: `xd-center-sk-${Math.random().toString(36).slice(2, 10)}`,
+      transactions: [],
+    },
+  };
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -147,8 +171,53 @@ export async function patchAllianceOrder(id, patch) {
 // ── Center ────────────────────────────────────────────────
 
 export async function getCenterState() {
-  if (usePostgres) return repo.getCenterState();
-  return jsonDb.loadDb("center");
+  const seed = loadCenterSeed();
+  if (usePostgres) {
+    const base = await repo.getCenterState();
+    return mergeCenterExtras(base, seed);
+  }
+  return mergeCenterExtras(jsonDb.loadDb("center"), seed);
+}
+
+export async function purchaseCenterTokens(packageId) {
+  const seed = loadCenterSeed();
+  const pkg = (seed.tokenPackages ?? []).find((p) => p.id === packageId);
+  if (!pkg) throw new Error("套餐不存在");
+
+  const state = await getCenterState();
+  const wallet = structuredClone(state.tokenWallet);
+  const credit = pkg.tokens + (pkg.bonus ?? 0);
+  wallet.balance += credit;
+  wallet.transactions.unshift({
+    id: `TX-${Date.now()}`,
+    type: "充值",
+    amount: credit,
+    balance: wallet.balance,
+    note: `购买${pkg.name}（${pkg.tokens.toLocaleString()} + 赠送 ${(pkg.bonus ?? 0).toLocaleString()}）`,
+    createdAt: new Date().toISOString().slice(0, 10),
+  });
+
+  if (usePostgres) await repo.saveTokenWallet(wallet);
+  else {
+    const db = jsonDb.loadDb("center");
+    db.tokenWallet = wallet;
+    jsonDb.saveDb("center", db);
+  }
+  return getCenterState();
+}
+
+export async function regenerateCenterApiKey() {
+  const state = await getCenterState();
+  const wallet = structuredClone(state.tokenWallet);
+  wallet.apiKey = `xd-center-sk-${Math.random().toString(36).slice(2, 6)}${Math.random().toString(36).slice(2, 6)}`;
+
+  if (usePostgres) await repo.saveTokenWallet(wallet);
+  else {
+    const db = jsonDb.loadDb("center");
+    db.tokenWallet = wallet;
+    jsonDb.saveDb("center", db);
+  }
+  return wallet;
 }
 
 export async function resetCenterState() {

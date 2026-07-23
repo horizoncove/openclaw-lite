@@ -457,3 +457,118 @@ tr:hover td { background: rgba(154, 52, 18, 0.03); }
   .member-event-grid { grid-template-columns: 1fr; }
   .member-profile-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* ── 五大中心：全景看板 & Token 服务 ── */
+.token-balance-chip {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.35rem 0.75rem; border-radius: 99px; text-decoration: none;
+  background: #ffedd5; color: #9a3412; font-size: 0.82rem; font-weight: 600;
+}
+.token-balance-chip:hover { background: #fed7aa; }
+.center-quick-links {
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+.center-quick-link {
+  padding: 0.55rem 1rem; border-radius: 10px; text-decoration: none;
+  background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; font-size: 0.88rem; font-weight: 600;
+}
+.center-login-features {
+  display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;
+}
+.center-login-features span {
+  font-size: 0.78rem; padding: 0.2rem 0.55rem; border-radius: 99px;
+  background: #ffedd5; color: #9a3412;
+}
+.panorama-page { display: flex; flex-direction: column; gap: 0; }
+.panorama-hero {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;
+  padding: 1.25rem; margin-bottom: 1rem; border-radius: 16px;
+  background: linear-gradient(135deg, #7c2d12, #9a3412); color: #fff;
+}
+.panorama-hero h3 { margin: 0.25rem 0; font-family: var(--display); color: #fff; }
+.panorama-hero p { color: #ffedd5; font-size: 0.9rem; margin: 0; max-width: 520px; }
+.panorama-eyebrow { font-size: 0.72rem; letter-spacing: 0.08em; color: #fed7aa; margin: 0; }
+.panorama-kpi.warn .stat-value { color: #b45309; }
+.panorama-center-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;
+}
+.panorama-center-card {
+  display: block; padding: 0.85rem; border-radius: 12px; text-decoration: none; color: inherit;
+  border: 1px solid var(--line); transition: box-shadow 0.15s, border-color 0.15s;
+}
+.panorama-center-card:hover { border-color: #fdba74; box-shadow: 0 4px 16px rgba(154,52,18,0.08); }
+.panorama-center-head { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem; }
+.panorama-center-head svg { color: #9a3412; }
+.panorama-center-stats { display: flex; gap: 0.75rem; font-size: 0.82rem; color: var(--muted); margin-bottom: 0.5rem; }
+.panorama-load-track, .panorama-trend-track, .token-usage-bar {
+  height: 8px; background: #eee7dc; border-radius: 99px; overflow: hidden;
+}
+.panorama-load-fill, .panorama-trend-fill, .token-usage-fill {
+  height: 100%; border-radius: 99px; background: linear-gradient(90deg, #9a3412, #ea580c);
+}
+.panorama-trend-item {
+  display: grid; grid-template-columns: 40px 1fr 48px; align-items: center; gap: 0.5rem;
+  margin-bottom: 0.5rem; font-size: 0.85rem;
+}
+.token-hub { display: flex; flex-direction: column; gap: 1rem; }
+.token-hero {
+  display: flex; justify-content: space-between; align-items: stretch; gap: 1rem; flex-wrap: wrap;
+}
+.token-hero h3 { margin: 0.25rem 0; font-family: var(--display); color: var(--brand-2); }
+.token-hero p { color: var(--muted); font-size: 0.9rem; margin: 0; max-width: 560px; }
+.token-eyebrow { font-size: 0.72rem; letter-spacing: 0.08em; color: #9a3412; margin: 0 0 0.25rem; }
+.token-balance-card {
+  min-width: 200px; padding: 1rem 1.25rem; border-radius: 14px;
+  background: linear-gradient(135deg, #9a3412, #c2410c); color: #fff;
+}
+.token-balance-card span { font-size: 0.82rem; color: #ffedd5; }
+.token-balance-card strong { display: block; font-size: 2rem; line-height: 1.1; }
+.token-balance-card small { color: #fed7aa; font-size: 0.8rem; }
+.token-usage-bar { margin-top: 0.65rem; background: rgba(255,255,255,0.25); }
+.token-usage-fill { background: #fff; }
+.token-usage-label { display: block; margin-top: 0.35rem; font-size: 0.75rem; color: #ffedd5; }
+.token-api-card { background: #fffaf5; border-color: #fed7aa; }
+.token-api-head { display: flex; gap: 0.65rem; align-items: flex-start; margin-bottom: 0.75rem; }
+.token-api-head p { margin: 0.15rem 0 0; font-size: 0.85rem; color: var(--muted); }
+.token-api-row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+.token-api-key {
+  flex: 1; min-width: 200px; padding: 0.55rem 0.75rem; border-radius: 8px;
+  background: #fff; border: 1px solid var(--line); font-size: 0.85rem;
+}
+.token-package-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; margin-top: 0.75rem;
+}
+.token-package-card {
+  position: relative; padding: 1.1rem; border-radius: 14px;
+  border: 1px solid var(--line); background: #fff;
+}
+.token-package-card.popular { border-color: #9a3412; box-shadow: 0 6px 24px rgba(154,52,18,0.1); }
+.token-popular-badge {
+  position: absolute; top: 0.65rem; right: 0.65rem; font-size: 0.7rem;
+  padding: 0.15rem 0.45rem; border-radius: 99px; background: #9a3412; color: #fff;
+}
+.token-package-price { font-size: 1.6rem; font-weight: 700; color: #9a3412; margin: 0.35rem 0; }
+.token-package-price span { font-size: 0.82rem; color: var(--muted); font-weight: 400; }
+.token-package-bonus { color: #166534; font-size: 0.85rem; margin: 0 0 0.35rem; }
+.token-package-card p { color: var(--muted); font-size: 0.85rem; min-height: 2.5rem; }
+.token-model-toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; }
+.token-filter-tabs { display: flex; gap: 0.35rem; }
+.token-filter-tabs button {
+  border: 1px solid var(--line); background: #fff; padding: 0.3rem 0.65rem;
+  border-radius: 99px; font-size: 0.82rem; cursor: pointer;
+}
+.token-filter-tabs button.active { background: #9a3412; color: #fff; border-color: #9a3412; }
+.token-model-tags { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem; }
+.token-ai-banner {
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  background: linear-gradient(90deg, #fff7ed, #fff); border-color: #fed7aa;
+}
+.token-ai-banner p { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.88rem; }
+@media (max-width: 1100px) {
+  .token-package-grid { grid-template-columns: repeat(2, 1fr); }
+  .panorama-center-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .token-package-grid { grid-template-columns: 1fr; }
+  .panorama-hero, .token-hero { flex-direction: column; }
+}

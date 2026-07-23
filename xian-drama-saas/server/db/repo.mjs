@@ -258,15 +258,18 @@ export async function getAllianceState() {
 }
 
 export async function getCenterState() {
-  const [orders, approvals, overseas, distributions, copyrights, ais] = await Promise.all([
-    listOrders("center"),
-    listApprovals(),
-    listOverseas(),
-    listDistributions(),
-    listCopyrights(),
-    listAis(),
-  ]);
-  return { orders, approvals, overseas, distributions, copyrights, ais };
+  const [orders, approvals, overseas, distributions, copyrights, ais, walletRow] =
+    await Promise.all([
+      listOrders("center"),
+      listApprovals(),
+      listOverseas(),
+      listDistributions(),
+      listCopyrights(),
+      listAis(),
+      query("SELECT data FROM center_extras WHERE key = 'tokenWallet'"),
+    ]);
+  const tokenWallet = walletRow.rows[0]?.data ?? null;
+  return { orders, approvals, overseas, distributions, copyrights, ais, tokenWallet };
 }
 
 export async function resetAllianceState(seed) {
@@ -280,6 +283,7 @@ export async function resetCenterState(seed) {
   await query("TRUNCATE approvals, overseas_projects, distributions, copyrights, ai_projects CASCADE");
   await query("DELETE FROM work_orders WHERE center <> '联盟'");
   await seedCenter(seed);
+  if (seed.tokenWallet) await saveTokenWallet(seed.tokenWallet);
   return getCenterState();
 }
 
@@ -415,6 +419,20 @@ export async function listCopyrights() {
 export async function listAis() {
   const r = await query("SELECT * FROM ai_projects ORDER BY id");
   return r.rows.map(mapAi);
+}
+
+export async function getTokenWallet() {
+  const r = await query("SELECT data FROM center_extras WHERE key = 'tokenWallet'");
+  return r.rows[0]?.data ?? null;
+}
+
+export async function saveTokenWallet(wallet) {
+  await query(
+    `INSERT INTO center_extras (key, data) VALUES ('tokenWallet', $1)
+     ON CONFLICT (key) DO UPDATE SET data = $1, updated_at = NOW()`,
+    [JSON.stringify(wallet)]
+  );
+  return wallet;
 }
 
 export async function getStats() {

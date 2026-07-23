@@ -102,4 +102,23 @@ export const centerApi = {
     update: (id: string, patch: Partial<WorkOrder>) =>
       request<WorkOrder>(`/center/orders/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
   },
+  tokens: {
+    get: () =>
+      request<{
+        tokenModels: CenterState["tokenModels"];
+        tokenPackages: CenterState["tokenPackages"];
+        tokenWallet: CenterState["tokenWallet"];
+      }>("/center/tokens"),
+    purchase: (packageId: string) =>
+      request<{
+        tokenWallet: CenterState["tokenWallet"];
+        tokenModels: CenterState["tokenModels"];
+        tokenPackages: CenterState["tokenPackages"];
+      }>("/center/tokens/purchase", { method: "POST", body: JSON.stringify({ packageId }) }),
+    regenerateKey: () =>
+      request<{ apiKey: string; tokenWallet: CenterState["tokenWallet"] }>(
+        "/center/tokens/regenerate-key",
+        { method: "POST" },
+      ),
+  },
 };

@@ -124,6 +124,74 @@ export interface AllianceState {
   orders: WorkOrder[];
 }
 
+export type TokenModelCategory = "chat" | "embedding" | "image" | "video";
+export type TokenModelStatus = "可用" | "限流" | "维护";
+export type TokenTxType = "充值" | "消耗" | "退款";
+
+export interface TokenModel {
+  id: string;
+  provider: string;
+  name: string;
+  category: TokenModelCategory;
+  inputPrice: number;
+  outputPrice: number;
+  contextWindow: number;
+  status: TokenModelStatus;
+  tags: string[];
+}
+
+export interface TokenPackage {
+  id: string;
+  name: string;
+  tokens: number;
+  price: number;
+  bonus: number;
+  popular?: boolean;
+  desc: string;
+}
+
+export interface TokenTransaction {
+  id: string;
+  type: TokenTxType;
+  amount: number;
+  balance: number;
+  model?: string;
+  note: string;
+  createdAt: string;
+}
+
+export interface TokenWallet {
+  balance: number;
+  usedThisMonth: number;
+  monthlyQuota: number;
+  apiKey: string;
+  transactions: TokenTransaction[];
+}
+
+export interface CenterPanoramaCenter {
+  id: CenterRole;
+  name: string;
+  workload: number;
+  active: number;
+  alerts: number;
+  link: string;
+}
+
+export interface CenterPanorama {
+  summary: {
+    openOrders: number;
+    highPriority: number;
+    tokenBalance: number;
+    monthlyTokenUsage: number;
+    totalWorkload: number;
+  };
+  centers: CenterPanoramaCenter[];
+  ordersByCenter: Record<string, number>;
+  tokenUsageTrend: { label: string; value: number }[];
+  recentOrders: WorkOrder[];
+  recentTransactions: TokenTransaction[];
+}
+
 export interface CenterState {
   user: CenterUser | null;
   orders: WorkOrder[];
@@ -132,6 +200,9 @@ export interface CenterState {
   distributions: DistributionCase[];
   copyrights: CopyrightCase[];
   ais: AIProject[];
+  tokenModels: TokenModel[];
+  tokenPackages: TokenPackage[];
+  tokenWallet: TokenWallet;
 }
 
 export const ALLIANCE_ROLE_LABEL: Record<AllianceRole, string> = {

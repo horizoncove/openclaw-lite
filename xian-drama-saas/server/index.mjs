@@ -21,8 +21,11 @@ import {
   upsertAllianceOrder,
   patchAllianceOrder,
   getCenterState,
+  getCenterState,
   resetCenterState,
   getCenterStats,
+  purchaseCenterTokens,
+  regenerateCenterApiKey,
   listApprovals,
   patchApproval,
   listOverseas,
@@ -65,7 +68,7 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     service: "xian-drama-saas",
-    version: "1.3.0",
+    version: "1.4.0",
     storage: isPostgres() ? "postgresql" : "json",
     portals: ["alliance", "center"],
   });
@@ -121,6 +124,31 @@ app.put("/api/alliance/orders/:id", asyncHandler(async (req, res) => {
 app.get("/api/center/state", asyncHandler(async (_req, res) => res.json(await getCenterState())));
 app.post("/api/center/reset", asyncHandler(async (_req, res) => res.json(await resetCenterState())));
 app.get("/api/center/stats", asyncHandler(async (_req, res) => res.json(await getCenterStats())));
+
+app.get("/api/center/tokens", asyncHandler(async (_req, res) => {
+  const state = await getCenterState();
+  res.json({
+    tokenModels: state.tokenModels,
+    tokenPackages: state.tokenPackages,
+    tokenWallet: state.tokenWallet,
+  });
+}));
+
+app.post("/api/center/tokens/purchase", asyncHandler(async (req, res) => {
+  const { packageId } = req.body || {};
+  if (!packageId) return res.status(400).json({ error: "缺少 packageId" });
+  const state = await purchaseCenterTokens(packageId);
+  res.json({
+    tokenWallet: state.tokenWallet,
+    tokenModels: state.tokenModels,
+    tokenPackages: state.tokenPackages,
+  });
+}));
+
+app.post("/api/center/tokens/regenerate-key", asyncHandler(async (_req, res) => {
+  const wallet = await regenerateCenterApiKey();
+  res.json({ apiKey: wallet.apiKey, tokenWallet: wallet });
+}));
 
 app.post("/api/center/auth/login", (req, res) => {
   const { role } = req.body || {};

@@ -485,5 +485,203 @@
       "lift": "配音成本 -20%",
       "owner": "AI-蒋一"
     }
-  ]
+  ],
+  "tokenModels": [
+    {
+      "id": "openai/gpt-4o-mini",
+      "provider": "OpenAI",
+      "name": "GPT-4o Mini",
+      "category": "chat",
+      "inputPrice": 1.2,
+      "outputPrice": 4.8,
+      "contextWindow": 128000,
+      "status": "可用",
+      "tags": ["通用", "低成本"]
+    },
+    {
+      "id": "anthropic/claude-3.5-sonnet",
+      "provider": "Anthropic",
+      "name": "Claude 3.5 Sonnet",
+      "category": "chat",
+      "inputPrice": 4.5,
+      "outputPrice": 22,
+      "contextWindow": 200000,
+      "status": "可用",
+      "tags": ["长文本", "剧本"]
+    },
+    {
+      "id": "google/gemini-2.0-flash",
+      "provider": "Google",
+      "name": "Gemini 2.0 Flash",
+      "category": "chat",
+      "inputPrice": 0.8,
+      "outputPrice": 3.2,
+      "contextWindow": 1000000,
+      "status": "可用",
+      "tags": ["多模态", "高速"]
+    },
+    {
+      "id": "alibaba/qwen-max",
+      "provider": "通义千问",
+      "name": "Qwen Max",
+      "category": "chat",
+      "inputPrice": 2.4,
+      "outputPrice": 9.6,
+      "contextWindow": 32000,
+      "status": "可用",
+      "tags": ["中文", "合规"]
+    },
+    {
+      "id": "baidu/ernie-4.0",
+      "provider": "文心一言",
+      "name": "ERNIE 4.0",
+      "category": "chat",
+      "inputPrice": 3,
+      "outputPrice": 12,
+      "contextWindow": 128000,
+      "status": "可用",
+      "tags": ["备案", "政务"]
+    },
+    {
+      "id": "deepseek/deepseek-v3",
+      "provider": "DeepSeek",
+      "name": "DeepSeek V3",
+      "category": "chat",
+      "inputPrice": 1,
+      "outputPrice": 2,
+      "contextWindow": 64000,
+      "status": "可用",
+      "tags": ["推理", "性价比"]
+    },
+    {
+      "id": "bytedance/doubao-pro",
+      "provider": "豆包",
+      "name": "Doubao Pro",
+      "category": "chat",
+      "inputPrice": 1.5,
+      "outputPrice": 6,
+      "contextWindow": 128000,
+      "status": "限流",
+      "tags": ["投放", "素材"]
+    },
+    {
+      "id": "xian-drama/script-v1",
+      "provider": "西安中心",
+      "name": "微短剧剧本助手 V1",
+      "category": "chat",
+      "inputPrice": 0.6,
+      "outputPrice": 2.4,
+      "contextWindow": 32000,
+      "status": "可用",
+      "tags": ["垂类", "分集大纲"]
+    },
+    {
+      "id": "openai/text-embedding-3-small",
+      "provider": "OpenAI",
+      "name": "Embedding 3 Small",
+      "category": "embedding",
+      "inputPrice": 0.2,
+      "outputPrice": 0,
+      "contextWindow": 8192,
+      "status": "可用",
+      "tags": ["检索", "RAG"]
+    },
+    {
+      "id": "runway/gen-3-alpha",
+      "provider": "Runway",
+      "name": "Gen-3 Alpha",
+      "category": "video",
+      "inputPrice": 48,
+      "outputPrice": 0,
+      "contextWindow": 0,
+      "status": "维护",
+      "tags": ["视频生成", "预告片"]
+    }
+  ],
+  "tokenPackages": [
+    {
+      "id": "PKG-STARTER",
+      "name": "入门包",
+      "tokens": 50000,
+      "price": 49,
+      "bonus": 0,
+      "desc": "适合小团队试用，覆盖剧本辅助与合规预检"
+    },
+    {
+      "id": "PKG-STANDARD",
+      "name": "标准包",
+      "tokens": 200000,
+      "price": 179,
+      "bonus": 20000,
+      "popular": true,
+      "desc": "五大中心日常运营推荐，含 10% 赠送额度"
+    },
+    {
+      "id": "PKG-PRO",
+      "name": "专业包",
+      "tokens": 1000000,
+      "price": 799,
+      "bonus": 150000,
+      "desc": "多模型并行调用，适合译制与素材产线"
+    },
+    {
+      "id": "PKG-ENTERPRISE",
+      "name": "企业包",
+      "tokens": 5000000,
+      "price": 3499,
+      "bonus": 1000000,
+      "desc": "统一结算、专属路由，支持私有化模型接入"
+    }
+  ],
+  "tokenWallet": {
+    "balance": 128400,
+    "usedThisMonth": 45600,
+    "monthlyQuota": 200000,
+    "apiKey": "xd-center-sk-live-demo-8f3a2b1c",
+    "transactions": [
+      {
+        "id": "TX-20260720-001",
+        "type": "充值",
+        "amount": 220000,
+        "balance": 128400,
+        "note": "购买标准包（含赠送 20,000）",
+        "createdAt": "2026-07-20"
+      },
+      {
+        "id": "TX-20260721-002",
+        "type": "消耗",
+        "amount": -12400,
+        "balance": 108400,
+        "model": "anthropic/claude-3.5-sonnet",
+        "note": "审批中心 · 备案材料智能预检",
+        "createdAt": "2026-07-21"
+      },
+      {
+        "id": "TX-20260722-003",
+        "type": "消耗",
+        "amount": -8600,
+        "balance": 99800,
+        "model": "xian-drama/script-v1",
+        "note": "AI 研发 · 分集大纲批量生成",
+        "createdAt": "2026-07-22"
+      },
+      {
+        "id": "TX-20260722-004",
+        "type": "消耗",
+        "amount": -15200,
+        "balance": 84600,
+        "model": "alibaba/qwen-max",
+        "note": "出海中心 · 多语种译制字幕",
+        "createdAt": "2026-07-22"
+      },
+      {
+        "id": "TX-20260723-005",
+        "type": "充值",
+        "amount": 43800,
+        "balance": 128400,
+        "note": "购买入门包补充额度",
+        "createdAt": "2026-07-23"
+      }
+    ]
+  }
 }

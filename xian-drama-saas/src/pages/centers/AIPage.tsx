@@ -1,10 +1,20 @@
+import { Link } from "react-router-dom";
 import { useCenterStore } from "../../store/centerStore";
 
 export default function AIPage() {
-  const { ais } = useCenterStore();
+  const { ais, tokenWallet } = useCenterStore();
 
   return (
     <div className="grid" style={{ gap: "1rem" }}>
+      <div className="card token-ai-banner">
+        <div>
+          <strong>AI 产线 Token 消耗</strong>
+          <p>本月已用 {(tokenWallet.usedThisMonth / 1000).toFixed(1)}k Tokens，通过统一 API 网关调用多模型。</p>
+        </div>
+        <Link className="btn btn-primary" to="/center/console/tokens">
+          充值 / 查看模型目录
+        </Link>
+      </div>
       <div className="grid grid-4">
         {["剧本辅助", "译制提速", "素材工厂", "合规辅助"].map((line) => (
           <div className="card" key={line}>

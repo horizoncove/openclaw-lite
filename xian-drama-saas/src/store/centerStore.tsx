@@ -16,6 +16,7 @@ import type {
   CenterState,
   CenterUser,
   OverseasProject,
+  TokenWallet,
   WorkOrder,
 } from "../types";
 import { CENTER_ROLE_LABEL } from "../types";
@@ -31,6 +32,8 @@ type CenterStore = CenterState & {
   updateOverseas: (id: string, patch: Partial<OverseasProject>) => Promise<void>;
   upsertOrder: (o: WorkOrder) => Promise<void>;
   resetDemo: () => Promise<void>;
+  purchaseTokens: (packageId: string) => Promise<void>;
+  regenerateApiKey: () => Promise<void>;
 };
 
 const Ctx = createContext<CenterStore | null>(null);
@@ -150,6 +153,46 @@ export function CenterStoreProvider({ children }: { children: ReactNode }) {
           setState((s) => ({ ...data, user: s.user }));
         } else {
           setState((s) => ({ ...centerSeed(), user: s.user }));
+        }
+      },
+      purchaseTokens: async (packageId) => {
+        if (apiOnline) {
+          const data = await centerApi.tokens.purchase(packageId);
+          setState((s) => ({
+            ...s,
+            tokenWallet: data.tokenWallet,
+            tokenModels: data.tokenModels,
+            tokenPackages: data.tokenPackages,
+          }));
+        } else {
+          const pkg = state.tokenPackages.find((p) => p.id === packageId);
+          if (!pkg) return;
+          const credit = pkg.tokens + (pkg.bonus ?? 0);
+          const wallet: TokenWallet = structuredClone(state.tokenWallet);
+          wallet.balance += credit;
+          wallet.transactions.unshift({
+            id: `TX-${Date.now()}`,
+            type: "充值",
+            amount: credit,
+            balance: wallet.balance,
+            note: `购买${pkg.name}`,
+            createdAt: new Date().toISOString().slice(0, 10),
+          });
+          setState((s) => ({ ...s, tokenWallet: wallet }));
+        }
+      },
+      regenerateApiKey: async () => {
+        if (apiOnline) {
+          const data = await centerApi.tokens.regenerateKey();
+          setState((s) => ({ ...s, tokenWallet: data.tokenWallet }));
+        } else {
+          setState((s) => ({
+            ...s,
+            tokenWallet: {
+              ...s.tokenWallet,
+              apiKey: `xd-center-sk-${Math.random().toString(36).slice(2, 10)}`,
+            },
+          }));
         }
       },
     }),

@@ -120,3 +120,9 @@ CREATE INDEX IF NOT EXISTS idx_members_status ON members(status);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON work_orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_center ON work_orders(center);
 CREATE INDEX IF NOT EXISTS idx_overseas_stage ON overseas_projects(stage);
+
+CREATE TABLE IF NOT EXISTS center_extras (
+  key VARCHAR(50) PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);

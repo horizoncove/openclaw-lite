@@ -56,7 +56,7 @@ export default function LandingPage() {
               <Bot size={18} />
             </div>
             <h3>五大中心侧</h3>
-            <p>审批、出海、发行投流、版权、AI 研发运营与中心工单</p>
+            <p>审批、出海、发行投流、版权、AI 研发 · 全景看板 · Token 聚合 API</p>
             <Link className="btn btn-secondary" to="/center/login">
               进入中心 →
             </Link>
@@ -75,7 +75,7 @@ export default function LandingPage() {
         </a>
       </section>
 
-      <footer className="landing-foot">西安微短剧产业服务中心 · 双入口 SaaS V1.2</footer>
+      <footer className="landing-foot">西安微短剧产业服务中心 · 双入口 SaaS V1.4</footer>
     </div>
   );
 }

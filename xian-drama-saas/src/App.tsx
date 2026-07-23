@@ -19,8 +19,10 @@ import MemberEventsPage from "./pages/alliance/member/MemberEventsPage";
 import MemberNeedsPage from "./pages/alliance/member/MemberNeedsPage";
 import MemberServicesPage from "./pages/alliance/member/MemberServicesPage";
 import CenterDashboard from "./pages/centers/CenterDashboard";
+import CenterPanoramaPage from "./pages/centers/CenterPanoramaPage";
 import CenterOrdersPage from "./pages/centers/CenterOrdersPage";
 import CenterKpiPage from "./pages/centers/CenterKpiPage";
+import TokenHubPage from "./pages/centers/TokenHubPage";
 import ApprovalPage from "./pages/centers/ApprovalPage";
 import OverseasPage from "./pages/centers/OverseasPage";
 import DistributionPage from "./pages/centers/DistributionPage";
@@ -67,6 +69,8 @@ export default function App() {
       <Route element={<RequireCenterAuth />}>
         <Route path="/center/console" element={<CenterLayout />}>
           <Route index element={<CenterDashboard />} />
+          <Route path="panorama" element={<CenterPanoramaPage />} />
+          <Route path="tokens" element={<TokenHubPage />} />
           <Route path="approval" element={<ApprovalPage />} />
           <Route path="overseas" element={<OverseasPage />} />
           <Route path="distribution" element={<DistributionPage />} />
