@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>西安微短剧产业服务中心 · 运营 SaaS 演示手册</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1512;
+      --muted: #5c534c;
+      --line: #e7e0d6;
+      --brand: #9a3412;
+      --navy: #1e3a5f;
+      --bg: #f7f3ee;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Noto Sans SC", sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 18px 60px; }
+    .hero {
+      background: linear-gradient(135deg, #172554, #9a3412);
+      color: #fff;
+      border-radius: 18px;
+      padding: 28px 24px;
+      margin-bottom: 22px;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 8px;
+    }
+    .hero p { opacity: 0.9; max-width: 40em; }
+    .note {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-left: 4px solid var(--brand);
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin: 16px 0 24px;
+      color: #7c2d12;
+      font-size: 0.95rem;
+    }
+    .toc {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 28px;
+    }
+    .toc h2 { font-family: "Noto Serif SC", serif; color: var(--navy); font-size: 1.1rem; margin-bottom: 8px; }
+    .toc ol { padding-left: 1.2rem; }
+    .toc a { color: var(--brand); text-decoration: none; }
+    .step {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 22px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .step h3 {
+      font-family: "Noto Serif SC", serif;
+      color: var(--navy);
+      font-size: 1.15rem;
+      margin-bottom: 6px;
+    }
+    .step .desc { color: var(--muted); margin-bottom: 12px; font-size: 0.95rem; }
+    .step img {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      display: block;
+      background: #eee;
+    }
+    .tag {
+      display: inline-block;
+      background: #fff7ed;
+      color: var(--brand);
+      border: 1px solid #fed7aa;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.78rem;
+      margin-bottom: 8px;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+    .actions a {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: var(--brand);
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .actions a.secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    @media print {
+      body { background: #fff; }
+      .wrap { max-width: none; padding: 0; }
+      .hero { break-after: page; }
+      .step { break-after: page; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>运营 SaaS 演示手册</h1>
+      <p>联盟运行 SaaS + 五大中心运营 SaaS。本页含完整界面截图，无需启动服务即可查看演示效果。</p>
+    </section>
+
+    <div class="note">
+      <strong>说明：</strong>云端开发环境的本地地址（如 localhost:5173）在您的电脑上无法直接打开。
+      请通过本演示手册 / 下方 PDF 查看界面；若要交互操作，请在本地执行
+      <code>cd xian-drama-saas && npm install && npm run dev</code>。
+    </div>
+
+    <section class="toc">
+      <h2>演示目录</h2>
+      <ol>
+        <li><a href="#s1">登录选角色</a></li>
+        <li><a href="#s2">运营总览</a></li>
+        <li><a href="#s3">工单中枢</a></li>
+        <li><a href="#s4">联盟 · 会员管理</a></li>
+        <li><a href="#s5">联盟 · 供需撮合</a></li>
+        <li><a href="#s6">审批中心</a></li>
+        <li><a href="#s7">出海中心</a></li>
+        <li><a href="#s8">发行投流中心</a></li>
+        <li><a href="#s9">版权中心</a></li>
+        <li><a href="#s10">AI 研发中心</a></li>
+        <li><a href="#s11">KPI 看板</a></li>
+      </ol>
+      <div class="actions">
+        <a href="./saas-demo.pdf">下载演示 PDF</a>
+        <a class="secondary" href="../README.md">查看启动说明</a>
+      </div>
+    </section>
+
+    <article class="step" id="s1">
+      <div class="tag">STEP 01</div>
+      <h3>登录选角色</h3>
+      <p class="desc">进入系统后选择角色：主任办、联盟秘书处，或审批/出海/发行投流/版权/AI 五大中心。</p>
+      <img src="./screens/01-login.png" alt="登录页" />
+    </article>
+
+    <article class="step" id="s2">
+      <div class="tag">STEP 02</div>
+      <h3>运营总览</h3>
+      <p class="desc">总控看板展示会员、工单、出海项目、活动等关键指标，并汇总五大中心负荷。</p>
+      <img src="./screens/02-dashboard.png" alt="运营总览" />
+    </article>
+
+    <article class="step" id="s3">
+      <div class="tag">STEP 03</div>
+      <h3>工单中枢</h3>
+      <p class="desc">跨中心工单统一受理：可搜索、筛选、改状态、新建工单（演示含备案预检/出海诊断/发行体检）。</p>
+      <img src="./screens/03-orders.png" alt="工单中枢" />
+    </article>
+
+    <article class="step" id="s4">
+      <div class="tag">STEP 04 · 联盟</div>
+      <h3>会员管理</h3>
+      <p class="desc">核心/专业/观察会员分层管理，支持标签、状态流转与新增会员。</p>
+      <img src="./screens/04-alliance-members.png" alt="会员管理" />
+    </article>
+
+    <article class="step" id="s5">
+      <div class="tag">STEP 05 · 联盟</div>
+      <h3>供需撮合</h3>
+      <p class="desc">登记需求与供给，跟踪撮合状态（开放/撮合中/已成交）。</p>
+      <img src="./screens/05-alliance-matching.png" alt="供需撮合" />
+    </article>
+
+    <article class="step" id="s6">
+      <div class="tag">STEP 06 · 中心</div>
+      <h3>审批中心</h3>
+      <p class="desc">备案预检流水线：收件→预检→会诊→出具意见→送审，风险分级可视。</p>
+      <img src="./screens/06-approval.png" alt="审批中心" />
+    </article>
+
+    <article class="step" id="s7">
+      <div class="tag">STEP 07 · 中心</div>
+      <h3>出海中心</h3>
+      <p class="desc">出海项目漏斗：选品 / 译制 / 谈判 / 上线，支持目标市场与评分。</p>
+      <img src="./screens/07-overseas.png" alt="出海中心" />
+    </article>
+
+    <article class="step" id="s8">
+      <div class="tag">STEP 08 · 中心</div>
+      <h3>发行投流中心</h3>
+      <p class="desc">发行体检与投放阶段管理：体检 / 冷启动 / 放量 / 复盘。</p>
+      <img src="./screens/08-distribution.png" alt="发行投流" />
+    </article>
+
+    <article class="step" id="s9">
+      <div class="tag">STEP 09 · 中心</div>
+      <h3>版权中心</h3>
+      <p class="desc">确权、登记辅导、授权、维权台账统一管理。</p>
+      <img src="./screens/09-copyright.png" alt="版权中心" />
+    </article>
+
+    <article class="step" id="s10">
+      <div class="tag">STEP 10 · 中心</div>
+      <h3>AI 研发中心</h3>
+      <p class="desc">四条产线接入状态与效率提升：剧本辅助、译制提速、素材工厂、合规辅助。</p>
+      <img src="./screens/10-ai.png" alt="AI研发" />
+    </article>
+
+    <article class="step" id="s11">
+      <div class="tag">STEP 11</div>
+      <h3>KPI 看板</h3>
+      <p class="desc">季度目标进度与运行健康度，口径对齐汇报方案附件 G。</p>
+      <img src="./screens/11-kpi.png" alt="KPI看板" />
+    </article>
+  </div>
+</body>
+</html>
