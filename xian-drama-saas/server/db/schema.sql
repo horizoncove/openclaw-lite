@@ -1,0 +1,122 @@
+-- 西安微短剧产业服务中心 · 运营 SaaS 数据库结构
+-- PostgreSQL 16+
+
+CREATE TABLE IF NOT EXISTS schema_migrations (
+  version INTEGER PRIMARY KEY,
+  applied_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS users (
+  id VARCHAR(32) PRIMARY KEY,
+  username VARCHAR(100) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL DEFAULT '',
+  name VARCHAR(100) NOT NULL,
+  role VARCHAR(50) NOT NULL,
+  org VARCHAR(200) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS members (
+  id VARCHAR(32) PRIMARY KEY,
+  name VARCHAR(200) NOT NULL,
+  tier VARCHAR(50) NOT NULL,
+  type VARCHAR(100) NOT NULL,
+  tags JSONB NOT NULL DEFAULT '[]',
+  contact VARCHAR(100) NOT NULL,
+  phone VARCHAR(50) NOT NULL DEFAULT '',
+  status VARCHAR(20) NOT NULL DEFAULT '待审',
+  joined_at DATE NOT NULL,
+  city VARCHAR(100) NOT NULL DEFAULT '西安',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS events (
+  id VARCHAR(32) PRIMARY KEY,
+  title VARCHAR(300) NOT NULL,
+  event_date DATE NOT NULL,
+  place VARCHAR(300) NOT NULL,
+  type VARCHAR(50) NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  capacity INTEGER NOT NULL DEFAULT 0,
+  enrolled INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS matches (
+  id VARCHAR(32) PRIMARY KEY,
+  org VARCHAR(200) NOT NULL,
+  need TEXT NOT NULL,
+  offer TEXT NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT '开放',
+  owner VARCHAR(100) NOT NULL,
+  updated_at DATE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS work_orders (
+  id VARCHAR(32) PRIMARY KEY,
+  product VARCHAR(200) NOT NULL,
+  center VARCHAR(50) NOT NULL,
+  org VARCHAR(200) NOT NULL,
+  contact VARCHAR(100) NOT NULL,
+  priority VARCHAR(10) NOT NULL DEFAULT '中',
+  status VARCHAR(20) NOT NULL DEFAULT '新建',
+  assignee VARCHAR(100) NOT NULL,
+  created_at DATE NOT NULL,
+  due_at DATE NOT NULL,
+  summary TEXT NOT NULL DEFAULT '',
+  created_ts TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS approvals (
+  id VARCHAR(32) PRIMARY KEY,
+  title VARCHAR(300) NOT NULL,
+  org VARCHAR(200) NOT NULL,
+  risk VARCHAR(10) NOT NULL DEFAULT '低',
+  stage VARCHAR(50) NOT NULL,
+  result VARCHAR(50),
+  updated_at DATE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS overseas_projects (
+  id VARCHAR(32) PRIMARY KEY,
+  title VARCHAR(300) NOT NULL,
+  market VARCHAR(100) NOT NULL,
+  stage VARCHAR(50) NOT NULL,
+  score INTEGER NOT NULL DEFAULT 0,
+  owner VARCHAR(100) NOT NULL,
+  updated_at DATE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS distributions (
+  id VARCHAR(32) PRIMARY KEY,
+  title VARCHAR(300) NOT NULL,
+  platform VARCHAR(200) NOT NULL,
+  budget VARCHAR(100) NOT NULL,
+  stage VARCHAR(50) NOT NULL,
+  roi VARCHAR(50),
+  owner VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS copyrights (
+  id VARCHAR(32) PRIMARY KEY,
+  title VARCHAR(300) NOT NULL,
+  type VARCHAR(50) NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  org VARCHAR(200) NOT NULL,
+  updated_at DATE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ai_projects (
+  id VARCHAR(32) PRIMARY KEY,
+  org VARCHAR(200) NOT NULL,
+  line VARCHAR(100) NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  lift VARCHAR(100),
+  owner VARCHAR(100) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_members_status ON members(status);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON work_orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_center ON work_orders(center);
+CREATE INDEX IF NOT EXISTS idx_overseas_stage ON overseas_projects(stage);

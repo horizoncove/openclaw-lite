@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>西安微短剧产业服务中心</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@500;600;700&family=ZCOOL+XiaoWei&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #1a1512;
+        --ink-soft: #3d342e;
+        --mist: #f2ebe3;
+        --cinnabar: #c45c26;
+        --cinnabar-deep: #9a3f16;
+        --bronze: #d4a017;
+        --film: #0e1a22;
+        --paper: #faf7f2;
+        --line: rgba(26, 21, 18, 0.12);
+        --font-brand: "ZCOOL XiaoWei", "Noto Serif SC", serif;
+        --font-display: "Noto Serif SC", serif;
+        --font-body: "Noto Sans SC", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      @page {
+        size: A4;
+        margin: 14mm 12mm;
+      }
+
+      body {
+        font-family: var(--font-body);
+        color: var(--ink);
+        background: #fff;
+        line-height: 1.7;
+        font-size: 11pt;
+      }
+
+      .page {
+        page-break-after: always;
+        break-after: page;
+      }
+
+      .page:last-child {
+        page-break-after: auto;
+      }
+
+      /* Cover */
+      .cover {
+        min-height: 260mm;
+        background:
+          linear-gradient(
+            135deg,
+            rgba(14, 26, 34, 0.92) 0%,
+            rgba(26, 21, 18, 0.75) 55%,
+            rgba(196, 92, 38, 0.55) 100%
+          ),
+          url("https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&w=1600&q=80")
+            center / cover;
+        color: var(--mist);
+        padding: 28mm 16mm 20mm;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+
+      .cover-eyebrow {
+        font-size: 10pt;
+        letter-spacing: 0.28em;
+        color: #e8c56a;
+        margin-bottom: 12mm;
+      }
+
+      .cover h1 {
+        font-family: var(--font-brand);
+        font-size: 28pt;
+        letter-spacing: 0.1em;
+        line-height: 1.25;
+        margin-bottom: 8mm;
+      }
+
+      .cover .headline {
+        font-family: var(--font-display);
+        font-size: 13pt;
+        letter-spacing: 0.12em;
+        margin-bottom: 4mm;
+      }
+
+      .cover .lead {
+        font-weight: 300;
+        max-width: 36em;
+        opacity: 0.88;
+        margin-bottom: 14mm;
+      }
+
+      .cover-meta {
+        border-top: 1px solid rgba(242, 235, 227, 0.25);
+        padding-top: 6mm;
+        font-size: 9pt;
+        letter-spacing: 0.08em;
+        opacity: 0.75;
+      }
+
+      /* Inner pages */
+      .inner {
+        padding: 6mm 2mm;
+      }
+
+      .label {
+        font-size: 8pt;
+        letter-spacing: 0.28em;
+        color: var(--cinnabar);
+        margin-bottom: 3mm;
+      }
+
+      h2 {
+        font-family: var(--font-display);
+        font-size: 18pt;
+        letter-spacing: 0.06em;
+        margin-bottom: 3mm;
+      }
+
+      .desc {
+        color: var(--ink-soft);
+        font-weight: 300;
+        max-width: 40em;
+        margin-bottom: 8mm;
+      }
+
+      h3 {
+        font-family: var(--font-display);
+        font-size: 13pt;
+        letter-spacing: 0.06em;
+        margin: 6mm 0 2mm;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8mm;
+        align-items: start;
+      }
+
+      .visual {
+        aspect-ratio: 4/3;
+        overflow: hidden;
+        background: #ddd;
+      }
+
+      .visual img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .points {
+        list-style: none;
+      }
+
+      .points li {
+        border-top: 1px solid var(--line);
+        padding: 3mm 0;
+        display: grid;
+        grid-template-columns: 22mm 1fr;
+        gap: 3mm;
+      }
+
+      .points strong {
+        font-family: var(--font-display);
+        color: var(--cinnabar-deep);
+        font-size: 10pt;
+      }
+
+      .points span {
+        color: var(--ink-soft);
+        font-weight: 300;
+        font-size: 10pt;
+      }
+
+      /* Centers */
+      .center-block {
+        border-top: 1px solid var(--line);
+        padding: 4mm 0;
+      }
+
+      .center-block:first-of-type {
+        border-top: none;
+      }
+
+      .center-en {
+        font-size: 8pt;
+        letter-spacing: 0.2em;
+        color: var(--bronze);
+        text-transform: uppercase;
+        margin-bottom: 2mm;
+      }
+
+      .center-block p {
+        color: var(--ink-soft);
+        font-weight: 300;
+        font-size: 10pt;
+        margin-bottom: 2.5mm;
+      }
+
+      .services {
+        list-style: none;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5mm 4mm;
+      }
+
+      .services li {
+        font-size: 9.5pt;
+        padding-left: 4mm;
+        position: relative;
+      }
+
+      .services li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.55em;
+        width: 2.5mm;
+        height: 1px;
+        background: var(--cinnabar);
+      }
+
+      /* Journey */
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4mm;
+        margin-top: 6mm;
+      }
+
+      .step {
+        text-align: center;
+        padding: 4mm 2mm;
+        background: var(--mist);
+      }
+
+      .step .num {
+        font-family: var(--font-display);
+        color: var(--cinnabar-deep);
+        font-size: 11pt;
+        margin-bottom: 2mm;
+      }
+
+      .step h4 {
+        font-family: var(--font-display);
+        font-size: 11pt;
+        margin-bottom: 1.5mm;
+      }
+
+      .step p {
+        font-size: 8.5pt;
+        color: var(--ink-soft);
+        font-weight: 300;
+      }
+
+      /* Contact */
+      .contact-box {
+        background: var(--film);
+        color: var(--mist);
+        padding: 10mm 8mm;
+        margin-top: 6mm;
+      }
+
+      .contact-box .label {
+        color: #e8c56a;
+      }
+
+      .contact-box h2 {
+        color: var(--mist);
+      }
+
+      .contact-box .desc {
+        color: rgba(242, 235, 227, 0.75);
+      }
+
+      .meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4mm;
+        margin-top: 6mm;
+      }
+
+      .meta .item .k {
+        font-size: 8pt;
+        letter-spacing: 0.18em;
+        color: var(--bronze);
+        margin-bottom: 1mm;
+      }
+
+      .meta .item .v {
+        font-size: 11pt;
+        letter-spacing: 0.04em;
+      }
+
+      .footer-note {
+        margin-top: 8mm;
+        font-size: 8pt;
+        color: rgba(242, 235, 227, 0.5);
+        letter-spacing: 0.06em;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Cover -->
+    <section class="page cover">
+      <p class="cover-eyebrow">XI'AN · MICRO DRAMA INDUSTRY SERVICE CENTER</p>
+      <h1>西安微短剧产业服务中心</h1>
+      <p class="headline">以长安为原点，贯通创作、合规、发行与出海</p>
+      <p class="lead">
+        汇聚产业联盟与五大专业中心，为微短剧机构与创作者提供一站式产业服务。
+      </p>
+      <p class="cover-meta">
+        涵盖：产业联盟 · 短剧出海 · 审批中心 · 发行投流 · 版权服务 · AI 研发
+      </p>
+    </section>
+
+    <!-- Alliance -->
+    <section class="page inner">
+      <p class="label">ALLIANCE</p>
+      <h2>西安微短剧产业联盟</h2>
+      <p class="desc">
+        联接制作方、平台方、资本与技术伙伴，共建开放协同的产业共同体，让资源在长安汇聚、在全国流转。
+      </p>
+      <div class="two-col">
+        <div class="visual">
+          <img
+            src="https://images.unsplash.com/photo-1533929736458-ca588d08c8ba?auto=format&fit=crop&w=1200&q=80"
+            alt="西安古城"
+          />
+        </div>
+        <div>
+          <h3>开放共建 · 资源互通 · 标准共治</h3>
+          <p style="color: var(--ink-soft); font-weight: 300; margin-bottom: 4mm">
+            联盟面向西安及西部微短剧产业链上下游开放入驻，通过联席机制推动项目撮合、人才交流与标准共建。
+          </p>
+          <ul class="points">
+            <li>
+              <strong>成员网络</strong>
+              <span>制作公司、MCN、平台、投资机构与高校研究院所协同入盟。</span>
+            </li>
+            <li>
+              <strong>项目撮合</strong>
+              <span>定期路演与供需对接，加速优质 IP 与制作资源匹配。</span>
+            </li>
+            <li>
+              <strong>标准共建</strong>
+              <span>沉淀内容规范、数据口径与合作范本，降低协作成本。</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Five centers -->
+    <section class="page inner">
+      <p class="label">SERVICE HUBS</p>
+      <h2>五大专业服务中心</h2>
+      <p class="desc">
+        从合规到出海、从版权到智能创作，以专业中心协同交付，覆盖微短剧全生命周期。
+      </p>
+
+      <article class="center-block">
+        <h3>短剧出海服务中心</h3>
+        <p class="center-en">Global Distribution Hub</p>
+        <p>
+          对接海外平台与本地化团队，提供内容适配、合规翻译、渠道发行与收益结算，助力长安故事走向全球。
+        </p>
+        <ul class="services">
+          <li>海外平台入驻与发行对接</li>
+          <li>多语种字幕与本地化改编</li>
+          <li>跨境合规与内容评级咨询</li>
+          <li>海外投放与数据复盘支持</li>
+        </ul>
+      </article>
+
+      <article class="center-block">
+        <h3>审批中心</h3>
+        <p class="center-en">Content Compliance Center</p>
+        <p>
+          贯通备案辅导、材料预审与政策解读，缩短立项到上线周期，让创作团队把精力留给内容本身。
+        </p>
+        <ul class="services">
+          <li>微短剧备案辅导与材料预审</li>
+          <li>内容合规风险提示</li>
+          <li>政策法规与窗口答疑</li>
+          <li>上线前合规复核支持</li>
+        </ul>
+      </article>
+
+      <article class="center-block">
+        <h3>发行投流中心</h3>
+        <p class="center-en">Release &amp; Growth Center</p>
+        <p>
+          整合宣发资源与精准投流能力，覆盖国内主流短视频与微短剧平台，提升作品曝光与转化效率。
+        </p>
+        <ul class="services">
+          <li>全网宣发策略与排期</li>
+          <li>精准投流与素材优化</li>
+          <li>达人矩阵与热点借势</li>
+          <li>发行数据看板与复盘</li>
+        </ul>
+      </article>
+
+      <article class="center-block">
+        <h3>版权服务中心</h3>
+        <p class="center-en">Copyright Service Center</p>
+        <p>
+          从确权存证到授权交易，构建微短剧版权全链条服务，守护原创价值、畅通交易通道。
+        </p>
+        <ul class="services">
+          <li>作品确权与区块链存证</li>
+          <li>版权登记辅导</li>
+          <li>授权交易与合同范本</li>
+          <li>侵权监测与维权协助</li>
+        </ul>
+      </article>
+
+      <article class="center-block">
+        <h3>AI 研发中心</h3>
+        <p class="center-en">AI Research &amp; Creation Lab</p>
+        <p>
+          面向剧本、分镜、配音与宣发素材，沉淀可用的 AI 工具链与行业模型，降低制作门槛、放大创作产能。
+        </p>
+        <ul class="services">
+          <li>AI 剧本辅助与分集结构化</li>
+          <li>智能分镜与素材生成</li>
+          <li>配音、配乐与字幕工具</li>
+          <li>行业模型训练与场景落地</li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- Process + Contact -->
+    <section class="page inner">
+      <p class="label">PROCESS</p>
+      <h2>服务流程</h2>
+      <p class="desc">清晰四步，让机构与创作者快速进入服务节奏。</p>
+      <div class="steps">
+        <div class="step">
+          <div class="num">01</div>
+          <h4>入驻对接</h4>
+          <p>提交项目或机构信息，匹配专属服务顾问。</p>
+        </div>
+        <div class="step">
+          <div class="num">02</div>
+          <h4>评估诊断</h4>
+          <p>从内容、合规、版权与发行路径做专项评估。</p>
+        </div>
+        <div class="step">
+          <div class="num">03</div>
+          <h4>中心协同</h4>
+          <p>按需联动出海、审批、投流、版权与 AI 能力。</p>
+        </div>
+        <div class="step">
+          <div class="num">04</div>
+          <h4>落地交付</h4>
+          <p>跟踪上线与数据表现，持续优化迭代。</p>
+        </div>
+      </div>
+
+      <div class="contact-box">
+        <p class="label">CONTACT</p>
+        <h2>入驻与业务对接</h2>
+        <p class="desc">
+          无论您是制作机构、平台方还是创作者，欢迎联系我们。我们将在 1–2
+          个工作日内与您对接。
+        </p>
+        <div class="meta">
+          <div class="item">
+            <div class="k">服务热线</div>
+            <div class="v">029-8888 6600</div>
+          </div>
+          <div class="item">
+            <div class="k">商务邮箱</div>
+            <div class="v">service@xadrama.cn</div>
+          </div>
+          <div class="item">
+            <div class="k">中心地址</div>
+            <div class="v">陕西省西安市 · 曲江新区文化产业园区</div>
+          </div>
+          <div class="item">
+            <div class="k">意向服务</div>
+            <div class="v">联盟入驻 / 出海 / 审批 / 投流 / 版权 / AI</div>
+          </div>
+        </div>
+        <p class="footer-note">
+          © 2026 西安微短剧产业服务中心 · Xi'an Micro Short Drama Industry
+          Service Center
+        </p>
+      </div>
+    </section>
+  </body>
+</html>

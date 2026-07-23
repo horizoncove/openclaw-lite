@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<title>附件 E 数据安全与脱敏管理办法</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink:#1c1917; --muted:#57534e; --line:#d6d3d1; --bg:#fafaf9;
+  --accent:#9a3412; --accent-soft:#fed7aa; --blue:#1e3a5f; --ok:#166534; --warn:#92400e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+@page{size:A4;margin:14mm 12mm}
+body{font-family:"Noto Sans SC",sans-serif;color:var(--ink);font-size:10pt;line-height:1.6;padding:2mm}
+h1,h2,h3,h4{font-family:"Noto Serif SC",serif;font-weight:700;line-height:1.35}
+.section>h2, h2.doc-title{
+  font-size:15pt;color:var(--blue);border-bottom:2px solid var(--accent);
+  padding-bottom:2mm;margin-bottom:4mm;
+}
+h3{font-size:12pt;color:var(--accent);margin:5mm 0 2mm}
+h4{font-size:10.5pt;color:var(--blue);margin:3.5mm 0 1.5mm}
+p{margin-bottom:2mm}
+ul,ol{padding-left:5mm;margin-bottom:2.5mm}
+li{margin-bottom:1mm}
+.lead{background:var(--bg);border-left:3px solid var(--accent);padding:3mm 3.5mm;margin:2.5mm 0 4mm;color:var(--muted)}
+table{width:100%;border-collapse:collapse;margin:2.5mm 0 4mm;font-size:9pt}
+th,td{border:1px solid var(--line);padding:1.8mm 2mm;vertical-align:top;text-align:left}
+th{background:#f5f5f4;color:var(--blue);font-weight:600}
+.tag{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:8pt;padding:.3mm 1.8mm;margin-right:1mm}
+.muted{color:var(--muted)}
+.ok{color:var(--ok);font-weight:600}
+.warn{color:var(--warn);font-weight:600}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin:2mm 0}
+.card{border:1px solid var(--line);background:var(--bg);padding:2.5mm}
+.card h4{margin-top:0}
+.footer-note{margin-top:6mm;padding-top:2.5mm;border-top:1px solid var(--line);font-size:8pt;color:var(--muted)}
+.small{font-size:8.5pt}
+.meta{font-size:9pt;color:var(--muted);margin-bottom:4mm}
+</style>
+</head>
+<body>
+<p class="meta">西安微短剧产业服务中心建设汇报方案 · 附件 E · V1.0</p>
+<h2 class="doc-title">附件 E 数据安全与脱敏管理办法</h2>
+<h3>E.1 数据分类</h3>
+  <table>
+    <tr><th>级别</th><th>示例</th><th>访问</th><th>对外</th></tr>
+    <tr><td>L1 公开</td><td>活动通知、公开标准</td><td>全员</td><td>可公开</td></tr>
+    <tr><td>L2 内部</td><td>会员名录、工单统计</td><td>相关岗位</td><td>脱敏后可共享</td></tr>
+    <tr><td>L3 敏感</td><td>投放账户、分成合同、未上线剧本</td><td>最小必要</td><td>禁止公开</td></tr>
+    <tr><td>L4 高敏</td><td>证件、银行账户、未公开融资</td><td>主任办审批</td><td>禁止</td></tr>
+  </table>
+
+  <h3>E.2 脱敏规则（复盘库/简报）</h3>
+  <ul>
+    <li>不出现企业全称时可保留题材标签；出现名称须获授权；</li>
+    <li>投放数据只保留区间与相对指标（如 ROI 区间、CPM 区间）；</li>
+    <li>素材与成片链接默认 7–30 天失效，下载需登记；</li>
+    <li>出海合同关键商业条款默认 L3，仅项目组可见。</li>
+  </ul>
+
+  <h3>E.3 系统与行为规范</h3>
+  <ol>
+    <li>全员签订保密承诺；离职即回收权限；</li>
+    <li>工单系统开启操作日志，保存≥12 个月；</li>
+    <li>禁止微信群传输 L3/L4 原件，改用加密网盘+权限；</li>
+    <li>对外研究/媒体口径统一由主任办审定；</li>
+    <li>发生疑似泄露：2 小时内报告，24 小时内完成影响评估。</li>
+  </ol>
+</section>
+
+<!-- ===================== F ===================== -->
+</body>
+</html>

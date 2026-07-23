@@ -47,6 +47,9 @@ logs/
 *.pdf
 *.xlsx
 !examples/*.xlsx
+!xian-drama-center/*.pdf
+!xian-drama-center/docs/*.pdf
+!xian-drama-center/docs/attachments/*.pdf
 
 # OS
 .DS_Store
@@ -56,3 +59,5 @@ Thumbs.db
 tmp/
 temp/
 *.tmpproperty_saas.db
+
+!xian-drama-saas/demo/*.pdf
