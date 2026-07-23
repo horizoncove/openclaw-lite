@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>西安微短剧产业联盟服务中心 · 管理平台 SaaS+AI</title>
+  <meta name="description" content="西安微短剧产业联盟服务中心管理平台 — 贯通创作、合规、发行、出海与版权的一站式 SaaS+AI 产业操作系统" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc',
+              400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca',
+              800: '#3730a3', 900: '#312e81'
+            },
+            gold: {
+              400: '#e6c068', 500: '#d4af37', 600: '#b8941f'
+            }
+          },
+          fontFamily: {
+            sans: ['"PingFang SC"', '"Microsoft YaHei"', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-100 text-slate-700">
+  <!-- 登录页 -->
+  <div id="loginView" class="login-view">
+    <div class="login-aurora"></div>
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="login-logo">🎬</div>
+        <div>
+          <h1>西安微短剧产业联盟服务中心</h1>
+          <p>Xi'an Micro-Drama Industry Alliance · 管理平台 SaaS+AI</p>
+        </div>
+      </div>
+      <form id="loginForm" class="login-form">
+        <label>
+          <span>账号</span>
+          <input name="account" value="admin@xadrama.cn" placeholder="请输入账号" autocomplete="username" />
+        </label>
+        <label>
+          <span>密码</span>
+          <input name="password" type="password" value="xadrama" placeholder="请输入密码" autocomplete="current-password" />
+        </label>
+        <div class="login-row">
+          <label class="login-remember"><input type="checkbox" checked /> 记住我</label>
+          <a href="#" onclick="return false">忘记密码？</a>
+        </div>
+        <button type="submit" class="btn-primary w-full">登录管理平台</button>
+        <p class="login-tip">演示账号已预填，直接点击登录即可体验全部功能</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- 主应用 -->
+  <div id="app" class="app hidden">
+    <!-- 侧边栏 -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo">🎬</div>
+        <div class="sidebar-title">
+          <strong>微短剧联盟</strong>
+          <span>SaaS · AI 产业平台</span>
+        </div>
+      </div>
+      <nav id="navMenu" class="sidebar-nav"></nav>
+      <div class="sidebar-ai-card" id="aiEntryCard" onclick="location.hash='#/ai'">
+        <div class="sidebar-ai-pulse"></div>
+        <div>
+          <strong>AI 产业助手</strong>
+          <span>剧本 / 合规 / 投流 / 复盘 一键直达</span>
+        </div>
+        <span class="sidebar-ai-arrow">→</span>
+      </div>
+      <div class="sidebar-foot">
+        <div class="sidebar-user">
+          <div class="avatar">管</div>
+          <div>
+            <strong>管理员</strong>
+            <span>超级管理员</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 主区域 -->
+    <div class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="menuToggle" class="icon-btn only-mobile" aria-label="菜单">☰</button>
+          <div id="pageCrumb" class="page-crumb">仪表盘</div>
+        </div>
+        <div class="topbar-right">
+          <div class="global-search">
+            <span>🔍</span>
+            <input id="globalSearch" placeholder="搜索项目 / 成员 / 作品…" />
+          </div>
+          <button class="icon-btn" title="AI 助手" onclick="location.hash='#/ai'">✨</button>
+          <button class="icon-btn has-dot" title="通知">🔔<i></i></button>
+          <button class="icon-btn" title="帮助">❓</button>
+        </div>
+      </header>
+      <main id="view" class="view"></main>
+      <footer class="app-foot">
+        <span>© <span id="year"></span> 西安微短剧产业联盟服务中心 · 产业操作系统</span>
+        <span>v1.0 · SaaS + AI · 数据为演示用例</span>
+      </footer>
+    </div>
+    <div id="sidebarMask" class="sidebar-mask"></div>
+  </div>
+
+  <!-- Toast 容器 -->
+  <div id="toasts" class="toasts"></div>
+
+  <!-- 全局 AI 抽屉 -->
+  <div id="aiDrawer" class="ai-drawer">
+    <div class="ai-drawer-head">
+      <div class="ai-drawer-title">
+        <span class="ai-spark">✨</span> AI 产业助手
+        <button class="ai-drawer-close" onclick="App.aiDrawer(false)">×</button>
+      </div>
+      <div class="ai-drawer-sub">剧本创作 · 合规审核 · 宣发文案 · 数据复盘 · 智能问答</div>
+    </div>
+    <div id="aiDrawerBody" class="ai-drawer-body"></div>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/ai.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
