@@ -20,6 +20,11 @@ import {
   listAllianceOrders,
   upsertAllianceOrder,
   patchAllianceOrder,
+  listWorks,
+  upsertWork,
+  patchWork,
+  listVenues,
+  patchVenue,
   getCenterState,
   getCenterState,
   resetCenterState,
@@ -68,7 +73,7 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     service: "xian-drama-saas",
-    version: "1.4.0",
+    version: "1.5.0",
     storage: isPostgres() ? "postgresql" : "json",
     portals: ["alliance", "center"],
   });
@@ -115,6 +120,21 @@ app.get("/api/alliance/orders", asyncHandler(async (_req, res) => res.json(await
 app.post("/api/alliance/orders", asyncHandler(async (req, res) => res.json(await upsertAllianceOrder(req.body))));
 app.put("/api/alliance/orders/:id", asyncHandler(async (req, res) => {
   const item = await patchAllianceOrder(req.params.id, req.body);
+  if (!item) return res.status(404).json({ error: "未找到" });
+  res.json(item);
+}));
+
+app.get("/api/alliance/works", asyncHandler(async (_req, res) => res.json(await listWorks())));
+app.post("/api/alliance/works", asyncHandler(async (req, res) => res.json(await upsertWork(req.body))));
+app.put("/api/alliance/works/:id", asyncHandler(async (req, res) => {
+  const item = await patchWork(req.params.id, req.body);
+  if (!item) return res.status(404).json({ error: "未找到" });
+  res.json(item);
+}));
+
+app.get("/api/alliance/venues", asyncHandler(async (_req, res) => res.json(await listVenues())));
+app.put("/api/alliance/venues/:id", asyncHandler(async (req, res) => {
+  const item = await patchVenue(req.params.id, req.body);
   if (!item) return res.status(404).json({ error: "未找到" });
   res.json(item);
 }));

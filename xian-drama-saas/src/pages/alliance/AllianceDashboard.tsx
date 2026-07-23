@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useAllianceStore } from "../../store/allianceStore";
 
 export default function AllianceDashboard() {
-  const { members, orders, events, matches } = useAllianceStore();
+  const { members, orders, events, matches, works, venues } = useAllianceStore();
   const openOrders = orders.filter((o) => o.status !== "完结" && o.status !== "关闭");
 
   return (

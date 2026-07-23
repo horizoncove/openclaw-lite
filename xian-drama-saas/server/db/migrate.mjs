@@ -6,7 +6,7 @@ import { seedAlliance, seedCenter, resetAllianceState, resetCenterState } from "
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SCHEMA_VERSION = 2;
-const DATA_SEED_VERSION = 4;
+const DATA_SEED_VERSION = 5;
 
 async function applySchema() {
   const sql = readFileSync(join(__dirname, "schema.sql"), "utf8");
@@ -51,7 +51,7 @@ async function main() {
   const centerSeed = JSON.parse(readFileSync(join(__dirname, "..", "data", "center-seed.json"), "utf8"));
 
   if (await needsDataRefresh()) {
-    console.log("[migrate] refreshing rich demo data (v4)...");
+    console.log("[migrate] refreshing rich demo data (v5)...");
     await resetAllianceState(allianceSeed);
     await resetCenterState(centerSeed);
     await markDataRefresh();

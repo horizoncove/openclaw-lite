@@ -17,6 +17,8 @@ import type {
   EventItem,
   MatchNeed,
   Member,
+  MemberWork,
+  Venue,
   WorkOrder,
 } from "../types";
 import { ALLIANCE_ROLE_LABEL } from "../types";
@@ -34,6 +36,9 @@ type AllianceStore = AllianceState & {
   addMatch: (m: MatchNeed) => Promise<void>;
   updateMatch: (id: string, patch: Partial<MatchNeed>) => Promise<void>;
   upsertOrder: (o: WorkOrder) => Promise<void>;
+  upsertWork: (w: MemberWork) => Promise<void>;
+  updateWork: (id: string, patch: Partial<MemberWork>) => Promise<void>;
+  updateVenue: (id: string, patch: Partial<Venue>) => Promise<void>;
   resetDemo: () => Promise<void>;
 };
 
@@ -183,6 +188,55 @@ export function AllianceStoreProvider({ children }: { children: ReactNode }) {
               orders: exists ? s.orders.map((x) => (x.id === o.id ? o : x)) : [o, ...s.orders],
             };
           });
+        }
+      },
+      upsertWork: async (w) => {
+        if (apiOnline) {
+          const saved = state.works.some((x) => x.id === w.id)
+            ? await allianceApi.works.update(w.id, w)
+            : await allianceApi.works.save(w);
+          setState((s) => ({
+            ...s,
+            works: s.works.some((x) => x.id === w.id)
+              ? s.works.map((x) => (x.id === w.id ? saved : x))
+              : [saved, ...s.works],
+          }));
+        } else {
+          setState((s) => {
+            const exists = s.works.some((x) => x.id === w.id);
+            return {
+              ...s,
+              works: exists ? s.works.map((x) => (x.id === w.id ? w : x)) : [w, ...s.works],
+            };
+          });
+        }
+      },
+      updateWork: async (id, patch) => {
+        if (apiOnline) {
+          const saved = await allianceApi.works.update(id, patch);
+          setState((s) => ({
+            ...s,
+            works: s.works.map((x) => (x.id === id ? saved : x)),
+          }));
+        } else {
+          setState((s) => ({
+            ...s,
+            works: s.works.map((x) => (x.id === id ? { ...x, ...patch } : x)),
+          }));
+        }
+      },
+      updateVenue: async (id, patch) => {
+        if (apiOnline) {
+          const saved = await allianceApi.venues.update(id, patch);
+          setState((s) => ({
+            ...s,
+            venues: s.venues.map((x) => (x.id === id ? saved : x)),
+          }));
+        } else {
+          setState((s) => ({
+            ...s,
+            venues: s.venues.map((x) => (x.id === id ? { ...x, ...patch } : x)),
+          }));
         }
       },
       resetDemo: async () => {

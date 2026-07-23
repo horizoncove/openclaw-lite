@@ -248,13 +248,14 @@ export async function listOrders(portal = "all") {
 }
 
 export async function getAllianceState() {
-  const [members, events, matches, orders] = await Promise.all([
+  const [members, events, matches, orders, extras] = await Promise.all([
     listMembers(),
     listEvents(),
     listMatches(),
     listOrders("alliance"),
+    getAllianceExtras(),
   ]);
-  return { members, events, matches, orders };
+  return { members, events, matches, orders, ...extras };
 }
 
 export async function getCenterState() {
@@ -276,6 +277,8 @@ export async function resetAllianceState(seed) {
   await query("TRUNCATE members, events, matches CASCADE");
   await query("DELETE FROM work_orders WHERE center = '联盟'");
   await seedAlliance(seed);
+  if (seed.works) await saveAllianceExtras("works", seed.works);
+  if (seed.venues) await saveAllianceExtras("venues", seed.venues);
   return getAllianceState();
 }
 
@@ -433,6 +436,55 @@ export async function saveTokenWallet(wallet) {
     [JSON.stringify(wallet)]
   );
   return wallet;
+}
+
+export async function getAllianceExtras() {
+  const r = await query("SELECT key, data FROM alliance_extras WHERE key IN ('works', 'venues')");
+  const out = { works: [], venues: [] };
+  for (const row of r.rows) {
+    if (row.key === "works") out.works = row.data ?? [];
+    if (row.key === "venues") out.venues = row.data ?? [];
+  }
+  return out;
+}
+
+export async function saveAllianceExtras(key, data) {
+  await query(
+    `INSERT INTO alliance_extras (key, data) VALUES ($1, $2)
+     ON CONFLICT (key) DO UPDATE SET data = $2, updated_at = NOW()`,
+    [key, JSON.stringify(data)]
+  );
+  return data;
+}
+
+export async function upsertWork(item) {
+  const extras = await getAllianceExtras();
+  const works = extras.works ?? [];
+  const idx = works.findIndex((w) => w.id === item.id);
+  if (idx >= 0) works[idx] = item;
+  else works.unshift(item);
+  await saveAllianceExtras("works", works);
+  return item;
+}
+
+export async function patchWork(id, patch) {
+  const extras = await getAllianceExtras();
+  const works = extras.works ?? [];
+  const idx = works.findIndex((w) => w.id === id);
+  if (idx < 0) return null;
+  works[idx] = { ...works[idx], ...patch };
+  await saveAllianceExtras("works", works);
+  return works[idx];
+}
+
+export async function patchVenue(id, patch) {
+  const extras = await getAllianceExtras();
+  const venues = extras.venues ?? [];
+  const idx = venues.findIndex((v) => v.id === id);
+  if (idx < 0) return null;
+  venues[idx] = { ...venues[idx], ...patch };
+  await saveAllianceExtras("venues", venues);
+  return venues[idx];
 }
 
 export async function getStats() {

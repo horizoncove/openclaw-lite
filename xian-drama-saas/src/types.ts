@@ -54,6 +54,42 @@ export interface MatchNeed {
   updatedAt: string;
 }
 
+export type WorkGenre = "甜宠" | "逆袭" | "古装" | "悬疑" | "文旅" | "都市" | "校园";
+export type WorkStatus = "热播" | "筹备" | "已完结" | "待上线";
+
+export interface MemberWork {
+  id: string;
+  org: string;
+  title: string;
+  genre: WorkGenre;
+  episodes: number;
+  status: WorkStatus;
+  platform?: string;
+  coverColor: string;
+  summary: string;
+  playCount?: string;
+  featured: boolean;
+  updatedAt: string;
+}
+
+export type VenueType = "影棚" | "景区" | "文创园" | "演播厅";
+export type VenueStatus = "可预约" | "紧张" | "维护";
+
+export interface Venue {
+  id: string;
+  name: string;
+  district: string;
+  type: VenueType;
+  area: string;
+  price: string;
+  tags: string[];
+  contact: string;
+  phone: string;
+  featured: boolean;
+  status: VenueStatus;
+  summary: string;
+}
+
 export interface WorkOrder {
   id: string;
   product: string;
@@ -122,6 +158,8 @@ export interface AllianceState {
   events: EventItem[];
   matches: MatchNeed[];
   orders: WorkOrder[];
+  works: MemberWork[];
+  venues: Venue[];
 }
 
 export type TokenModelCategory = "chat" | "embedding" | "image" | "video";

@@ -572,3 +572,61 @@ tr:hover td { background: rgba(154, 52, 18, 0.03); }
   .token-package-grid { grid-template-columns: 1fr; }
   .panorama-hero, .token-hero { flex-direction: column; }
 }
+
+/* ── 联盟：作品展示 & 场地推荐 ── */
+.showcase-toolbar {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;
+}
+.showcase-actions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+.work-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;
+}
+.work-grid.compact { grid-template-columns: 1fr; gap: 0.75rem; }
+.work-card {
+  background: #fff; border: 1px solid #ccfbf1; border-radius: 14px; overflow: hidden;
+}
+.work-card.horizontal { display: flex; gap: 0; }
+.work-cover {
+  height: 120px; display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 0.65rem; color: #fff; position: relative;
+}
+.work-cover.sm { width: 88px; height: auto; min-height: 88px; flex-shrink: 0; align-items: center; justify-content: center; }
+.work-genre, .work-featured {
+  font-size: 0.72rem; padding: 0.15rem 0.45rem; border-radius: 99px; background: rgba(0,0,0,0.25);
+}
+.work-body { padding: 0.85rem 1rem 1rem; }
+.work-body h4 { margin: 0 0 0.2rem; font-family: var(--display); }
+.work-org { color: var(--muted); font-size: 0.82rem; margin: 0 0 0.35rem; }
+.work-summary { color: var(--muted); font-size: 0.85rem; margin: 0 0 0.5rem; line-height: 1.45; }
+.work-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; font-size: 0.78rem; color: var(--muted); align-items: center; }
+.venue-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+.venue-card {
+  position: relative; padding: 1rem; border-radius: 14px; border: 1px solid var(--line); background: #fff;
+}
+.venue-card.featured { border-color: #5eead4; background: #f0fdfa; }
+.venue-card-head { display: flex; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
+.venue-card-head h4 { margin: 0; font-family: var(--display); }
+.venue-card-head p { margin: 0.15rem 0 0; font-size: 0.82rem; color: var(--muted); }
+.venue-summary { font-size: 0.85rem; color: var(--muted); margin: 0 0 0.5rem; line-height: 1.45; }
+.venue-card-foot {
+  display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+  font-size: 0.82rem; color: var(--muted); flex-wrap: wrap;
+}
+.venue-card-foot strong { color: #0f766e; font-size: 0.95rem; }
+.venue-featured-badge {
+  position: absolute; top: 0.65rem; right: 0.65rem; font-size: 0.68rem;
+  padding: 0.12rem 0.4rem; border-radius: 99px; background: #0f766e; color: #fff;
+}
+.discover-hero { margin-bottom: 1rem; }
+.discover-section-head { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.75rem; color: #0f766e; }
+.discover-section-head h3 { margin: 0; color: var(--brand-2); }
+.member-quick-grid.secondary { margin-top: 0; grid-template-columns: repeat(2, 1fr); }
+.btn.featured-on { color: #0f766e; font-weight: 600; }
+@media (max-width: 1100px) {
+  .work-grid { grid-template-columns: repeat(2, 1fr); }
+  .venue-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .work-grid { grid-template-columns: 1fr; }
+  .member-quick-grid.secondary { grid-template-columns: 1fr; }
+}

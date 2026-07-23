@@ -9,6 +9,8 @@ import type {
   EventItem,
   MatchNeed,
   Member,
+  MemberWork,
+  Venue,
   OverseasProject,
   WorkOrder,
 } from "../types";
@@ -61,6 +63,16 @@ export const allianceApi = {
       request<WorkOrder>("/alliance/orders", { method: "POST", body: JSON.stringify(o) }),
     update: (id: string, patch: Partial<WorkOrder>) =>
       request<WorkOrder>(`/alliance/orders/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
+  },
+  works: {
+    save: (w: MemberWork) =>
+      request<MemberWork>("/alliance/works", { method: "POST", body: JSON.stringify(w) }),
+    update: (id: string, patch: Partial<MemberWork>) =>
+      request<MemberWork>(`/alliance/works/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
+  },
+  venues: {
+    update: (id: string, patch: Partial<Venue>) =>
+      request<Venue>(`/alliance/venues/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
   },
 };
 

@@ -126,3 +126,9 @@ CREATE TABLE IF NOT EXISTS center_extras (
   data JSONB NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS alliance_extras (
+  key VARCHAR(50) PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);

@@ -1,9 +1,6 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import * as jsonDb from "./db.mjs";
 import * as repo from "./db/repo.mjs";
 import { checkDb } from "./db/pool.mjs";
@@ -12,6 +9,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function loadCenterSeed() {
   return JSON.parse(readFileSync(join(__dirname, "data", "center-seed.json"), "utf8"));
+}
+
+function loadAllianceSeed() {
+  return JSON.parse(readFileSync(join(__dirname, "data", "alliance-seed.json"), "utf8"));
 }
 
 function mergeCenterExtras(base, seed) {
@@ -29,7 +30,13 @@ function mergeCenterExtras(base, seed) {
   };
 }
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+function mergeAllianceExtras(base, seed) {
+  return {
+    ...base,
+    works: base.works ?? seed.works ?? [],
+    venues: base.venues ?? seed.venues ?? [],
+  };
+}
 
 let usePostgres = null;
 
@@ -88,8 +95,13 @@ function upsertJsonList(portal, key, item) {
 // ── Alliance ──────────────────────────────────────────────
 
 export async function getAllianceState() {
-  if (usePostgres) return repo.getAllianceState();
-  return jsonDb.loadDb("alliance");
+  const seed = loadAllianceSeed();
+  if (usePostgres) {
+    const base = await repo.getAllianceState();
+    const extras = await repo.getAllianceExtras();
+    return mergeAllianceExtras({ ...base, ...extras }, seed);
+  }
+  return mergeAllianceExtras(jsonDb.loadDb("alliance"), seed);
 }
 
 export async function resetAllianceState() {
@@ -166,6 +178,31 @@ export async function upsertAllianceOrder(item) {
 export async function patchAllianceOrder(id, patch) {
   if (usePostgres) return repo.patchOrder(id, patch);
   return patchJson("alliance", "orders", id, patch);
+}
+
+export async function listWorks() {
+  const state = await getAllianceState();
+  return state.works;
+}
+
+export async function upsertWork(item) {
+  if (usePostgres) return repo.upsertWork(item);
+  return upsertJsonList("alliance", "works", item);
+}
+
+export async function patchWork(id, patch) {
+  if (usePostgres) return repo.patchWork(id, patch);
+  return patchJson("alliance", "works", id, patch);
+}
+
+export async function listVenues() {
+  const state = await getAllianceState();
+  return state.venues;
+}
+
+export async function patchVenue(id, patch) {
+  if (usePostgres) return repo.patchVenue(id, patch);
+  return patchJson("alliance", "venues", id, patch);
 }
 
 // ── Center ────────────────────────────────────────────────
