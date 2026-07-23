@@ -34,14 +34,20 @@ export default function AllianceLayout() {
   const { user, logout, resetDemo, apiOnline, loading } = useAllianceStore();
   const navFn = useNavigate();
   const loc = useLocation();
-  const title = titles[loc.pathname] ?? "联盟运行 SaaS";
+  const title = titles[loc.pathname] ?? "联盟秘书处";
+
+  if (user?.role === "member") {
+    navFn("/alliance/member", { replace: true });
+    return null;
+  }
 
   return (
-    <div className="app-shell">
-      <aside className="sidebar alliance-sidebar">
+    <div className="app-shell secretariat-shell">
+      <aside className="sidebar alliance-sidebar secretariat-sidebar">
         <div className="brand">
-          <h1>产业联盟</h1>
-          <p>会员 · 活动 · 撮合</p>
+          <p className="secretariat-badge">联盟秘书处</p>
+          <h1>运营工作台</h1>
+          <p>会员管理 · 活动 · 撮合 · 工单</p>
         </div>
         <nav className="nav">
           {nav.map((item) => (

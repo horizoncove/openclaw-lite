@@ -30,6 +30,8 @@ type AllianceStore = AllianceState & {
   logout: () => void;
   upsertMember: (m: Member) => Promise<void>;
   addEvent: (e: EventItem) => Promise<void>;
+  updateEvent: (id: string, patch: Partial<EventItem>) => Promise<void>;
+  addMatch: (m: MatchNeed) => Promise<void>;
   updateMatch: (id: string, patch: Partial<MatchNeed>) => Promise<void>;
   upsertOrder: (o: WorkOrder) => Promise<void>;
   resetDemo: () => Promise<void>;
@@ -124,6 +126,28 @@ export function AllianceStoreProvider({ children }: { children: ReactNode }) {
           setState((s) => ({ ...s, events: [saved, ...s.events] }));
         } else {
           setState((s) => ({ ...s, events: [e, ...s.events] }));
+        }
+      },
+      updateEvent: async (id, patch) => {
+        if (apiOnline) {
+          const saved = await allianceApi.events.update(id, patch);
+          setState((s) => ({
+            ...s,
+            events: s.events.map((x) => (x.id === id ? saved : x)),
+          }));
+        } else {
+          setState((s) => ({
+            ...s,
+            events: s.events.map((x) => (x.id === id ? { ...x, ...patch } : x)),
+          }));
+        }
+      },
+      addMatch: async (m) => {
+        if (apiOnline) {
+          const saved = await allianceApi.matches.save(m);
+          setState((s) => ({ ...s, matches: [saved, ...s.matches] }));
+        } else {
+          setState((s) => ({ ...s, matches: [m, ...s.matches] }));
         }
       },
       updateMatch: async (id, patch) => {

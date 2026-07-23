@@ -47,8 +47,12 @@ export const allianceApi = {
   events: {
     save: (e: EventItem) =>
       request<EventItem>("/alliance/events", { method: "POST", body: JSON.stringify(e) }),
+    update: (id: string, patch: Partial<EventItem>) =>
+      request<EventItem>(`/alliance/events/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
   },
   matches: {
+    save: (m: MatchNeed) =>
+      request<MatchNeed>("/alliance/matches", { method: "POST", body: JSON.stringify(m) }),
     update: (id: string, patch: Partial<MatchNeed>) =>
       request<MatchNeed>(`/alliance/matches/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
   },

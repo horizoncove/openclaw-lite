@@ -1,5 +1,6 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import AllianceLayout from "./layouts/AllianceLayout";
+import MemberLayout from "./layouts/MemberLayout";
 import CenterLayout from "./layouts/CenterLayout";
 import { useAllianceStore } from "./store/allianceStore";
 import { useCenterStore } from "./store/centerStore";
@@ -12,6 +13,11 @@ import AllianceKpiPage from "./pages/alliance/AllianceKpiPage";
 import MembersPage from "./pages/alliance/MembersPage";
 import EventsPage from "./pages/alliance/EventsPage";
 import MatchingPage from "./pages/alliance/MatchingPage";
+import MemberHomePage from "./pages/alliance/member/MemberHomePage";
+import MemberProfilePage from "./pages/alliance/member/MemberProfilePage";
+import MemberEventsPage from "./pages/alliance/member/MemberEventsPage";
+import MemberNeedsPage from "./pages/alliance/member/MemberNeedsPage";
+import MemberServicesPage from "./pages/alliance/member/MemberServicesPage";
 import CenterDashboard from "./pages/centers/CenterDashboard";
 import CenterOrdersPage from "./pages/centers/CenterOrdersPage";
 import CenterKpiPage from "./pages/centers/CenterKpiPage";
@@ -47,6 +53,13 @@ export default function App() {
           <Route path="matching" element={<MatchingPage />} />
           <Route path="orders" element={<AllianceOrdersPage />} />
           <Route path="kpi" element={<AllianceKpiPage />} />
+        </Route>
+        <Route path="/alliance/member" element={<MemberLayout />}>
+          <Route index element={<MemberHomePage />} />
+          <Route path="profile" element={<MemberProfilePage />} />
+          <Route path="events" element={<MemberEventsPage />} />
+          <Route path="needs" element={<MemberNeedsPage />} />
+          <Route path="services" element={<MemberServicesPage />} />
         </Route>
       </Route>
 

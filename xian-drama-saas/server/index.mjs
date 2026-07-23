@@ -15,6 +15,8 @@ import {
   upsertEvent,
   listMatches,
   patchMatch,
+  saveMatch,
+  patchEvent,
   listAllianceOrders,
   upsertAllianceOrder,
   patchAllianceOrder,
@@ -63,7 +65,7 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     service: "xian-drama-saas",
-    version: "1.2.0",
+    version: "1.2.1",
     storage: isPostgres() ? "postgresql" : "json",
     portals: ["alliance", "center"],
   });
@@ -92,8 +94,14 @@ app.put("/api/alliance/members/:id", asyncHandler(async (req, res) => {
 
 app.get("/api/alliance/events", asyncHandler(async (_req, res) => res.json(await listEvents())));
 app.post("/api/alliance/events", asyncHandler(async (req, res) => res.json(await upsertEvent(req.body))));
+app.put("/api/alliance/events/:id", asyncHandler(async (req, res) => {
+  const item = await patchEvent(req.params.id, req.body);
+  if (!item) return res.status(404).json({ error: "未找到" });
+  res.json(item);
+}));
 
 app.get("/api/alliance/matches", asyncHandler(async (_req, res) => res.json(await listMatches())));
+app.post("/api/alliance/matches", asyncHandler(async (req, res) => res.json(await saveMatch(req.body))));
 app.put("/api/alliance/matches/:id", asyncHandler(async (req, res) => {
   const item = await patchMatch(req.params.id, req.body);
   if (!item) return res.status(404).json({ error: "未找到" });

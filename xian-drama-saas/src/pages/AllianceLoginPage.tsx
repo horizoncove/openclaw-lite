@@ -17,18 +17,23 @@ export default function AllianceLoginPage() {
         <p className="sub">
           会员管理、活动运营与供需撮合。本入口数据与五大中心完全隔离。
         </p>
-        <div className="role-grid">
+        <div className="role-grid alliance-role-grid">
           {roles.map((role) => (
             <button
               key={role}
               type="button"
+              className={role === "member" ? "role-member" : "role-secretariat"}
               onClick={async () => {
                 await login(role);
-                nav("/alliance/console");
+                nav(role === "member" ? "/alliance/member" : "/alliance/console");
               }}
             >
               <strong>{ALLIANCE_ROLE_LABEL[role]}</strong>
-              <span>{role === "member" ? "查看会员服务" : "进入联盟工作台"}</span>
+              <span>
+                {role === "member"
+                  ? "会员门户：活动报名、供需发布、服务申请"
+                  : "秘书处：会员管理、活动运营、撮合与工单"}
+              </span>
             </button>
           ))}
         </div>

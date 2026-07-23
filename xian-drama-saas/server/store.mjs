@@ -109,6 +109,16 @@ export async function upsertEvent(item) {
   return upsertJsonList("alliance", "events", item);
 }
 
+export async function patchEvent(id, patch) {
+  if (usePostgres) return repo.patchEvent(id, patch);
+  return patchJson("alliance", "events", id, patch);
+}
+
+export async function saveMatch(item) {
+  if (usePostgres) return repo.saveMatch(item);
+  return upsertJsonList("alliance", "matches", item);
+}
+
 export async function listMatches() {
   if (usePostgres) return repo.listMatches();
   return jsonDb.loadDb("alliance").matches;

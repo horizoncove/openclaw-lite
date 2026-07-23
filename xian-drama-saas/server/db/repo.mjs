@@ -182,6 +182,23 @@ export async function upsertEvent(item) {
   return mapEvent(r.rows[0]);
 }
 
+export async function patchEvent(id, patch) {
+  const cur = await query("SELECT * FROM events WHERE id=$1", [id]);
+  if (!cur.rows[0]) return null;
+  const m = { ...mapEvent(cur.rows[0]), ...patch };
+  return upsertEvent(m);
+}
+
+export async function saveMatch(item) {
+  await query(
+    `INSERT INTO matches (id, org, need, offer, status, owner, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7)
+     ON CONFLICT (id) DO UPDATE SET org=$2, need=$3, offer=$4, status=$5, owner=$6, updated_at=$7`,
+    [item.id, item.org, item.need, item.offer, item.status, item.owner, item.updatedAt]
+  );
+  const r = await query("SELECT * FROM matches WHERE id=$1", [item.id]);
+  return mapMatch(r.rows[0]);
+}
+
 export async function listMatches() {
   const r = await query("SELECT * FROM matches ORDER BY updated_at DESC");
   return r.rows.map(mapMatch);
