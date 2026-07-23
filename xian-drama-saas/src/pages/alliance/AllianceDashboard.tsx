@@ -53,6 +53,7 @@ export default function AllianceDashboard() {
             ["会员管理", members.length, "/alliance/console/members"],
             ["活动运营", events.length, "/alliance/console/events"],
             ["供需撮合", matches.length, "/alliance/console/matching"],
+            ["内容推荐", works.length + venues.length, "/alliance/console/showcase"],
           ].map(([name, count, to]) => (
             <div className="list-row" key={name as string}>
               <div>
