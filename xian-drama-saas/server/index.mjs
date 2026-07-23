@@ -5,8 +5,9 @@ import { fileURLToPath } from "node:url";
 import {
   initStore,
   isPostgres,
-  getState,
-  resetState,
+  getAllianceState,
+  resetAllianceState,
+  getAllianceStats,
   listMembers,
   upsertMember,
   patchMember,
@@ -14,9 +15,12 @@ import {
   upsertEvent,
   listMatches,
   patchMatch,
-  listOrders,
-  upsertOrder,
-  patchOrder,
+  listAllianceOrders,
+  upsertAllianceOrder,
+  patchAllianceOrder,
+  getCenterState,
+  resetCenterState,
+  getCenterStats,
   listApprovals,
   patchApproval,
   listOverseas,
@@ -24,7 +28,9 @@ import {
   listDistributions,
   listCopyrights,
   listAis,
-  getStats,
+  listCenterOrders,
+  upsertCenterOrder,
+  patchCenterOrder,
 } from "./store.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -34,9 +40,12 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "2mb" }));
 
-const USERS = {
-  admin: { id: "u1", name: "张衡", role: "admin", org: "服务中心主任办" },
+const ALLIANCE_USERS = {
   alliance: { id: "u2", name: "陈希", role: "alliance", org: "联盟秘书处" },
+  member: { id: "u8", name: "王敏", role: "member", org: "长安映缔影视" },
+};
+
+const CENTER_USERS = {
   approval: { id: "u3", name: "刘芳", role: "approval", org: "审批中心" },
   overseas: { id: "u4", name: "韩磊", role: "overseas", org: "出海中心" },
   distribution: { id: "u5", name: "苏晚", role: "distribution", org: "发行投流中心" },
@@ -54,71 +63,89 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     service: "xian-drama-saas",
-    version: "1.1.0",
+    version: "1.2.0",
     storage: isPostgres() ? "postgresql" : "json",
+    portals: ["alliance", "center"],
   });
 });
 
-app.get("/api/state", asyncHandler(async (_req, res) => {
-  res.json(await getState());
-}));
+// ── Alliance API（数据独立）────────────────────────────────
 
-app.post("/api/reset", asyncHandler(async (_req, res) => {
-  res.json(await resetState());
-}));
+app.get("/api/alliance/state", asyncHandler(async (_req, res) => res.json(await getAllianceState())));
+app.post("/api/alliance/reset", asyncHandler(async (_req, res) => res.json(await resetAllianceState())));
+app.get("/api/alliance/stats", asyncHandler(async (_req, res) => res.json(await getAllianceStats())));
 
-app.post("/api/auth/login", (req, res) => {
+app.post("/api/alliance/auth/login", (req, res) => {
   const { role } = req.body || {};
-  const user = USERS[role];
+  const user = ALLIANCE_USERS[role];
   if (!user) return res.status(400).json({ error: "无效角色" });
-  res.json({ user, token: `demo-${role}` });
+  res.json({ user, token: `alliance-${role}` });
 });
 
-app.get("/api/members", asyncHandler(async (_req, res) => res.json(await listMembers())));
-app.post("/api/members", asyncHandler(async (req, res) => res.json(await upsertMember(req.body))));
-app.put("/api/members/:id", asyncHandler(async (req, res) => {
+app.get("/api/alliance/members", asyncHandler(async (_req, res) => res.json(await listMembers())));
+app.post("/api/alliance/members", asyncHandler(async (req, res) => res.json(await upsertMember(req.body))));
+app.put("/api/alliance/members/:id", asyncHandler(async (req, res) => {
   const item = await patchMember(req.params.id, req.body);
   if (!item) return res.status(404).json({ error: "未找到" });
   res.json(item);
 }));
 
-app.get("/api/events", asyncHandler(async (_req, res) => res.json(await listEvents())));
-app.post("/api/events", asyncHandler(async (req, res) => res.json(await upsertEvent(req.body))));
+app.get("/api/alliance/events", asyncHandler(async (_req, res) => res.json(await listEvents())));
+app.post("/api/alliance/events", asyncHandler(async (req, res) => res.json(await upsertEvent(req.body))));
 
-app.get("/api/matches", asyncHandler(async (_req, res) => res.json(await listMatches())));
-app.put("/api/matches/:id", asyncHandler(async (req, res) => {
+app.get("/api/alliance/matches", asyncHandler(async (_req, res) => res.json(await listMatches())));
+app.put("/api/alliance/matches/:id", asyncHandler(async (req, res) => {
   const item = await patchMatch(req.params.id, req.body);
   if (!item) return res.status(404).json({ error: "未找到" });
   res.json(item);
 }));
 
-app.get("/api/orders", asyncHandler(async (_req, res) => res.json(await listOrders())));
-app.post("/api/orders", asyncHandler(async (req, res) => res.json(await upsertOrder(req.body))));
-app.put("/api/orders/:id", asyncHandler(async (req, res) => {
-  const item = await patchOrder(req.params.id, req.body);
+app.get("/api/alliance/orders", asyncHandler(async (_req, res) => res.json(await listAllianceOrders())));
+app.post("/api/alliance/orders", asyncHandler(async (req, res) => res.json(await upsertAllianceOrder(req.body))));
+app.put("/api/alliance/orders/:id", asyncHandler(async (req, res) => {
+  const item = await patchAllianceOrder(req.params.id, req.body);
   if (!item) return res.status(404).json({ error: "未找到" });
   res.json(item);
 }));
 
-app.get("/api/approvals", asyncHandler(async (_req, res) => res.json(await listApprovals())));
-app.put("/api/approvals/:id", asyncHandler(async (req, res) => {
+// ── Center API（数据独立）──────────────────────────────────
+
+app.get("/api/center/state", asyncHandler(async (_req, res) => res.json(await getCenterState())));
+app.post("/api/center/reset", asyncHandler(async (_req, res) => res.json(await resetCenterState())));
+app.get("/api/center/stats", asyncHandler(async (_req, res) => res.json(await getCenterStats())));
+
+app.post("/api/center/auth/login", (req, res) => {
+  const { role } = req.body || {};
+  const user = CENTER_USERS[role];
+  if (!user) return res.status(400).json({ error: "无效角色" });
+  res.json({ user, token: `center-${role}` });
+});
+
+app.get("/api/center/approvals", asyncHandler(async (_req, res) => res.json(await listApprovals())));
+app.put("/api/center/approvals/:id", asyncHandler(async (req, res) => {
   const item = await patchApproval(req.params.id, req.body);
   if (!item) return res.status(404).json({ error: "未找到" });
   res.json(item);
 }));
 
-app.get("/api/overseas", asyncHandler(async (_req, res) => res.json(await listOverseas())));
-app.put("/api/overseas/:id", asyncHandler(async (req, res) => {
+app.get("/api/center/overseas", asyncHandler(async (_req, res) => res.json(await listOverseas())));
+app.put("/api/center/overseas/:id", asyncHandler(async (req, res) => {
   const item = await patchOverseas(req.params.id, req.body);
   if (!item) return res.status(404).json({ error: "未找到" });
   res.json(item);
 }));
 
-app.get("/api/distributions", asyncHandler(async (_req, res) => res.json(await listDistributions())));
-app.get("/api/copyrights", asyncHandler(async (_req, res) => res.json(await listCopyrights())));
-app.get("/api/ais", asyncHandler(async (_req, res) => res.json(await listAis())));
+app.get("/api/center/distributions", asyncHandler(async (_req, res) => res.json(await listDistributions())));
+app.get("/api/center/copyrights", asyncHandler(async (_req, res) => res.json(await listCopyrights())));
+app.get("/api/center/ais", asyncHandler(async (_req, res) => res.json(await listAis())));
 
-app.get("/api/stats", asyncHandler(async (_req, res) => res.json(await getStats())));
+app.get("/api/center/orders", asyncHandler(async (_req, res) => res.json(await listCenterOrders())));
+app.post("/api/center/orders", asyncHandler(async (req, res) => res.json(await upsertCenterOrder(req.body))));
+app.put("/api/center/orders/:id", asyncHandler(async (req, res) => {
+  const item = await patchCenterOrder(req.params.id, req.body);
+  if (!item) return res.status(404).json({ error: "未找到" });
+  res.json(item);
+}));
 
 app.use((err, _req, res, _next) => {
   console.error(err);
@@ -136,5 +163,5 @@ if (process.env.NODE_ENV === "production") {
 await initStore();
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`xian-drama-saas API http://0.0.0.0:${PORT} [${isPostgres() ? "postgresql" : "json"}]`);
+  console.log(`xian-drama-saas http://0.0.0.0:${PORT} [${isPostgres() ? "postgresql" : "json"}] portals=alliance,center`);
 });

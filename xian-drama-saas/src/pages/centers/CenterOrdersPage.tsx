@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
-import { useStore } from "../store";
-import type { OrderStatus, Priority, WorkOrder } from "../types";
+import { useCenterStore } from "../../store/centerStore";
+import type { OrderStatus, Priority, WorkOrder } from "../../types";
 
-const centers = ["联盟", "审批", "出海", "发行投流", "版权", "AI", "主任办"] as const;
+const centers = ["审批", "出海", "发行投流", "版权", "AI"] as const;
 
-export default function OrdersPage() {
-  const { orders, upsertOrder } = useStore();
+export default function CenterOrdersPage() {
+  const { orders, upsertOrder } = useCenterStore();
   const [q, setQ] = useState("");
   const [center, setCenter] = useState("全部");
   const [open, setOpen] = useState(false);
@@ -38,7 +38,7 @@ export default function OrdersPage() {
     upsertOrder({
       id,
       product: form.product!,
-      center: (form.center as WorkOrder["center"]) || "主任办",
+      center: form.center || "审批",
       org: form.org!,
       contact: form.contact || "待补充",
       priority: (form.priority as Priority) || "中",
@@ -62,7 +62,7 @@ export default function OrdersPage() {
           ))}
         </select>
         <button className="btn btn-primary" onClick={() => setOpen(true)}>
-          新建工单
+          新建中心工单
         </button>
       </div>
       <div className="table-wrap">
@@ -120,7 +120,7 @@ export default function OrdersPage() {
       {open && (
         <div className="modal-backdrop">
           <div className="modal">
-            <h3>新建工单</h3>
+            <h3>新建中心工单</h3>
             <div className="field">
               <label>机构</label>
               <input value={form.org || ""} onChange={(e) => setForm({ ...form, org: e.target.value })} />
@@ -135,10 +135,7 @@ export default function OrdersPage() {
             </div>
             <div className="field">
               <label>中心</label>
-              <select
-                value={form.center}
-                onChange={(e) => setForm({ ...form, center: e.target.value as WorkOrder["center"] })}
-              >
+              <select value={form.center} onChange={(e) => setForm({ ...form, center: e.target.value })}>
                 {centers.map((c) => (
                   <option key={c}>{c}</option>
                 ))}

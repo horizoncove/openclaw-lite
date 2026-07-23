@@ -1,7 +1,7 @@
-import { useStore } from "../../store";
+import { useCenterStore } from "../../store/centerStore";
 
 export default function AIPage() {
-  const { ais } = useStore();
+  const { ais } = useCenterStore();
 
   return (
     <div className="grid" style={{ gap: "1rem" }}>

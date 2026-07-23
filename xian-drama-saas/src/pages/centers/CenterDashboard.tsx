@@ -1,10 +1,8 @@
 import { Link } from "react-router-dom";
-import { useStore } from "../store";
+import { useCenterStore } from "../../store/centerStore";
 
-export default function Dashboard() {
-  const { members, orders, events, approvals, overseas, distributions, copyrights, ais } =
-    useStore();
-
+export default function CenterDashboard() {
+  const { orders, approvals, overseas, distributions, copyrights, ais } = useCenterStore();
   const openOrders = orders.filter((o) => o.status !== "完结" && o.status !== "关闭");
   const highRisk = approvals.filter((a) => a.risk === "高" || a.stage === "会诊");
 
@@ -12,26 +10,26 @@ export default function Dashboard() {
     <div className="grid" style={{ gap: "1rem" }}>
       <div className="grid grid-4">
         <div className="card">
-          <div className="stat-value">{members.filter((m) => m.status === "有效").length}</div>
-          <div className="stat-label">有效联盟会员</div>
-        </div>
-        <div className="card">
           <div className="stat-value">{openOrders.length}</div>
           <div className="stat-label">进行中工单</div>
         </div>
         <div className="card">
-          <div className="stat-value">{overseas.length}</div>
-          <div className="stat-label">出海在管项目</div>
+          <div className="stat-value">{approvals.length}</div>
+          <div className="stat-label">审批案件</div>
         </div>
         <div className="card">
-          <div className="stat-value">{events.filter((e) => e.status !== "已结束").length}</div>
-          <div className="stat-label">进行中活动</div>
+          <div className="stat-value">{overseas.length}</div>
+          <div className="stat-label">出海项目</div>
+        </div>
+        <div className="card">
+          <div className="stat-value">{ais.length}</div>
+          <div className="stat-label">AI 接入</div>
         </div>
       </div>
 
       <div className="grid grid-2">
         <div className="card">
-          <h3>工单中枢快照</h3>
+          <h3>中心工单</h3>
           {openOrders.slice(0, 5).map((o) => (
             <div className="list-row" key={o.id}>
               <div>
@@ -44,8 +42,8 @@ export default function Dashboard() {
             </div>
           ))}
           <div style={{ marginTop: "0.8rem" }}>
-            <Link className="btn btn-secondary" to="/console/orders">
-              进入工单中枢
+            <Link className="btn btn-secondary" to="/center/console/orders">
+              查看全部工单
             </Link>
           </div>
         </div>
@@ -53,11 +51,11 @@ export default function Dashboard() {
         <div className="card">
           <h3>五大中心负荷</h3>
           {[
-            ["审批中心", approvals.length, `/console/centers/approval`],
-            ["出海中心", overseas.length, `/console/centers/overseas`],
-            ["发行投流", distributions.length, `/console/centers/distribution`],
-            ["版权中心", copyrights.length, `/console/centers/copyright`],
-            ["AI 研发", ais.length, `/console/centers/ai`],
+            ["审批中心", approvals.length, "/center/console/approval"],
+            ["出海中心", overseas.length, "/center/console/overseas"],
+            ["发行投流", distributions.length, "/center/console/distribution"],
+            ["版权中心", copyrights.length, "/center/console/copyright"],
+            ["AI 研发", ais.length, "/center/console/ai"],
           ].map(([name, count, to]) => (
             <div className="list-row" key={name as string}>
               <div>

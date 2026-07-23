@@ -10,70 +10,72 @@ import {
   Users,
 } from "lucide-react";
 
-const modules = [
-  { icon: Users, title: "联盟运行", desc: "会员、活动、供需撮合与标准共建" },
-  { icon: Stamp, title: "审批中心", desc: "备案预检、合规会诊、政策导航" },
-  { icon: Globe2, title: "出海中心", desc: "选品、译制、渠道对接与结算协助" },
-  { icon: Megaphone, title: "发行投流", desc: "发行体检、冷启动策略与数据复盘" },
-  { icon: Scale, title: "版权中心", desc: "确权、授权、维权与合同范本" },
-  { icon: Bot, title: "AI 研发", desc: "剧本、译制、素材、合规四条产线" },
-];
-
 export default function LandingPage() {
   return (
     <div className="landing">
       <header className="landing-nav">
         <div className="landing-brand">西安微短剧产业服务中心</div>
-        <Link className="btn btn-primary" to="/login">
-          进入平台 <ArrowRight size={16} />
-        </Link>
       </header>
 
       <section className="landing-hero">
-        <p className="eyebrow">ALLIANCE + FIVE CENTERS · SAAS</p>
+        <p className="eyebrow">ALLIANCE + FIVE CENTERS · DUAL SAAS</p>
         <h1>
-          联盟运行 SaaS
+          联盟会员 SaaS
           <br />
           五大中心运营 SaaS
         </h1>
         <p className="lead">
-          一站式产业公共服务平台：会员与撮合、跨中心工单、审批出海发行版权 AI 全链路运营。
+          两套独立入口、两套独立数据。联盟侧管会员与撮合，中心侧管审批出海发行版权 AI，互不共享。
         </p>
-        <div className="hero-actions">
-          <Link className="btn btn-primary btn-lg" to="/login">
-            立即登录演示
+        <div className="hero-actions portal-actions">
+          <Link className="btn btn-primary btn-lg portal-btn alliance" to="/alliance/login">
+            <Users size={18} /> 联盟会员入口 <ArrowRight size={16} />
           </Link>
-          <a className="btn btn-secondary btn-lg" href="/demo/saas-demo.pdf">
-            下载演示 PDF
-          </a>
+          <Link className="btn btn-primary btn-lg portal-btn center" to="/center/login">
+            <Stamp size={18} /> 五大中心入口 <ArrowRight size={16} />
+          </Link>
         </div>
       </section>
 
       <section className="landing-modules">
-        <h2>平台模块</h2>
-        <div className="module-grid">
-          {modules.map((m) => (
-            <article className="module-card" key={m.title}>
-              <m.icon size={22} />
-              <h3>{m.title}</h3>
-              <p>{m.desc}</p>
-            </article>
-          ))}
+        <div className="portal-split">
+          <article className="module-card portal-card">
+            <Users size={22} />
+            <h3>联盟会员侧</h3>
+            <p>会员管理、活动运营、供需撮合、联盟工单与 KPI</p>
+            <Link className="btn btn-secondary" to="/alliance/login">
+              进入联盟 →
+            </Link>
+          </article>
+          <article className="module-card portal-card">
+            <div className="center-icons">
+              <Stamp size={18} />
+              <Globe2 size={18} />
+              <Megaphone size={18} />
+              <Scale size={18} />
+              <Bot size={18} />
+            </div>
+            <h3>五大中心侧</h3>
+            <p>审批、出海、发行投流、版权、AI 研发运营与中心工单</p>
+            <Link className="btn btn-secondary" to="/center/login">
+              进入中心 →
+            </Link>
+          </article>
         </div>
       </section>
 
       <section className="landing-cta">
         <Handshake size={28} />
         <div>
-          <h3>面向服务中心专班与园区运营方</h3>
-          <p>支持角色分权、工单 SLA、KPI 看板与数据持久化 API。</p>
+          <h3>数据完全隔离</h3>
+          <p>联盟 API（/api/alliance）与中心 API（/api/center）独立存储，各自重置、各自运营。</p>
         </div>
-        <Link className="btn btn-primary" to="/login">
-          开始使用
-        </Link>
+        <a className="btn btn-secondary" href="/demo/saas-demo.pdf">
+          下载演示 PDF
+        </a>
       </section>
 
-      <footer className="landing-foot">西安微短剧产业服务中心 · 运营 SaaS V1.0</footer>
+      <footer className="landing-foot">西安微短剧产业服务中心 · 双入口 SaaS V1.2</footer>
     </div>
   );
 }

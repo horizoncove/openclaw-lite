@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
-import { useStore } from "../../store";
+import { useAllianceStore } from "../../store/allianceStore";
 import type { Member, MemberStatus, MemberTier } from "../../types";
 
 export default function MembersPage() {
-  const { members, upsertMember } = useStore();
+  const { members, upsertMember } = useAllianceStore();
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<Partial<Member>>({

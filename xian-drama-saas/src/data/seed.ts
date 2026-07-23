@@ -1,4 +1,4 @@
-import type { AppState } from "../types";
+import type { AllianceState, CenterState } from "../types";
 
 const today = () => new Date().toISOString().slice(0, 10);
 const plus = (n: number) => {
@@ -7,8 +7,7 @@ const plus = (n: number) => {
   return d.toISOString().slice(0, 10);
 };
 
-export const seedState = (): AppState => ({
-  user: null,
+export const allianceSeed = (): Omit<AllianceState, "user"> => ({
   members: [
     {
       id: "M001",
@@ -101,6 +100,37 @@ export const seedState = (): AppState => ({
       updatedAt: today(),
     },
   ],
+  orders: [
+    {
+      id: "AL-2026-001",
+      product: "会员入会审核",
+      center: "联盟",
+      org: "未央青年创作社",
+      contact: "周宁",
+      priority: "中",
+      status: "处理中",
+      assignee: "联盟-陈希",
+      createdAt: today(),
+      dueAt: plus(3),
+      summary: "观察会员申请，待补充营业执照",
+    },
+    {
+      id: "AL-2026-002",
+      product: "供需对接会筹备",
+      center: "联盟",
+      org: "长安映缔影视",
+      contact: "王敏",
+      priority: "高",
+      status: "新建",
+      assignee: "联盟-陈希",
+      createdAt: today(),
+      dueAt: plus(5),
+      summary: "7 月对接会议程与席位确认",
+    },
+  ],
+});
+
+export const centerSeed = (): Omit<CenterState, "user"> => ({
   orders: [
     {
       id: "WO-2026-018",

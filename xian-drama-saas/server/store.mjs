@@ -39,157 +39,172 @@ export function isPostgres() {
   return usePostgres === true;
 }
 
-function loadSeed() {
-  return JSON.parse(readFileSync(join(__dirname, "data", "seed.json"), "utf8"));
+function loadSeed(portal) {
+  return JSON.parse(readFileSync(join(__dirname, "data", `${portal}-seed.json`), "utf8"));
 }
 
-export async function getState() {
-  if (usePostgres) return repo.getState();
-  return jsonDb.loadDb();
+function patchJson(portal, key, id, patch) {
+  const db = jsonDb.loadDb(portal);
+  const idx = db[key].findIndex((x) => x.id === id);
+  if (idx < 0) return null;
+  db[key][idx] = { ...db[key][idx], ...patch };
+  jsonDb.saveDb(portal, db);
+  return db[key][idx];
 }
 
-export async function resetState() {
-  if (usePostgres) return repo.resetState(loadSeed());
-  return jsonDb.resetDb();
+function upsertJsonList(portal, key, item) {
+  const db = jsonDb.loadDb(portal);
+  const idx = db[key].findIndex((x) => x.id === item.id);
+  if (idx >= 0) db[key][idx] = item;
+  else db[key].unshift(item);
+  jsonDb.saveDb(portal, db);
+  return item;
+}
+
+// ── Alliance ──────────────────────────────────────────────
+
+export async function getAllianceState() {
+  if (usePostgres) return repo.getAllianceState();
+  return jsonDb.loadDb("alliance");
+}
+
+export async function resetAllianceState() {
+  if (usePostgres) return repo.resetAllianceState(loadSeed("alliance"));
+  return jsonDb.resetDb("alliance");
+}
+
+export async function getAllianceStats() {
+  if (usePostgres) return repo.getAllianceStats();
+  const db = jsonDb.loadDb("alliance");
+  return {
+    members: db.members.filter((m) => m.status === "有效").length,
+    openOrders: db.orders.filter((o) => !["完结", "关闭"].includes(o.status)).length,
+    events: db.events.filter((e) => e.status !== "已结束").length,
+    matches: db.matches.filter((m) => ["开放", "撮合中"].includes(m.status)).length,
+  };
 }
 
 export async function listMembers() {
   if (usePostgres) return repo.listMembers();
-  return jsonDb.loadDb().members;
+  return jsonDb.loadDb("alliance").members;
 }
 
 export async function upsertMember(item) {
   if (usePostgres) return repo.upsertMember(item);
-  const db = jsonDb.loadDb();
-  const idx = db.members.findIndex((x) => x.id === item.id);
-  if (idx >= 0) db.members[idx] = item;
-  else db.members.unshift(item);
-  jsonDb.saveDb(db);
-  return item;
+  return upsertJsonList("alliance", "members", item);
 }
 
 export async function patchMember(id, patch) {
   if (usePostgres) return repo.patchMember(id, patch);
-  const db = jsonDb.loadDb();
-  const idx = db.members.findIndex((x) => x.id === id);
-  if (idx < 0) return null;
-  db.members[idx] = { ...db.members[idx], ...patch };
-  jsonDb.saveDb(db);
-  return db.members[idx];
+  return patchJson("alliance", "members", id, patch);
 }
 
 export async function listEvents() {
   if (usePostgres) return repo.listEvents();
-  return jsonDb.loadDb().events;
+  return jsonDb.loadDb("alliance").events;
 }
 
 export async function upsertEvent(item) {
   if (usePostgres) return repo.upsertEvent(item);
-  const db = jsonDb.loadDb();
-  const idx = db.events.findIndex((x) => x.id === item.id);
-  if (idx >= 0) db.events[idx] = item;
-  else db.events.unshift(item);
-  jsonDb.saveDb(db);
-  return item;
+  return upsertJsonList("alliance", "events", item);
 }
 
 export async function listMatches() {
   if (usePostgres) return repo.listMatches();
-  return jsonDb.loadDb().matches;
+  return jsonDb.loadDb("alliance").matches;
 }
 
 export async function patchMatch(id, patch) {
   if (usePostgres) return repo.patchMatch(id, patch);
-  const db = jsonDb.loadDb();
-  const idx = db.matches.findIndex((x) => x.id === id);
-  if (idx < 0) return null;
-  db.matches[idx] = { ...db.matches[idx], ...patch };
-  jsonDb.saveDb(db);
-  return db.matches[idx];
+  return patchJson("alliance", "matches", id, patch);
 }
 
-export async function listOrders() {
-  if (usePostgres) return repo.listOrders();
-  return jsonDb.loadDb().orders;
+export async function listAllianceOrders() {
+  if (usePostgres) return repo.listOrders("alliance");
+  return jsonDb.loadDb("alliance").orders;
 }
 
-export async function upsertOrder(item) {
+export async function upsertAllianceOrder(item) {
   if (usePostgres) return repo.upsertOrder(item);
-  const db = jsonDb.loadDb();
-  const idx = db.orders.findIndex((x) => x.id === item.id);
-  if (idx >= 0) db.orders[idx] = item;
-  else db.orders.unshift(item);
-  jsonDb.saveDb(db);
-  return item;
+  return upsertJsonList("alliance", "orders", item);
 }
 
-export async function patchOrder(id, patch) {
+export async function patchAllianceOrder(id, patch) {
   if (usePostgres) return repo.patchOrder(id, patch);
-  const db = jsonDb.loadDb();
-  const idx = db.orders.findIndex((x) => x.id === id);
-  if (idx < 0) return null;
-  db.orders[idx] = { ...db.orders[idx], ...patch };
-  jsonDb.saveDb(db);
-  return db.orders[idx];
+  return patchJson("alliance", "orders", id, patch);
 }
 
-export async function listApprovals() {
-  if (usePostgres) return repo.listApprovals();
-  return jsonDb.loadDb().approvals;
+// ── Center ────────────────────────────────────────────────
+
+export async function getCenterState() {
+  if (usePostgres) return repo.getCenterState();
+  return jsonDb.loadDb("center");
 }
 
-export async function patchApproval(id, patch) {
-  if (usePostgres) return repo.patchApproval(id, patch);
-  const db = jsonDb.loadDb();
-  const idx = db.approvals.findIndex((x) => x.id === id);
-  if (idx < 0) return null;
-  db.approvals[idx] = { ...db.approvals[idx], ...patch };
-  jsonDb.saveDb(db);
-  return db.approvals[idx];
+export async function resetCenterState() {
+  if (usePostgres) return repo.resetCenterState(loadSeed("center"));
+  return jsonDb.resetDb("center");
 }
 
-export async function listOverseas() {
-  if (usePostgres) return repo.listOverseas();
-  return jsonDb.loadDb().overseas;
-}
-
-export async function patchOverseas(id, patch) {
-  if (usePostgres) return repo.patchOverseas(id, patch);
-  const db = jsonDb.loadDb();
-  const idx = db.overseas.findIndex((x) => x.id === id);
-  if (idx < 0) return null;
-  db.overseas[idx] = { ...db.overseas[idx], ...patch };
-  jsonDb.saveDb(db);
-  return db.overseas[idx];
-}
-
-export async function listDistributions() {
-  if (usePostgres) return repo.listDistributions();
-  return jsonDb.loadDb().distributions;
-}
-
-export async function listCopyrights() {
-  if (usePostgres) return repo.listCopyrights();
-  return jsonDb.loadDb().copyrights;
-}
-
-export async function listAis() {
-  if (usePostgres) return repo.listAis();
-  return jsonDb.loadDb().ais;
-}
-
-export async function getStats() {
-  if (usePostgres) return repo.getStats();
-  const db = jsonDb.loadDb();
-  const openOrders = db.orders.filter((o) => !["完结", "关闭"].includes(o.status));
+export async function getCenterStats() {
+  if (usePostgres) return repo.getCenterStats();
+  const db = jsonDb.loadDb("center");
   return {
-    members: db.members.filter((m) => m.status === "有效").length,
-    openOrders: openOrders.length,
-    overseas: db.overseas.length,
-    events: db.events.filter((e) => e.status !== "已结束").length,
+    openOrders: db.orders.filter((o) => !["完结", "关闭"].includes(o.status)).length,
     approvals: db.approvals.length,
+    overseas: db.overseas.length,
     distributions: db.distributions.length,
     copyrights: db.copyrights.length,
     ais: db.ais.length,
   };
+}
+
+export async function listApprovals() {
+  if (usePostgres) return repo.listApprovals();
+  return jsonDb.loadDb("center").approvals;
+}
+
+export async function patchApproval(id, patch) {
+  if (usePostgres) return repo.patchApproval(id, patch);
+  return patchJson("center", "approvals", id, patch);
+}
+
+export async function listOverseas() {
+  if (usePostgres) return repo.listOverseas();
+  return jsonDb.loadDb("center").overseas;
+}
+
+export async function patchOverseas(id, patch) {
+  if (usePostgres) return repo.patchOverseas(id, patch);
+  return patchJson("center", "overseas", id, patch);
+}
+
+export async function listDistributions() {
+  if (usePostgres) return repo.listDistributions();
+  return jsonDb.loadDb("center").distributions;
+}
+
+export async function listCopyrights() {
+  if (usePostgres) return repo.listCopyrights();
+  return jsonDb.loadDb("center").copyrights;
+}
+
+export async function listAis() {
+  if (usePostgres) return repo.listAis();
+  return jsonDb.loadDb("center").ais;
+}
+
+export async function listCenterOrders() {
+  if (usePostgres) return repo.listOrders("center");
+  return jsonDb.loadDb("center").orders;
+}
+
+export async function upsertCenterOrder(item) {
+  if (usePostgres) return repo.upsertOrder(item);
+  return upsertJsonList("center", "orders", item);
+}
+
+export async function patchCenterOrder(id, patch) {
+  if (usePostgres) return repo.patchOrder(id, patch);
+  return patchJson("center", "orders", id, patch);
 }

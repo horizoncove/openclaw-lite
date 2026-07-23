@@ -1,8 +1,8 @@
-import { useStore } from "../../store";
+import { useAllianceStore } from "../../store/allianceStore";
 import type { MatchNeed } from "../../types";
 
 export default function MatchingPage() {
-  const { matches, updateMatch } = useStore();
+  const { matches, updateMatch } = useAllianceStore();
 
   return (
     <div className="card">

@@ -2,10 +2,10 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { query, checkDb, closePool } from "./pool.mjs";
-import { seedAll } from "./repo.mjs";
+import { seedAlliance, seedCenter } from "./repo.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 async function applySchema() {
   const sql = readFileSync(join(__dirname, "schema.sql"), "utf8");
@@ -14,13 +14,17 @@ async function applySchema() {
 
 async function ensureMigration() {
   const r = await query("SELECT version FROM schema_migrations WHERE version = $1", [SCHEMA_VERSION]);
-  if (r.rows.length > 0) return false;
+  if (r.rows.length > 0) return;
   await query("INSERT INTO schema_migrations (version) VALUES ($1)", [SCHEMA_VERSION]);
-  return true;
 }
 
-async function needsSeed() {
+async function needsAllianceSeed() {
   const r = await query("SELECT COUNT(*)::int AS n FROM members");
+  return r.rows[0].n === 0;
+}
+
+async function needsCenterSeed() {
+  const r = await query("SELECT COUNT(*)::int AS n FROM approvals");
   return r.rows[0].n === 0;
 }
 
@@ -33,13 +37,21 @@ async function main() {
   await applySchema();
   await ensureMigration();
 
-  if (await needsSeed()) {
-    console.log("[migrate] seeding initial data...");
-    const seed = JSON.parse(readFileSync(join(__dirname, "..", "data", "seed.json"), "utf8"));
-    await seedAll(seed);
-    console.log("[migrate] seed complete");
+  const allianceSeed = JSON.parse(readFileSync(join(__dirname, "..", "data", "alliance-seed.json"), "utf8"));
+  const centerSeed = JSON.parse(readFileSync(join(__dirname, "..", "data", "center-seed.json"), "utf8"));
+
+  if (await needsAllianceSeed()) {
+    console.log("[migrate] seeding alliance data...");
+    await seedAlliance(allianceSeed);
   } else {
-    console.log("[migrate] data already present, skip seed");
+    console.log("[migrate] alliance data present, skip");
+  }
+
+  if (await needsCenterSeed()) {
+    console.log("[migrate] seeding center data...");
+    await seedCenter(centerSeed);
+  } else {
+    console.log("[migrate] center data present, skip");
   }
 
   console.log("[migrate] done");

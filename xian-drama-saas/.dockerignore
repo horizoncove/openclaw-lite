@@ -3,5 +3,7 @@ dist
 .git
 .env
 server/data/db.json
+server/data/alliance-db.json
+server/data/center-db.json
 demo/screens
 *.log
