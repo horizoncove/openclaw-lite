@@ -24,21 +24,33 @@ npm run dev
 
 打开浏览器 → 官网 → **进入平台** → 选择角色登录。
 
-## 生产部署（单进程）
+## 生产部署
+
+### Docker Compose（推荐，含 PostgreSQL）
+
+```bash
+cp .env.example .env   # 修改数据库密码
+docker compose up -d --build
+```
+
+访问 `http://服务器IP:3001`。详细步骤见 [`deploy/DEPLOY.md`](./deploy/DEPLOY.md)。
+
+### 单进程（JSON 或 PostgreSQL）
 
 ```bash
 npm install
 npm run build
+# 使用 PostgreSQL 时：
+export DATABASE_URL=postgresql://user:pass@127.0.0.1:5432/xian_drama
+npm run db:migrate
 PORT=3001 npm start
 ```
-
-访问 `http://服务器IP:3001`（同时提供网页 + API）。
 
 ## 技术栈
 
 - 前端：React + TypeScript + Vite + React Router
-- 后端：Express + JSON 文件数据库（`server/data/db.json`）
-- API 离线时自动降级为浏览器本地模式
+- 后端：Express + **PostgreSQL 16**（生产）/ JSON 文件（本地降级）
+- Docker：多阶段构建 + docker-compose（app + postgres）
 
 ## 演示资料
 

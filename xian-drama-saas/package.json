@@ -9,6 +9,7 @@
     "dev:api": "node server/index.mjs",
     "build": "tsc -b && vite build",
     "start": "NODE_ENV=production node server/index.mjs",
+    "db:migrate": "node server/db/migrate.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
     "seed:server": "npx tsx -e \"import {writeFileSync,mkdirSync} from 'node:fs';import {seedState} from './src/data/seed.ts';const {user,...d}=seedState();mkdirSync('server/data',{recursive:true});writeFileSync('server/data/seed.json',JSON.stringify(d,null,2));\""
@@ -19,6 +20,7 @@
     "date-fns": "^4.4.0",
     "express": "^5.2.1",
     "lucide-react": "^1.25.0",
+    "pg": "^8.22.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1"

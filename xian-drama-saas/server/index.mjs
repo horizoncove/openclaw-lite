@@ -2,7 +2,30 @@ import express from "express";
 import cors from "cors";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadDb, saveDb, resetDb } from "./db.mjs";
+import {
+  initStore,
+  isPostgres,
+  getState,
+  resetState,
+  listMembers,
+  upsertMember,
+  patchMember,
+  listEvents,
+  upsertEvent,
+  listMatches,
+  patchMatch,
+  listOrders,
+  upsertOrder,
+  patchOrder,
+  listApprovals,
+  patchApproval,
+  listOverseas,
+  patchOverseas,
+  listDistributions,
+  listCopyrights,
+  listAis,
+  getStats,
+} from "./store.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3001);
@@ -21,17 +44,28 @@ const USERS = {
   ai: { id: "u7", name: "蒋一", role: "ai", org: "AI 研发中心" },
 };
 
+function asyncHandler(fn) {
+  return (req, res, next) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+}
+
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, service: "xian-drama-saas", version: "1.0.0" });
+  res.json({
+    ok: true,
+    service: "xian-drama-saas",
+    version: "1.1.0",
+    storage: isPostgres() ? "postgresql" : "json",
+  });
 });
 
-app.get("/api/state", (_req, res) => {
-  res.json(loadDb());
-});
+app.get("/api/state", asyncHandler(async (_req, res) => {
+  res.json(await getState());
+}));
 
-app.post("/api/reset", (_req, res) => {
-  res.json(resetDb());
-});
+app.post("/api/reset", asyncHandler(async (_req, res) => {
+  res.json(await resetState());
+}));
 
 app.post("/api/auth/login", (req, res) => {
   const { role } = req.body || {};
@@ -40,98 +74,55 @@ app.post("/api/auth/login", (req, res) => {
   res.json({ user, token: `demo-${role}` });
 });
 
-function patchList(db, key, id, patch) {
-  const list = db[key];
-  const idx = list.findIndex((x) => x.id === id);
-  if (idx < 0) return null;
-  list[idx] = { ...list[idx], ...patch };
-  saveDb(db);
-  return list[idx];
-}
-
-function upsertList(db, key, item) {
-  const list = db[key];
-  const idx = list.findIndex((x) => x.id === item.id);
-  if (idx >= 0) list[idx] = item;
-  else list.unshift(item);
-  saveDb(db);
-  return item;
-}
-
-app.get("/api/members", (_req, res) => res.json(loadDb().members));
-app.post("/api/members", (req, res) => {
-  const db = loadDb();
-  const item = upsertList(db, "members", req.body);
-  res.json(item);
-});
-app.put("/api/members/:id", (req, res) => {
-  const db = loadDb();
-  const item = patchList(db, "members", req.params.id, req.body);
+app.get("/api/members", asyncHandler(async (_req, res) => res.json(await listMembers())));
+app.post("/api/members", asyncHandler(async (req, res) => res.json(await upsertMember(req.body))));
+app.put("/api/members/:id", asyncHandler(async (req, res) => {
+  const item = await patchMember(req.params.id, req.body);
   if (!item) return res.status(404).json({ error: "未找到" });
   res.json(item);
-});
+}));
 
-app.get("/api/events", (_req, res) => res.json(loadDb().events));
-app.post("/api/events", (req, res) => {
-  const db = loadDb();
-  const item = upsertList(db, "events", req.body);
-  res.json(item);
-});
+app.get("/api/events", asyncHandler(async (_req, res) => res.json(await listEvents())));
+app.post("/api/events", asyncHandler(async (req, res) => res.json(await upsertEvent(req.body))));
 
-app.get("/api/matches", (_req, res) => res.json(loadDb().matches));
-app.put("/api/matches/:id", (req, res) => {
-  const db = loadDb();
-  const item = patchList(db, "matches", req.params.id, req.body);
+app.get("/api/matches", asyncHandler(async (_req, res) => res.json(await listMatches())));
+app.put("/api/matches/:id", asyncHandler(async (req, res) => {
+  const item = await patchMatch(req.params.id, req.body);
   if (!item) return res.status(404).json({ error: "未找到" });
   res.json(item);
-});
+}));
 
-app.get("/api/orders", (_req, res) => res.json(loadDb().orders));
-app.post("/api/orders", (req, res) => {
-  const db = loadDb();
-  const item = upsertList(db, "orders", req.body);
-  res.json(item);
-});
-app.put("/api/orders/:id", (req, res) => {
-  const db = loadDb();
-  const item = patchList(db, "orders", req.params.id, req.body);
+app.get("/api/orders", asyncHandler(async (_req, res) => res.json(await listOrders())));
+app.post("/api/orders", asyncHandler(async (req, res) => res.json(await upsertOrder(req.body))));
+app.put("/api/orders/:id", asyncHandler(async (req, res) => {
+  const item = await patchOrder(req.params.id, req.body);
   if (!item) return res.status(404).json({ error: "未找到" });
   res.json(item);
-});
+}));
 
-app.get("/api/approvals", (_req, res) => res.json(loadDb().approvals));
-app.put("/api/approvals/:id", (req, res) => {
-  const db = loadDb();
-  const item = patchList(db, "approvals", req.params.id, req.body);
+app.get("/api/approvals", asyncHandler(async (_req, res) => res.json(await listApprovals())));
+app.put("/api/approvals/:id", asyncHandler(async (req, res) => {
+  const item = await patchApproval(req.params.id, req.body);
   if (!item) return res.status(404).json({ error: "未找到" });
   res.json(item);
-});
+}));
 
-app.get("/api/overseas", (_req, res) => res.json(loadDb().overseas));
-app.put("/api/overseas/:id", (req, res) => {
-  const db = loadDb();
-  const item = patchList(db, "overseas", req.params.id, req.body);
+app.get("/api/overseas", asyncHandler(async (_req, res) => res.json(await listOverseas())));
+app.put("/api/overseas/:id", asyncHandler(async (req, res) => {
+  const item = await patchOverseas(req.params.id, req.body);
   if (!item) return res.status(404).json({ error: "未找到" });
   res.json(item);
-});
+}));
 
-app.get("/api/distributions", (_req, res) => res.json(loadDb().distributions));
-app.get("/api/copyrights", (_req, res) => res.json(loadDb().copyrights));
-app.get("/api/ais", (_req, res) => res.json(loadDb().ais));
+app.get("/api/distributions", asyncHandler(async (_req, res) => res.json(await listDistributions())));
+app.get("/api/copyrights", asyncHandler(async (_req, res) => res.json(await listCopyrights())));
+app.get("/api/ais", asyncHandler(async (_req, res) => res.json(await listAis())));
 
-app.get("/api/stats", (_req, res) => {
-  const db = loadDb();
-  const openOrders = db.orders.filter((o) => !["完结", "关闭"].includes(o.status));
-  res.json({
-    members: db.members.filter((m) => m.status === "有效").length,
-    openOrders: openOrders.length,
-    overseas: db.overseas.length,
-    events: db.events.filter((e) => e.status !== "已结束").length,
-    approvals: db.approvals.length,
-    distributions: db.distributions.length,
-    copyrights: db.copyrights.length,
-    ais: db.ais.length,
-  });
+app.get("/api/stats", asyncHandler(async (_req, res) => res.json(await getStats())));
+
+app.use((err, _req, res, _next) => {
+  console.error(err);
+  res.status(500).json({ error: err.message || "服务器错误" });
 });
 
 const dist = join(__dirname, "..", "dist");
@@ -142,6 +133,8 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
+await initStore();
+
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`xian-drama-saas API http://0.0.0.0:${PORT}`);
+  console.log(`xian-drama-saas API http://0.0.0.0:${PORT} [${isPostgres() ? "postgresql" : "json"}]`);
 });
