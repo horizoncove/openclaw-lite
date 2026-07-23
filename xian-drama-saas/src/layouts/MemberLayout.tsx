@@ -8,7 +8,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useAllianceStore } from "../store/allianceStore";
-import { findMemberOrg } from "../lib/memberContext";
+import { findMemberOrg } from "../utils/memberContext";
 
 const nav = [
   { to: "/alliance/member", label: "会员首页", icon: Home, end: true },

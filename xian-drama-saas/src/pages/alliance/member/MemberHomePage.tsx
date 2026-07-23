@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { CalendarHeart, Megaphone, LifeBuoy, ShieldCheck } from "lucide-react";
 import { useAllianceStore } from "../../../store/allianceStore";
-import { findMemberOrg } from "../../../lib/memberContext";
+import { findMemberOrg } from "../../../utils/memberContext";
 
 export default function MemberHomePage() {
   const { user, members, events, matches, orders } = useAllianceStore();

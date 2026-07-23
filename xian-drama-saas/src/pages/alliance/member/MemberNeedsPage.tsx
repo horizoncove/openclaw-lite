@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAllianceStore } from "../../../store/allianceStore";
-import { findMemberOrg } from "../../../lib/memberContext";
+import { findMemberOrg } from "../../../utils/memberContext";
 import type { MatchNeed } from "../../../types";
 
 export default function MemberNeedsPage() {
