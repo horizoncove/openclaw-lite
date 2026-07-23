@@ -30,9 +30,9 @@ export default function LoginPage() {
             <button
               key={role}
               type="button"
-              onClick={() => {
-                login(role);
-                nav("/");
+              onClick={async () => {
+                await login(role);
+                nav("/console");
               }}
             >
               <strong>{ROLE_LABEL[role]}</strong>

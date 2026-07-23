@@ -44,7 +44,7 @@ export default function Dashboard() {
             </div>
           ))}
           <div style={{ marginTop: "0.8rem" }}>
-            <Link className="btn btn-secondary" to="/orders">
+            <Link className="btn btn-secondary" to="/console/orders">
               进入工单中枢
             </Link>
           </div>
@@ -53,11 +53,11 @@ export default function Dashboard() {
         <div className="card">
           <h3>五大中心负荷</h3>
           {[
-            ["审批中心", approvals.length, `/centers/approval`],
-            ["出海中心", overseas.length, `/centers/overseas`],
-            ["发行投流", distributions.length, `/centers/distribution`],
-            ["版权中心", copyrights.length, `/centers/copyright`],
-            ["AI 研发", ais.length, `/centers/ai`],
+            ["审批中心", approvals.length, `/console/centers/approval`],
+            ["出海中心", overseas.length, `/console/centers/overseas`],
+            ["发行投流", distributions.length, `/console/centers/distribution`],
+            ["版权中心", copyrights.length, `/console/centers/copyright`],
+            ["AI 研发", ais.length, `/console/centers/ai`],
           ].map(([name, count, to]) => (
             <div className="list-row" key={name as string}>
               <div>

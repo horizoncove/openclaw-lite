@@ -1,12 +1,14 @@
 import {
   createContext,
   createElement,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
+import { api as apiClient } from "./api/client";
 import { seedState } from "./data/seed";
 import type {
   AppState,
@@ -21,96 +23,197 @@ import type {
 } from "./types";
 import { ROLE_LABEL } from "./types";
 
-const STORAGE_KEY = "xian-drama-saas-v1";
+const USER_KEY = "xian-drama-saas-user";
 
 type Store = AppState & {
-  login: (role: Role) => void;
+  loading: boolean;
+  apiOnline: boolean;
+  refresh: () => Promise<void>;
+  login: (role: Role) => Promise<void>;
   logout: () => void;
-  upsertMember: (m: Member) => void;
-  addEvent: (e: EventItem) => void;
-  updateMatch: (id: string, patch: Partial<MatchNeed>) => void;
-  upsertOrder: (o: WorkOrder) => void;
-  updateApproval: (id: string, patch: Partial<ApprovalCase>) => void;
-  updateOverseas: (id: string, patch: Partial<OverseasProject>) => void;
-  resetDemo: () => void;
+  upsertMember: (m: Member) => Promise<void>;
+  addEvent: (e: EventItem) => Promise<void>;
+  updateMatch: (id: string, patch: Partial<MatchNeed>) => Promise<void>;
+  upsertOrder: (o: WorkOrder) => Promise<void>;
+  updateApproval: (id: string, patch: Partial<ApprovalCase>) => Promise<void>;
+  updateOverseas: (id: string, patch: Partial<OverseasProject>) => Promise<void>;
+  resetDemo: () => Promise<void>;
 };
 
 const Ctx = createContext<Store | null>(null);
 
-const demoUsers: Record<Role, User> = {
-  admin: { id: "u1", name: "张衡", role: "admin", org: "服务中心主任办" },
-  alliance: { id: "u2", name: "陈希", role: "alliance", org: "联盟秘书处" },
-  approval: { id: "u3", name: "刘芳", role: "approval", org: "审批中心" },
-  overseas: { id: "u4", name: "韩磊", role: "overseas", org: "出海中心" },
-  distribution: { id: "u5", name: "苏晚", role: "distribution", org: "发行投流中心" },
-  copyright: { id: "u6", name: "顾清", role: "copyright", org: "版权中心" },
-  ai: { id: "u7", name: "蒋一", role: "ai", org: "AI 研发中心" },
-};
-
-function load(): AppState {
+function loadUser(): User | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return seedState();
-    return { ...seedState(), ...JSON.parse(raw), user: JSON.parse(raw).user ?? null };
+    const raw = localStorage.getItem(USER_KEY);
+    return raw ? JSON.parse(raw) : null;
   } catch {
-    return seedState();
+    return null;
   }
 }
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AppState>(() => load());
+  const [state, setState] = useState<AppState>(() => {
+    const { user: _u, ...rest } = seedState();
+    return { ...rest, user: loadUser() };
+  });
+  const [loading, setLoading] = useState(true);
+  const [apiOnline, setApiOnline] = useState(false);
+
+  const refresh = useCallback(async () => {
+    try {
+      await apiClient.health();
+      setApiOnline(true);
+      const data = await apiClient.state();
+      setState((s) => ({ ...data, user: s.user }));
+    } catch {
+      setApiOnline(false);
+      const { user: _u, ...rest } = seedState();
+      setState((s) => ({ ...rest, user: s.user }));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [state]);
+    refresh();
+  }, [refresh]);
 
-  const api = useMemo<Store>(
+  const store = useMemo<Store>(
     () => ({
       ...state,
-      login: (role) => setState((s) => ({ ...s, user: demoUsers[role] })),
-      logout: () => setState((s) => ({ ...s, user: null })),
-      upsertMember: (m) =>
-        setState((s) => {
-          const exists = s.members.some((x) => x.id === m.id);
-          return {
-            ...s,
-            members: exists
-              ? s.members.map((x) => (x.id === m.id ? m : x))
-              : [m, ...s.members],
+      loading,
+      apiOnline,
+      refresh,
+      login: async (role) => {
+        try {
+          const { user } = await apiClient.login(role);
+          localStorage.setItem(USER_KEY, JSON.stringify(user));
+          setState((s) => ({ ...s, user }));
+        } catch {
+          const fallback: User = {
+            id: `u-${role}`,
+            name: ROLE_LABEL[role].split("/")[0].trim(),
+            role,
+            org: ROLE_LABEL[role],
           };
-        }),
-      addEvent: (e) => setState((s) => ({ ...s, events: [e, ...s.events] })),
-      updateMatch: (id, patch) =>
-        setState((s) => ({
-          ...s,
-          matches: s.matches.map((x) => (x.id === id ? { ...x, ...patch } : x)),
-        })),
-      upsertOrder: (o) =>
-        setState((s) => {
-          const exists = s.orders.some((x) => x.id === o.id);
-          return {
+          localStorage.setItem(USER_KEY, JSON.stringify(fallback));
+          setState((s) => ({ ...s, user: fallback }));
+        }
+      },
+      logout: () => {
+        localStorage.removeItem(USER_KEY);
+        setState((s) => ({ ...s, user: null }));
+      },
+      upsertMember: async (m) => {
+        if (apiOnline) {
+          const saved = state.members.some((x) => x.id === m.id)
+            ? await apiClient.members.update(m.id, m)
+            : await apiClient.members.save(m);
+          setState((s) => ({
             ...s,
-            orders: exists
-              ? s.orders.map((x) => (x.id === o.id ? o : x))
-              : [o, ...s.orders],
-          };
-        }),
-      updateApproval: (id, patch) =>
-        setState((s) => ({
-          ...s,
-          approvals: s.approvals.map((x) => (x.id === id ? { ...x, ...patch } : x)),
-        })),
-      updateOverseas: (id, patch) =>
-        setState((s) => ({
-          ...s,
-          overseas: s.overseas.map((x) => (x.id === id ? { ...x, ...patch } : x)),
-        })),
-      resetDemo: () => setState({ ...seedState(), user: state.user }),
+            members: s.members.some((x) => x.id === m.id)
+              ? s.members.map((x) => (x.id === m.id ? saved : x))
+              : [saved, ...s.members],
+          }));
+        } else {
+          setState((s) => {
+            const exists = s.members.some((x) => x.id === m.id);
+            return {
+              ...s,
+              members: exists
+                ? s.members.map((x) => (x.id === m.id ? m : x))
+                : [m, ...s.members],
+            };
+          });
+        }
+      },
+      addEvent: async (e) => {
+        if (apiOnline) {
+          const saved = await apiClient.events.save(e);
+          setState((s) => ({ ...s, events: [saved, ...s.events] }));
+        } else {
+          setState((s) => ({ ...s, events: [e, ...s.events] }));
+        }
+      },
+      updateMatch: async (id, patch) => {
+        if (apiOnline) {
+          const saved = await apiClient.matches.update(id, patch);
+          setState((s) => ({
+            ...s,
+            matches: s.matches.map((x) => (x.id === id ? saved : x)),
+          }));
+        } else {
+          setState((s) => ({
+            ...s,
+            matches: s.matches.map((x) => (x.id === id ? { ...x, ...patch } : x)),
+          }));
+        }
+      },
+      upsertOrder: async (o) => {
+        if (apiOnline) {
+          const saved = state.orders.some((x) => x.id === o.id)
+            ? await apiClient.orders.update(o.id, o)
+            : await apiClient.orders.save(o);
+          setState((s) => ({
+            ...s,
+            orders: s.orders.some((x) => x.id === o.id)
+              ? s.orders.map((x) => (x.id === o.id ? saved : x))
+              : [saved, ...s.orders],
+          }));
+        } else {
+          setState((s) => {
+            const exists = s.orders.some((x) => x.id === o.id);
+            return {
+              ...s,
+              orders: exists
+                ? s.orders.map((x) => (x.id === o.id ? o : x))
+                : [o, ...s.orders],
+            };
+          });
+        }
+      },
+      updateApproval: async (id, patch) => {
+        if (apiOnline) {
+          const saved = await apiClient.approvals.update(id, patch);
+          setState((s) => ({
+            ...s,
+            approvals: s.approvals.map((x) => (x.id === id ? saved : x)),
+          }));
+        } else {
+          setState((s) => ({
+            ...s,
+            approvals: s.approvals.map((x) => (x.id === id ? { ...x, ...patch } : x)),
+          }));
+        }
+      },
+      updateOverseas: async (id, patch) => {
+        if (apiOnline) {
+          const saved = await apiClient.overseas.update(id, patch);
+          setState((s) => ({
+            ...s,
+            overseas: s.overseas.map((x) => (x.id === id ? saved : x)),
+          }));
+        } else {
+          setState((s) => ({
+            ...s,
+            overseas: s.overseas.map((x) => (x.id === id ? { ...x, ...patch } : x)),
+          }));
+        }
+      },
+      resetDemo: async () => {
+        if (apiOnline) {
+          const data = (await apiClient.reset()) as Omit<AppState, "user">;
+          setState((s) => ({ ...data, user: s.user }));
+        } else {
+          const { user: _u, ...rest } = seedState();
+          setState((s) => ({ ...rest, user: s.user }));
+        }
+      },
     }),
-    [state],
+    [state, loading, apiOnline, refresh],
   );
 
-  return createElement(Ctx.Provider, { value: api }, children);
+  return createElement(Ctx.Provider, { value: store }, children);
 }
 
 export function useStore() {

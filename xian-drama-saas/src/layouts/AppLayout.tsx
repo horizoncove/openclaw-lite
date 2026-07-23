@@ -17,35 +17,35 @@ import {
 import { roleName, useStore } from "../store";
 
 const allianceNav = [
-  { to: "/alliance/members", label: "会员管理", icon: Users },
-  { to: "/alliance/events", label: "活动运营", icon: CalendarDays },
-  { to: "/alliance/matching", label: "供需撮合", icon: Handshake },
+  { to: "/console/alliance/members", label: "会员管理", icon: Users },
+  { to: "/console/alliance/events", label: "活动运营", icon: CalendarDays },
+  { to: "/console/alliance/matching", label: "供需撮合", icon: Handshake },
 ];
 
 const centerNav = [
-  { to: "/centers/approval", label: "审批中心", icon: Stamp },
-  { to: "/centers/overseas", label: "出海中心", icon: Globe2 },
-  { to: "/centers/distribution", label: "发行投流", icon: Megaphone },
-  { to: "/centers/copyright", label: "版权中心", icon: Scale },
-  { to: "/centers/ai", label: "AI 研发", icon: Bot },
+  { to: "/console/centers/approval", label: "审批中心", icon: Stamp },
+  { to: "/console/centers/overseas", label: "出海中心", icon: Globe2 },
+  { to: "/console/centers/distribution", label: "发行投流", icon: Megaphone },
+  { to: "/console/centers/copyright", label: "版权中心", icon: Scale },
+  { to: "/console/centers/ai", label: "AI 研发", icon: Bot },
 ];
 
 const titles: Record<string, string> = {
-  "/": "运营总览",
-  "/orders": "工单中枢",
-  "/kpi": "KPI 看板",
-  "/alliance/members": "联盟 · 会员管理",
-  "/alliance/events": "联盟 · 活动运营",
-  "/alliance/matching": "联盟 · 供需撮合",
-  "/centers/approval": "审批中心运营",
-  "/centers/overseas": "出海中心运营",
-  "/centers/distribution": "发行投流中心运营",
-  "/centers/copyright": "版权中心运营",
-  "/centers/ai": "AI 研发中心运营",
+  "/console": "运营总览",
+  "/console/orders": "工单中枢",
+  "/console/kpi": "KPI 看板",
+  "/console/alliance/members": "联盟 · 会员管理",
+  "/console/alliance/events": "联盟 · 活动运营",
+  "/console/alliance/matching": "联盟 · 供需撮合",
+  "/console/centers/approval": "审批中心运营",
+  "/console/centers/overseas": "出海中心运营",
+  "/console/centers/distribution": "发行投流中心运营",
+  "/console/centers/copyright": "版权中心运营",
+  "/console/centers/ai": "AI 研发中心运营",
 };
 
 export default function AppLayout() {
-  const { user, logout, resetDemo } = useStore();
+  const { user, logout, resetDemo, apiOnline, loading } = useStore();
   const nav = useNavigate();
   const loc = useLocation();
   const title = titles[loc.pathname] ?? "运营 SaaS";
@@ -60,13 +60,13 @@ export default function AppLayout() {
         <nav className="nav">
           <div className="nav-group">
             <div className="nav-label">总控</div>
-            <NavLink to="/" end className={({ isActive }) => (isActive ? "active" : undefined)}>
+            <NavLink to="/console" end className={({ isActive }) => (isActive ? "active" : undefined)}>
               <LayoutDashboard size={16} /> 运营总览
             </NavLink>
-            <NavLink to="/orders" className={({ isActive }) => (isActive ? "active" : undefined)}>
+            <NavLink to="/console/orders" className={({ isActive }) => (isActive ? "active" : undefined)}>
               <ClipboardList size={16} /> 工单中枢
             </NavLink>
-            <NavLink to="/kpi" className={({ isActive }) => (isActive ? "active" : undefined)}>
+            <NavLink to="/console/kpi" className={({ isActive }) => (isActive ? "active" : undefined)}>
               <ChartColumnIncreasing size={16} /> KPI 看板
             </NavLink>
           </div>
@@ -104,8 +104,11 @@ export default function AppLayout() {
       <div className="main">
         <header className="topbar">
           <h2>{title}</h2>
-          <div className="topbar-actions">
-            <button className="btn btn-secondary" onClick={resetDemo}>
+        <div className="topbar-actions">
+          <span className={`api-badge ${apiOnline ? "on" : "off"}`}>
+            {apiOnline ? "API 在线" : "离线模式"}
+          </span>
+          <button className="btn btn-secondary" onClick={() => resetDemo()}>
               <RotateCcw size={15} /> 重置演示数据
             </button>
             <button
@@ -120,7 +123,13 @@ export default function AppLayout() {
           </div>
         </header>
         <main className="content">
-          <Outlet />
+          {loading ? (
+            <div className="card" style={{ textAlign: "center", color: "var(--muted)" }}>
+              正在连接服务平台…
+            </div>
+          ) : (
+            <Outlet />
+          )}
         </main>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import AppLayout from "./layouts/AppLayout";
 import { useStore } from "./store";
+import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import OrdersPage from "./pages/OrdersPage";
@@ -23,9 +24,10 @@ function RequireAuth() {
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route element={<RequireAuth />}>
-        <Route element={<AppLayout />}>
+        <Route path="/console" element={<AppLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="kpi" element={<KpiPage />} />
