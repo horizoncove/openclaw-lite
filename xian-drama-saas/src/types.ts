@@ -1,21 +1,22 @@
-export type Role =
-  | "admin"
-  | "alliance"
-  | "approval"
-  | "overseas"
-  | "distribution"
-  | "copyright"
-  | "ai";
+export type AllianceRole = "alliance" | "member";
+export type CenterRole = "approval" | "overseas" | "distribution" | "copyright" | "ai";
 
 export type MemberTier = "核心会员" | "专业会员" | "观察会员";
 export type MemberStatus = "有效" | "待审" | "退出";
 export type OrderStatus = "新建" | "处理中" | "待客户" | "完结" | "关闭";
 export type Priority = "高" | "中" | "低";
 
-export interface User {
+export interface AllianceUser {
   id: string;
   name: string;
-  role: Role;
+  role: AllianceRole;
+  org: string;
+}
+
+export interface CenterUser {
+  id: string;
+  name: string;
+  role: CenterRole;
   org: string;
 }
 
@@ -56,7 +57,7 @@ export interface MatchNeed {
 export interface WorkOrder {
   id: string;
   product: string;
-  center: "联盟" | "审批" | "出海" | "发行投流" | "版权" | "AI" | "主任办";
+  center: string;
   org: string;
   contact: string;
   priority: Priority;
@@ -115,11 +116,16 @@ export interface AIProject {
   owner: string;
 }
 
-export interface AppState {
-  user: User | null;
+export interface AllianceState {
+  user: AllianceUser | null;
   members: Member[];
   events: EventItem[];
   matches: MatchNeed[];
+  orders: WorkOrder[];
+}
+
+export interface CenterState {
+  user: CenterUser | null;
   orders: WorkOrder[];
   approvals: ApprovalCase[];
   overseas: OverseasProject[];
@@ -128,9 +134,12 @@ export interface AppState {
   ais: AIProject[];
 }
 
-export const ROLE_LABEL: Record<Role, string> = {
-  admin: "主任办 / 管理员",
+export const ALLIANCE_ROLE_LABEL: Record<AllianceRole, string> = {
   alliance: "联盟秘书处",
+  member: "会员单位",
+};
+
+export const CENTER_ROLE_LABEL: Record<CenterRole, string> = {
   approval: "审批中心",
   overseas: "出海中心",
   distribution: "发行投流中心",

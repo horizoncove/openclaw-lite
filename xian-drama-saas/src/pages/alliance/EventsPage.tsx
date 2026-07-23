@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useStore } from "../../store";
+import { useAllianceStore } from "../../store/allianceStore";
 import type { EventItem } from "../../types";
 
 export default function EventsPage() {
-  const { events, addEvent } = useStore();
+  const { events, addEvent } = useAllianceStore();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<Partial<EventItem>>({
     type: "对接会",

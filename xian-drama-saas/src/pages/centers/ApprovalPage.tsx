@@ -1,8 +1,8 @@
-import { useStore } from "../../store";
+import { useCenterStore } from "../../store/centerStore";
 import type { ApprovalCase } from "../../types";
 
 export default function ApprovalPage() {
-  const { approvals, updateApproval, orders } = useStore();
+  const { approvals, updateApproval, orders } = useCenterStore();
   const related = orders.filter((o) => o.center === "审批");
 
   return (

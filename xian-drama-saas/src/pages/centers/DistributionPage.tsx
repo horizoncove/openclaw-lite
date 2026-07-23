@@ -1,7 +1,7 @@
-import { useStore } from "../../store";
+import { useCenterStore } from "../../store/centerStore";
 
 export default function DistributionPage() {
-  const { distributions } = useStore();
+  const { distributions } = useCenterStore();
 
   return (
     <div className="grid" style={{ gap: "1rem" }}>

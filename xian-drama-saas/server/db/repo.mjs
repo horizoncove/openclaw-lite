@@ -199,11 +199,6 @@ export async function patchMatch(id, patch) {
   return mapMatch(r.rows[0]);
 }
 
-export async function listOrders() {
-  const r = await query("SELECT * FROM work_orders ORDER BY created_at DESC");
-  return r.rows.map(mapOrder);
-}
-
 export async function upsertOrder(item) {
   await query(
     `INSERT INTO work_orders (id, product, center, org, contact, priority, status, assignee, created_at, due_at, summary)
@@ -220,6 +215,140 @@ export async function patchOrder(id, patch) {
   const cur = await query("SELECT * FROM work_orders WHERE id=$1", [id]);
   if (!cur.rows[0]) return null;
   return upsertOrder({ ...mapOrder(cur.rows[0]), ...patch });
+}
+
+export async function listOrders(portal = "all") {
+  if (portal === "alliance") {
+    const r = await query("SELECT * FROM work_orders WHERE center = '联盟' ORDER BY created_at DESC");
+    return r.rows.map(mapOrder);
+  }
+  if (portal === "center") {
+    const r = await query("SELECT * FROM work_orders WHERE center <> '联盟' ORDER BY created_at DESC");
+    return r.rows.map(mapOrder);
+  }
+  const r = await query("SELECT * FROM work_orders ORDER BY created_at DESC");
+  return r.rows.map(mapOrder);
+}
+
+export async function getAllianceState() {
+  const [members, events, matches, orders] = await Promise.all([
+    listMembers(),
+    listEvents(),
+    listMatches(),
+    listOrders("alliance"),
+  ]);
+  return { members, events, matches, orders };
+}
+
+export async function getCenterState() {
+  const [orders, approvals, overseas, distributions, copyrights, ais] = await Promise.all([
+    listOrders("center"),
+    listApprovals(),
+    listOverseas(),
+    listDistributions(),
+    listCopyrights(),
+    listAis(),
+  ]);
+  return { orders, approvals, overseas, distributions, copyrights, ais };
+}
+
+export async function resetAllianceState(seed) {
+  await query("TRUNCATE members, events, matches CASCADE");
+  await query("DELETE FROM work_orders WHERE center = '联盟'");
+  await seedAlliance(seed);
+  return getAllianceState();
+}
+
+export async function resetCenterState(seed) {
+  await query("TRUNCATE approvals, overseas_projects, distributions, copyrights, ai_projects CASCADE");
+  await query("DELETE FROM work_orders WHERE center <> '联盟'");
+  await seedCenter(seed);
+  return getCenterState();
+}
+
+export async function getAllianceStats() {
+  const r = await query(`
+    SELECT
+      (SELECT COUNT(*)::int FROM members WHERE status = '有效') AS members,
+      (SELECT COUNT(*)::int FROM work_orders WHERE center = '联盟' AND status NOT IN ('完结', '关闭')) AS open_orders,
+      (SELECT COUNT(*)::int FROM events WHERE status <> '已结束') AS events,
+      (SELECT COUNT(*)::int FROM matches WHERE status IN ('开放', '撮合中')) AS matches
+  `);
+  const s = r.rows[0];
+  return { members: s.members, openOrders: s.open_orders, events: s.events, matches: s.matches };
+}
+
+export async function getCenterStats() {
+  const r = await query(`
+    SELECT
+      (SELECT COUNT(*)::int FROM work_orders WHERE center <> '联盟' AND status NOT IN ('完结', '关闭')) AS open_orders,
+      (SELECT COUNT(*)::int FROM approvals) AS approvals,
+      (SELECT COUNT(*)::int FROM overseas_projects) AS overseas,
+      (SELECT COUNT(*)::int FROM distributions) AS distributions,
+      (SELECT COUNT(*)::int FROM copyrights) AS copyrights,
+      (SELECT COUNT(*)::int FROM ai_projects) AS ais
+  `);
+  const s = r.rows[0];
+  return {
+    openOrders: s.open_orders,
+    approvals: s.approvals,
+    overseas: s.overseas,
+    distributions: s.distributions,
+    copyrights: s.copyrights,
+    ais: s.ais,
+  };
+}
+
+export async function seedAlliance(seed) {
+  for (const m of seed.members ?? []) await upsertMember(m);
+  for (const e of seed.events ?? []) await upsertEvent(e);
+  for (const m of seed.matches ?? []) {
+    await query(
+      `INSERT INTO matches (id, org, need, offer, status, owner, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7)
+       ON CONFLICT (id) DO NOTHING`,
+      [m.id, m.org, m.need, m.offer, m.status, m.owner, m.updatedAt]
+    );
+  }
+  for (const o of seed.orders ?? []) await upsertOrder(o);
+}
+
+export async function seedCenter(seed) {
+  for (const o of seed.orders ?? []) await upsertOrder(o);
+  for (const a of seed.approvals ?? []) {
+    await query(
+      `INSERT INTO approvals (id, title, org, risk, stage, result, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7)
+       ON CONFLICT (id) DO NOTHING`,
+      [a.id, a.title, a.org, a.risk, a.stage, a.result ?? null, a.updatedAt]
+    );
+  }
+  for (const o of seed.overseas ?? []) {
+    await query(
+      `INSERT INTO overseas_projects (id, title, market, stage, score, owner, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7)
+       ON CONFLICT (id) DO NOTHING`,
+      [o.id, o.title, o.market, o.stage, o.score, o.owner, o.updatedAt]
+    );
+  }
+  for (const d of seed.distributions ?? []) {
+    await query(
+      `INSERT INTO distributions (id, title, platform, budget, stage, roi, owner) VALUES ($1,$2,$3,$4,$5,$6,$7)
+       ON CONFLICT (id) DO NOTHING`,
+      [d.id, d.title, d.platform, d.budget, d.stage, d.roi ?? null, d.owner]
+    );
+  }
+  for (const c of seed.copyrights ?? []) {
+    await query(
+      `INSERT INTO copyrights (id, title, type, status, org, updated_at) VALUES ($1,$2,$3,$4,$5,$6)
+       ON CONFLICT (id) DO NOTHING`,
+      [c.id, c.title, c.type, c.status, c.org, c.updatedAt]
+    );
+  }
+  for (const a of seed.ais ?? []) {
+    await query(
+      `INSERT INTO ai_projects (id, org, line, status, lift, owner) VALUES ($1,$2,$3,$4,$5,$6)
+       ON CONFLICT (id) DO NOTHING`,
+      [a.id, a.org, a.line, a.status, a.lift ?? null, a.owner]
+    );
+  }
 }
 
 export async function listApprovals() {

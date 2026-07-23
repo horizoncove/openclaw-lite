@@ -1,7 +1,7 @@
-import { useStore } from "../../store";
+import { useCenterStore } from "../../store/centerStore";
 
 export default function CopyrightPage() {
-  const { copyrights } = useStore();
+  const { copyrights } = useCenterStore();
 
   return (
     <div className="grid" style={{ gap: "1rem" }}>

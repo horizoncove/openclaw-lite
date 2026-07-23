@@ -1,7 +1,20 @@
-const BASE = "/api";
+import type {
+  AllianceRole,
+  AllianceState,
+  AllianceUser,
+  ApprovalCase,
+  CenterRole,
+  CenterState,
+  CenterUser,
+  EventItem,
+  MatchNeed,
+  Member,
+  OverseasProject,
+  WorkOrder,
+} from "../types";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetch(`/api${path}`, {
     headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
     ...init,
   });
@@ -12,82 +25,77 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export const api = {
+export const allianceApi = {
   health: () => request<{ ok: boolean }>("/health"),
+  state: () => request<Omit<AllianceState, "user">>("/alliance/state"),
+  reset: () => request<unknown>("/alliance/reset", { method: "POST" }),
   stats: () =>
-    request<{
-      members: number;
-      openOrders: number;
-      overseas: number;
-      events: number;
-      approvals: number;
-      distributions: number;
-      copyrights: number;
-      ais: number;
-    }>("/stats"),
-  state: () => request<Omit<import("../types").AppState, "user">>("/state"),
-  reset: () => request<unknown>("/reset", { method: "POST" }),
-  login: (role: string) =>
-    request<{ user: import("../types").User; token: string }>("/auth/login", {
+    request<{ members: number; openOrders: number; events: number; matches: number }>(
+      "/alliance/stats",
+    ),
+  login: (role: AllianceRole) =>
+    request<{ user: AllianceUser; token: string }>("/alliance/auth/login", {
       method: "POST",
       body: JSON.stringify({ role }),
     }),
   members: {
-    list: () => request<import("../types").Member[]>("/members"),
-    save: (m: import("../types").Member) =>
-      request<import("../types").Member>("/members", { method: "POST", body: JSON.stringify(m) }),
-    update: (id: string, patch: Partial<import("../types").Member>) =>
-      request<import("../types").Member>(`/members/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(patch),
-      }),
+    save: (m: Member) =>
+      request<Member>("/alliance/members", { method: "POST", body: JSON.stringify(m) }),
+    update: (id: string, patch: Partial<Member>) =>
+      request<Member>(`/alliance/members/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
   },
   events: {
-    list: () => request<import("../types").EventItem[]>("/events"),
-    save: (e: import("../types").EventItem) =>
-      request<import("../types").EventItem>("/events", { method: "POST", body: JSON.stringify(e) }),
+    save: (e: EventItem) =>
+      request<EventItem>("/alliance/events", { method: "POST", body: JSON.stringify(e) }),
   },
   matches: {
-    list: () => request<import("../types").MatchNeed[]>("/matches"),
-    update: (id: string, patch: Partial<import("../types").MatchNeed>) =>
-      request<import("../types").MatchNeed>(`/matches/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(patch),
-      }),
+    update: (id: string, patch: Partial<MatchNeed>) =>
+      request<MatchNeed>(`/alliance/matches/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
   },
   orders: {
-    list: () => request<import("../types").WorkOrder[]>("/orders"),
-    save: (o: import("../types").WorkOrder) =>
-      request<import("../types").WorkOrder>("/orders", { method: "POST", body: JSON.stringify(o) }),
-    update: (id: string, patch: Partial<import("../types").WorkOrder>) =>
-      request<import("../types").WorkOrder>(`/orders/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(patch),
-      }),
+    save: (o: WorkOrder) =>
+      request<WorkOrder>("/alliance/orders", { method: "POST", body: JSON.stringify(o) }),
+    update: (id: string, patch: Partial<WorkOrder>) =>
+      request<WorkOrder>(`/alliance/orders/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
   },
+};
+
+export const centerApi = {
+  health: () => request<{ ok: boolean }>("/health"),
+  state: () => request<Omit<CenterState, "user">>("/center/state"),
+  reset: () => request<unknown>("/center/reset", { method: "POST" }),
+  stats: () =>
+    request<{
+      openOrders: number;
+      approvals: number;
+      overseas: number;
+      distributions: number;
+      copyrights: number;
+      ais: number;
+    }>("/center/stats"),
+  login: (role: CenterRole) =>
+    request<{ user: CenterUser; token: string }>("/center/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ role }),
+    }),
   approvals: {
-    list: () => request<import("../types").ApprovalCase[]>("/approvals"),
-    update: (id: string, patch: Partial<import("../types").ApprovalCase>) =>
-      request<import("../types").ApprovalCase>(`/approvals/${id}`, {
+    update: (id: string, patch: Partial<ApprovalCase>) =>
+      request<ApprovalCase>(`/center/approvals/${id}`, {
         method: "PUT",
         body: JSON.stringify(patch),
       }),
   },
   overseas: {
-    list: () => request<import("../types").OverseasProject[]>("/overseas"),
-    update: (id: string, patch: Partial<import("../types").OverseasProject>) =>
-      request<import("../types").OverseasProject>(`/overseas/${id}`, {
+    update: (id: string, patch: Partial<OverseasProject>) =>
+      request<OverseasProject>(`/center/overseas/${id}`, {
         method: "PUT",
         body: JSON.stringify(patch),
       }),
   },
-  distributions: {
-    list: () => request<import("../types").DistributionCase[]>("/distributions"),
-  },
-  copyrights: {
-    list: () => request<import("../types").CopyrightCase[]>("/copyrights"),
-  },
-  ais: {
-    list: () => request<import("../types").AIProject[]>("/ais"),
+  orders: {
+    save: (o: WorkOrder) =>
+      request<WorkOrder>("/center/orders", { method: "POST", body: JSON.stringify(o) }),
+    update: (id: string, patch: Partial<WorkOrder>) =>
+      request<WorkOrder>(`/center/orders/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
   },
 };

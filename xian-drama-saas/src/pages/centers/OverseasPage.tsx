@@ -1,8 +1,8 @@
-import { useStore } from "../../store";
+import { useCenterStore } from "../../store/centerStore";
 import type { OverseasProject } from "../../types";
 
 export default function OverseasPage() {
-  const { overseas, updateOverseas } = useStore();
+  const { overseas, updateOverseas } = useCenterStore();
 
   return (
     <div className="grid" style={{ gap: "1rem" }}>
