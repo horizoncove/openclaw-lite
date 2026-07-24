@@ -15,19 +15,25 @@ export default function LandingPage() {
     <div className="landing">
       <header className="landing-nav">
         <div className="landing-brand">西安微短剧产业服务中心</div>
+        <Link className="btn btn-primary" to="/overseas">
+          出海服务中心 <ArrowRight size={14} />
+        </Link>
       </header>
 
       <section className="landing-hero">
-        <p className="eyebrow">ALLIANCE + FIVE CENTERS · DUAL SAAS</p>
+        <p className="eyebrow">ALLIANCE · CENTERS · OVERSEAS</p>
         <h1>
-          联盟会员 SaaS
+          产业服务平台
           <br />
-          五大中心运营 SaaS
+          出海运营 SaaS
         </h1>
         <p className="lead">
-          两套独立入口、两套独立数据。联盟侧管会员与撮合，中心侧管审批出海发行版权 AI，互不共享。
+          联盟会员、五大中心与微短剧出海服务中心三套入口。出海侧覆盖选品、译制、平台谈判与结算全链路。
         </p>
         <div className="hero-actions portal-actions">
+          <Link className="btn btn-primary btn-lg portal-btn overseas" to="/overseas">
+            <Globe2 size={18} /> 出海服务中心 <ArrowRight size={16} />
+          </Link>
           <Link className="btn btn-primary btn-lg portal-btn alliance" to="/alliance/login">
             <Users size={18} /> 联盟会员入口 <ArrowRight size={16} />
           </Link>
@@ -38,7 +44,15 @@ export default function LandingPage() {
       </section>
 
       <section className="landing-modules">
-        <div className="portal-split">
+        <div className="portal-split portal-split-3">
+          <article className="module-card portal-card">
+            <Globe2 size={22} />
+            <h3>出海服务中心</h3>
+            <p>选品漏斗、译制本地化、平台伙伴、商务谈判、结算对账与客户进件</p>
+            <Link className="btn btn-secondary" to="/overseas">
+              进入出海 →
+            </Link>
+          </article>
           <article className="module-card portal-card">
             <Users size={22} />
             <h3>联盟会员侧</h3>
@@ -68,14 +82,16 @@ export default function LandingPage() {
         <Handshake size={28} />
         <div>
           <h3>数据完全隔离</h3>
-          <p>联盟 API（/api/alliance）与中心 API（/api/center）独立存储，各自重置、各自运营。</p>
+          <p>
+            联盟、中心、出海三套 API 独立存储：/api/alliance · /api/center · /api/overseas
+          </p>
         </div>
         <a className="btn btn-secondary" href="/demo/saas-demo.pdf">
           下载演示 PDF
         </a>
       </section>
 
-      <footer className="landing-foot">西安微短剧产业服务中心 · 双入口 SaaS V1.2</footer>
+      <footer className="landing-foot">西安微短剧产业服务中心 · 出海 SaaS V2.0</footer>
     </div>
   );
 }

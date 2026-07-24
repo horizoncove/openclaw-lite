@@ -2,8 +2,11 @@ import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import AllianceLayout from "./layouts/AllianceLayout";
 import MemberLayout from "./layouts/MemberLayout";
 import CenterLayout from "./layouts/CenterLayout";
+import OverseasLayout from "./layouts/OverseasLayout";
+import OverseasClientLayout from "./layouts/OverseasClientLayout";
 import { useAllianceStore } from "./store/allianceStore";
 import { useCenterStore } from "./store/centerStore";
+import { useOverseasStore } from "./store/overseasStore";
 import LandingPage from "./pages/LandingPage";
 import AllianceLoginPage from "./pages/AllianceLoginPage";
 import CenterLoginPage from "./pages/CenterLoginPage";
@@ -26,6 +29,19 @@ import OverseasPage from "./pages/centers/OverseasPage";
 import DistributionPage from "./pages/centers/DistributionPage";
 import CopyrightPage from "./pages/centers/CopyrightPage";
 import AIPage from "./pages/centers/AIPage";
+import OverseasLandingPage from "./pages/overseas/OverseasLandingPage";
+import OverseasLoginPage from "./pages/overseas/OverseasLoginPage";
+import OverseasDashboard from "./pages/overseas/ops/OverseasDashboard";
+import OverseasProjectsPage from "./pages/overseas/ops/OverseasProjectsPage";
+import OverseasLocalizationPage from "./pages/overseas/ops/OverseasLocalizationPage";
+import OverseasPlatformsPage from "./pages/overseas/ops/OverseasPlatformsPage";
+import OverseasDealsPage from "./pages/overseas/ops/OverseasDealsPage";
+import OverseasSettlementPage from "./pages/overseas/ops/OverseasSettlementPage";
+import OverseasMarketsPage from "./pages/overseas/ops/OverseasMarketsPage";
+import OverseasIntakesPage from "./pages/overseas/ops/OverseasIntakesPage";
+import ClientHomePage from "./pages/overseas/client/ClientHomePage";
+import ClientSubmitPage from "./pages/overseas/client/ClientSubmitPage";
+import ClientProjectsPage from "./pages/overseas/client/ClientProjectsPage";
 
 function RequireAllianceAuth() {
   const { user } = useAllianceStore();
@@ -39,10 +55,47 @@ function RequireCenterAuth() {
   return <Outlet />;
 }
 
+function RequireOverseasOps() {
+  const { user } = useOverseasStore();
+  if (!user) return <Navigate to="/overseas/login" replace />;
+  if (user.role !== "ops") return <Navigate to="/overseas/client" replace />;
+  return <Outlet />;
+}
+
+function RequireOverseasClient() {
+  const { user } = useOverseasStore();
+  if (!user) return <Navigate to="/overseas/login" replace />;
+  if (user.role !== "client") return <Navigate to="/overseas/console" replace />;
+  return <Outlet />;
+}
+
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+
+      {/* 出海服务中心 SaaS */}
+      <Route path="/overseas" element={<OverseasLandingPage />} />
+      <Route path="/overseas/login" element={<OverseasLoginPage />} />
+      <Route element={<RequireOverseasOps />}>
+        <Route path="/overseas/console" element={<OverseasLayout />}>
+          <Route index element={<OverseasDashboard />} />
+          <Route path="projects" element={<OverseasProjectsPage />} />
+          <Route path="localization" element={<OverseasLocalizationPage />} />
+          <Route path="platforms" element={<OverseasPlatformsPage />} />
+          <Route path="deals" element={<OverseasDealsPage />} />
+          <Route path="settlement" element={<OverseasSettlementPage />} />
+          <Route path="markets" element={<OverseasMarketsPage />} />
+          <Route path="intakes" element={<OverseasIntakesPage />} />
+        </Route>
+      </Route>
+      <Route element={<RequireOverseasClient />}>
+        <Route path="/overseas/client" element={<OverseasClientLayout />}>
+          <Route index element={<ClientHomePage />} />
+          <Route path="submit" element={<ClientSubmitPage />} />
+          <Route path="projects" element={<ClientProjectsPage />} />
+        </Route>
+      </Route>
 
       <Route path="/alliance/login" element={<AllianceLoginPage />} />
       <Route element={<RequireAllianceAuth />}>
@@ -77,7 +130,6 @@ export default function App() {
         </Route>
       </Route>
 
-      {/* 旧路径重定向 */}
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route path="/console/*" element={<Navigate to="/" replace />} />
 

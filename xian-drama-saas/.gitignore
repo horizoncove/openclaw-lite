@@ -25,3 +25,4 @@ dist-ssr
 server/data/db.json
 server/data/alliance-db.json
 server/data/center-db.json
+server/data/overseas-db.json
