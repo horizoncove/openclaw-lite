@@ -1,12 +1,15 @@
+import type { ReactNode } from "react";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import AllianceLayout from "./layouts/AllianceLayout";
 import MemberLayout from "./layouts/MemberLayout";
 import CenterLayout from "./layouts/CenterLayout";
 import OverseasLayout from "./layouts/OverseasLayout";
 import OverseasClientLayout from "./layouts/OverseasClientLayout";
+import AppLayout from "./layouts/AppLayout";
 import { useAllianceStore } from "./store/allianceStore";
 import { useCenterStore } from "./store/centerStore";
 import { useOverseasStore } from "./store/overseasStore";
+import { useP1Store } from "./store/p1Store";
 import LandingPage from "./pages/LandingPage";
 import AllianceLoginPage from "./pages/AllianceLoginPage";
 import CenterLoginPage from "./pages/CenterLoginPage";
@@ -42,6 +45,14 @@ import OverseasIntakesPage from "./pages/overseas/ops/OverseasIntakesPage";
 import ClientHomePage from "./pages/overseas/client/ClientHomePage";
 import ClientSubmitPage from "./pages/overseas/client/ClientSubmitPage";
 import ClientProjectsPage from "./pages/overseas/client/ClientProjectsPage";
+import AppLoginPage from "./pages/app/AppLoginPage";
+import WorkspacePage from "./pages/app/WorkspacePage";
+import ProjectsPage from "./pages/app/ProjectsPage";
+import DemandsPage from "./pages/app/DemandsPage";
+import OpportunitiesPage from "./pages/app/OpportunitiesPage";
+import WalletPage from "./pages/app/WalletPage";
+import ComputePage from "./pages/app/ComputePage";
+import NoticesPage from "./pages/app/NoticesPage";
 
 function RequireAllianceAuth() {
   const { user } = useAllianceStore();
@@ -69,10 +80,36 @@ function RequireOverseasClient() {
   return <Outlet />;
 }
 
+function RequireP1Auth({ children }: { children: ReactNode }) {
+  const { user } = useP1Store();
+  if (!user) return <Navigate to="/app/login" replace />;
+  return <>{children}</>;
+}
+
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+
+      {/* P1 会员协作中枢 */}
+      <Route path="/app/login" element={<AppLoginPage />} />
+      <Route
+        path="/app"
+        element={
+          <RequireP1Auth>
+            <AppLayout />
+          </RequireP1Auth>
+        }
+      >
+        <Route index element={<Navigate to="workspace" replace />} />
+        <Route path="workspace" element={<WorkspacePage />} />
+        <Route path="projects" element={<ProjectsPage />} />
+        <Route path="demands" element={<DemandsPage />} />
+        <Route path="opportunities" element={<OpportunitiesPage />} />
+        <Route path="wallet" element={<WalletPage />} />
+        <Route path="compute" element={<ComputePage />} />
+        <Route path="notices" element={<NoticesPage />} />
+      </Route>
 
       {/* 出海服务中心 SaaS */}
       <Route path="/overseas" element={<OverseasLandingPage />} />

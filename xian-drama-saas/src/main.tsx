@@ -5,18 +5,21 @@ import App from "./App";
 import { AllianceStoreProvider } from "./store/allianceStore";
 import { CenterStoreProvider } from "./store/centerStore";
 import { OverseasStoreProvider } from "./store/overseasStore";
+import { P1StoreProvider } from "./store/p1Store";
 import "./styles.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AllianceStoreProvider>
-      <CenterStoreProvider>
-        <OverseasStoreProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </OverseasStoreProvider>
-      </CenterStoreProvider>
-    </AllianceStoreProvider>
+    <P1StoreProvider>
+      <AllianceStoreProvider>
+        <CenterStoreProvider>
+          <OverseasStoreProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </OverseasStoreProvider>
+        </CenterStoreProvider>
+      </AllianceStoreProvider>
+    </P1StoreProvider>
   </StrictMode>,
 );
