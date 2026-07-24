@@ -4,6 +4,7 @@
 > 日期：2026-07-24  
 > 视角：**从用户怎么用、要完成什么事**出发（非技术架构视角）  
 > 深挖：核心痛点第一性原理见 [PAIN_FIRST_PRINCIPLES.md](./PAIN_FIRST_PRINCIPLES.md)  
+> 扩展：使用功能与生态闭环见 [ECOSYSTEM_AND_USAGE.md](./ECOSYSTEM_AND_USAGE.md)  
 > 派生规格：功能落点见 [PRD.md](./PRD.md) V1.3；工程验收见 [ACCEPTANCE.md](./ACCEPTANCE.md)  
 > 说明：本文是需求真源的「用户侧」；实现不得违背本文中的用户目标与禁区。
 
