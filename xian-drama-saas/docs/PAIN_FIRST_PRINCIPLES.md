@@ -3,7 +3,7 @@
 > 版本：**P0.1**  
 > 日期：2026-07-24  
 > 目的：剥掉功能清单与页面，回到**不可再分的约束**，解释用户为什么痛、软件能解哪一层  
-> 上游：[USER_REQUIREMENTS.md](./USER_REQUIREMENTS.md) · 下游：[PRD.md](./PRD.md) V1.3  
+> 上游：[USER_REQUIREMENTS.md](./USER_REQUIREMENTS.md) · 下游：[ECOSYSTEM_AND_USAGE.md](./ECOSYSTEM_AND_USAGE.md) · [PRD.md](./PRD.md) V1.3  
 
 ---
 
