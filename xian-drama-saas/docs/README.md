@@ -27,7 +27,8 @@
 | [API_CONTRACT.md](./API_CONTRACT.md) | **现行 HTTP 契约（以代码为准）** | 联调 / 验收 |
 | [ACCEPTANCE.md](./ACCEPTANCE.md) | Phase 1 验收清单与审核记录 | 放行标准 |
 | [REVIEW_REF_MINIMAX_DEMO.md](./REVIEW_REF_MINIMAX_DEMO.md) | 外部参考演示评审（内部） | 对照参考 |
-| [FEEDBACK_TO_MINIMAX.md](./FEEDBACK_TO_MINIMAX.md) | **致 MiniMax 的修改意见（可外发）** | 对外反馈 |
+| [FEEDBACK_TO_MINIMAX.md](./FEEDBACK_TO_MINIMAX.md) | 致 MiniMax 的修改意见（撮合展台） | 对外反馈 |
+| [FEEDBACK_TO_CODEBUDDY.md](./FEEDBACK_TO_CODEBUDDY.md) | **致 CodeBuddy 出海服务站修改意见（优化版）** | 对外反馈 |
 
 冲突处理顺序：
 
