@@ -2,7 +2,7 @@
 
 > 版本：**V1.3**  
 > 日期：2026-07-24  
-> 状态：业务决策已确认；升级说明见 [SCHEME_V13.md](./SCHEME_V13.md)  
+> 状态：业务决策已确认；**用户侧需求真源**见 [USER_REQUIREMENTS.md](./USER_REQUIREMENTS.md) U1.0；升级说明见 [SCHEME_V13.md](./SCHEME_V13.md)  
 > 实现边界 / 契约 / 验收：[P1_BOUNDARY.md](./P1_BOUNDARY.md) · [API_CONTRACT.md](./API_CONTRACT.md) · [ACCEPTANCE.md](./ACCEPTANCE.md)  
 >  
 > **已拍板：**  
@@ -11,7 +11,8 @@
 > 3. **API 聚合** + **算力调度**（统一网关、Tokens 计量）  
 > 4. **产品三角**：会员中枢（主）· 出海专业服务线 · 撮合履约网络  
 >  
-> **协作：** 文档线负责需求/架构/契约/验收；实现 Agent 按契约交付。UI 审美不作为文档线主责。
+> **协作：** 文档线负责需求/架构/契约/验收；实现 Agent 按契约交付。UI 审美不作为文档线主责。  
+> **阅读顺序：** 先 [USER_REQUIREMENTS.md](./USER_REQUIREMENTS.md)（谁、要办成什么事）→ 再读本文（功能规格）。
 
 ---
 
