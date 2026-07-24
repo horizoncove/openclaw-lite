@@ -19,9 +19,10 @@
 
 | 文档 | 说明 | 权威 |
 |------|------|------|
-| **[SCHEME_V13.md](./SCHEME_V13.md)** | **V1.3 升级总说明（先读）** | 增量索引 |
-| [PRD.md](./PRD.md) | 产品需求 **V1.3** | 业务 |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | 目标技术 **V1.3** | 目标架构 |
+| **[USER_REQUIREMENTS.md](./USER_REQUIREMENTS.md)** | **用户需求 U1.0（先读：谁、场景、Jobs）** | 用户侧真源 |
+| [SCHEME_V13.md](./SCHEME_V13.md) | V1.3 方案升级总说明 | 增量索引 |
+| [PRD.md](./PRD.md) | 产品功能规格 V1.3 | 功能规格 |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | 目标技术 V1.3 | 目标架构 |
 | [P1_BOUNDARY.md](./P1_BOUNDARY.md) | 仓库现状 vs 目标 | 审核基线 |
 | [API_CONTRACT.md](./API_CONTRACT.md) | 现行 HTTP 契约 | 联调 |
 | [ACCEPTANCE.md](./ACCEPTANCE.md) | 验收与放行 | 放行 |
@@ -31,7 +32,7 @@
 | [FEEDBACK_HUB_V32.md](./FEEDBACK_HUB_V32.md) | 中枢 v3.2 | 历史 |
 | [REVIEW_REF_MINIMAX_DEMO.md](./REVIEW_REF_MINIMAX_DEMO.md) | 首次外审笔记 | 历史 |
 
-冲突顺序：拍板决策 → API_CONTRACT/BOUNDARY 现行 → PRD/ARCH 目标 → 外审演示壳（最弱）。
+冲突顺序：用户目标（USER_REQUIREMENTS）→ 拍板决策 → API_CONTRACT/BOUNDARY 现行 → PRD/ARCH 功能与技术 → 外审演示壳（最弱）。
 
 ---
 

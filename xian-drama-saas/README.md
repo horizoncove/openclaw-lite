@@ -2,14 +2,15 @@
 
 > **定位（V1.3）：** 联盟**会员协作中枢**——项目、全联盟需求与撮合订单、进度、**Tokens 钱包 + API 聚合 + 算力调度**、通知。  
 > 出海为专业服务线。**不做** Token 转售。  
-> 升级说明：[docs/SCHEME_V13.md](./docs/SCHEME_V13.md)
+> **用户需求（先读）：** [docs/USER_REQUIREMENTS.md](./docs/USER_REQUIREMENTS.md) · 升级说明：[docs/SCHEME_V13.md](./docs/SCHEME_V13.md)
 
 ## 文档（主交付）
 
 | 文档 | 用途 |
 |------|------|
-| [docs/SCHEME_V13.md](./docs/SCHEME_V13.md) | **V1.3 方案升级总览** |
-| [docs/PRD.md](./docs/PRD.md) | 产品需求 V1.3 |
+| [docs/USER_REQUIREMENTS.md](./docs/USER_REQUIREMENTS.md) | **用户需求：画像 / 场景 / Jobs** |
+| [docs/SCHEME_V13.md](./docs/SCHEME_V13.md) | V1.3 方案升级总览 |
+| [docs/PRD.md](./docs/PRD.md) | 产品功能规格 V1.3 |
 | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | 目标技术 V1.3 |
 | [docs/API_CONTRACT.md](./docs/API_CONTRACT.md) | 现行 HTTP 契约 |
 | [docs/ACCEPTANCE.md](./docs/ACCEPTANCE.md) | 验收放行 |
