@@ -1,131 +1,134 @@
 # Phase 1 验收清单与审核记录
 
-> 版本：impl-1  
+> 版本：**V1.3**  
 > 日期：2026-07-24  
-> 依据：PRD §8、ARCHITECTURE §9、`P1_BOUNDARY.md`、`API_CONTRACT.md`
+> 依据：PRD / ARCHITECTURE **V1.3**、`SCHEME_V13.md`、`P1_BOUNDARY.md`、`API_CONTRACT.md`  
+> 图例：✅ 通过 · ❌ 未过 · ⚠ 有条件通过 · ⏸ 已批准延期  
 
-图例：✅ 通过 · ❌ 未过 · ⚠ 有条件通过 · ⏸ 已批准延期
+---
+
+## 总判定（仓库工程 · 2026-07-24）
+
+| 维度 | 结论 |
+|------|------|
+| 产品主轴 | 正确（无转售；中枢+网关） |
+| 严格验收 | **未通过** — 见下方 ❌ |
+| 外部 hub v3.3 演示壳 | 叙事有条件通过（见 FEEDBACK_HUB_V33）；**不计入**本表工程放行 |
+| 合入建议 | draft 可保留；清 P0 后再标「验收通过」 |
 
 ---
 
 ## A. 环境
 
-| # | 条目 | 结果 | 证据 / 说明 |
-|---|------|------|-------------|
-| A1 | `GET /api/v1/health` 返回 p1 ok | ✅ | 本地冒烟 200 |
-| A2 | `/app/login` 五账号可登录 | ✅ | seed users |
+| # | 条目 | 结果 | 说明 |
+|---|------|------|------|
+| A1 | `GET /api/v1/health` | ✅ | |
+| A2 | 多账号登录 | ✅ | 五账号；V1.3 要求双机构闭环可演示 |
 
 ---
 
-## B. 需求全联盟（PRD §8.1）
+## B. 需求 + 订单（PRD §8.1–8.2）
 
 | # | 条目 | 结果 | 说明 |
 |---|------|------|------|
-| B1 | A 发布后 B 广场可见 | ✅ | plaza scope |
-| B2 | B 应征、A 确认成交 | ✅ | apply/confirm |
-| B3 | 本机构不可应征 | ✅ | API 校验 |
-| B4 | 草稿不在广场；visibility 锁定 alliance | ✅ | |
-| B5 | 搜索 / 我应征的 / 成交建任务 | ⏸ | BOUNDARY 延期；非 §8 原文硬项但属 §3.2 |
+| B1 | A 发布 B 可见 | ✅ | |
+| B2 | 应征 + 确认 | ✅ | |
+| B3 | 禁本机构应征 | ✅ | |
+| B4 | visibility 锁定 alliance | ✅ | |
+| B5 | **我应征的** `scope=applied` | ❌ | V1.3 P0；当前缺 |
+| B6 | **确认后生成 match_orders** | ❌ | V1.3 P0；当前缺 |
+| B7 | 品类枚举含翻译/配音/IP授权等 | ⚠ | seed 部分有；需统一校验 |
+| B8 | 搜索筛选 | ⏸ | P1.1 |
 
 ---
 
-## C. 工作台逾期（PRD §8.2）
+## C. 工作台逾期
 
 | # | 条目 | 结果 | 说明 |
 |---|------|------|------|
-| C1 | summary 含逾期任务 | ❌ | seed 任务 `dueAt` 均为未来，开箱无逾期 |
-| C2 | UI 展示逾期标红 | ⚠ | 逻辑有；缺数据 |
-
-**实现 Agent 必补：** seed 至少 1 条 `dueAt < today` 且 assignee=演示账号。
+| C1 | summary 含逾期 | ❌ | seed 无过去 dueAt |
+| C2 | UI 标红 | ⚠ | 有逻辑缺数据 |
 
 ---
 
-## D. 钱包 + 网关（PRD §8.3 / §8.5）
+## D. Tokens 钱包 + 网关
 
 | # | 条目 | 结果 | 说明 |
 |---|------|------|------|
-| D1 | purchase 入账 + ledger 充值 | ✅ | |
-| D2 | Bearer 调 chat，余额下降 + 消耗流水 | ✅ | |
-| D3 | 流水可查 | ✅ | 合并在 GET `/wallet` |
-| D4 | 余额不足 402，且不执行上游 | ⚠ | 有 402；**未证明**上游短路；且成功路径先扣后调 |
-| D5 | usage_records 审计 | ❌ | 缺失 |
-| D6 | Key 仅哈希存储 | ❌ | 明文 |
+| D1 | 购额入账 | ✅ | 单位应统一宣传为 Tokens |
+| D2 | Chat 扣费 + 流水 | ✅ | |
+| D3 | 流水可查 | ✅ | |
+| D4 | 402 且不调上游 | ⚠ | 有 402；先扣后调未纠 |
+| D5 | 预检→上游→成功再扣 / 失败退款 | ❌ | V1.3 目标 |
+| D6 | usage_records | ❌ | |
+| D7 | Key hash 存储 | ❌ | 明文 |
+| D8 | **文案：托管 ≠ Token 互转** | ❌ | 订单能力未上时先在钱包/需求页脚注 |
 
 ---
 
-## E. 算力作业（PRD §8.4）
+## E. 算力
 
 | # | 条目 | 结果 | 说明 |
 |---|------|------|------|
-| E1 | 提交 → queued + 预扣 | ✅ | |
-| E2 | ops 推进 running → succeeded | ✅ | transition |
-| E3 | 项目收到完成事件/通知 | ❌ | 无回写 |
+| E1 | 提交预扣 | ✅ | |
+| E2 | running→succeeded | ✅ | |
+| E3 | 成功通知/回写 | ❌ | |
 | E4 | queued 取消退款 | ✅ | |
-| E5 | failed 释放预扣 | ❌ | 不退；需修或书面降级+调账 |
+| E5 | **failed 释放预扣** | ❌ | |
+| E6 | cancelled（已开始）释放 | ❌ | 按 PRD 应释放 |
 
 ---
 
-## F. 无转售（PRD §8.6）
+## F. 无转售
 
 | # | 条目 | 结果 | 说明 |
 |---|------|------|------|
-| F1 | 无转售 API/UI/表 | ✅ | 回归必跑 |
+| F1 | 无转售 API/UI | ✅ | 回归必跑 |
 
 ---
 
-## G. 通知已读（PRD §8.7）
+## G. 通知
 
 | # | 条目 | 结果 | 说明 |
 |---|------|------|------|
-| G1 | 秘书处发布，会员未读→已读 | ✅ | receipts |
+| G1 | 未读→已读 | ✅ | |
+| G2 | 跳转订单/作业（有 link） | ⏸ | P1.1 |
 
 ---
 
-## H. 安全 / 工程底线
+## H. 安全 / 工程
 
 | # | 条目 | 结果 | 说明 |
 |---|------|------|------|
-| H1 | 不可用裸 `x-user-id` 冒充（或文档标明仅 localhost） | ❌ | 公网风险 |
-| H2 | `/reset` 受保护 | ❌ | 无鉴权 |
-| H3 | PRD §8 自动化测试 | ❌ | 无 |
+| H1 | 不可裸冒充用户 | ❌ | x-user-id |
+| H2 | `/reset` 保护 | ❌ | |
+| H3 | smoke 脚本 | ❌ | |
+| H4 | 一级导航无版权链/热度生产项 | ⚠ | 前端 `/app` 已较瘦；勿再加 |
 
 ---
 
-## 总判定
+## 实现 Agent · V1.3 必改清单（按序）
 
-| 维度 | 结论 |
-|------|------|
-| 产品演示 | **可对外演示主路径** |
-| 文档严格验收 | **未通过**（C1、D4/D5/D6、E3/E5、H*） |
-| 合入建议 | 保留 draft PR；实现 Agent 按下方「下一轮必改」清 P0 后再申请「验收通过」标签 |
+1. Seed：逾期任务 ≥1（assignee=演示用户）  
+2. `GET /demands?scope=applied` + UI Tab「我应征的」  
+3. confirm 时写入 `match_orders` + `GET /match-orders` + 简单列表页  
+4. Chat：预检→上游→成功扣费；失败不扣或退款；单测/脚本  
+5. 作业 failed / cancelled 释放预扣；succeeded 写 notice  
+6. `/reset`、`/auth/users` 仅 development 或鉴权  
+7. `docs/scripts/p1-smoke.sh` 覆盖 B1–B6、D、E、G  
+8. 回写 `API_CONTRACT.md`  
 
----
-
-## 下一轮实现 Agent 必改（P0）
-
-1. **Seed：** 逾期任务 ≥1，保证 C1 开箱绿  
-2. **计费：** Chat 改为「预检 → 上游 → 成功再扣」或「失败自动退款」；补测试  
-3. **作业：** `failed` / 已开始 `cancelled` 退预扣，或提供超管调账 API + 审计  
-4. **完成回写：** succeeded 时写 notice 或 project 事件（最小一条即可）  
-5. **公网安全：** `/reset` 与用户枚举加保护或仅 `NODE_ENV=development`  
-6. **验收脚本：** `docs/scripts/p1-smoke.sh`（或等价）覆盖 B/D/E/G  
-
-P1 审核通过条件：上表 ❌ 清零或转 ⏸（需文档线签字）。
+**放行条件：** 上表 ❌ 清零或文档线签字转 ⏸。
 
 ---
 
-## curl 冒烟（审核用）
+## curl 冒烟（基线）
 
 ```bash
 BASE=http://127.0.0.1:3001
 curl -s $BASE/api/v1/health
-curl -s -X POST $BASE/api/v1/auth/login -H 'Content-Type: application/json' -d '{"userId":"u-wang"}'
+# 登录后带 x-user-id
 curl -s "$BASE/api/v1/demands?scope=plaza" -H 'x-user-id: u-ma'
-curl -s $BASE/api/v1/wallet -H 'x-user-id: u-wang'
-# KEY 取自 wallet.apiKey
-curl -s -X POST $BASE/v1/chat/completions \
-  -H "Authorization: Bearer $KEY" -H 'Content-Type: application/json' \
-  -d '{"model":"deepseek-chat","messages":[{"role":"user","content":"ping"}]}'
+curl -s "$BASE/api/v1/demands?scope=applied" -H 'x-user-id: u-ma'   # V1.3
+curl -s "$BASE/api/v1/match-orders" -H 'x-user-id: u-wang'         # V1.3
 ```
-
-完整严格验收以本清单表格为准，不以「页面能点开」为准。  

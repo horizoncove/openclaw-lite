@@ -1,241 +1,230 @@
 # 微短剧产业服务 SaaS · 技术设计文档
 
-> 版本：V1.2 Draft  
+> 版本：**V1.3**  
 > 日期：2026-07-24  
-> 对应需求：[PRD.md](./PRD.md) V1.2  
-> 决策：工作需求全联盟可见；**无转售**；建设 **API 聚合网关 + 算力调度**。  
+> 对应需求：[PRD.md](./PRD.md) V1.3 · 升级说明：[SCHEME_V13.md](./SCHEME_V13.md)  
+> 决策：全联盟需求；无转售；XD-Router + Compute；**撮合订单**；**Tokens ≠ 托管结算**  
 >  
-> **注意：** 本文描述**目标架构**。现行实现以 [API_CONTRACT.md](./API_CONTRACT.md) 为准，差距见 [P1_BOUNDARY.md](./P1_BOUNDARY.md)。
+> **注意：** 本文 = **目标架构**。现行实现以 [API_CONTRACT.md](./API_CONTRACT.md) 为准，差距见 [P1_BOUNDARY.md](./P1_BOUNDARY.md)。
 
 ---
 
 ## 1. 设计目标
 
-1. 会员主路径：项目、全联盟需求、进度、撮合、通知  
-2. **XD-Router**：OpenAI 兼容的多模型 API 聚合与计量  
-3. **Compute Scheduler**：异步算力作业队列与状态机  
-4. 钱包仅支持官方充值/消耗/退款，不支持机构间转让  
-5. 出海等专业能力通过 `service_requests` 挂接项目  
+1. 会员主路径：项目、需求、**撮合订单**、进度、通知  
+2. **XD-Router**：OpenAI 兼容聚合 + **Tokens** 计量  
+3. **Compute Scheduler**：异步作业 + 预扣/释放  
+4. 钱包仅官方购额/消耗/退款/调账  
+5. 出海等通过 `service_requests` 挂项目  
+6. 对外演示壳可对接沙箱 API，但不得伪造生产合规能力  
 
 ---
 
 ## 2. 逻辑架构
 
 ```
-                    ┌──────── Member Web ────────┐
-                    │ 项目/需求/进度/通知/钱包    │
-                    └─────────────┬──────────────┘
-                                  │
-         ┌────────────────────────┼────────────────────────┐
-         ▼                        ▼                        ▼
-   Platform API              XD-Router                 Scheduler
-   (CRUD/RBAC)            (同步推理网关)              (异步算力)
-         │                        │                        │
-         │                        ├─ Provider Adapters ────┤
-         │                        │  DeepSeek/Qwen/...     │
-         │                        │  GPU Workers           │
-         ▼                        ▼                        ▼
-                    PostgreSQL · Redis · Object Storage
+                 ┌──────── Member Web / Demo Shell ────────┐
+                 │ 工作台 需求 订单 钱包 网关 算力 通知      │
+                 └──────────────────┬──────────────────────┘
+                                    │
+        ┌───────────────────────────┼───────────────────────────┐
+        ▼                           ▼                           ▼
+  Platform API                 XD-Router                   Scheduler
+  projects/demands             /v1/chat/*                  compute jobs
+  match_orders/notices         计量 Tokens                 预扣/释放
+  service_requests             usage_records               job_events
+        │                           │                           │
+        └───────────────────────────┴───────────────────────────┘
+                                    ▼
+                     PostgreSQL · Redis · Object Storage
 ```
+
+专业服务营销站 → 仅 `POST service_requests`（或等价进件），不单独持有钱包账本。
 
 ---
 
 ## 3. 权限与可见性
 
-- `tenant_id` + `org_id` 隔离私有数据  
-- `demands`：**发布后 `visibility = alliance` 固定**；列表接口对所有认证会员可读  
-- 草稿仅创建机构可见  
+- `tenant_id` + `org_id` 隔离  
+- `demands`：发布后 `visibility=alliance` 锁定  
+- 草稿仅本机构；广场：`published|matching|deal`  
+- 「我应征的」= 当前用户/机构的 `demand_applications`  
 
-权限：
+权限（逻辑名）：
 
-- `project:*` `demand:publish|apply|confirm`  
-- `wallet:purchase` `wallet:read`  
-- `router:invoke` `router:admin`  
-- `compute:submit` `compute:operate`  
-- `notice:*` `match:facilitate`  
+`project:*` `demand:publish|apply|confirm` `order:read`  
+`wallet:purchase|read` `router:invoke|admin`  
+`compute:submit|operate` `notice:*` `match:facilitate`  
+`service:request|operate`
 
-**删除** `token:resell` 及相关表。
+**删除** `token:resell` 及任何 org→org 余额转移。
 
 ---
 
-## 4. 数据模型（增量要点）
+## 4. 数据模型（V1.3 要点）
 
-### 4.1 需求
-
-`demands.visibility` 默认 `alliance`；发布动作校验并锁定。
-
-### 4.2 钱包与账本（无转售表）
+### 4.1 需求与应征
 
 ```
-wallets(org_id, balance, api_key_hash, status)
-token_packages
-token_orders              -- 官方购买
-token_ledger              -- 充值/消耗/退款/调账
+demands(..., category, status, visibility, budget_text, budget_tokens null)
+demand_applications(..., status: pending|accepted|rejected)
 ```
 
+`category ∈ {翻译,配音,IP授权,海外发行,算力协助,其他}`  
+`status ∈ {draft,published,matching,deal,closed}`
+
+### 4.2 撮合订单（新增）
+
+```
+match_orders(
+  id, demand_id, publisher_org_id, applicant_org_id,
+  amount_text,          -- 展示用（可含分账描述）
+  amount_tokens null,   -- 可选 Tokens 报价快照
+  currency_amount null, -- 可选法币托管金额
+  node,                 -- escrowed|...
+  status,               -- escrowed|in_progress|released|disputed|closed
+  created_at, updated_at
+)
+```
+
+**约束：** 不提供 `transfer_tokens(from_org, to_org)`。放款由结算域/人工秘书处流程表达，Tokens 账本不因「放款」减少对方机构余额而增加己方（禁止伪装转让）。
+
+### 4.3 Tokens 钱包
+
+```
+wallets(org_id, balance_tokens, api_key_hash, status)
+token_packages(id, cny_price, tokens, bonus, ...)
+token_orders(id, org_id, package_id, cny_paid, tokens_credited, status)
+token_ledger(id, org_id, type, amount_tokens, balance, note, ref, created_at)
+```
+
+`type ∈ {充值,消耗,退款,调账}`  
 禁止：`token_resale_*`
 
-### 4.3 API 聚合
+### 4.4 API 聚合
 
 ```
-llm_providers(id, name, base_url, auth_ref, status)
-llm_models(id, provider_id, model_key, modality, price_in, price_out, status, tags)
-routing_policies(id, name, rules jsonb)   -- 任务类型→候选模型
-api_keys(id, org_id, key_hash, name, scopes, revoked_at)
-usage_records(id, org_id, project_id, model_id, req_id,
-              prompt_tokens, completion_tokens, cost, latency_ms, status, created_at)
+llm_providers / llm_models / routing_policies
+api_keys(org_id, key_hash, name, scopes, revoked_at)
+usage_records(org_id, project_id, model_id, req_id,
+              prompt_tokens, completion_tokens, cost_tokens, latency_ms, status, ...)
 ```
 
-### 4.4 算力调度
+### 4.5 算力
 
 ```
-compute_pools(id, name, type, capacity, status)
-compute_nodes(id, pool_id, endpoint, heartbeat_at, status)
-compute_jobs(id, org_id, project_id, pool_id, job_type, priority,
-             payload jsonb, status, cost, error, created_at, started_at, finished_at)
-compute_job_events(id, job_id, from_status, to_status, at, note)
+compute_pools / compute_nodes
+compute_jobs(..., cost_tokens, status, ...)
+compute_job_events(...)
 ```
 
-作业状态机：
+状态机同 PRD；**failed / cancelled → 释放预扣并写 ledger 退款**。
+
+### 4.6 出海工单
 
 ```
-queued → running → succeeded
-                → failed → (retry) queued
-queued/running → cancelled
+service_requests(id, org_id, project_id, service_code, status, payload, ...)
 ```
+
+`service_code` 示例：`OS-TRANSLATE` `OS-DISTRIBUTE` …
+
+### 4.7 通知
+
+`notices` + `notice_receipts`；`link_type/link_id` 支持跳转。
 
 ---
 
-## 5. XD-Router（API 聚合）设计
+## 5. XD-Router
 
-### 5.1 对外协议
+### 5.1 协议
 
-兼容：
-
-- `POST /v1/chat/completions`  
-- `GET /v1/models`  
-- Phase 2：`/v1/images/generations` 等  
+- P0：`POST /v1/chat/completions` `GET /v1/models`  
+- P2：`/v1/images` `/v1/audio/speech` `/v1/translations` 等  
 
 鉴权：`Authorization: Bearer <org_api_key>`
 
-### 5.2 请求处理流水线
+### 5.2 流水线（目标）
 
-1. 鉴权 → 解析 org  
-2. 限流（Redis token bucket：RPM/TPM）  
-3. 估费/余额预检  
-4. 路由：显式 `model` 或 policy 选择  
-5. 调用 Provider Adapter（超时、重试、熔断）  
-6. 计量写入 `usage_records` + `token_ledger` 扣费  
-7. 返回上游结果（可剥离上游品牌头）  
+1. 鉴权 → org  
+2. 限流 RPM/TPM  
+3. **估费 + 余额预检**（不足则 402，结束）  
+4. 路由  
+5. Provider 调用  
+6. **成功** → `usage_records` + ledger 扣 Tokens；失败 → 不扣或自动退（配置）  
+7. 返回结果  
 
-### 5.3 Adapter 接口
+### 5.3 错误
 
-```ts
-interface LlmProviderAdapter {
-  chat(req: ChatRequest, cfg: ProviderConfig): Promise<ChatResponse & { usage: Usage }>;
-  health(): Promise<"ok" | "degraded" | "down">;
-}
-```
-
-上游 Key 存 KMS/环境密钥，不进前端。
-
-### 5.4 失败与计费
-
-- 上游 5xx：不扣费或按策略半价（配置项），记失败用量  
-- 余额不足：`402` + `INSUFFICIENT_BALANCE`  
-- 限流：`429`
+- `402` `INSUFFICIENT_BALANCE`  
+- `429` 限流  
+- 上游 5xx：默认不扣费  
 
 ---
 
-## 6. 算力调度设计
+## 6. 算力调度
 
-### 6.1 提交
-
-`POST /api/v1/compute/jobs`
-
-```json
-{
-  "projectId": "...",
-  "jobType": "subtitle_batch",
-  "priority": "normal",
-  "payload": { "assetId": "...", "targetLang": "en" }
-}
-```
-
-### 6.2 Worker 协议（Phase 1 可简化）
-
-- 平台将 job 置 `queued`  
-- Worker `POST /internal/compute/lease` 领取  
-- 心跳 `POST /internal/compute/jobs/:id/heartbeat`  
-- 完成 `POST /internal/compute/jobs/:id/complete`（结果 URI + 用量）  
-
-Phase 1 允许「运维台人工点完成」模拟 Worker，保证产品闭环。
-
-### 6.3 调度策略（P0）
-
-- 单池 FIFO + priority 插队  
-- 并发槽位 = pool.capacity  
-- 超时回收 lease  
-
-Phase 2：多池、亲和性、失败转移到备池。
+- `POST /api/v1/compute/jobs` 预扣  
+- Phase 1：`POST .../transition`（ops）  
+- Phase 1.1：`/internal/compute/lease|heartbeat|complete`  
+- 成功通知：`notices` 或 project event  
 
 ---
 
-## 7. 平台 API 摘要
+## 7. 平台 API 摘要（目标前缀 `/api/v1`）
 
 | 区域 | 路径 |
 |------|------|
-| 项目/任务 | `/projects`, `/tasks` |
-| 需求广场 | `/demands`（联盟可读）, `/demands/:id/apply` |
+| 项目/任务 | `/projects` `/tasks` |
+| 需求 | `/demands?scope=plaza\|mine\|applied` `/demands/:id/apply` `/confirm` |
+| 订单 | `/match-orders` |
 | 工作台 | `/workspace/summary` |
 | 通知 | `/notices` |
-| 钱包 | `/wallet`, `/wallet/purchase`, `/wallet/ledger` |
-| 路由管理 | `/admin/models`, `/admin/policies` |
-| 算力 | `/compute/jobs`, `/admin/compute/pools` |
-| 兼容网关 | `/v1/chat/completions`, `/v1/models` |
+| 钱包 | `/wallet` `/wallet/purchase` |
+| 算力 | `/compute/jobs` `/compute/jobs/:id/transition` |
+| 出海 | `/service-requests` |
+| 管理 | `/admin/models` `/admin/policies` `/admin/compute/pools` |
+| 网关 | `/v1/chat/completions` `/v1/models` |
+
+现行实现若缺路径，见 API_CONTRACT「缺口」；实现后必须回写契约。
 
 ---
 
-## 8. 前端信息架构
+## 8. 前端 IA
 
-会员端增加 **「API 与算力」**：
-
-- Key 管理、模型目录与价格  
-- 用量图表与流水  
-- 作业列表（提交/取消/日志）  
-- 充值套餐  
-
-**不出现**转售/挂单页面。
+对齐 PRD §5 V1.3。钱包/网关展示单位为 **Tokens**；购额区展示 `¥ → T`。  
+订单页脚注：**托管放款 ≠ Token 互转**。
 
 ---
 
-## 9. Phase 1 工程顺序
+## 9. Phase 1 工程顺序（修订）
 
-1. Org/User/RBAC  
-2. Project/Task/Workspace  
-3. Demand 广场（alliance 可见）  
-4. Wallet + Purchase + Ledger  
-5. XD-Router Chat 网关 + usage  
-6. Compute Job 最小队列 + 人工/模拟 Worker  
-7. Notices + Opportunities  
-8. E2E：PRD §8  
+1. Org/User  
+2. Project/Task/Workspace（含逾期 seed）  
+3. Demand + applied scope + confirm  
+4. **Match orders**  
+5. Wallet Tokens + Purchase + Ledger  
+6. XD-Router（预检后扣费）+ usage_records（可先最小表）  
+7. Compute + failed 退款 + 成功通知  
+8. Notices  
+9. 安全：reset 保护、弱化可伪造身份  
+10. E2E / `p1-smoke.sh` = ACCEPTANCE  
 
 ---
 
 ## 10. 安全
 
-- API Key 仅哈希存储；创建时展示一次  
-- 上游 Provider 密钥与租户隔离  
-- 管理接口与推理接口域名/路径隔离（可用同域不同前缀）  
-- 全量 `audit_logs`：购额、调账、改路由、撤 Key  
+- API Key 只存 hash；明文仅创建/轮换响应  
+- 推理与管理权限分离  
+- `audit_logs`：购额、调账、改路由、撤 Key、订单放款操作  
+- 公网演示：禁止无鉴权 reset  
 
 ---
 
-## 11. 明确删除的设计
+## 11. 明确删除
 
-- `token_resale_listings` / `token_resale_trades`  
-- 任何「余额转让」API  
-- 需求 `visibility=private` 作为已发布选项  
+- `token_resale_*`、余额转让 API  
+- 已发布需求的 private 可见性  
+- MVP 一级导航中的版权链 / 热度生产话术  
 
 ---
 
@@ -244,5 +233,6 @@ Phase 2：多池、亲和性、失败转移到备池。
 | 版本 | 说明 |
 |------|------|
 | V1.1 | 会员中枢；含转售 |
-| V1.2 | 全联盟需求；砍转售；XD-Router + Compute Scheduler |
-| V1.2-doc | 标明目标架构 vs 现行契约；联调改以 API_CONTRACT 为准 |
+| V1.2 | 全联盟；砍转售；Router+Scheduler |
+| V1.2-doc | 契约分栏 |
+| **V1.3** | match_orders；Tokens/托管分账；service_requests；计费流水线纠偏；延期域划界 |
