@@ -20,6 +20,7 @@
 | 文档 | 说明 | 权威 |
 |------|------|------|
 | **[USER_REQUIREMENTS.md](./USER_REQUIREMENTS.md)** | **用户需求 U1.0（先读：谁、场景、Jobs）** | 用户侧真源 |
+| **[PAIN_FIRST_PRINCIPLES.md](./PAIN_FIRST_PRINCIPLES.md)** | **核心痛点第一性原理（P1–P5）** | 痛点推导 |
 | [SCHEME_V13.md](./SCHEME_V13.md) | V1.3 方案升级总说明 | 增量索引 |
 | [PRD.md](./PRD.md) | 产品功能规格 V1.3 | 功能规格 |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | 目标技术 V1.3 | 目标架构 |
@@ -32,7 +33,7 @@
 | [FEEDBACK_HUB_V32.md](./FEEDBACK_HUB_V32.md) | 中枢 v3.2 | 历史 |
 | [REVIEW_REF_MINIMAX_DEMO.md](./REVIEW_REF_MINIMAX_DEMO.md) | 首次外审笔记 | 历史 |
 
-冲突顺序：用户目标（USER_REQUIREMENTS）→ 拍板决策 → API_CONTRACT/BOUNDARY 现行 → PRD/ARCH 功能与技术 → 外审演示壳（最弱）。
+冲突顺序：用户目标（USER_REQUIREMENTS）→ 痛点命题（PAIN_FIRST_PRINCIPLES）→ 拍板决策 → API_CONTRACT/BOUNDARY 现行 → PRD/ARCH 功能与技术 → 外审演示壳（最弱）。
 
 ---
 

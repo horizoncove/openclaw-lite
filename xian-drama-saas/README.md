@@ -9,6 +9,7 @@
 | 文档 | 用途 |
 |------|------|
 | [docs/USER_REQUIREMENTS.md](./docs/USER_REQUIREMENTS.md) | **用户需求：画像 / 场景 / Jobs** |
+| [docs/PAIN_FIRST_PRINCIPLES.md](./docs/PAIN_FIRST_PRINCIPLES.md) | **核心痛点第一性原理** |
 | [docs/SCHEME_V13.md](./docs/SCHEME_V13.md) | V1.3 方案升级总览 |
 | [docs/PRD.md](./docs/PRD.md) | 产品功能规格 V1.3 |
 | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | 目标技术 V1.3 |
