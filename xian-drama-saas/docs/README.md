@@ -1,68 +1,63 @@
 # 文档与协作约定
 
-> 更新：2026-07-24  
+> 更新：2026-07-24 · **方案 V1.3**  
 > 适用：`xian-drama-saas/` 后续迭代
 
 ## 角色分工
 
 | 角色 | 职责 | 不做 |
 |------|------|------|
-| **文档 / 审核 Agent（本线）** | PRD、架构、API 契约、验收清单；对照文档审核其他 Agent 的实现与 PR | UI 视觉设计、版式审美主导 |
-| **实现 Agent** | 按契约与验收清单编码、自测、提交 | 擅自改产品决策或砍掉文档中的 P0 验收项 |
-| **产品决策** | 可见性、是否转售、分期边界等已拍板事项 | — |
+| **文档 / 审核** | PRD、架构、契约、验收；审核实现与外部演示 | UI 审美主导 |
+| **实现 Agent** | 按 V1.3 验收清单编码 | 擅自改拍板决策 |
+| **产品决策** | 可见性 / 转售 / 三角分层 等 | — |
 
-**原则：先契约与验收，后实现；实现偏差必须回写文档或修代码，禁止只改前端糊弄。**
-
-审美 / 视觉稿不作为本线主交付。实现 Agent 若改 UI，审核只验：**信息架构是否对齐 PRD §5、关键路径是否可完成 §8 用例**，不评审视觉风格。
+**原则：先契约与验收，后实现；偏差必须回写文档或修代码。**
 
 ---
 
 ## 文档地图
 
-| 文档 | 说明 | 权威级别 |
-|------|------|----------|
-| [PRD.md](./PRD.md) | 产品需求 V1.2 | 业务决策 |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | 目标技术设计 V1.2 | 目标架构 |
-| [P1_BOUNDARY.md](./P1_BOUNDARY.md) | **当前已落地边界 vs 目标差距** | 实现审核基线 |
-| [API_CONTRACT.md](./API_CONTRACT.md) | **现行 HTTP 契约（以代码为准）** | 联调 / 验收 |
-| [ACCEPTANCE.md](./ACCEPTANCE.md) | Phase 1 验收清单与审核记录 | 放行标准 |
-| [REVIEW_REF_MINIMAX_DEMO.md](./REVIEW_REF_MINIMAX_DEMO.md) | 外部参考演示评审（内部） | 对照参考 |
-| [FEEDBACK_TO_MINIMAX.md](./FEEDBACK_TO_MINIMAX.md) | 致 MiniMax 的修改意见（撮合展台） | 对外反馈 |
-| [FEEDBACK_TO_CODEBUDDY.md](./FEEDBACK_TO_CODEBUDDY.md) | 致 CodeBuddy 出海服务站修改意见 | 对外反馈 |
-| [FEEDBACK_HUB_V32.md](./FEEDBACK_HUB_V32.md) | 会员中枢 v3.2 演示分析（历史） | 对外反馈 |
-| [FEEDBACK_HUB_V33.md](./FEEDBACK_HUB_V33.md) | **会员中枢 v3.3 hub.html 分析与优化** | 对外反馈 |
+| 文档 | 说明 | 权威 |
+|------|------|------|
+| **[SCHEME_V13.md](./SCHEME_V13.md)** | **V1.3 升级总说明（先读）** | 增量索引 |
+| [PRD.md](./PRD.md) | 产品需求 **V1.3** | 业务 |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | 目标技术 **V1.3** | 目标架构 |
+| [P1_BOUNDARY.md](./P1_BOUNDARY.md) | 仓库现状 vs 目标 | 审核基线 |
+| [API_CONTRACT.md](./API_CONTRACT.md) | 现行 HTTP 契约 | 联调 |
+| [ACCEPTANCE.md](./ACCEPTANCE.md) | 验收与放行 | 放行 |
+| [FEEDBACK_HUB_V33.md](./FEEDBACK_HUB_V33.md) | 外部中枢演示 v3.3 | 对照 |
+| [FEEDBACK_TO_CODEBUDDY.md](./FEEDBACK_TO_CODEBUDDY.md) | 出海服务站意见 | 对照 |
+| [FEEDBACK_TO_MINIMAX.md](./FEEDBACK_TO_MINIMAX.md) | 早期撮合展台意见 | 历史 |
+| [FEEDBACK_HUB_V32.md](./FEEDBACK_HUB_V32.md) | 中枢 v3.2 | 历史 |
+| [REVIEW_REF_MINIMAX_DEMO.md](./REVIEW_REF_MINIMAX_DEMO.md) | 首次外审笔记 | 历史 |
 
-冲突处理顺序：
-
-1. 已拍板决策（全联盟需求 / 无转售 / 要做 API+算力）不可被实现推翻  
-2. `API_CONTRACT.md` + `P1_BOUNDARY.md` 描述「现在允许多少」  
-3. `ARCHITECTURE.md` / `PRD.md` 描述「目标应是什么」  
-4. 若代码与契约不符 → **修代码**；若契约故意简化 → **在 BOUNDARY 标明延期**
+冲突顺序：拍板决策 → API_CONTRACT/BOUNDARY 现行 → PRD/ARCH 目标 → 外审演示壳（最弱）。
 
 ---
 
-## 已确认决策
+## 已确认决策（V1.3）
 
-1. 工作需求：全联盟可见  
-2. Token：只官方充值与消耗，**不转售**  
-3. 建设 API 聚合与算力调度  
+1. 工作需求全联盟可见  
+2. 不做 Token 转售 / 机构间余额转让  
+3. API 聚合 + 算力调度（Tokens 计量）  
+4. **产品三角**：中枢主产品 · 出海专业服务 · 撮合履约（订单）  
+5. **Tokens 钱包 ≠ 订单法币托管**  
+6. 热度测试 / 版权链不进 MVP 导航  
 
-## P1 已采纳的开放问题决议
+## P1 决议
 
-| 问题 | 决议（P1） |
-|------|------------|
-| 会员端形态 | **Web only** |
-| 算力完成方式 | **人工/运维 transition 模拟 Worker**；真实 lease 协议 Phase 1.1+ |
-| BYOK | **不做**；上游 Key 仅平台环境变量托管 |
-| 通知强制已读 | `forceRead` 字段预留；P1 **不做强制阻断 UX** |
-| 子 Key | 归 **Phase 2**（PRD 正文若写「P1」视为笔误） |
+| 问题 | 决议 |
+|------|------|
+| 客户端 | Web only |
+| 算力 Worker | 人工 transition |
+| BYOK | 否 |
+| 强制已读 UX | 否 |
+| 子 Key | Phase 2 |
 
 ---
 
-## 给实现 Agent 的提交要求
+## 给实现 Agent
 
-每个功能 PR 必须附：
-
-1. 对应验收条目编号（见 `ACCEPTANCE.md`）  
-2. 若触及计费 / 鉴权 / 状态机：附 curl 或自动化命令输出  
-3. 若故意延期某 P0：先改 `P1_BOUNDARY.md` 获文档线确认，再合入  
+1. 先读 `SCHEME_V13.md` + `ACCEPTANCE.md` V1.3 必改清单  
+2. PR 注明验收编号；计费/状态机附 curl 输出  
+3. 完成 §9 缺口后回写 `API_CONTRACT.md`  

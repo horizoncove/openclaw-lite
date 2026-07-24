@@ -1,10 +1,10 @@
 # HTTP API 契约（现行实现）
 
-> 版本：impl-1  
+> 版本：impl-1 · **对照目标 V1.3**  
 > 日期：2026-07-24  
-> **权威来源：** `server/p1/routes.mjs`、`server/p1/store.mjs`  
+> **权威来源（现行）：** `server/p1/routes.mjs`、`server/p1/store.mjs`  
 > 前缀：业务 API → `/api/v1`；兼容网关 → `/v1`  
-> 目标设计见 `ARCHITECTURE.md`；差异见 `P1_BOUNDARY.md`。
+> 目标设计见 `ARCHITECTURE.md` V1.3；差异见 `P1_BOUNDARY.md`；升级说明见 `SCHEME_V13.md`。
 
 ---
 
@@ -155,12 +155,26 @@ failed → queued
 | `/app/compute` | 算力作业 |
 | `/app/notices` | 通知 |
 
-PRD「机构设置」「我应征的」：**未实现**。
+PRD「机构设置」「我应征的」「撮合订单」：**未实现**（V1.3 P0，见下节）。
 
 ---
 
-## 9. 契约变更流程
+## 9. V1.3 待实现缺口（实现后移入正文并删本表）
 
-1. 改 `server/p1/routes.mjs` 必须同步本文件  
+| Method | Path | 说明 |
+|--------|------|------|
+| GET | `/api/v1/demands?scope=applied` | 我应征的 |
+| GET | `/api/v1/match-orders` | 本机构相关撮合订单 |
+| POST | （confirm 副作用） | `POST /demands/:id/confirm` 必须创建 match_order |
+| — | Chat 流水线 | 改为预检→上游→成功扣费 |
+| — | Compute transition | failed/cancelled 释放预扣；succeeded 写 notice |
+
+前端路由增补目标：`/app/orders`；demands 页 Tab「我应征的」。
+
+---
+
+## 10. 契约变更流程
+
+1. 改 `server/p1/routes.mjs` 必须同步本文件（把 §9 项移入对应章节）  
 2. 若降低安全或计费保证，同步改 `P1_BOUNDARY.md` 并通知审核线  
-3. ARCH §7 为远期目录；**联调以本文件为准**  
+3. ARCH 为远期目录；**联调以本文件现行章节为准**  
