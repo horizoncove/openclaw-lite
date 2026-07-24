@@ -26,6 +26,7 @@
 | [P1_BOUNDARY.md](./P1_BOUNDARY.md) | **当前已落地边界 vs 目标差距** | 实现审核基线 |
 | [API_CONTRACT.md](./API_CONTRACT.md) | **现行 HTTP 契约（以代码为准）** | 联调 / 验收 |
 | [ACCEPTANCE.md](./ACCEPTANCE.md) | Phase 1 验收清单与审核记录 | 放行标准 |
+| [REVIEW_REF_MINIMAX_DEMO.md](./REVIEW_REF_MINIMAX_DEMO.md) | 外部参考演示评审（MiniMax 出海展台） | 对照参考 |
 
 冲突处理顺序：
 
