@@ -7,6 +7,7 @@
 | 文档 | 说明 |
 |------|------|
 | **[MVP.md](./MVP.md)** | **最小 MVP：购 T→发悬赏→接单→平台收付 T** |
+| [TAX_AND_SETTLEMENT.md](./TAX_AND_SETTLEMENT.md) | **Token 支付税务与发票方案** |
 | [REQUIREMENTS.md](./REQUIREMENTS.md) | 需求整合版 R2.1（全景；MVP 外后置） |
 | [TECHNICAL.md](./TECHNICAL.md) | 技术整合版 T2.1 |
 
