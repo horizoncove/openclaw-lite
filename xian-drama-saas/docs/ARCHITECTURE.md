@@ -1,11 +1,12 @@
-# 微短剧产业服务 SaaS · 技术设计文档
+# 微短剧产业服务 SaaS · 技术设计文档（模块详规）
 
-> 版本：**V1.3**  
-> 日期：2026-07-24  
-> 对应需求：[PRD.md](./PRD.md) V1.3 · 升级说明：[SCHEME_V13.md](./SCHEME_V13.md)  
-> 决策：全联盟需求；无转售；XD-Router + Compute；**撮合订单**；**Tokens ≠ 托管结算**  
+> 版本：**V1.3.1**  
+> 日期：2026-07-25  
+> **整体架构请先读：[SAAS_ARCHITECTURE.md](./SAAS_ARCHITECTURE.md) T1.0**  
+> 需求总册：[REQUIREMENTS_SPEC.md](./REQUIREMENTS_SPEC.md) R1.0 · 功能详规：[PRD.md](./PRD.md)  
+> 结算：**D1.3 进/转/出**（订单 T 托管 + 官方回收）；无转售；XD-Router + Compute  
 >  
-> **注意：** 本文 = **目标架构**。现行实现以 [API_CONTRACT.md](./API_CONTRACT.md) 为准，差距见 [P1_BOUNDARY.md](./P1_BOUNDARY.md)。
+> **注意：** 本文保留模块级细节。与 T1.0 冲突时以 **SAAS_ARCHITECTURE** 与 **D1.3** 为准。现行实现以 [API_CONTRACT.md](./API_CONTRACT.md) 为准，差距见 [P1_BOUNDARY.md](./P1_BOUNDARY.md)。
 
 ---
 
@@ -87,19 +88,20 @@ match_orders(
 )
 ```
 
-**约束：** 不提供 `transfer_tokens(from_org, to_org)`。放款由结算域/人工秘书处流程表达，Tokens 账本不因「放款」减少对方机构余额而增加己方（禁止伪装转让）。
+**约束：** 不提供无订单 `transfer_tokens(from_org, to_org)`。放款必须经 `match_orders`：需求方冻结 → 托管 → 供给方 `earned`（扣平台撮合费）。禁止「直接改两家余额」伪装转让。
 
-### 4.3 Tokens 钱包
+### 4.3 Tokens 钱包（D1.3）
 
 ```
-wallets(org_id, balance_tokens, api_key_hash, status)
+wallets(org_id, purchased, earned, frozen, bonus, api_key_hash, status)
 token_packages(id, cny_price, tokens, bonus, ...)
 token_orders(id, org_id, package_id, cny_paid, tokens_credited, status)
-token_ledger(id, org_id, type, amount_tokens, balance, note, ref, created_at)
+token_ledger(id, org_id, type, bucket, amount_tokens, balance_after, note, ref, created_at)
+redeem_requests / redeem_payouts
 ```
 
-`type ∈ {充值,消耗,退款,调账}`  
-禁止：`token_resale_*`
+`type ∈ {purchase,freeze,unfreeze,consume,earn_release,fee,burn_redeem,refund,adjust,…}`  
+禁止：`token_resale_*`、会员互兑 API
 
 ### 4.4 API 聚合
 
@@ -192,7 +194,7 @@ service_requests(id, org_id, project_id, service_code, status, payload, ...)
 ## 8. 前端 IA
 
 对齐 PRD §5 V1.3。钱包/网关展示单位为 **Tokens**；购额区展示 `¥ → T`。  
-订单页脚注：**托管放款 ≠ Token 互转**。
+订单页脚注：**托管放款 = 订单内 T 结算，≠ 自由互转/兑换所**。
 
 ---
 
@@ -235,4 +237,5 @@ service_requests(id, org_id, project_id, service_code, status, payload, ...)
 | V1.1 | 会员中枢；含转售 |
 | V1.2 | 全联盟；砍转售；Router+Scheduler |
 | V1.2-doc | 契约分栏 |
-| **V1.3** | match_orders；Tokens/托管分账；service_requests；计费流水线纠偏；延期域划界 |
+| **V1.3** | match_orders；service_requests；计费流水线纠偏；延期域划界 |
+| **V1.3.1** | 指向 SAAS_ARCHITECTURE T1.0；钱包分桶与订单 T 托管对齐 D1.3 |
