@@ -19,8 +19,9 @@ https://raw.githubusercontent.com/horizoncove/openclaw-lite/cursor/overseas-dram
 ```
 请按 PACK_MINIMAX_TRAE.md + CORE_VALUE_MATCHING.md 实现「微短剧联盟会员协作中枢」SaaS。
 
-北极星（第一性原理）：整站围绕「撮合适配保障 × 信任保障」——
-先做 发布→应征→确认→T托管→验收放款；工作台/钱包/网关/出海/回收都是卫星，不得反客为主。
+北极星：撮合适配保障 × 信任保障。
+飞轮：A 主轮（可信成交）先转；B 产能加油、C 法币旁路、D 护栏、R 回收出口为卫星。
+先做 发布→应征→确认→T托管→验收放款；禁止挂单/兑换所，禁止出海站抢中枢。
 
 必守：Tokens 进/转/出（D1.3）；禁止挂单/互兑/兑换所/购入即兑。
 产品是会员中枢，不是出海营销站，也不是交易所。

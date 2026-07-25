@@ -40,6 +40,7 @@
 | [USER_REQUIREMENTS.md](./USER_REQUIREMENTS.md) | 用户画像 / 场景 / Jobs（U1.0） | 用户侧真源 |
 | [PAIN_FIRST_PRINCIPLES.md](./PAIN_FIRST_PRINCIPLES.md) | 痛点 P1–P5 | 痛点推导 |
 | **[CORE_VALUE_MATCHING.md](./CORE_VALUE_MATCHING.md)** | **撮合平台核心价值（第一性原理）** | 撮合排期尺子 |
+| **[FLYWHEEL_AND_BUSINESS_LOOP.md](./FLYWHEEL_AND_BUSINESS_LOOP.md)** | **商业闭环 × 生态飞轮（W1.0）** | 飞轮与收入咬合 |
 | [ECOSYSTEM_AND_USAGE.md](./ECOSYSTEM_AND_USAGE.md) | 功能 F1–F25 + 闭环 A/B/C/D/R | 功能与飞轮 |
 | [BUSINESS_LOGIC.md](./BUSINESS_LOGIC.md) | 商业模式 × 服务中心（B1.4） | 商务真源 |
 | [DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md) | Tokens 进/转/出（D1.3） | 结算决策 |
@@ -70,6 +71,7 @@
 ## 已确认决策（滚动）
 
 1. **北极星：** 整站围绕 **信任保障 × 撮合适配保障**（[CORE_VALUE_MATCHING.md](./CORE_VALUE_MATCHING.md) C1.1）；其余模块为卫星  
+1a. **飞轮：** **A 主轮**转可信成交；B/C/D/R 为加油/旁路/护栏/出口（[FLYWHEEL_AND_BUSINESS_LOOP.md](./FLYWHEEL_AND_BUSINESS_LOOP.md) W1.0）  
 2. 工作需求全联盟可见  
 3. **Tokens D1.3（进/转/出）：** 官方购入 → 托管撮合+生产消耗 → C 环法币合同和/或 Earned **官方回收销毁退 ¥**；禁互兑/挂单/购入即兑  
 4. API 聚合 + 算力调度（履约卫星）  
