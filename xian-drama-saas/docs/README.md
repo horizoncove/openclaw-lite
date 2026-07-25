@@ -1,94 +1,41 @@
 # 文档与协作约定
 
-> 更新：2026-07-25 · **需求总册 R1.1 + 架构总册 T1.0**  
-> 适用：`xian-drama-saas/` 后续迭代
+> 更新：2026-07-25 · **整合主文档 R2.0 / T2.0**
 
-## 角色分工
-
-| 角色 | 职责 | 不做 |
-|------|------|------|
-| **文档 / 审核** | 需求、架构、契约、验收；审核实现与外部演示 | UI 审美主导 |
-| **实现 Agent** | 按验收清单编码 | 擅自改拍板决策 |
-| **产品决策** | 可见性 / 结算闸门 / 三角分层 等 | — |
-
-**原则：先契约与验收，后实现；偏差必须回写文档或修代码。**
-
----
-
-## 两套主文档（先读）
-
-| 文档 | 说明 | 权威 |
-|------|------|------|
-| **[REQUIREMENTS_SPEC.md](./REQUIREMENTS_SPEC.md)** | **需求规格总册 R1.1（SRS）** | 需求入口 |
-| **[SAAS_ARCHITECTURE.md](./SAAS_ARCHITECTURE.md)** | **SaaS 技术架构总册 T1.0** | 技术入口 |
-
-## 外发合集（MiniMax / Trae）
+## 主入口（先读这两份）
 
 | 文档 | 说明 |
 |------|------|
-| **[PACK_MINIMAX_TRAE.md](./PACK_MINIMAX_TRAE.md)** | **需求+技术单文件合集（直接转发）** |
-| [SEND_TO_MINIMAX_TRAE.md](./SEND_TO_MINIMAX_TRAE.md) | 外发说明与附言模板 |
+| **[REQUIREMENTS.md](./REQUIREMENTS.md)** | **需求文档整合版 R2.0**（含 A/B/C/D/R + 监督视角） |
+| **[TECHNICAL.md](./TECHNICAL.md)** | **技术文档整合版 T2.0**（含监督子系统） |
 
----
-
-## 完整文档地图
-
-### A. 需求与商业
-
-| 文档 | 说明 | 权威 |
-|------|------|------|
-| [USER_REQUIREMENTS.md](./USER_REQUIREMENTS.md) | 用户画像 / 场景 / Jobs（U1.0） | 用户侧真源 |
-| [PAIN_FIRST_PRINCIPLES.md](./PAIN_FIRST_PRINCIPLES.md) | 痛点 P1–P5 | 痛点推导 |
-| **[CORE_VALUE_MATCHING.md](./CORE_VALUE_MATCHING.md)** | **撮合平台核心价值（第一性原理）** | 撮合排期尺子 |
-| **[FLYWHEEL_AND_BUSINESS_LOOP.md](./FLYWHEEL_AND_BUSINESS_LOOP.md)** | **商业闭环 × 生态飞轮（W1.0）** | 飞轮与收入咬合 |
-| **[BUSINESS_MODEL_RESEARCH.md](./BUSINESS_MODEL_RESEARCH.md)** | **撮合×Token 商业模式深度研究（BM1.0）** | 战略压力测试 |
-| **[SUPERVISION_VIEW.md](./SUPERVISION_VIEW.md)** | **监管者监督视角（S1.0）** | 秘书处/运维仪表盘 |
-| [ECOSYSTEM_AND_USAGE.md](./ECOSYSTEM_AND_USAGE.md) | 功能 F1–F25 + 闭环 A/B/C/D/R | 功能与飞轮 |
-| [BUSINESS_LOGIC.md](./BUSINESS_LOGIC.md) | 商业模式 × 服务中心（B1.4） | 商务真源 |
-| [DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md) | Tokens 进/转/出（D1.3） | 结算决策 |
-| **[REQUIREMENTS_SPEC.md](./REQUIREMENTS_SPEC.md)** | **SRS 汇总（含扩展功能清单）** | 评审入口 |
-| [PRD.md](./PRD.md) | 产品功能规格 | 界面/字段级 |
-| [SCHEME_V13.md](./SCHEME_V13.md) | V1.3 方案升级索引 | 增量索引 |
-
-### B. 技术与工程
-
-| 文档 | 说明 | 权威 |
-|------|------|------|
-| **[SAAS_ARCHITECTURE.md](./SAAS_ARCHITECTURE.md)** | **整体 SaaS 架构** | 技术入口 |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | 模块级技术详规 | 补充 |
-| [API_CONTRACT.md](./API_CONTRACT.md) | 现行 HTTP 契约 | 联调 |
-| [P1_BOUNDARY.md](./P1_BOUNDARY.md) | 仓库现状 vs 目标 | 审核基线 |
-| [ACCEPTANCE.md](./ACCEPTANCE.md) | 验收与放行 | 放行 |
-
-### C. 外部对照（最弱）
+## 外发给 MiniMax / Trae
 
 | 文档 | 说明 |
 |------|------|
-| [FEEDBACK_HUB_V33.md](./FEEDBACK_HUB_V33.md) 等 | 外部演示壳意见 / 历史笔记 |
+| **[PACK_MINIMAX_TRAE.md](./PACK_MINIMAX_TRAE.md)** | 单文件合集 |
+| [SEND_TO_MINIMAX_TRAE.md](./SEND_TO_MINIMAX_TRAE.md) | 附言模板 |
 
-冲突顺序：用户目标 → 痛点 → 生态闭环 → **商业/结算拍板** → **REQUIREMENTS_SPEC / PRD** → **SAAS_ARCHITECTURE / API_CONTRACT** → 外审演示壳（最弱）。
+## 专题深挖（按需）
 
----
+| 文档 | 说明 |
+|------|------|
+| [CORE_VALUE_MATCHING.md](./CORE_VALUE_MATCHING.md) | 北极星：适配 × 信任 |
+| [FLYWHEEL_AND_BUSINESS_LOOP.md](./FLYWHEEL_AND_BUSINESS_LOOP.md) | 主轮 + 卫星飞轮 |
+| [DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md) | Tokens 进/转/出 D1.3 |
+| [SUPERVISION_VIEW.md](./SUPERVISION_VIEW.md) | 监管监督视角专册 |
+| [BUSINESS_MODEL_RESEARCH.md](./BUSINESS_MODEL_RESEARCH.md) | 商业模式研究 BM1.0 |
+| [BUSINESS_LOGIC.md](./BUSINESS_LOGIC.md) | 服务中心业务逻辑 |
+| [USER_REQUIREMENTS.md](./USER_REQUIREMENTS.md) | 用户画像 Jobs |
+| [REQUIREMENTS_SPEC.md](./REQUIREMENTS_SPEC.md) | 旧 SRS（由 R2.0 承接） |
+| [SAAS_ARCHITECTURE.md](./SAAS_ARCHITECTURE.md) | 旧架构总册（由 T2.0 承接） |
+| [PRD.md](./PRD.md) / [API_CONTRACT.md](./API_CONTRACT.md) / [ACCEPTANCE.md](./ACCEPTANCE.md) | 字段、契约、放行 |
 
-## 已确认决策（滚动）
+冲突顺序：北极星 → D1.3 → **REQUIREMENTS R2.0** → **TECHNICAL T2.0** → PRD/契约 → 外审壳。
 
-1. **北极星：** 整站围绕 **信任保障 × 撮合适配保障**（[CORE_VALUE_MATCHING.md](./CORE_VALUE_MATCHING.md) C1.1）；其余模块为卫星  
-1a. **飞轮：** **A 主轮**转可信成交；B/C/D/R 为加油/旁路/护栏/出口（[FLYWHEEL_AND_BUSINESS_LOOP.md](./FLYWHEEL_AND_BUSINESS_LOOP.md) W1.0）  
-2. 工作需求全联盟可见  
-3. **Tokens D1.3（进/转/出）：** 官方购入 → 托管撮合+生产消耗 → C 环法币合同和/或 Earned **官方回收销毁退 ¥**；禁互兑/挂单/购入即兑  
-4. API 聚合 + 算力调度（履约卫星）  
-5. 产品结构：撮合核 · 中枢主场 · 出海/回收等卫星  
-6. 热度测试 / 版权链不进 MVP 导航  
+## 已确认决策
 
----
-
-## 阅读路径（推荐）
-
-**商务一周搞懂：**  
-REQUIREMENTS_SPEC §1–4 → BUSINESS_LOGIC → DECISION_TOKEN_SETTLEMENT  
-
-**产品开写故事：**  
-USER_REQUIREMENTS → ECOSYSTEM → REQUIREMENTS_SPEC → PRD  
-
-**研发开工：**  
-REQUIREMENTS_SPEC §5–9 → SAAS_ARCHITECTURE → API_CONTRACT → P1_BOUNDARY → ACCEPTANCE  
+1. 北极星：信任保障 × 撮合适配保障  
+2. 飞轮：A 主轮；B 加油；C 法币旁路；D 治理+**监督视角**；R 回收出口  
+3. Tokens 进/转/出；禁互兑/挂单/购入即兑  
+4. 日常入口 `/app`；监管入口 `/app/supervision`  
