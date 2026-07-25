@@ -1,5 +1,14 @@
 # 发给 MiniMax / Trae
 
+## 本机工程（已登记）
+
+```
+c:\Users\Ameow\.minimax-agent-cn\projects\xi-an-short-drama-saas
+```
+
+备忘全文：[MINIMAX_LOCAL_PROJECT.md](./MINIMAX_LOCAL_PROJECT.md)  
+说明：云端无法直读该路径；在本机 MiniMax 项目中引用下方 Raw，或把生成物回传对照。
+
 ## 优先：核心包 Raw（含 MVP + UI 约束）
 
 https://raw.githubusercontent.com/horizoncove/openclaw-lite/cursor/overseas-drama-saas-8928/xian-drama-saas/docs/PACK_CORE.md

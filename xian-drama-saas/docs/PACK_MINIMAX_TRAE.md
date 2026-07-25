@@ -2,6 +2,11 @@
 
 > GitHub 大文件预览可能空白，请用 Raw。
 
+## 本机 MiniMax 工程
+
+`c:\Users\Ameow\.minimax-agent-cn\projects\xi-an-short-drama-saas`  
+详见 [MINIMAX_LOCAL_PROJECT.md](./MINIMAX_LOCAL_PROJECT.md)
+
 ## 必发
 
 - 核心包：https://raw.githubusercontent.com/horizoncove/openclaw-lite/cursor/overseas-drama-saas-8928/xian-drama-saas/docs/PACK_CORE.md  

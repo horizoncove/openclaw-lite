@@ -19,6 +19,7 @@
 | **[PACK_CORE.md](./PACK_CORE.md)** | 核心包（MVP + UI + 需求 + 技术） |
 | [PACK_MINIMAX_TRAE.md](./PACK_MINIMAX_TRAE.md) | 索引与 Raw 链接 |
 | [SEND_TO_MINIMAX_TRAE.md](./SEND_TO_MINIMAX_TRAE.md) | 附言 |
+| [MINIMAX_LOCAL_PROJECT.md](./MINIMAX_LOCAL_PROJECT.md) | 本机 MiniMax 工程路径备忘 |
 
 ## 专题（后置深挖）
 
