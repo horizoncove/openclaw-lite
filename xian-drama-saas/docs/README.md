@@ -1,6 +1,6 @@
 # 文档与协作约定
 
-> 更新：2026-07-25 · **需求总册 R1.0 + 架构总册 T1.0**  
+> 更新：2026-07-25 · **需求总册 R1.1 + 架构总册 T1.0**  
 > 适用：`xian-drama-saas/` 后续迭代
 
 ## 角色分工
@@ -19,7 +19,7 @@
 
 | 文档 | 说明 | 权威 |
 |------|------|------|
-| **[REQUIREMENTS_SPEC.md](./REQUIREMENTS_SPEC.md)** | **需求规格总册 R1.0（SRS）** | 需求入口 |
+| **[REQUIREMENTS_SPEC.md](./REQUIREMENTS_SPEC.md)** | **需求规格总册 R1.1（SRS）** | 需求入口 |
 | **[SAAS_ARCHITECTURE.md](./SAAS_ARCHITECTURE.md)** | **SaaS 技术架构总册 T1.0** | 技术入口 |
 
 ---
@@ -35,7 +35,7 @@
 | [ECOSYSTEM_AND_USAGE.md](./ECOSYSTEM_AND_USAGE.md) | 功能 F1–F25 + 闭环 A/B/C/D/R | 功能与飞轮 |
 | [BUSINESS_LOGIC.md](./BUSINESS_LOGIC.md) | 商业模式 × 服务中心（B1.4） | 商务真源 |
 | [DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md) | Tokens 进/转/出（D1.3） | 结算决策 |
-| **[REQUIREMENTS_SPEC.md](./REQUIREMENTS_SPEC.md)** | **SRS 汇总** | 评审入口 |
+| **[REQUIREMENTS_SPEC.md](./REQUIREMENTS_SPEC.md)** | **SRS 汇总（含扩展功能清单）** | 评审入口 |
 | [PRD.md](./PRD.md) | 产品功能规格 | 界面/字段级 |
 | [SCHEME_V13.md](./SCHEME_V13.md) | V1.3 方案升级索引 | 增量索引 |
 

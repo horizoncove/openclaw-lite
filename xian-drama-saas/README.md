@@ -8,7 +8,7 @@
 
 | 文档 | 用途 |
 |------|------|
-| **[docs/REQUIREMENTS_SPEC.md](./docs/REQUIREMENTS_SPEC.md)** | **需求规格总册（SRS）R1.0** |
+| **[docs/REQUIREMENTS_SPEC.md](./docs/REQUIREMENTS_SPEC.md)** | **需求规格总册（SRS）R1.1** |
 | **[docs/SAAS_ARCHITECTURE.md](./docs/SAAS_ARCHITECTURE.md)** | **SaaS 技术架构总册 T1.0** |
 
 完整地图与协作约定：[docs/README.md](./docs/README.md)
