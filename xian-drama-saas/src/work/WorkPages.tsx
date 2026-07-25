@@ -10,26 +10,22 @@ export function WorkWalletPage() {
   return (
     <div className="work-page">
       <h1>钱包</h1>
-      <p className="sub">官方购入平台积分 T。演示价 1¥ = 1T。可申请发票（占位）。</p>
-      <div className="work-grid" style={{ marginBottom: "1.25rem" }}>
-        <div className="work-item">
-          <div className="row">
-            <span>可用余额</span>
-            <span className="budget">{balance} T</span>
-          </div>
+      <p className="sub">官方购入平台积分 T。演示价 1¥ = 1T。发票入口为占位。</p>
+
+      <div className="work-stats">
+        <div>
+          <div className="k">可用</div>
+          <div className="v">{balance} T</div>
         </div>
-        <div className="work-item">
-          <div className="row">
-            <span>托管冻结</span>
-            <span className="budget">{frozen} T</span>
-          </div>
+        <div>
+          <div className="k">冻结</div>
+          <div className="v">{frozen} T</div>
         </div>
       </div>
 
       {user?.role === "client" && (
         <form
           className="work-form"
-          style={{ marginBottom: "1.5rem" }}
           onSubmit={(e: FormEvent) => {
             e.preventDefault();
             requestBuy(amount);
@@ -37,7 +33,7 @@ export function WorkWalletPage() {
           }}
         >
           <label>
-            购入套餐（T）
+            购入额度
             <select value={amount} onChange={(e) => setAmount(Number(e.target.value))}>
               <option value={200}>200 T · ¥200</option>
               <option value={500}>500 T · ¥500</option>
@@ -45,15 +41,15 @@ export function WorkWalletPage() {
             </select>
           </label>
           <button type="submit" className="work-btn work-btn-primary">
-            发起购买（需在工作区确认）
+            发起购买（回工作区确认）
           </button>
           <button type="button" className="work-btn work-btn-ghost">
-            申请发票 / 对公信息（演示占位）
+            申请发票 / 对公信息（占位）
           </button>
         </form>
       )}
 
-      <h2 style={{ fontFamily: "var(--w-display)", marginBottom: "0.75rem" }}>流水</h2>
+      <h2>流水</h2>
       {ledger.length === 0 ? (
         <div className="work-empty">暂无流水</div>
       ) : (
@@ -79,8 +75,8 @@ export function WorkWalletPage() {
           </tbody>
         </table>
       )}
-      <p style={{ marginTop: "1rem" }}>
-        <Link className="work-nav-link" to="/work">
+      <p style={{ marginTop: "1.5rem" }}>
+        <Link className="work-btn-quiet" to="/work">
           ← 回工作区
         </Link>
       </p>
@@ -97,28 +93,24 @@ export function WorkBountiesPage() {
 
   return (
     <div className="work-page">
-      <h1>{user?.role === "supplier" ? "可接悬赏" : "我的悬赏 / 大厅"}</h1>
-      <p className="sub">品类为微短剧履约（译制 / 配音 / 发行）。单位 T。</p>
+      <h1>{user?.role === "supplier" ? "可接悬赏" : "悬赏"}</h1>
+      <p className="sub">品类：译制 / 配音 / 发行 / 剪辑。单位 T。</p>
       {list.length === 0 ? (
         <div className="work-empty">暂无悬赏</div>
       ) : (
-        <div className="work-grid">
+        <div className="work-list">
           {list.map((b) => (
-            <Link key={b.id} to={`/work/bounties/${b.id}`} className="work-item">
-              <div className="row">
-                <span className="tag" style={{ color: "var(--w-accent)" }}>
-                  {b.category}
-                </span>
-                <span className="budget">{b.budgetT} T</span>
+            <Link key={b.id} to={`/work/bounties/${b.id}`} className="work-row">
+              <div className="cat">{b.category}</div>
+              <div className="main">
+                <strong>{b.title}</strong>
+                <p>{b.summary}</p>
+                <div className="meta">
+                  {b.clientOrg} · {b.applicants.length} 应征 ·{" "}
+                  <span className={`work-status ${b.status}`}>{b.status}</span>
+                </div>
               </div>
-              <strong>{b.title}</strong>
-              <p style={{ color: "var(--w-muted)", fontSize: "0.88rem" }}>{b.summary}</p>
-              <div className="work-meta">
-                <span>
-                  {b.clientOrg} · <b>{b.applicants.length}</b> 应征
-                </span>
-                <span className={`work-status ${b.status}`}>{b.status}</span>
-              </div>
+              <div className="amt">{b.budgetT} T</div>
             </Link>
           ))}
         </div>
@@ -188,7 +180,7 @@ export function WorkBountyNewPage() {
           <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
         </label>
         <button type="submit" className="work-btn work-btn-primary">
-          发布到大厅
+          发布
         </button>
       </form>
     </div>
@@ -213,12 +205,14 @@ export function WorkBountyDetailPage() {
   return (
     <div className="work-page">
       <p className="sub">
-        <Link to="/work/bounties">← 列表</Link>
+        <Link className="work-btn-quiet" to="/work/bounties">
+          ← 悬赏列表
+        </Link>
       </p>
       <h1>{b.title}</h1>
       <p className="sub">{b.summary}</p>
-      <div className="work-meta" style={{ marginBottom: "1rem" }}>
-        <span className="work-status open">{b.category}</span>
+      <div className="work-detail-meta">
+        <span>{b.category}</span>
         <span>
           预算 <b>{b.budgetT} T</b>
         </span>
@@ -226,7 +220,7 @@ export function WorkBountyDetailPage() {
           期限 <b>{b.deadline}</b>
         </span>
         <span>
-          发布方 <b>{b.clientOrg}</b>
+          发布 <b>{b.clientOrg}</b>
         </span>
         <span className={`work-status ${b.status}`}>{b.status}</span>
       </div>
@@ -234,7 +228,6 @@ export function WorkBountyDetailPage() {
       {user?.role === "supplier" && b.status === "open" && (
         <form
           className="work-form"
-          style={{ marginBottom: "1.5rem" }}
           onSubmit={(e: FormEvent) => {
             e.preventDefault();
             applyBounty(b.id, note);
@@ -251,43 +244,41 @@ export function WorkBountyDetailPage() {
         </form>
       )}
 
-      <h2 style={{ fontFamily: "var(--w-display)", marginBottom: "0.75rem" }}>应征列表</h2>
+      <h2>应征</h2>
       {b.applicants.length === 0 ? (
         <div className="work-empty">暂无应征</div>
       ) : (
-        <div className="work-grid">
-          {b.applicants.map((a) => (
-            <div key={a.id} className="work-item">
-              <strong>
-                {a.org} · {a.name}
-              </strong>
-              <p style={{ color: "var(--w-muted)", fontSize: "0.88rem" }}>{a.note}</p>
-              {user?.role === "client" && b.status === "open" && (
-                <button
-                  type="button"
-                  className="work-btn work-btn-primary"
-                  onClick={() => {
-                    requestMatch(b.id, a.id);
-                    nav("/work");
-                  }}
-                >
-                  确认合作（去工作区确认冻结）
-                </button>
-              )}
-              {b.selectedApplicantId === a.id && (
-                <span className="work-status matched">已选定</span>
-              )}
-            </div>
-          ))}
-        </div>
+        b.applicants.map((a) => (
+          <div key={a.id} className="work-applicant">
+            <strong>
+              {a.org} · {a.name}
+            </strong>
+            <p>{a.note}</p>
+            {user?.role === "client" && b.status === "open" && (
+              <button
+                type="button"
+                className="work-btn work-btn-primary"
+                onClick={() => {
+                  requestMatch(b.id, a.id);
+                  nav("/work");
+                }}
+              >
+                确认合作（回工作区冻结）
+              </button>
+            )}
+            {b.selectedApplicantId === a.id && (
+              <span className="work-status matched">已选定</span>
+            )}
+          </div>
+        ))
       )}
 
       {b.orderId && (
-        <p style={{ marginTop: "1rem" }}>
+        <div className="work-actions">
           <Link className="work-btn work-btn-ghost" to={`/work/orders/${b.orderId}`}>
             查看订单
           </Link>
-        </p>
+        </div>
       )}
     </div>
   );
@@ -297,24 +288,24 @@ export function WorkOrdersPage() {
   const { orders } = useWorkDemo();
   return (
     <div className="work-page">
-      <h1>我的订单</h1>
+      <h1>订单</h1>
       <p className="sub">托管中 → 履约中 → 已放款</p>
       {orders.length === 0 ? (
         <div className="work-empty">暂无订单</div>
       ) : (
-        <div className="work-grid">
+        <div className="work-list">
           {orders.map((o) => (
-            <Link key={o.id} to={`/work/orders/${o.id}`} className="work-item">
-              <div className="row">
+            <Link key={o.id} to={`/work/orders/${o.id}`} className="work-row">
+              <div className="cat">
                 <span className={`work-status ${o.status}`}>{o.status}</span>
-                <span className="budget">{o.budgetT} T</span>
               </div>
-              <strong>{o.title}</strong>
-              <div className="work-meta">
-                <span>{o.clientOrg}</span>
-                <span>→</span>
-                <span>{o.supplierOrg}</span>
+              <div className="main">
+                <strong>{o.title}</strong>
+                <div className="meta">
+                  {o.clientOrg} → {o.supplierOrg}
+                </div>
               </div>
+              <div className="amt">{o.budgetT} T</div>
             </Link>
           ))}
         </div>
@@ -340,13 +331,15 @@ export function WorkOrderDetailPage() {
   return (
     <div className="work-page">
       <p className="sub">
-        <Link to="/work/orders">← 订单列表</Link>
+        <Link className="work-btn-quiet" to="/work/orders">
+          ← 订单列表
+        </Link>
       </p>
       <h1>{o.title}</h1>
       <p className="sub">
         {o.clientOrg} → {o.supplierOrg} · {o.supplierName}
       </p>
-      <div className="work-meta" style={{ marginBottom: "1.25rem" }}>
+      <div className="work-detail-meta">
         <span className={`work-status ${o.status}`}>{o.status}</span>
         <span>
           冻结 <b>{o.frozenT} T</b>
@@ -358,16 +351,13 @@ export function WorkOrderDetailPage() {
         )}
       </div>
 
-      <div className="work-ctx-card" style={{ marginBottom: "1rem" }}>
-        <span className="tag">时间线</span>
-        <p>
-          已确认 → 托管冻结
-          {o.status !== "escrowed" ? " → 履约中" : ""}
-          {o.status === "paid" ? " → 验收通过 → 已放款至供应商" : ""}
-        </p>
-      </div>
+      <p className="sub" style={{ marginBottom: "0.5rem" }}>
+        已确认 → 托管冻结
+        {o.status !== "escrowed" ? " → 履约中" : ""}
+        {o.status === "paid" ? " → 验收通过 → 已放款" : ""}
+      </p>
 
-      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+      <div className="work-actions">
         {user?.role === "supplier" && o.status === "escrowed" && (
           <button
             type="button"
@@ -377,7 +367,7 @@ export function WorkOrderDetailPage() {
               nav("/work");
             }}
           >
-            标记履约 / 交付待验收
+            标记履约 / 待验收
           </button>
         )}
         {user?.role === "client" && o.status !== "paid" && (
@@ -389,7 +379,7 @@ export function WorkOrderDetailPage() {
               nav("/work");
             }}
           >
-            发起验收（去工作区确认）
+            发起验收（回工作区确认）
           </button>
         )}
         <Link className="work-btn work-btn-ghost" to="/work">

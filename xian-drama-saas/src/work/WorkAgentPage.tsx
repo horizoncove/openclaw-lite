@@ -43,8 +43,8 @@ export function WorkAgentPage() {
       }
       return {
         tag: "下一步",
-        title: "可以说「买 Token」或「发悬赏」",
-        body: "Agent 会代拟草稿；购 T / 确认合作 / 验收必须你点头。",
+        title: "买 Token，或发一条悬赏",
+        body: "Agent 代拟；购 T / 确认合作 / 验收须你点头。",
         to: "/work/wallet",
       };
     }
@@ -54,7 +54,7 @@ export function WorkAgentPage() {
       return {
         tag: mine.status === "escrowed" ? "托管履约" : "进行中",
         title: mine.title,
-        body: `预算 ${mine.budgetT} T · 客户 ${mine.clientOrg}`,
+        body: `预算 ${mine.budgetT} T · ${mine.clientOrg}`,
         to: `/work/orders/${mine.id}`,
       };
     }
@@ -69,7 +69,7 @@ export function WorkAgentPage() {
     return {
       tag: "待命",
       title: "暂无新任务",
-      body: "切换客户账号发一条悬赏后再回来接单。",
+      body: "切换客户账号发悬赏后再回来。",
       to: "/work/bounties",
     };
   }, [user, bounties, orders]);
@@ -86,8 +86,8 @@ export function WorkAgentPage() {
       const b = bounties.find((x) => x.id === pendingConfirm.bountyId);
       const a = b?.applicants.find((x) => x.id === pendingConfirm.applicantId);
       return {
-        title: "确认合作并冻结预算",
-        desc: `与 ${a?.org ?? ""} · ${a?.name ?? ""} 合作「${b?.title ?? ""}」，将冻结 ${b?.budgetT ?? 0} T。`,
+        title: "确认合作并冻结",
+        desc: `与 ${a?.org ?? ""} · ${a?.name ?? ""} 合作「${b?.title ?? ""}」，冻结 ${b?.budgetT ?? 0} T。`,
       };
     }
     const o = orders.find((x) => x.id === pendingConfirm.orderId);
@@ -112,86 +112,86 @@ export function WorkAgentPage() {
   return (
     <div className="work-main">
       <section className="work-chat">
+        <div className="work-stage">
+          <p className="work-stage-kicker">Conversation</p>
+          <h2 className="work-stage-title">跟 Agent 把这一单做完</h2>
+        </div>
         <div className="work-messages">
           {messages.map((m) => (
-            <div key={m.id} className={`work-bubble ${m.from}`}>
+            <div key={m.id} className={`work-line ${m.from}`}>
               <span className="who">
                 {m.from === "agent" ? "Agent" : m.from === "user" ? "你" : "系统"}
               </span>
-              {m.text}
+              <div className="body">{m.text}</div>
             </div>
           ))}
           <div ref={endRef} />
         </div>
 
-        {pendingLabel && (
-          <div className="work-confirm">
-            <strong>{pendingLabel.title}</strong>
-            <p>{pendingLabel.desc}</p>
-            <div className="work-confirm-actions">
-              <button type="button" className="work-btn work-btn-primary" onClick={confirmPending}>
-                确认执行
-              </button>
-              <button type="button" className="work-btn work-btn-ghost" onClick={cancelPending}>
-                取消
-              </button>
+        <div className="work-dock">
+          {pendingLabel && (
+            <div className="work-confirm">
+              <strong>{pendingLabel.title}</strong>
+              <p>{pendingLabel.desc}</p>
+              <div className="work-confirm-actions">
+                <button type="button" className="work-btn work-btn-primary" onClick={confirmPending}>
+                  确认执行
+                </button>
+                <button type="button" className="work-btn work-btn-ghost" onClick={cancelPending}>
+                  取消
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="work-quick">
-          {quick.map((q) => (
-            <button key={q} type="button" onClick={() => send(q)}>
-              {q}
-            </button>
-          ))}
-        </div>
-        <form
-          className="work-composer"
-          onSubmit={(e: FormEvent) => {
-            e.preventDefault();
-            send();
-          }}
-        >
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="对 Agent 说：买 Token / 发悬赏 / 应征 / 验收…"
-            rows={2}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                send();
-              }
+          <div className="work-quick">
+            {quick.map((q) => (
+              <button key={q} type="button" onClick={() => send(q)}>
+                {q}
+              </button>
+            ))}
+          </div>
+          <form
+            className="work-composer"
+            onSubmit={(e: FormEvent) => {
+              e.preventDefault();
+              send();
             }}
-          />
-          <button type="submit" className="work-btn work-btn-primary">
-            发送
-          </button>
-        </form>
+          >
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="对 Agent 说…（Enter 发送，Shift+Enter 换行）"
+              rows={2}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  send();
+                }
+              }}
+            />
+            <button type="submit" className="work-btn work-btn-primary">
+              发送
+            </button>
+          </form>
+        </div>
       </section>
 
       <aside className="work-side">
-        <h2>当前上下文</h2>
+        <h2>此刻</h2>
         {ctx && (
-          <div className="work-ctx-card">
-            <span className="tag">{ctx.tag}</span>
+          <div className="work-ctx">
+            <div className="label">{ctx.tag}</div>
             <h3>{ctx.title}</h3>
             <p>{ctx.body}</p>
-            <div className="work-meta">
-              <Link className="work-btn work-btn-ghost" to={ctx.to}>
-                打开详情
-              </Link>
-            </div>
+            <Link className="work-btn work-btn-ghost" to={ctx.to}>
+              打开
+            </Link>
           </div>
         )}
-        <div className="work-ctx-card">
-          <span className="tag">演示剧本</span>
-          <h3>5 分钟走通</h3>
-          <p>
-            1. 客户购 T → 2. 发悬赏 → 3. 退出换供应商应征 → 4. 换回客户确认冻结 → 5. 供应商标履约 → 6.
-            客户验收放款
-          </p>
+        <div className="work-script">
+          <div className="label">演示剧本</div>
+          客户购 T → 发悬赏 → 换供应商应征 → 换回客户确认冻结 → 履约 → 验收放款。
         </div>
       </aside>
     </div>
