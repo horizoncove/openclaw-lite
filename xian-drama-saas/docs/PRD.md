@@ -7,7 +7,7 @@
 >  
 > **已拍板：**  
 > 1. 工作需求 **全联盟可见**  
-> 2. Tokens：**官方单向购额（可账期）+ 订单赚取**；用于撮合结算与生产消耗；**禁止 Token↔货币自由兑换/提现**；禁止挂单转售与无订单互转（[DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md) D1.1）  
+> 2. Tokens：官方单向购额（可账期）+ 订单赚取；撮合托管结算；生产消耗；**Earned 可官方回收销毁后退 ¥（受控）**；**禁止自由兑换/挂单/购入即兑**（[DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md) D1.2）  
 > 3. **API 聚合** + **算力调度**（统一网关、Tokens 计量）  
 > 4. **产品三角**：会员中枢（主）· 出海专业服务线 · 撮合履约网络  
 >  

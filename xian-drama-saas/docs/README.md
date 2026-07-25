@@ -21,9 +21,9 @@
 |------|------|------|
 | **[USER_REQUIREMENTS.md](./USER_REQUIREMENTS.md)** | **用户需求 U1.0（先读：谁、场景、Jobs）** | 用户侧真源 |
 | **[PAIN_FIRST_PRINCIPLES.md](./PAIN_FIRST_PRINCIPLES.md)** | **核心痛点第一性原理（P1–P5）** | 痛点推导 |
-| **[ECOSYSTEM_AND_USAGE.md](./ECOSYSTEM_AND_USAGE.md)** | **使用功能 F1–F24 + 生态闭环 A/B/C/D** | 功能与飞轮 |
-| **[BUSINESS_LOGIC.md](./BUSINESS_LOGIC.md)** | **生态闭环×商业模式×服务中心业务逻辑** | 商务真源 |
-| **[DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md)** | **Tokens 撮合结算 + 信用账期（D1.0）** | 结算决策 |
+| **[ECOSYSTEM_AND_USAGE.md](./ECOSYSTEM_AND_USAGE.md)** | **使用功能 F1–F25 + 生态闭环 A/B/C/D + R 回收** | 功能与飞轮 |
+| **[BUSINESS_LOGIC.md](./BUSINESS_LOGIC.md)** | **生态闭环×商业模式×服务中心业务逻辑（B1.3）** | 商务真源 |
+| **[DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md)** | **Tokens 撮合结算 + 官方回收退法币（D1.2）** | 结算决策 |
 | [SCHEME_V13.md](./SCHEME_V13.md) | V1.3 方案升级总说明 | 增量索引 |
 | [PRD.md](./PRD.md) | 产品功能规格 V1.3 | 功能规格 |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | 目标技术 V1.3 | 目标架构 |
@@ -43,7 +43,7 @@
 ## 已确认决策（滚动）
 
 1. 工作需求全联盟可见  
-2. **Tokens 结算 D1.1：** 可买（¥→T 单向）可赚可耗；撮合平台托管放款；**禁止 T↔¥ 自由转化/提现**；禁挂单与无订单互转；账期=赊购应收（[DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md)）  
+2. **Tokens D1.2：** ¥→T 官方购入；订单赚取；生产消耗；**官方回收销毁→退 ¥（仅 Earned、折价、限额）**；禁自由兑换与挂单（[DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md)）  
 3. API 聚合 + 算力调度  
 4. 产品三角：中枢 · 出海服务 · 撮合履约  
 5. 热度测试 / 版权链不进 MVP 导航  
