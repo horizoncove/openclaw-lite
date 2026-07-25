@@ -43,7 +43,7 @@
 ## 已确认决策（滚动）
 
 1. 工作需求全联盟可见  
-2. **Tokens 结算 D1.0：** 可买可赚可耗；撮合走平台托管放款；**禁挂单转售/无订单互转**；购额可按信用账期（[DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md)）  
+2. **Tokens 结算 D1.1：** 可买（¥→T 单向）可赚可耗；撮合平台托管放款；**禁止 T↔¥ 自由转化/提现**；禁挂单与无订单互转；账期=赊购应收（[DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md)）  
 3. API 聚合 + 算力调度  
 4. 产品三角：中枢 · 出海服务 · 撮合履约  
 5. 热度测试 / 版权链不进 MVP 导航  
