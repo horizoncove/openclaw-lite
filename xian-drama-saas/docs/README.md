@@ -41,6 +41,7 @@
 | [PAIN_FIRST_PRINCIPLES.md](./PAIN_FIRST_PRINCIPLES.md) | 痛点 P1–P5 | 痛点推导 |
 | **[CORE_VALUE_MATCHING.md](./CORE_VALUE_MATCHING.md)** | **撮合平台核心价值（第一性原理）** | 撮合排期尺子 |
 | **[FLYWHEEL_AND_BUSINESS_LOOP.md](./FLYWHEEL_AND_BUSINESS_LOOP.md)** | **商业闭环 × 生态飞轮（W1.0）** | 飞轮与收入咬合 |
+| **[BUSINESS_MODEL_RESEARCH.md](./BUSINESS_MODEL_RESEARCH.md)** | **撮合×Token 商业模式深度研究（BM1.0）** | 战略压力测试 |
 | **[SUPERVISION_VIEW.md](./SUPERVISION_VIEW.md)** | **监管者监督视角（S1.0）** | 秘书处/运维仪表盘 |
 | [ECOSYSTEM_AND_USAGE.md](./ECOSYSTEM_AND_USAGE.md) | 功能 F1–F25 + 闭环 A/B/C/D/R | 功能与飞轮 |
 | [BUSINESS_LOGIC.md](./BUSINESS_LOGIC.md) | 商业模式 × 服务中心（B1.4） | 商务真源 |
