@@ -22,6 +22,13 @@
 | **[REQUIREMENTS_SPEC.md](./REQUIREMENTS_SPEC.md)** | **需求规格总册 R1.1（SRS）** | 需求入口 |
 | **[SAAS_ARCHITECTURE.md](./SAAS_ARCHITECTURE.md)** | **SaaS 技术架构总册 T1.0** | 技术入口 |
 
+## 外发合集（MiniMax / Trae）
+
+| 文档 | 说明 |
+|------|------|
+| **[PACK_MINIMAX_TRAE.md](./PACK_MINIMAX_TRAE.md)** | **需求+技术单文件合集（直接转发）** |
+| [SEND_TO_MINIMAX_TRAE.md](./SEND_TO_MINIMAX_TRAE.md) | 外发说明与附言模板 |
+
 ---
 
 ## 完整文档地图

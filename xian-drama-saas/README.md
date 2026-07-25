@@ -11,6 +11,13 @@
 | **[docs/REQUIREMENTS_SPEC.md](./docs/REQUIREMENTS_SPEC.md)** | **需求规格总册（SRS）R1.1** |
 | **[docs/SAAS_ARCHITECTURE.md](./docs/SAAS_ARCHITECTURE.md)** | **SaaS 技术架构总册 T1.0** |
 
+## 外发给 MiniMax / Trae
+
+| 文档 | 用途 |
+|------|------|
+| **[docs/PACK_MINIMAX_TRAE.md](./docs/PACK_MINIMAX_TRAE.md)** | **需求+技术单文件合集（直接转发）** |
+| [docs/SEND_TO_MINIMAX_TRAE.md](./docs/SEND_TO_MINIMAX_TRAE.md) | 附言模板 |
+
 完整地图与协作约定：[docs/README.md](./docs/README.md)
 
 ## 文档索引

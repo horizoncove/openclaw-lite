@@ -3,7 +3,7 @@
 > 版本：**T1.0**  
 > 日期：2026-07-25  
 > 状态：**目标架构 + 现行实现对照**  
-> 需求入口：[REQUIREMENTS_SPEC.md](./REQUIREMENTS_SPEC.md) R1.0  
+> 需求入口：[REQUIREMENTS_SPEC.md](./REQUIREMENTS_SPEC.md) R1.1  
 > 结算：[DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md) D1.3  
 > 现行 HTTP：[API_CONTRACT.md](./API_CONTRACT.md) · 差距：[P1_BOUNDARY.md](./P1_BOUNDARY.md)  
 > 模块级旧稿：[ARCHITECTURE.md](./ARCHITECTURE.md)（保留；以本文为准做总览）
