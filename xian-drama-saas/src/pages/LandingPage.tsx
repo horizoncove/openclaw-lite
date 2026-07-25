@@ -5,28 +5,28 @@ export default function LandingPage() {
   return (
     <div className="landing">
       <header className="landing-nav">
-        <div className="landing-brand">微短剧产业服务 SaaS</div>
-        <Link className="btn btn-primary" to="/app/login">
-          进入 P1 会员中枢 <ArrowRight size={14} />
+        <div className="landing-brand">微短剧 AI Agent 工作端</div>
+        <Link className="btn btn-primary" to="/work/login">
+          进入工作端演示 <ArrowRight size={14} />
         </Link>
       </header>
 
       <section className="landing-hero">
-        <p className="eyebrow">PHASE 1 · MEMBER HUB</p>
+        <p className="eyebrow">DEMO · AGENT WORK CLIENT</p>
         <h1>
-          管项目 · 对接需求
+          对话编排履约
           <br />
-          API 聚合 · 算力调度
+          托管确认结清
         </h1>
         <p className="lead">
-          全联盟可见的工作需求广场、进度工作台、XD-Router 模型网关与算力作业队列；另保留联盟/中心/出海专业入口。
+          纯前端演示：购 Token → 发悬赏 → 应征 → 确认冻结 → 验收放款。默认主界面是 Agent 工作区，不是 SaaS 后台。
         </p>
         <div className="hero-actions portal-actions">
-          <Link className="btn btn-primary btn-lg portal-btn overseas" to="/app/login">
-            <Sparkles size={18} /> 进入会员中枢（P1） <ArrowRight size={16} />
+          <Link className="btn btn-primary btn-lg portal-btn overseas" to="/work/login">
+            <Bot size={18} /> 打开 Agent 工作端演示 <ArrowRight size={16} />
           </Link>
-          <Link className="btn btn-primary btn-lg portal-btn alliance" to="/alliance/login">
-            <Users size={18} /> 联盟入口
+          <Link className="btn btn-primary btn-lg portal-btn alliance" to="/app/login">
+            <Sparkles size={18} /> 旧版 P1 中枢
           </Link>
           <Link className="btn btn-primary btn-lg portal-btn center" to="/center/login">
             <Stamp size={18} /> 五大中心
@@ -57,7 +57,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="landing-foot">微短剧产业服务 SaaS · Phase 1</footer>
+      <footer className="landing-foot">微短剧 AI Agent 工作端 · 演示</footer>
     </div>
   );
 }

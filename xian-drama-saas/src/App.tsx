@@ -54,6 +54,16 @@ import WalletPage from "./pages/app/WalletPage";
 import ComputePage from "./pages/app/ComputePage";
 import NoticesPage from "./pages/app/NoticesPage";
 import SupervisionPage from "./pages/app/SupervisionPage";
+import { RequireWorkAuth, WorkLayout, WorkLoginPage } from "./work/WorkShell";
+import { WorkAgentPage } from "./work/WorkAgentPage";
+import {
+  WorkBountyDetailPage,
+  WorkBountyNewPage,
+  WorkBountiesPage,
+  WorkOrderDetailPage,
+  WorkOrdersPage,
+  WorkWalletPage,
+} from "./work/WorkPages";
 
 function RequireAllianceAuth() {
   const { user } = useAllianceStore();
@@ -91,6 +101,20 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+
+      {/* AI Agent 工作端演示（纯前端） */}
+      <Route path="/work/login" element={<WorkLoginPage />} />
+      <Route element={<RequireWorkAuth />}>
+        <Route path="/work" element={<WorkLayout />}>
+          <Route index element={<WorkAgentPage />} />
+          <Route path="wallet" element={<WorkWalletPage />} />
+          <Route path="bounties" element={<WorkBountiesPage />} />
+          <Route path="bounties/new" element={<WorkBountyNewPage />} />
+          <Route path="bounties/:id" element={<WorkBountyDetailPage />} />
+          <Route path="orders" element={<WorkOrdersPage />} />
+          <Route path="orders/:id" element={<WorkOrderDetailPage />} />
+        </Route>
+      </Route>
 
       {/* P1 会员协作中枢 */}
       <Route path="/app/login" element={<AppLoginPage />} />
