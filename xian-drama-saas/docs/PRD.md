@@ -7,12 +7,12 @@
 >  
 > **已拍板：**  
 > 1. 工作需求 **全联盟可见**  
-> 2. **不做** Token 转售 / 机构间余额转让  
+> 2. Tokens：**官方购额（可信用账期）+ 订单赚取**；用于**撮合结算与生产消耗**；**禁止挂单转售/无订单互转**（见 [DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md)）  
 > 3. **API 聚合** + **算力调度**（统一网关、Tokens 计量）  
 > 4. **产品三角**：会员中枢（主）· 出海专业服务线 · 撮合履约网络  
 >  
 > **协作：** 文档线负责需求/架构/契约/验收；实现 Agent 按契约交付。UI 审美不作为文档线主责。  
-> **阅读顺序：** [USER_REQUIREMENTS](./USER_REQUIREMENTS.md) → [PAIN_FIRST_PRINCIPLES](./PAIN_FIRST_PRINCIPLES.md) → [ECOSYSTEM_AND_USAGE](./ECOSYSTEM_AND_USAGE.md) → [BUSINESS_LOGIC](./BUSINESS_LOGIC.md) → 本文（功能规格）。
+> **阅读顺序：** [USER_REQUIREMENTS](./USER_REQUIREMENTS.md) → [PAIN…](./PAIN_FIRST_PRINCIPLES.md) → [ECOSYSTEM…](./ECOSYSTEM_AND_USAGE.md) → [BUSINESS_LOGIC](./BUSINESS_LOGIC.md) → [DECISION_TOKEN_SETTLEMENT](./DECISION_TOKEN_SETTLEMENT.md) → 本文。
 
 ---
 
