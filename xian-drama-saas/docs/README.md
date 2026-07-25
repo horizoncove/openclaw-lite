@@ -39,6 +39,7 @@
 |------|------|------|
 | [USER_REQUIREMENTS.md](./USER_REQUIREMENTS.md) | 用户画像 / 场景 / Jobs（U1.0） | 用户侧真源 |
 | [PAIN_FIRST_PRINCIPLES.md](./PAIN_FIRST_PRINCIPLES.md) | 痛点 P1–P5 | 痛点推导 |
+| **[CORE_VALUE_MATCHING.md](./CORE_VALUE_MATCHING.md)** | **撮合平台核心价值（第一性原理）** | 撮合排期尺子 |
 | [ECOSYSTEM_AND_USAGE.md](./ECOSYSTEM_AND_USAGE.md) | 功能 F1–F25 + 闭环 A/B/C/D/R | 功能与飞轮 |
 | [BUSINESS_LOGIC.md](./BUSINESS_LOGIC.md) | 商业模式 × 服务中心（B1.4） | 商务真源 |
 | [DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md) | Tokens 进/转/出（D1.3） | 结算决策 |
