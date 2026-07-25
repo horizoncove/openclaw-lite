@@ -1,24 +1,16 @@
 # 微短剧产业服务 · SaaS 平台
 
-> **定位：** 联盟会员协作中枢——适配×信任撮合、Tokens 进/转/出、产能计量、出海服务回写、**监管监督视角**。  
-> **不做** Token 转售/自由兑换。
+> **当前 MVP：** 客户买 Token → 发悬赏 → 供应商接单 → 平台托管收付 Token。  
+> 全景能力（回收/出海/网关/监督）见文档，**不挡最小闭环**。
 
-## 主文档（整合版 · 先读）
-
-| 文档 | 用途 |
-|------|------|
-| **[docs/REQUIREMENTS.md](./docs/REQUIREMENTS.md)** | **需求文档 R2.0** |
-| **[docs/TECHNICAL.md](./docs/TECHNICAL.md)** | **技术文档 T2.0** |
-
-## 外发 MiniMax / Trae
+## 先读
 
 | 文档 | 用途 |
 |------|------|
-| **[docs/PACK_CORE.md](./docs/PACK_CORE.md)** | **精简核心包（优先发，含需求+技术全文）** |
-| [docs/PACK_MINIMAX_TRAE.md](./docs/PACK_MINIMAX_TRAE.md) | 索引与 Raw 链接 |
-| [docs/SEND_TO_MINIMAX_TRAE.md](./docs/SEND_TO_MINIMAX_TRAE.md) | 附言 |
-
-完整地图：[docs/README.md](./docs/README.md)
+| **[docs/MVP.md](./docs/MVP.md)** | **最小 MVP 范围** |
+| [docs/REQUIREMENTS.md](./docs/REQUIREMENTS.md) | 需求 R2.1 |
+| [docs/TECHNICAL.md](./docs/TECHNICAL.md) | 技术 T2.1 |
+| **[docs/PACK_CORE.md](./docs/PACK_CORE.md)** | 外发核心包 |
 
 ## 快速开始
 
@@ -29,7 +21,4 @@ cd xian-drama-saas && npm install && npm run dev
 | 入口 | 路径 |
 |------|------|
 | 会员中枢 | `/app/login` → `/app/workspace` |
-| **监管监督视角** | 陈希/韩磊登录 → `/app/supervision` |
 | 演示壳 | `/overseas` · `/alliance` · `/center` |
-
-生产：`npm run build && npm start`

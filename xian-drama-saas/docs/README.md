@@ -1,42 +1,23 @@
-# 文档与协作约定
+# 文档地图
 
-> 更新：2026-07-25 · **整合主文档 R2.0 / T2.0**
+> 更新：2026-07-25 · **MVP-1.0 回归悬赏托管主路径**
 
-## 主入口（先读这两份）
-
-| 文档 | 说明 |
-|------|------|
-| **[REQUIREMENTS.md](./REQUIREMENTS.md)** | **需求文档整合版 R2.0**（含 A/B/C/D/R + 监督视角） |
-| **[TECHNICAL.md](./TECHNICAL.md)** | **技术文档整合版 T2.0**（含监督子系统） |
-
-## 外发给 MiniMax / Trae
+## 当前必达（先读）
 
 | 文档 | 说明 |
 |------|------|
-| **[PACK_CORE.md](./PACK_CORE.md)** | **精简核心包（需求+技术全文，优先发）** |
-| [PACK_MINIMAX_TRAE.md](./PACK_MINIMAX_TRAE.md) | 外发索引 + Raw 链接（避免巨文件空白） |
-| [SEND_TO_MINIMAX_TRAE.md](./SEND_TO_MINIMAX_TRAE.md) | 附言模板 |
+| **[MVP.md](./MVP.md)** | **最小 MVP：购 T→发悬赏→接单→平台收付 T** |
+| [REQUIREMENTS.md](./REQUIREMENTS.md) | 需求整合版 R2.1（全景；MVP 外后置） |
+| [TECHNICAL.md](./TECHNICAL.md) | 技术整合版 T2.1 |
 
-## 专题深挖（按需）
+## 外发
 
 | 文档 | 说明 |
 |------|------|
-| [CORE_VALUE_MATCHING.md](./CORE_VALUE_MATCHING.md) | 北极星：适配 × 信任 |
-| [FLYWHEEL_AND_BUSINESS_LOOP.md](./FLYWHEEL_AND_BUSINESS_LOOP.md) | 主轮 + 卫星飞轮 |
-| [DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md) | Tokens 进/转/出 D1.3 |
-| [SUPERVISION_VIEW.md](./SUPERVISION_VIEW.md) | 监管监督视角专册 |
-| [BUSINESS_MODEL_RESEARCH.md](./BUSINESS_MODEL_RESEARCH.md) | 商业模式研究 BM1.0 |
-| [BUSINESS_LOGIC.md](./BUSINESS_LOGIC.md) | 服务中心业务逻辑 |
-| [USER_REQUIREMENTS.md](./USER_REQUIREMENTS.md) | 用户画像 Jobs |
-| [REQUIREMENTS_SPEC.md](./REQUIREMENTS_SPEC.md) | 旧 SRS（由 R2.0 承接） |
-| [SAAS_ARCHITECTURE.md](./SAAS_ARCHITECTURE.md) | 旧架构总册（由 T2.0 承接） |
-| [PRD.md](./PRD.md) / [API_CONTRACT.md](./API_CONTRACT.md) / [ACCEPTANCE.md](./ACCEPTANCE.md) | 字段、契约、放行 |
+| **[PACK_CORE.md](./PACK_CORE.md)** | 核心包（MVP + 需求 + 技术） |
+| [PACK_MINIMAX_TRAE.md](./PACK_MINIMAX_TRAE.md) | 索引与 Raw 链接 |
+| [SEND_TO_MINIMAX_TRAE.md](./SEND_TO_MINIMAX_TRAE.md) | 附言 |
 
-冲突顺序：北极星 → D1.3 → **REQUIREMENTS R2.0** → **TECHNICAL T2.0** → PRD/契约 → 外审壳。
+## 专题（后置深挖）
 
-## 已确认决策
-
-1. 北极星：信任保障 × 撮合适配保障  
-2. 飞轮：A 主轮；B 加油；C 法币旁路；D 治理+**监督视角**；R 回收出口  
-3. Tokens 进/转/出；禁互兑/挂单/购入即兑  
-4. 日常入口 `/app`；监管入口 `/app/supervision`  
+CORE_VALUE · FLYWHEEL · DECISION · SUPERVISION · BUSINESS_MODEL_RESEARCH · PRD · API_CONTRACT · ACCEPTANCE
