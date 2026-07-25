@@ -1,8 +1,9 @@
 # 业务逻辑总册：生态闭环 × 商业模式 × 服务中心
 
-> 版本：**B1.0**  
+> 版本：**B1.1**  
 > 日期：2026-07-25  
 > 目的：把「生态怎么转」与「谁向谁付什么钱」对齐，并**仔细梳清服务中心整条业务逻辑**  
+> **结算决策：** 撮合默认用 Tokens 平台托管结算，见 [DECISION_TOKEN_SETTLEMENT.md](./DECISION_TOKEN_SETTLEMENT.md) D1.0  
 > 上游：[ECOSYSTEM_AND_USAGE.md](./ECOSYSTEM_AND_USAGE.md) · [PAIN_FIRST_PRINCIPLES.md](./PAIN_FIRST_PRINCIPLES.md)  
 > 下游：[PRD.md](./PRD.md) · 商务报价/合同（组织侧另附）  
 
