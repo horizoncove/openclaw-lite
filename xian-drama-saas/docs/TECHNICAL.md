@@ -1,20 +1,34 @@
 # 微短剧会员协作中枢 · 技术文档（整合版）
 
-> 版本：**T2.0**  
+> 版本：**T2.1**  
 > 日期：2026-07-25  
 > 状态：**技术主入口（整合）**  
-> 需求对照：[REQUIREMENTS.md](./REQUIREMENTS.md) **R2.0**  
-> 现行契约：[API_CONTRACT.md](./API_CONTRACT.md) · 差距：[P1_BOUNDARY.md](./P1_BOUNDARY.md)  
-> 专题：结算 D1.3 · 监督 [SUPERVISION_VIEW.md](./SUPERVISION_VIEW.md) · 模块旧稿 ARCHITECTURE.md
+> **当前必达实现：** [MVP.md](./MVP.md) MVP-1.0  
+> 需求对照：[REQUIREMENTS.md](./REQUIREMENTS.md) R2.1  
+> 现行契约：[API_CONTRACT.md](./API_CONTRACT.md) · 差距：[P1_BOUNDARY.md](./P1_BOUNDARY.md)
 
 ---
 
 ## 0. 架构一句话
 
-> 单仓 **Web + API** 多租户 SaaS：  
-> **撮合域（A）+ 结算域（Token 进/转/出）** 为核；  
-> **产能域（B）**、**服务域（C）**、**治理/监督域（D）**、**回收（R）** 为卫星；  
-> 会员看工作台，监管看监督视角，账本只允许经结算域改余额。
+> **MVP：** 购 T + 悬赏任务 + 接单 + 平台托管收付 T。  
+> 全景：单仓 Web+API；撮合/结算为核；产能 B、服务 C、治理 D、回收 R 为后置卫星。
+
+### 0.1 MVP 技术主路径（先实现）
+
+```
+Client Web
+  ├─ POST /wallet/purchase          买 T
+  ├─ POST /demands (publish)        发悬赏
+  ├─ GET  /demands?scope=plaza      大厅
+  ├─ POST /demands/:id/apply        接单
+  ├─ POST /demands/:id/confirm      确认 → freeze 托管
+  ├─ POST /match-orders/:id/release 验收放款 → 供应商 +T
+  └─ GET  /wallet                   余额与流水
+```
+
+数据最小集：`users/orgs` · `wallets`(+ledger) · `demands` · `applications` · `match_orders`  
+MVP 可用单字段 `balance`；放款记流水即可。禁止 `transfer` API。
 
 ---
 
@@ -302,9 +316,10 @@ xian-drama-saas/
 
 | 阶段 | 架构动作 |
 |------|----------|
-| **MVP** | A 托管放款账本；监督 overview；购额+Router+Compute 最小；禁兑 |
-| **P1.1** | 分桶强制；redeem；JWT；Key hash；service_requests 回写；争议 |
-| **P2** | Worker lease；Redis；账期；监督告警规则 |
+| **MVP-1.0** | 按 [MVP.md](./MVP.md)：购 T、悬赏 CRUD、接单确认、freeze/release、流水；无互转；UI 最少 6 页 |
+| **P1** | 工作台待办、通知、订单取消退托管、分桶 |
+| **P1.1** | redeem、supervision、service_requests、JWT/Key hash |
+| **P2** | Worker、Redis、账期、Router 产能 |
 
 验收以 [ACCEPTANCE.md](./ACCEPTANCE.md) + REQUIREMENTS §9 为准。
 
@@ -329,4 +344,5 @@ xian-drama-saas/
 | 版本 | 说明 |
 |------|------|
 | T1.0 | 首版架构总册 |
-| **T2.0** | **整合版**：A/B/C/D/R 映射、结算域、**监督子系统专章**、权限 IA、分期与追溯对齐 REQUIREMENTS R2.0 |
+| T2.0 | 整合版全景 |
+| **T2.1** | 对齐 MVP-1.0 悬赏托管主路径；全景能力标为后置 |
