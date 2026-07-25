@@ -13,7 +13,8 @@
 
 | 文档 | 说明 |
 |------|------|
-| **[PACK_MINIMAX_TRAE.md](./PACK_MINIMAX_TRAE.md)** | 单文件合集 |
+| **[PACK_CORE.md](./PACK_CORE.md)** | **精简核心包（需求+技术全文，优先发）** |
+| [PACK_MINIMAX_TRAE.md](./PACK_MINIMAX_TRAE.md) | 外发索引 + Raw 链接（避免巨文件空白） |
 | [SEND_TO_MINIMAX_TRAE.md](./SEND_TO_MINIMAX_TRAE.md) | 附言模板 |
 
 ## 专题深挖（按需）

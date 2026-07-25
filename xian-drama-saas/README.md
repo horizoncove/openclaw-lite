@@ -14,7 +14,8 @@
 
 | 文档 | 用途 |
 |------|------|
-| **[docs/PACK_MINIMAX_TRAE.md](./docs/PACK_MINIMAX_TRAE.md)** | 单文件合集 |
+| **[docs/PACK_CORE.md](./docs/PACK_CORE.md)** | **精简核心包（优先发，含需求+技术全文）** |
+| [docs/PACK_MINIMAX_TRAE.md](./docs/PACK_MINIMAX_TRAE.md) | 索引与 Raw 链接 |
 | [docs/SEND_TO_MINIMAX_TRAE.md](./docs/SEND_TO_MINIMAX_TRAE.md) | 附言 |
 
 完整地图：[docs/README.md](./docs/README.md)
