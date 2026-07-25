@@ -12,7 +12,7 @@
 > 4. **产品三角**：会员中枢（主）· 出海专业服务线 · 撮合履约网络  
 >  
 > **协作：** 文档线负责需求/架构/契约/验收；实现 Agent 按契约交付。UI 审美不作为文档线主责。  
-> **阅读顺序：** [USER_REQUIREMENTS](./USER_REQUIREMENTS.md) → [PAIN_FIRST_PRINCIPLES](./PAIN_FIRST_PRINCIPLES.md) → [ECOSYSTEM_AND_USAGE](./ECOSYSTEM_AND_USAGE.md) → 本文（功能规格）。
+> **阅读顺序：** [USER_REQUIREMENTS](./USER_REQUIREMENTS.md) → [PAIN_FIRST_PRINCIPLES](./PAIN_FIRST_PRINCIPLES.md) → [ECOSYSTEM_AND_USAGE](./ECOSYSTEM_AND_USAGE.md) → [BUSINESS_LOGIC](./BUSINESS_LOGIC.md) → 本文（功能规格）。
 
 ---
 

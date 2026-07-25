@@ -3,7 +3,7 @@
 > 版本：**E1.0**  
 > 日期：2026-07-24  
 > 上游：[PAIN_FIRST_PRINCIPLES.md](./PAIN_FIRST_PRINCIPLES.md) · [USER_REQUIREMENTS.md](./USER_REQUIREMENTS.md)  
-> 下游：[PRD.md](./PRD.md) V1.3 · [ARCHITECTURE.md](./ARCHITECTURE.md)  
+> 下游：[BUSINESS_LOGIC.md](./BUSINESS_LOGIC.md) · [PRD.md](./PRD.md) V1.3 · [ARCHITECTURE.md](./ARCHITECTURE.md)  
 > 目的：把「痛点命题」展开为**用户怎么用的功能**，再展开为**多方如何互相增强的生态闭环**。
 
 ---
