@@ -1,5 +1,5 @@
 import { useAllianceStore } from "../../../store/allianceStore";
-import { findMemberOrg } from "../../../lib/memberContext";
+import { findMemberOrg } from "../../../utils/memberContext";
 
 export default function MemberEventsPage() {
   const { user, members, events, updateEvent } = useAllianceStore();

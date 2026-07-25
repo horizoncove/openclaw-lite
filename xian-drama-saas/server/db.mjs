@@ -13,6 +13,10 @@ const PORTALS = {
     dbPath: process.env.CENTER_DB_PATH || join(__dirname, "data", "center-db.json"),
     seedPath: join(__dirname, "data", "center-seed.json"),
   },
+  overseas: {
+    dbPath: process.env.OVERSEAS_DB_PATH || join(__dirname, "data", "overseas-db.json"),
+    seedPath: join(__dirname, "data", "overseas-seed.json"),
+  },
 };
 
 function loadSeed(portal) {

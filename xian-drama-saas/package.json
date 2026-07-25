@@ -12,7 +12,7 @@
     "db:migrate": "node server/db/migrate.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
-    "seed:server": "npx tsx -e \"import {writeFileSync} from 'node:fs';import {allianceSeed,centerSeed} from './src/data/seed.ts';writeFileSync('server/data/alliance-seed.json',JSON.stringify(allianceSeed(),null,2));writeFileSync('server/data/center-seed.json',JSON.stringify(centerSeed(),null,2));\""
+    "seed:server": "npx tsx -e \"import {writeFileSync} from 'node:fs';import {allianceSeed,centerSeed} from './src/data/seed.ts';import {overseasSeed} from './src/data/overseasSeed.ts';import {p1Seed} from './src/data/p1Seed.ts';writeFileSync('server/data/alliance-seed.json',JSON.stringify(allianceSeed(),null,2));writeFileSync('server/data/center-seed.json',JSON.stringify(centerSeed(),null,2));writeFileSync('server/data/overseas-seed.json',JSON.stringify(overseasSeed(),null,2));writeFileSync('server/data/p1-seed.json',JSON.stringify(p1Seed(),null,2));\""
   },
   "dependencies": {
     "concurrently": "^10.0.3",

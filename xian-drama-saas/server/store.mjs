@@ -218,3 +218,54 @@ export async function patchCenterOrder(id, patch) {
   if (usePostgres) return repo.patchOrder(id, patch);
   return patchJson("center", "orders", id, patch);
 }
+
+// ── Overseas Hub（出海服务中心，JSON 独立门户）──────────────
+
+export async function getOverseasHubState() {
+  return jsonDb.loadDb("overseas");
+}
+
+export async function resetOverseasHubState() {
+  return jsonDb.resetDb("overseas");
+}
+
+export async function getOverseasHubStats() {
+  const db = jsonDb.loadDb("overseas");
+  return {
+    projects: db.projects.length,
+    activeProjects: db.projects.filter((p) => !["结算"].includes(p.stage)).length,
+    localizations: db.localizations.filter((l) => l.status !== "已交付").length,
+    platforms: db.platforms.filter((p) => p.status === "合作中").length,
+    openDeals: db.deals.filter((d) => !["完结"].includes(d.stage)).length,
+    pendingSettlements: db.settlements.filter((s) => s.status === "待核对").length,
+    openIntakes: db.intakes.filter((i) => ["新建", "评估中"].includes(i.status)).length,
+  };
+}
+
+export async function patchOsProject(id, patch) {
+  return patchJson("overseas", "projects", id, patch);
+}
+
+export async function upsertOsProject(item) {
+  return upsertJsonList("overseas", "projects", item);
+}
+
+export async function patchLocalization(id, patch) {
+  return patchJson("overseas", "localizations", id, patch);
+}
+
+export async function patchDeal(id, patch) {
+  return patchJson("overseas", "deals", id, patch);
+}
+
+export async function patchSettlement(id, patch) {
+  return patchJson("overseas", "settlements", id, patch);
+}
+
+export async function patchIntake(id, patch) {
+  return patchJson("overseas", "intakes", id, patch);
+}
+
+export async function upsertIntake(item) {
+  return upsertJsonList("overseas", "intakes", item);
+}

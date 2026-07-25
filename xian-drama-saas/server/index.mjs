@@ -33,7 +33,18 @@ import {
   listCenterOrders,
   upsertCenterOrder,
   patchCenterOrder,
+  getOverseasHubState,
+  resetOverseasHubState,
+  getOverseasHubStats,
+  patchOsProject,
+  upsertOsProject,
+  patchLocalization,
+  patchDeal,
+  patchSettlement,
+  patchIntake,
+  upsertIntake,
 } from "./store.mjs";
+import { p1Router, v1Router, p1ErrorHandler } from "./p1/routes.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3001);
@@ -55,6 +66,11 @@ const CENTER_USERS = {
   ai: { id: "u7", name: "蒋一", role: "ai", org: "AI 研发中心" },
 };
 
+const OVERSEAS_USERS = {
+  ops: { id: "os-1", name: "韩磊", role: "ops", org: "出海服务中心" },
+  client: { id: "os-2", name: "王敏", role: "client", org: "长安映缔影视" },
+};
+
 function asyncHandler(fn) {
   return (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
@@ -65,9 +81,10 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     service: "xian-drama-saas",
-    version: "1.2.1",
+    version: "3.0.0-p1",
     storage: isPostgres() ? "postgresql" : "json",
-    portals: ["alliance", "center"],
+    portals: ["alliance", "center", "overseas", "p1"],
+    version_note: "p1 member hub",
   });
 });
 
@@ -155,6 +172,62 @@ app.put("/api/center/orders/:id", asyncHandler(async (req, res) => {
   res.json(item);
 }));
 
+// ── Overseas Hub API（出海服务中心）────────────────────────
+
+app.get("/api/overseas/state", asyncHandler(async (_req, res) => res.json(await getOverseasHubState())));
+app.post("/api/overseas/reset", asyncHandler(async (_req, res) => res.json(await resetOverseasHubState())));
+app.get("/api/overseas/stats", asyncHandler(async (_req, res) => res.json(await getOverseasHubStats())));
+
+app.post("/api/overseas/auth/login", (req, res) => {
+  const { role } = req.body || {};
+  const user = OVERSEAS_USERS[role];
+  if (!user) return res.status(400).json({ error: "无效角色" });
+  res.json({ user, token: `overseas-${role}` });
+});
+
+app.put("/api/overseas/projects/:id", asyncHandler(async (req, res) => {
+  const item = await patchOsProject(req.params.id, req.body);
+  if (!item) return res.status(404).json({ error: "未找到" });
+  res.json(item);
+}));
+app.post("/api/overseas/projects", asyncHandler(async (req, res) => res.json(await upsertOsProject(req.body))));
+
+app.put("/api/overseas/localizations/:id", asyncHandler(async (req, res) => {
+  const item = await patchLocalization(req.params.id, req.body);
+  if (!item) return res.status(404).json({ error: "未找到" });
+  res.json(item);
+}));
+
+app.put("/api/overseas/deals/:id", asyncHandler(async (req, res) => {
+  const item = await patchDeal(req.params.id, req.body);
+  if (!item) return res.status(404).json({ error: "未找到" });
+  res.json(item);
+}));
+
+app.put("/api/overseas/settlements/:id", asyncHandler(async (req, res) => {
+  const item = await patchSettlement(req.params.id, req.body);
+  if (!item) return res.status(404).json({ error: "未找到" });
+  res.json(item);
+}));
+
+app.get("/api/overseas/intakes", asyncHandler(async (_req, res) => {
+  const state = await getOverseasHubState();
+  res.json(state.intakes);
+}));
+app.post("/api/overseas/intakes", asyncHandler(async (req, res) => res.json(await upsertIntake(req.body))));
+app.put("/api/overseas/intakes/:id", asyncHandler(async (req, res) => {
+  const item = await patchIntake(req.params.id, req.body);
+  if (!item) return res.status(404).json({ error: "未找到" });
+  res.json(item);
+}));
+
+
+// ── P1 Member Hub + XD-Router ──────────────────────────
+app.use("/api/v1", p1Router);
+app.use("/v1", v1Router);
+
+app.use(p1ErrorHandler);
+
 app.use((err, _req, res, _next) => {
   console.error(err);
   res.status(500).json({ error: err.message || "服务器错误" });
@@ -163,7 +236,7 @@ app.use((err, _req, res, _next) => {
 const dist = join(__dirname, "..", "dist");
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(dist));
-  app.get(/^(?!\/api).*/, (_req, res) => {
+  app.get(/^(?!\/(api|v1)).*/, (_req, res) => {
     res.sendFile(join(dist, "index.html"));
   });
 }
@@ -171,5 +244,5 @@ if (process.env.NODE_ENV === "production") {
 await initStore();
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`xian-drama-saas http://0.0.0.0:${PORT} [${isPostgres() ? "postgresql" : "json"}] portals=alliance,center`);
+  console.log(`xian-drama-saas http://0.0.0.0:${PORT} [${isPostgres() ? "postgresql" : "json"}] portals=alliance,center,overseas,p1`);
 });

@@ -7,9 +7,17 @@ import type {
   CenterState,
   CenterUser,
   EventItem,
+  IntakeRequest,
+  LocalizationJob,
   MatchNeed,
   Member,
+  OsProject,
+  OverseasDeal,
+  OverseasHubState,
+  OverseasRole,
+  OverseasUser,
   OverseasProject,
+  SettlementRecord,
   WorkOrder,
 } from "../types";
 
@@ -101,5 +109,59 @@ export const centerApi = {
       request<WorkOrder>("/center/orders", { method: "POST", body: JSON.stringify(o) }),
     update: (id: string, patch: Partial<WorkOrder>) =>
       request<WorkOrder>(`/center/orders/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
+  },
+};
+
+export const overseasApi = {
+  health: () => request<{ ok: boolean }>("/health"),
+  state: () => request<Omit<OverseasHubState, "user">>("/overseas/state"),
+  reset: () => request<unknown>("/overseas/reset", { method: "POST" }),
+  stats: () =>
+    request<{
+      projects: number;
+      activeProjects: number;
+      localizations: number;
+      platforms: number;
+      openDeals: number;
+      pendingSettlements: number;
+      openIntakes: number;
+    }>("/overseas/stats"),
+  login: (role: OverseasRole) =>
+    request<{ user: OverseasUser; token: string }>("/overseas/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ role }),
+    }),
+  projects: {
+    save: (p: OsProject) =>
+      request<OsProject>("/overseas/projects", { method: "POST", body: JSON.stringify(p) }),
+    update: (id: string, patch: Partial<OsProject>) =>
+      request<OsProject>(`/overseas/projects/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
+  },
+  localizations: {
+    update: (id: string, patch: Partial<LocalizationJob>) =>
+      request<LocalizationJob>(`/overseas/localizations/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(patch),
+      }),
+  },
+  deals: {
+    update: (id: string, patch: Partial<OverseasDeal>) =>
+      request<OverseasDeal>(`/overseas/deals/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
+  },
+  settlements: {
+    update: (id: string, patch: Partial<SettlementRecord>) =>
+      request<SettlementRecord>(`/overseas/settlements/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(patch),
+      }),
+  },
+  intakes: {
+    save: (i: IntakeRequest) =>
+      request<IntakeRequest>("/overseas/intakes", { method: "POST", body: JSON.stringify(i) }),
+    update: (id: string, patch: Partial<IntakeRequest>) =>
+      request<IntakeRequest>(`/overseas/intakes/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(patch),
+      }),
   },
 };

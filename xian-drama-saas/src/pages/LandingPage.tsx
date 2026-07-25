@@ -1,81 +1,63 @@
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  Bot,
-  Globe2,
-  Handshake,
-  Megaphone,
-  Scale,
-  Stamp,
-  Users,
-} from "lucide-react";
+import { ArrowRight, Bot, Globe2, Sparkles, Stamp, Users } from "lucide-react";
 
 export default function LandingPage() {
   return (
     <div className="landing">
       <header className="landing-nav">
-        <div className="landing-brand">西安微短剧产业服务中心</div>
+        <div className="landing-brand">微短剧 AI Agent 工作端</div>
+        <Link className="btn btn-primary" to="/work/login">
+          进入工作端演示 <ArrowRight size={14} />
+        </Link>
       </header>
 
       <section className="landing-hero">
-        <p className="eyebrow">ALLIANCE + FIVE CENTERS · DUAL SAAS</p>
+        <p className="eyebrow">DEMO · AGENT WORK CLIENT</p>
         <h1>
-          联盟会员 SaaS
+          对话编排履约
           <br />
-          五大中心运营 SaaS
+          托管确认结清
         </h1>
         <p className="lead">
-          两套独立入口、两套独立数据。联盟侧管会员与撮合，中心侧管审批出海发行版权 AI，互不共享。
+          纯前端演示：购 Token → 发悬赏 → 应征 → 确认冻结 → 验收放款。默认主界面是 Agent 工作区，不是 SaaS 后台。
         </p>
         <div className="hero-actions portal-actions">
-          <Link className="btn btn-primary btn-lg portal-btn alliance" to="/alliance/login">
-            <Users size={18} /> 联盟会员入口 <ArrowRight size={16} />
+          <Link className="btn btn-primary btn-lg portal-btn overseas" to="/work/login">
+            <Bot size={18} /> 打开 Agent 工作端演示 <ArrowRight size={16} />
+          </Link>
+          <Link className="btn btn-primary btn-lg portal-btn alliance" to="/app/login">
+            <Sparkles size={18} /> 旧版 P1 中枢
           </Link>
           <Link className="btn btn-primary btn-lg portal-btn center" to="/center/login">
-            <Stamp size={18} /> 五大中心入口 <ArrowRight size={16} />
+            <Stamp size={18} /> 五大中心
+          </Link>
+          <Link className="btn btn-secondary btn-lg" to="/overseas">
+            <Globe2 size={18} /> 出海专业线
           </Link>
         </div>
       </section>
 
       <section className="landing-modules">
-        <div className="portal-split">
-          <article className="module-card portal-card">
+        <div className="module-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+          <article className="module-card">
+            <Sparkles size={22} />
+            <h3>会员中枢 P1</h3>
+            <p>项目、需求广场、进度、API/算力、撮合、通知</p>
+          </article>
+          <article className="module-card">
             <Users size={22} />
-            <h3>联盟会员侧</h3>
-            <p>会员管理、活动运营、供需撮合、联盟工单与 KPI</p>
-            <Link className="btn btn-secondary" to="/alliance/login">
-              进入联盟 →
-            </Link>
+            <h3>联盟治理</h3>
+            <p>会员、活动、供需撮合、工单 KPI</p>
           </article>
-          <article className="module-card portal-card">
-            <div className="center-icons">
-              <Stamp size={18} />
-              <Globe2 size={18} />
-              <Megaphone size={18} />
-              <Scale size={18} />
-              <Bot size={18} />
-            </div>
-            <h3>五大中心侧</h3>
-            <p>审批、出海、发行投流、版权、AI 研发运营与中心工单</p>
-            <Link className="btn btn-secondary" to="/center/login">
-              进入中心 →
-            </Link>
+          <article className="module-card">
+            <Bot size={22} />
+            <h3>专业服务</h3>
+            <p>审批 / 出海 / 发行 / 版权 / AI</p>
           </article>
         </div>
       </section>
 
-      <section className="landing-cta">
-        <Handshake size={28} />
-        <div>
-          <h3>数据完全隔离</h3>
-          <p>联盟 API（/api/alliance）与中心 API（/api/center）独立存储，各自重置、各自运营。</p>
-        </div>
-        <a className="btn btn-secondary" href="/demo/saas-demo.pdf">
-          下载演示 PDF
-        </a>
-      </section>
-
-      <footer className="landing-foot">西安微短剧产业服务中心 · 双入口 SaaS V1.2</footer>
+      <footer className="landing-foot">微短剧 AI Agent 工作端 · 演示</footer>
     </div>
   );
 }
