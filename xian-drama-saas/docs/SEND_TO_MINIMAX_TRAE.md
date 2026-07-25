@@ -17,13 +17,13 @@ https://raw.githubusercontent.com/horizoncove/openclaw-lite/cursor/overseas-dram
 ## 建议附言（可复制）
 
 ```
-请按 PACK_MINIMAX_TRAE.md 实现「微短剧联盟会员协作中枢」SaaS。
+请按 PACK_MINIMAX_TRAE.md + CORE_VALUE_MATCHING.md 实现「微短剧联盟会员协作中枢」SaaS。
 
-必守：Tokens 进/转/出（D1.3）——官方购入、订单 T 托管、earned 官方回收退法币；
-禁止：Token 挂单/互兑/兑换所/购入即兑。
+北极星（第一性原理）：整站围绕「撮合适配保障 × 信任保障」——
+先做 发布→应征→确认→T托管→验收放款；工作台/钱包/网关/出海/回收都是卫星，不得反客为主。
 
+必守：Tokens 进/转/出（D1.3）；禁止挂单/互兑/兑换所/购入即兑。
 产品是会员中枢，不是出海营销站，也不是交易所。
-实现顺序见合集封面「建议实现顺序」；验收见合集内 ACCEPTANCE 篇章。
 仓库：https://github.com/horizoncove/openclaw-lite/tree/cursor/overseas-drama-saas-8928/xian-drama-saas
 ```
 

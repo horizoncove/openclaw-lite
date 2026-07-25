@@ -12,7 +12,7 @@
 
 ## 0. 架构一句话
 
-> 单仓 **Web + API** 的多租户会员 SaaS：中枢业务域（项目/需求/订单/通知/服务进件）与 **结算域**（钱包分桶、托管、回收）共用账本约束；**XD-Router** 与 **Compute Scheduler** 作为产能平面，统一用 Tokens 计量。
+> 单仓 **Web + API** 的多租户会员 SaaS：以 **撮合适配 × 信任保障** 为核（需求/应征/订单托管放款），中枢体验与结算域围核运转；**XD-Router** / **Compute** 为履约产能卫星；出海工单与官方回收为出口卫星。详见 [CORE_VALUE_MATCHING.md](./CORE_VALUE_MATCHING.md) C1.1。
 
 ---
 
