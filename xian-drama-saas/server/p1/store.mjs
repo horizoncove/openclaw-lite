@@ -127,3 +127,153 @@ export function workspaceSummary(db, user) {
     wallet: orgId ? getWallet(db, orgId) : null,
   };
 }
+
+/** 监管者监督视角：联盟秘书处 / 运维看全网飞轮健康与待介入队列 */
+export function supervisionOverview(db) {
+  const openDemands = db.demands.filter((d) => ["published", "matching"].includes(d.status));
+  const dealDemands = db.demands.filter((d) => d.status === "deal");
+  const pendingApps = db.applications.filter((a) => a.status === "pending");
+  const acceptedApps = db.applications.filter((a) => a.status === "accepted");
+  const matchOrders = db.matchOrders || [];
+  const disputedOrders = matchOrders.filter((o) => o.status === "disputed");
+  const escrowedOrders = matchOrders.filter((o) =>
+    ["escrowed", "in_progress"].includes(o.status),
+  );
+  const releasedOrders = matchOrders.filter((o) => o.status === "released");
+
+  // 适配风险：开放需求超过 3 天仍无应征，或有应征但发布方未确认
+  const silentDemands = openDemands
+    .filter((d) => {
+      const apps = db.applications.filter((a) => a.demandId === d.id);
+      return apps.length === 0;
+    })
+    .map((d) => ({
+      id: d.id,
+      title: d.title,
+      orgName: d.orgName,
+      category: d.category,
+      status: d.status,
+      dueAt: d.dueAt,
+      signal: "无应征",
+      severity: "amber",
+    }));
+
+  const pendingConfirm = pendingApps.map((a) => {
+    const d = db.demands.find((x) => x.id === a.demandId);
+    return {
+      id: a.id,
+      demandId: a.demandId,
+      title: d?.title || a.demandId,
+      publisherOrg: d?.orgName || "—",
+      applicantOrg: a.orgName,
+      message: a.message,
+      createdAt: a.createdAt,
+      signal: "待确认成交",
+      severity: "red",
+    };
+  });
+
+  const overdueTasks = db.tasks.filter(
+    (t) => !["done", "cancelled"].includes(t.status) && t.dueAt < today(),
+  );
+  const failedJobs = db.jobs.filter((j) => j.status === "failed");
+  const activeJobs = db.jobs.filter((j) => ["queued", "running"].includes(j.status));
+
+  const memberOrgs = db.orgs.filter((o) => o.id !== "org-alliance");
+  const walletRows = (db.wallets || [])
+    .filter((w) => w.orgId !== "org-alliance")
+    .map((w) => {
+      const org = db.orgs.find((o) => o.id === w.orgId);
+      return {
+        orgId: w.orgId,
+        orgName: org?.name || w.orgId,
+        balance: w.balance,
+        usedThisMonth: w.usedThisMonth || 0,
+      };
+    });
+
+  const totalBalance = walletRows.reduce((s, w) => s + (w.balance || 0), 0);
+  const totalUsed = walletRows.reduce((s, w) => s + (w.usedThisMonth || 0), 0);
+
+  // 主轮健康：有开放需求、有待确认、有成交痕迹 → 简化评分
+  const flywheelScore = (() => {
+    let score = 40;
+    if (openDemands.length > 0) score += 15;
+    if (pendingApps.length > 0) score += 10; // 有应征说明适配在动
+    if (dealDemands.length + releasedOrders.length > 0) score += 20;
+    if (silentDemands.length === 0 && openDemands.length > 0) score += 10;
+    if (disputedOrders.length > 0) score -= Math.min(20, disputedOrders.length * 5);
+    if (failedJobs.length > 2) score -= 10;
+    return Math.max(0, Math.min(100, score));
+  })();
+
+  return {
+    roleView: "regulator",
+    generatedAt: nowIso(),
+    northStar: {
+      matchCompatibility: "撮合适配保障",
+      trustGuarantee: "信任保障",
+    },
+    flywheel: {
+      score: flywheelScore,
+      openDemands: openDemands.length,
+      pendingApplications: pendingApps.length,
+      deals: dealDemands.length + acceptedApps.length,
+      escrowedOrders: escrowedOrders.length,
+      releasedOrders: releasedOrders.length,
+      disputedOrders: disputedOrders.length,
+    },
+    queues: {
+      pendingConfirm,
+      silentDemands,
+      disputedOrders: disputedOrders.map((o) => ({
+        id: o.id,
+        demandId: o.demandId,
+        status: o.status,
+        signal: "争议中",
+        severity: "red",
+      })),
+      overdueTasks: overdueTasks.slice(0, 12).map((t) => ({
+        id: t.id,
+        title: t.title,
+        dueAt: t.dueAt,
+        assigneeId: t.assigneeId,
+        signal: "任务逾期",
+        severity: "amber",
+      })),
+      failedJobs: failedJobs.slice(0, 8).map((j) => ({
+        id: j.id,
+        title: j.title || j.type || j.id,
+        orgId: j.orgId,
+        error: j.error,
+        signal: "作业失败",
+        severity: "amber",
+      })),
+    },
+    capacity: {
+      activeJobs: activeJobs.length,
+      failedJobs: failedJobs.length,
+      memberOrgCount: memberOrgs.length,
+      totalWalletBalance: totalBalance,
+      totalUsedThisMonth: totalUsed,
+      wallets: walletRows,
+    },
+    guardrails: {
+      tokenResaleEnabled: false,
+      peerTransferEnabled: false,
+      freeFxEnabled: false,
+      purchasedRedeemEnabled: false,
+      notes: [
+        "禁止挂单转售 / 会员互兑 / 浮动汇率",
+        "订单放款须走托管状态机（目标）",
+        "官方回收仅 earned（目标 P1.1）",
+      ],
+    },
+    actions: [
+      { id: "review-confirm", label: "催办待确认应征", href: "/app/demands", count: pendingConfirm.length },
+      { id: "revive-silent", label: "激活无应征需求", href: "/app/demands", count: silentDemands.length },
+      { id: "publish-notice", label: "发布治理通知", href: "/app/notices", count: 0 },
+      { id: "ops-jobs", label: "处理失败作业", href: "/app/compute", count: failedJobs.length },
+    ],
+  };
+}

@@ -8,6 +8,7 @@ import {
   chargeWallet,
   creditWallet,
   workspaceSummary,
+  supervisionOverview,
   newId,
   nowIso,
   today,
@@ -92,6 +93,19 @@ p1Router.get(
   "/workspace/summary",
   asyncHandler(async (req, res) => {
     res.json(workspaceSummary(req.db, req.user));
+  }),
+);
+
+/** 监管者监督视角（秘书处 / 运维） */
+p1Router.get(
+  "/supervision/overview",
+  asyncHandler(async (req, res) => {
+    if (req.user.role !== "secretariat" && req.user.role !== "ops") {
+      return res.status(403).json({
+        error: { code: "FORBIDDEN", message: "仅联盟秘书处/运维可查看监督视角" },
+      });
+    }
+    res.json(supervisionOverview(req.db));
   }),
 );
 

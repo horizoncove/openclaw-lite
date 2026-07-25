@@ -9,10 +9,11 @@ import {
   LogOut,
   RotateCcw,
   BriefcaseBusiness,
+  ShieldCheck,
 } from "lucide-react";
 import { useP1Store } from "../store/p1Store";
 
-const nav = [
+const baseNav = [
   { to: "/app/workspace", label: "工作台", icon: LayoutDashboard },
   { to: "/app/projects", label: "我的项目", icon: FolderKanban },
   { to: "/app/demands", label: "工作需求", icon: BriefcaseBusiness },
@@ -30,6 +31,7 @@ const titles: Record<string, string> = {
   "/app/wallet": "API 聚合与钱包",
   "/app/compute": "算力作业队列",
   "/app/notices": "联盟通知",
+  "/app/supervision": "监管监督视角",
 };
 
 export default function AppLayout() {
@@ -37,13 +39,20 @@ export default function AppLayout() {
   const navFn = useNavigate();
   const loc = useLocation();
   const title = titles[loc.pathname] ?? "会员协作中枢";
+  const isRegulator = user?.role === "secretariat" || user?.role === "ops";
+  const nav = isRegulator
+    ? [
+        { to: "/app/supervision", label: "监督视角", icon: ShieldCheck },
+        ...baseNav,
+      ]
+    : baseNav;
 
   return (
-    <div className="app-shell p1-shell">
+    <div className={`app-shell p1-shell${isRegulator ? " p1-shell-regulator" : ""}`}>
       <aside className="sidebar p1-sidebar">
         <div className="brand">
           <h1>产业服务 SaaS</h1>
-          <p>项目 · 需求 · API · 算力</p>
+          <p>{isRegulator ? "监管 · 主轮健康 · 护栏" : "项目 · 需求 · API · 算力"}</p>
         </div>
         <nav className="nav">
           {nav.map((item) => (

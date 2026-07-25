@@ -79,7 +79,7 @@
 
 ---
 
-## 4. Opportunities / Notices
+## 4. Opportunities / Notices / Supervision
 
 | Method | Path | 说明 |
 |--------|------|------|
@@ -88,6 +88,9 @@
 | GET | `/api/v1/notices` | 含 `read` 布尔 |
 | POST | `/api/v1/notices` | 秘书处/ops |
 | POST | `/api/v1/notices/:id/read` | 写 receipts |
+| GET | `/api/v1/supervision/overview` | **监管监督视角**；仅 `secretariat`/`ops`，其余 403 |
+
+监督概览字段摘要：`flywheel`（健康分与主轮计数）、`queues`（待确认/无应征/争议/逾期/失败作业）、`capacity`、`guardrails`、`actions`。详见 `SUPERVISION_VIEW.md`。
 
 ---
 

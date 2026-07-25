@@ -1,38 +1,24 @@
 # 微短剧会员协作中枢 · 需求+技术文档合集
 
-> **发给：MiniMax / Trae** · 合集 **P1.2** · 分支 `cursor/overseas-drama-saas-8928` · PR https://github.com/horizoncove/openclaw-lite/pull/12
+> **发给：MiniMax / Trae** · 合集 **P1.3** · `cursor/overseas-drama-saas-8928` · https://github.com/horizoncove/openclaw-lite/pull/12
 
-## 0. 封面（2 分钟）
+## 0. 封面
 
 **北极星：** 撮合适配保障 × 信任保障  
-**主飞轮 A：** 发布→应征→确认→T托管→放款→双方再来  
-**卫星：** B 产能加油 · C 法币旁路 · D 护栏 · R 回收出口  
-**禁：** 挂单/互兑/兑换所；卫星反客为主  
+**主飞轮 A：** 发布→应征→确认→T托管→放款→再来  
+**监管视角：** 秘书处/运维 `/app/supervision` 盯主轮健康与待介入队列  
+**禁：** 挂单/互兑/兑换所  
 
-口令：先立两柱转主轮，再挂卫星；收入先有可信成交再做厚。
-
-1. 核心价值北极星（第一性原理） (`CORE_VALUE_MATCHING.md`)
-2. 商业闭环 × 生态飞轮 (`FLYWHEEL_AND_BUSINESS_LOOP.md`)
-3. 结算拍板（必守） (`DECISION_TOKEN_SETTLEMENT.md`)
-4. 需求规格总册 (`REQUIREMENTS_SPEC.md`)
-5. SaaS 技术架构总册 (`SAAS_ARCHITECTURE.md`)
-6. 产品功能规格（界面/字段） (`PRD.md`)
-7. 验收放行清单 (`ACCEPTANCE.md`)
-8. 现行 HTTP 契约（实现对照） (`API_CONTRACT.md`)
-9. 现状 vs 目标边界 (`P1_BOUNDARY.md`)
-
-真源链接：
-- [核心价值北极星（第一性原理）](https://github.com/horizoncove/openclaw-lite/blob/cursor/overseas-drama-saas-8928/xian-drama-saas/docs/CORE_VALUE_MATCHING.md)
-- [商业闭环 × 生态飞轮](https://github.com/horizoncove/openclaw-lite/blob/cursor/overseas-drama-saas-8928/xian-drama-saas/docs/FLYWHEEL_AND_BUSINESS_LOOP.md)
-- [结算拍板（必守）](https://github.com/horizoncove/openclaw-lite/blob/cursor/overseas-drama-saas-8928/xian-drama-saas/docs/DECISION_TOKEN_SETTLEMENT.md)
-- [需求规格总册](https://github.com/horizoncove/openclaw-lite/blob/cursor/overseas-drama-saas-8928/xian-drama-saas/docs/REQUIREMENTS_SPEC.md)
-- [SaaS 技术架构总册](https://github.com/horizoncove/openclaw-lite/blob/cursor/overseas-drama-saas-8928/xian-drama-saas/docs/SAAS_ARCHITECTURE.md)
-- [产品功能规格（界面/字段）](https://github.com/horizoncove/openclaw-lite/blob/cursor/overseas-drama-saas-8928/xian-drama-saas/docs/PRD.md)
-- [验收放行清单](https://github.com/horizoncove/openclaw-lite/blob/cursor/overseas-drama-saas-8928/xian-drama-saas/docs/ACCEPTANCE.md)
-- [现行 HTTP 契约（实现对照）](https://github.com/horizoncove/openclaw-lite/blob/cursor/overseas-drama-saas-8928/xian-drama-saas/docs/API_CONTRACT.md)
-- [现状 vs 目标边界](https://github.com/horizoncove/openclaw-lite/blob/cursor/overseas-drama-saas-8928/xian-drama-saas/docs/P1_BOUNDARY.md)
-
-裁决：CORE_VALUE > FLYWHEEL > D1.3 > SRS > PRD > ARCH > API_CONTRACT
+1. 核心价值北极星（第一性原理）
+2. 商业闭环 × 生态飞轮
+3. 监管者监督视角
+4. 结算拍板（必守）
+5. 需求规格总册
+6. SaaS 技术架构总册
+7. 产品功能规格（界面/字段）
+8. 验收放行清单
+9. 现行 HTTP 契约（实现对照）
+10. 现状 vs 目标边界
 
 ---
 
@@ -460,9 +446,12 @@ A 放款 → earned ↑ →（部分）官方回收 ¥ → 供给敢接更多联
 
 ```
 规则/机会/告警 → 通知触达 → 跳进订单/应征/余额动作 → 逾期与违规↓
+         ▲
+         └── 监管监督视角：主轮健康分 + 待介入队列 + 护栏灯
 ```
 
 **咬合 A：** 待确认、放款提醒、争议通知直接推主轮动作；禁兑/禁挂单保护信任柱。  
+**监督视觉：** 秘书处/运维每日看 `/app/supervision`，而不是翻群（见 [SUPERVISION_VIEW.md](./SUPERVISION_VIEW.md)）。  
 **商业：** 会费续得下；仲裁成本可控。
 
 ---
@@ -615,6 +604,111 @@ A 放款 → earned ↑ →（部分）官方回收 ¥ → 供给敢接更多联
 | 版本 | 说明 |
 |------|------|
 | **W1.0** | 主飞轮（适配×信任）+ 卫星咬合；商业闭环收入栈；增强/调节回路；反飞轮；冷启动与仪表盘 |
+
+
+---
+
+# 【合集篇章】监管者监督视角
+
+> `docs/SUPERVISION_VIEW.md`
+
+# 监管者监督视角（Regulator View）
+
+> 版本：**S1.0**  
+> 日期：2026-07-25  
+> 北极星：[CORE_VALUE_MATCHING.md](./CORE_VALUE_MATCHING.md) C1.1  
+> 飞轮：[FLYWHEEL_AND_BUSINESS_LOOP.md](./FLYWHEEL_AND_BUSINESS_LOOP.md) W1.0  
+> 入口：`/app/supervision`（角色：`secretariat` / `ops`）  
+> API：`GET /api/v1/supervision/overview`
+
+---
+
+## 0. 为什么需要单独「监督视觉」
+
+会员工作台回答的是：**我今天要处理什么？**  
+监管视角回答的是：**主飞轮是否在转？哪里要人介入？护栏是否被捅破？**
+
+监管者不该再做一个「更大的会员工作台」，而应看到：
+
+1. **适配柱**是否干旱（无应征 / 无人确认）  
+2. **信任柱**是否卡住（托管/争议/放款）  
+3. **护栏**是否仍关闭（转售/互兑/汇率）  
+4. **待介入队列**按严重度排序，一点进业务对象  
+
+---
+
+## 1. 信息架构（一屏）
+
+```
+┌─ Hero：主轮健康分 + 两根柱子文案 ─────────────────────┐
+├─ 三柱指标：适配 | 信任 | 产能会员 ────────────────────┤
+├─ 快捷行动条：催确认 / 激活需求 / 发通知 / 失败作业 ───┤
+├─ 队列区（左→右、上→下）────────────────────────────────┤
+│  待确认成交 │ 无应征需求 │ 争议单 │ 逾期任务 │ 失败作业 │ 护栏状态 │
+└────────────────────────────────────────────────────────┘
+```
+
+视觉原则（监督感，非营销感）：
+
+- 深色监管侧栏 + 墨蓝 Hero；预警用琥珀/朱红，健康用翠绿  
+- **禁止**兑换所 K 线、紫光科技风、堆砌无行动 KPI  
+- 每个数字必须能点进队列或业务页  
+
+---
+
+## 2. 角色与权限
+
+| 角色 | 可见 | 动作 |
+|------|------|------|
+| `secretariat` | 全量监督概览 | 催办、发通知、进仲裁（P1.1） |
+| `ops` | 同左 + 作业失败更突出 | 推进作业 transition |
+| 会员 | **403 / 无导航** | — |
+
+---
+
+## 3. 需求条目（写入 SRS）
+
+| ID | 需求 | 优先级 |
+|----|------|--------|
+| GV-S01 | 监督概览 API 与页面 | P0（演示）/ P1 |
+| GV-S02 | 主轮健康分（可解释规则） | P1 |
+| GV-S03 | 待确认 / 无应征队列 | P0 |
+| GV-S04 | 争议订单队列 | P1（随订单上线） |
+| GV-S05 | 护栏状态只读灯 | P0 |
+| GV-S06 | 行动条跳转业务对象 | P0 |
+| GV-S07 | 回收审批队列进监督页 | P1.1 |
+| GV-S08 | 导出监管周报 | P2 |
+
+---
+
+## 4. 与飞轮的映射
+
+| 监督模块 | 飞轮 |
+|----------|------|
+| 开放需求 / 无应征 / 待确认 | A 适配齿 |
+| 成交 / 托管 / 争议 / 放款 | A 信任齿 |
+| 失败作业 / 用量 | B |
+| 护栏灯 + 通知行动 | D |
+| （后续）回收待审 | R |
+
+监管成功标准：秘书处**每天打开监督页**，而不是翻群问「有没有单子卡住」。
+
+---
+
+## 5. 演示路径
+
+1. `/app/login` 选 **陈希（秘书处）** 或 **韩磊（运维）**  
+2. 侧栏第一项 **监督视角**  
+3. 可见：待确认应征（丝路→长安需求）、无应征需求、护栏全关  
+4. 点「催办待确认应征」进入需求广场  
+
+---
+
+## 变更记录
+
+| 版本 | 说明 |
+|------|------|
+| **S1.0** | 监督视角 IA、API、角色、与飞轮映射；P1 页面落地 |
 
 
 ---
@@ -1109,6 +1203,12 @@ D 管秩序，R 管现金出口；R **不是**自由兑换市场。
 | GV-01 | 秘书处仲裁台 | P1 | 争议订单队列 |
 | GV-02 | 违规处置 | P2 | 禁发需求/禁回收等策略开关 |
 | GV-03 | 规则公告版本 | P2 | 关键规则变更可追溯 |
+| **GV-S01** | **监管监督视角** | **P0/P1** | `/app/supervision`：主轮健康、待介入队列、护栏灯；仅秘书处/运维 |
+| GV-S02 | 主轮健康分 | P1 | 可解释规则，映射适配/信任齿 |
+| GV-S03 | 待确认 / 无应征队列 | P0 | 监管每日主队列 |
+| GV-S05 | 护栏状态灯 | P0 | 转售/互兑/汇率/购入兑出只读 |
+
+详见 [SUPERVISION_VIEW.md](./SUPERVISION_VIEW.md)。
 
 ### 5.9 报表与导出
 
@@ -1887,9 +1987,9 @@ Phase 1.1+：成员、里程碑、附件。
 
 **二级 / 折叠「专业服务」：** 出海译制进件、（实验）热度测试  
 
-**秘书处：** 通知、机会、争议订单、会员；超管：模型/池/套餐/限额  
+**秘书处 / 运维：** **监督视角**（主轮健康、待确认/无应征/争议队列、护栏灯）· 通知 · 机会 · 争议订单 · 会员；超管：模型/池/套餐/限额  
 
-**不出现：** 转售、挂单、机构转余额、默认一级「版权链」。
+**不出现：** 转售、挂单、机构转余额、默认一级「版权链」、监督页上的兑换所行情。
 
 ---
 
@@ -2201,7 +2301,7 @@ curl -s "$BASE/api/v1/match-orders" -H 'x-user-id: u-wang'         # V1.3
 
 ---
 
-## 4. Opportunities / Notices
+## 4. Opportunities / Notices / Supervision
 
 | Method | Path | 说明 |
 |--------|------|------|
@@ -2210,6 +2310,9 @@ curl -s "$BASE/api/v1/match-orders" -H 'x-user-id: u-wang'         # V1.3
 | GET | `/api/v1/notices` | 含 `read` 布尔 |
 | POST | `/api/v1/notices` | 秘书处/ops |
 | POST | `/api/v1/notices/:id/read` | 写 receipts |
+| GET | `/api/v1/supervision/overview` | **监管监督视角**；仅 `secretariat`/`ops`，其余 403 |
+
+监督概览字段摘要：`flywheel`（健康分与主轮计数）、`queues`（待确认/无应征/争议/逾期/失败作业）、`capacity`、`guardrails`、`actions`。详见 `SUPERVISION_VIEW.md`。
 
 ---
 
@@ -2400,4 +2503,4 @@ admin 模型/策略/池、internal lease、子 Key、图像视频、自动路由
 
 ---
 
-# 【合集结束】P1.2 `cursor/overseas-drama-saas-8928`
+# 【合集结束】P1.3

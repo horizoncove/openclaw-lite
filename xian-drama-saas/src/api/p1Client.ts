@@ -144,4 +144,5 @@ export const p1Api = {
       }),
   },
   models: () => request<P1Model[]>("/models"),
+  supervision: () => request<Record<string, unknown>>("/supervision/overview"),
 };

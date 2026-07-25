@@ -53,6 +53,7 @@ import OpportunitiesPage from "./pages/app/OpportunitiesPage";
 import WalletPage from "./pages/app/WalletPage";
 import ComputePage from "./pages/app/ComputePage";
 import NoticesPage from "./pages/app/NoticesPage";
+import SupervisionPage from "./pages/app/SupervisionPage";
 
 function RequireAllianceAuth() {
   const { user } = useAllianceStore();
@@ -109,6 +110,7 @@ export default function App() {
         <Route path="wallet" element={<WalletPage />} />
         <Route path="compute" element={<ComputePage />} />
         <Route path="notices" element={<NoticesPage />} />
+        <Route path="supervision" element={<SupervisionPage />} />
       </Route>
 
       {/* 出海服务中心 SaaS */}
