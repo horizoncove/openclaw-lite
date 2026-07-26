@@ -55,6 +55,7 @@ export default function AllianceDashboard() {
             ["供需撮合", matches.length, "/alliance/console/matching"],
             ["内容推荐", works.length + venues.length, "/alliance/console/showcase"],
             ["生态闭环", deals.length, "/alliance/console/loop"],
+            ["流程 SOP", 9, "/alliance/console/sop"],
           ].map(([name, count, to]) => (
             <div className="list-row" key={name as string}>
               <div>

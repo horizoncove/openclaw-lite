@@ -1,7 +1,8 @@
 # 西安微短剧产业生态 · MVP 需求文档（PRD）
 
 > **文档对象**：Minimax / Trae 等协作方做 MVP 验证与补齐  
-> **产品版本基线**：`xian-drama-saas` v1.6.0  
+> **产品版本基线**：`xian-drama-saas` v1.8.1  
+
 > **仓库路径**：`xian-drama-saas/`  
 > **验证目标**：跑通「撮合 → 开预算 → 履约扣费 → 激励回流」最小闭环，并证明四方参与者各自有清晰下一步
 
@@ -267,4 +268,5 @@ Token 不是充值页上的数字，而是**项目履约燃料**。
 
 配套技术文档：[`TECH.md`](./TECH.md)  
 交易本质：[`TRANSACTION.md`](./TRANSACTION.md)  
+全流程 SOP：[`SOP.md`](./SOP.md)（登记 / 购 Token / 签注 / 确权 / 仲裁）  
 验证清单：[`MVP-VALIDATION.md`](./MVP-VALIDATION.md)

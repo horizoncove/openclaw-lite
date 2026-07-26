@@ -22,6 +22,7 @@ import MemberWorksPage from "./pages/alliance/member/MemberWorksPage";
 import MemberDiscoverPage from "./pages/alliance/member/MemberDiscoverPage";
 import ShowcasePage from "./pages/alliance/ShowcasePage";
 import EcosystemLoopPage from "./pages/alliance/EcosystemLoopPage";
+import SopGuidePage from "./pages/alliance/SopGuidePage";
 import MemberDealsPage from "./pages/alliance/member/MemberDealsPage";
 import CenterDashboard from "./pages/centers/CenterDashboard";
 import CenterPanoramaPage from "./pages/centers/CenterPanoramaPage";
@@ -59,6 +60,7 @@ export default function App() {
           <Route path="events" element={<EventsPage />} />
           <Route path="matching" element={<MatchingPage />} />
           <Route path="loop" element={<EcosystemLoopPage />} />
+          <Route path="sop" element={<SopGuidePage />} />
           <Route path="showcase" element={<ShowcasePage />} />
           <Route path="orders" element={<AllianceOrdersPage />} />
           <Route path="kpi" element={<AllianceKpiPage />} />

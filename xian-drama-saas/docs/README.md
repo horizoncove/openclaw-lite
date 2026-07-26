@@ -6,6 +6,7 @@
 |------|------|------|
 | [PRD.md](./PRD.md) | 产品 / Minimax | 参与者、范围、用户故事、成功标准 |
 | [TRANSACTION.md](./TRANSACTION.md) | 双方必读 | **交易本质**：要约/托管/对价切割/结算 |
+| [SOP.md](./SOP.md) | 运营 / 秘书处 / 中心 | **全流程 SOP**：登记、购 Token、签注、确权、仲裁等 |
 | [TECH.md](./TECH.md) | 工程 / Trae | 架构、模型、API、持久化、红线 |
 | [MVP-VALIDATION.md](./MVP-VALIDATION.md) | 双方 | 分工、操作脚本、报告模板、系统提示词 |
 
@@ -23,7 +24,8 @@ docs/reports/trae-mvp-report.md
 → 撮合费/供给激励/中心保留 → 剩余退回 → 项目闭环
 ```
 
-代码基线：`xian-drama-saas` v1.8.0（以 `/api/health` 为准）。详读 [`TRANSACTION.md`](./TRANSACTION.md)。
+代码基线：`xian-drama-saas` v1.8.1（以 `/api/health` 为准）。  
+交易看 [`TRANSACTION.md`](./TRANSACTION.md)；作业步骤看 [`SOP.md`](./SOP.md)；控制台速查 `/alliance/console/sop`。
 
 ## 本地一键
 
