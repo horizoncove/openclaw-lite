@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useAllianceStore } from "../../store/allianceStore";
 
 export default function AllianceDashboard() {
-  const { members, orders, events, matches, works, venues } = useAllianceStore();
+  const { members, orders, events, matches, works, venues, deals } = useAllianceStore();
   const openOrders = orders.filter((o) => o.status !== "完结" && o.status !== "关闭");
 
   return (
@@ -54,6 +54,7 @@ export default function AllianceDashboard() {
             ["活动运营", events.length, "/alliance/console/events"],
             ["供需撮合", matches.length, "/alliance/console/matching"],
             ["内容推荐", works.length + venues.length, "/alliance/console/showcase"],
+            ["生态闭环", deals.length, "/alliance/console/loop"],
           ].map(([name, count, to]) => (
             <div className="list-row" key={name as string}>
               <div>
