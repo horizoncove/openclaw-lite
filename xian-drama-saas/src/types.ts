@@ -58,6 +58,29 @@ export interface MatchNeed {
   sceneId?: string;
   /** 成交后的项目 Deal */
   dealId?: string;
+  /** 需求方设定的支付机制 */
+  preferredPayMechanism?: PayMechanism;
+  /** 需求方对支付机制的说明 */
+  payMechanismNote?: string;
+}
+
+/** 支付机制：需求方可设，供应方应征时可要求变更 */
+export type PayMechanism = "预付" | "过程支付" | "验收后支付";
+
+export interface MatchBid {
+  id: string;
+  matchId: string;
+  supplierOrg: string;
+  /** 是否接受需求方原机制 */
+  acceptBuyerMechanism: boolean;
+  /** 供应方主张的机制（可与需求方不同） */
+  proposedPayMechanism: PayMechanism;
+  /** 变更机制的理由 / 应征说明 */
+  note: string;
+  /** 可选：供应方报价（Tokens，覆盖场景包默认） */
+  quoteTokens?: number;
+  status: "待审" | "已采纳" | "已拒绝" | "撤回";
+  createdAt: string;
 }
 
 export type DealStatus = "待确认" | "预算已开" | "履约中" | "已结算" | "暂停";
@@ -108,6 +131,11 @@ export interface DealProject {
   sceneName: string;
   /** 交易标的（人话） */
   consideration: string;
+  /** 最终成交采用的支付机制 */
+  payMechanism: PayMechanism;
+  /** 机制来自谁的主张 */
+  payMechanismSource: "buyer" | "supplier" | "negotiated";
+  payMechanismNote?: string;
   buyerOrg: string;
   supplierOrg: string;
   broker: string;
@@ -119,10 +147,15 @@ export interface DealProject {
   budget: number;
   /** 托管池剩余（未消耗） */
   escrow: number;
+  /** 过程支付：尚未冻结进托管的剩余额度 */
+  unfunded: number;
   spent: number;
   brokerEarned: number;
   supplierEarned: number;
   centerRetained: number;
+  /** 验收后支付：暂存未释放的撮合费/激励 */
+  heldBroker: number;
+  heldSupplier: number;
   orderId?: string;
   createdAt: string;
   updatedAt: string;
@@ -270,6 +303,7 @@ export interface AllianceState {
   deals: DealProject[];
   orgWallets: OrgWallet[];
   scenePackages: ScenePackage[];
+  bids: MatchBid[];
 }
 
 export type TokenModelCategory = "chat" | "embedding" | "image" | "video";

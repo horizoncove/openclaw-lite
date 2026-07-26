@@ -6,7 +6,7 @@ import { seedAlliance, seedCenter, resetAllianceState, resetCenterState } from "
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SCHEMA_VERSION = 2;
-const DATA_SEED_VERSION = 7;
+const DATA_SEED_VERSION = 8;
 
 async function applySchema() {
   const sql = readFileSync(join(__dirname, "schema.sql"), "utf8");

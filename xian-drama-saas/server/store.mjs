@@ -37,6 +37,7 @@ function mergeAllianceExtras(base, seed) {
     venues: base.venues?.length ? base.venues : seed.venues ?? [],
     deals: base.deals?.length ? base.deals : seed.deals ?? [],
     orgWallets: base.orgWallets?.length ? base.orgWallets : seed.orgWallets ?? [],
+    bids: base.bids?.length ? base.bids : seed.bids ?? [],
     scenePackages: seed.scenePackages ?? base.scenePackages ?? [],
   };
 }
@@ -214,6 +215,7 @@ async function persistAllianceLoop(state) {
     await repo.saveAllianceExtras("orgWallets", state.orgWallets);
     await repo.saveAllianceExtras("works", state.works ?? []);
     await repo.saveAllianceExtras("venues", state.venues ?? []);
+    await repo.saveAllianceExtras("bids", state.bids ?? []);
     for (const m of state.matches ?? []) await repo.patchMatch(m.id, m);
     for (const o of state.orders ?? []) {
       if (o.center === "联盟" || o.dealId) await repo.upsertOrder(o);
@@ -224,11 +226,21 @@ async function persistAllianceLoop(state) {
     db.orgWallets = state.orgWallets;
     db.matches = state.matches;
     db.orders = state.orders;
+    db.bids = state.bids ?? [];
     jsonDb.saveDb("alliance", db);
   }
 }
 
-export async function closeMatchDeal({ matchId, supplierOrg, sceneId }) {
+export async function closeMatchDeal({
+  matchId,
+  supplierOrg,
+  sceneId,
+  bidId,
+  payMechanism,
+  payMechanismSource,
+  payMechanismNote,
+  budgetOverride,
+}) {
   const { buildDealFromMatch, findScene, lockEscrow, today } = await import("./dealLoop.mjs");
   const state = await getAllianceState();
   const match = state.matches.find((m) => m.id === matchId);
@@ -238,30 +250,72 @@ export async function closeMatchDeal({ matchId, supplierOrg, sceneId }) {
   const scene = findScene(state.scenePackages, sceneId || match.sceneId);
   if (!scene) throw new Error("场景包不存在");
 
-  const partner = supplierOrg || match.suggestedPartner;
+  let partner = supplierOrg || match.suggestedPartner;
+  let mechanism = payMechanism || match.preferredPayMechanism || "预付";
+  let mechSource = payMechanismSource || "buyer";
+  let mechNote = payMechanismNote || match.payMechanismNote;
+  let quote;
+  let bids = [...(state.bids || [])];
+
+  if (bidId) {
+    const bid = bids.find((b) => b.id === bidId && b.matchId === matchId);
+    if (!bid) throw new Error("应征不存在");
+    if (bid.status === "撤回" || bid.status === "已拒绝") throw new Error("该应征不可采纳");
+    partner = bid.supplierOrg;
+    mechanism = bid.proposedPayMechanism;
+    mechSource = bid.acceptBuyerMechanism ? "buyer" : "supplier";
+    mechNote = bid.note || mechNote;
+    quote = bid.quoteTokens;
+    bids = bids.map((b) => {
+      if (b.id === bidId) return { ...b, status: "已采纳" };
+      if (b.matchId === matchId && b.status === "待审") return { ...b, status: "已拒绝" };
+      return b;
+    });
+  } else if (payMechanism && payMechanism !== match.preferredPayMechanism) {
+    mechSource = payMechanismSource || "negotiated";
+  }
+
   if (!partner) throw new Error("请指定供给方");
 
-  let wallets = lockEscrow(state.orgWallets, match.org, scene.tokens);
-  if (!wallets) throw new Error(`需求方「${match.org}」可用余额不足，请先充值后再冻结对价`);
-
   const dealIndex = state.deals.length + 1;
-  const { deal, order } = buildDealFromMatch({
+  const preview = buildDealFromMatch({
     match,
     supplierOrg: partner,
     scene,
     dealIndex,
     autoAccept: true,
+    payMechanism: mechanism,
+    payMechanismSource: mechSource,
+    payMechanismNote: mechNote,
+    budgetOverride: budgetOverride || quote,
   });
+
+  let wallets = lockEscrow(state.orgWallets, match.org, preview.lockAmount);
+  if (!wallets) {
+    throw new Error(
+      `需求方「${match.org}」可用余额不足（需冻结 ${preview.lockAmount.toLocaleString()}，机制「${mechanism}」），请先充值`,
+    );
+  }
+
+  const { deal, order } = preview;
 
   const matches = state.matches.map((m) =>
     m.id === matchId
-      ? { ...m, status: "已成交", dealId: deal.id, suggestedPartner: partner, sceneId: scene.id, updatedAt: today() }
-      : m
+      ? {
+          ...m,
+          status: "已成交",
+          dealId: deal.id,
+          suggestedPartner: partner,
+          sceneId: scene.id,
+          preferredPayMechanism: mechanism,
+          updatedAt: today(),
+        }
+      : m,
   );
   const deals = [deal, ...state.deals];
   const orders = [order, ...state.orders];
 
-  const next = { ...state, matches, deals, orders, orgWallets: wallets };
+  const next = { ...state, matches, deals, orders, orgWallets: wallets, bids };
   await persistAllianceLoop(next);
 
   if (order.center !== "联盟") {
@@ -282,16 +336,104 @@ export async function closeMatchDeal({ matchId, supplierOrg, sceneId }) {
   return getAllianceState();
 }
 
-export async function consumeDealTokens({ dealId, amount, actor, note, model }) {
-  const { applyConsume, findScene, creditWallet, releaseBuyerLocked, today } = await import("./dealLoop.mjs");
+export async function placeMatchBid(body) {
+  const { today } = await import("./dealLoop.mjs");
   const state = await getAllianceState();
-  const deal = state.deals.find((d) => d.id === dealId);
+  const {
+    matchId,
+    supplierOrg,
+    acceptBuyerMechanism = true,
+    proposedPayMechanism,
+    note = "",
+    quoteTokens,
+  } = body || {};
+  if (!matchId || !supplierOrg) throw new Error("缺少 matchId 或 supplierOrg");
+  const match = state.matches.find((m) => m.id === matchId);
+  if (!match) throw new Error("供需不存在");
+  if (!["开放", "撮合中"].includes(match.status)) throw new Error("该供需已不可应征");
+  if (match.org === supplierOrg) throw new Error("不能应征自己的供需");
+
+  const buyerMech = match.preferredPayMechanism || "预付";
+  const proposed = proposedPayMechanism || buyerMech;
+  const accept = !!acceptBuyerMechanism && proposed === buyerMech;
+
+  const existing = (state.bids || []).find(
+    (b) => b.matchId === matchId && b.supplierOrg === supplierOrg && b.status === "待审",
+  );
+  if (existing) throw new Error("已有待审应征，请先撤回或等待审核");
+
+  const bid = {
+    id: `BID-${String((state.bids?.length || 0) + 1).padStart(3, "0")}`,
+    matchId,
+    supplierOrg,
+    acceptBuyerMechanism: accept,
+    proposedPayMechanism: proposed,
+    note: note || (accept ? "接受需求方支付机制" : `要求改为「${proposed}」`),
+    quoteTokens: quoteTokens > 0 ? Number(quoteTokens) : undefined,
+    status: "待审",
+    createdAt: today(),
+  };
+
+  const bids = [bid, ...(state.bids || [])];
+  const matches = state.matches.map((m) =>
+    m.id === matchId && m.status === "开放" ? { ...m, status: "撮合中", updatedAt: today() } : m,
+  );
+  await persistAllianceLoop({ ...state, bids, matches });
+  return getAllianceState();
+}
+
+export async function reviewMatchBid({ bidId, action }) {
+  const state = await getAllianceState();
+  const bid = (state.bids || []).find((b) => b.id === bidId);
+  if (!bid) throw new Error("应征不存在");
+  if (bid.status !== "待审") throw new Error("应征已处理");
+
+  if (action === "reject") {
+    const bids = state.bids.map((b) => (b.id === bidId ? { ...b, status: "已拒绝" } : b));
+    await persistAllianceLoop({ ...state, bids });
+    return getAllianceState();
+  }
+  if (action === "withdraw") {
+    const bids = state.bids.map((b) => (b.id === bidId ? { ...b, status: "撤回" } : b));
+    await persistAllianceLoop({ ...state, bids });
+    return getAllianceState();
+  }
+  if (action === "accept") {
+    return closeMatchDeal({ matchId: bid.matchId, bidId });
+  }
+  throw new Error("action 须为 accept / reject / withdraw");
+}
+
+export async function consumeDealTokens({ dealId, amount, actor, note, model }) {
+  const {
+    applyConsume,
+    findScene,
+    creditWallet,
+    releaseBuyerLocked,
+    topUpEscrow,
+    today,
+  } = await import("./dealLoop.mjs");
+  const state = await getAllianceState();
+  let deal = state.deals.find((d) => d.id === dealId);
   if (!deal) throw new Error("项目不存在");
   if (deal.status === "已结算" || deal.phase === "已闭环") throw new Error("项目已结算");
   if (deal.status === "待确认") throw new Error("双方尚未确认，托管未生效");
 
   const scene = findScene(state.scenePackages, deal.sceneId);
-  const spend = Math.min(Number(amount) || 0, deal.escrow ?? deal.budget - deal.spent);
+  let want = Number(amount) || 0;
+  if (want <= 0) throw new Error("扣费金额无效");
+
+  let wallets = state.orgWallets;
+  // 过程支付：托管不足时从 unfunded 追加冻结
+  if (deal.escrow < want && (deal.unfunded || 0) > 0) {
+    const gap = Math.min(want - deal.escrow, deal.unfunded);
+    const topped = topUpEscrow(deal, wallets, gap);
+    if (!topped) throw new Error(`过程支付追加冻结失败：买方可用余额不足（需 ${gap.toLocaleString()}）`);
+    deal = topped.deal;
+    wallets = topped.wallets;
+  }
+
+  const spend = Math.min(want, deal.escrow ?? 0);
   if (spend <= 0) throw new Error("扣费金额无效或托管已耗尽");
 
   const beforeBroker = deal.brokerEarned || 0;
@@ -300,7 +442,7 @@ export async function consumeDealTokens({ dealId, amount, actor, note, model }) 
   const brokerDelta = (updated.brokerEarned || 0) - beforeBroker;
   const supplierDelta = (updated.supplierEarned || 0) - beforeSupplier;
 
-  let wallets = releaseBuyerLocked(state.orgWallets, deal.buyerOrg, spend);
+  wallets = releaseBuyerLocked(wallets, deal.buyerOrg, spend);
   if (brokerDelta > 0) wallets = creditWallet(wallets, "联盟秘书处", brokerDelta, "broker");
   if (supplierDelta > 0) wallets = creditWallet(wallets, deal.supplierOrg, supplierDelta, "supplier");
 
@@ -312,7 +454,7 @@ export async function consumeDealTokens({ dealId, amount, actor, note, model }) 
           status: updated.status === "已结算" ? "完结" : "处理中",
           summary: `${String(o.summary).split("｜")[0]}｜托管剩余 ${updated.escrow}/${updated.budget}`,
         }
-      : o
+      : o,
   );
 
   await persistAllianceLoop({ ...state, deals, orgWallets: wallets, orders });
@@ -346,19 +488,21 @@ export async function consumeDealTokens({ dealId, amount, actor, note, model }) 
 }
 
 export async function settleDealProject(dealId) {
-  const { settleDeal, unlockEscrow } = await import("./dealLoop.mjs");
+  const { settleDeal, unlockEscrow, creditWallet } = await import("./dealLoop.mjs");
   const state = await getAllianceState();
   const deal = state.deals.find((d) => d.id === dealId);
   if (!deal) throw new Error("项目不存在");
   if (deal.phase === "已闭环") throw new Error("项目已闭环");
 
-  const { deal: updated, refund } = settleDeal(deal);
+  const { deal: updated, refund, releasedBroker, releasedSupplier } = settleDeal(deal);
   let wallets = state.orgWallets;
   if (refund > 0) wallets = unlockEscrow(wallets, deal.buyerOrg, refund);
+  if (releasedBroker > 0) wallets = creditWallet(wallets, "联盟秘书处", releasedBroker, "broker");
+  if (releasedSupplier > 0) wallets = creditWallet(wallets, deal.supplierOrg, releasedSupplier, "supplier");
 
   const deals = state.deals.map((d) => (d.id === dealId ? updated : d));
   const orders = state.orders.map((o) =>
-    o.dealId === dealId ? { ...o, status: "完结" } : o
+    o.dealId === dealId ? { ...o, status: "完结" } : o,
   );
   await persistAllianceLoop({ ...state, deals, orgWallets: wallets, orders });
   return getAllianceState();

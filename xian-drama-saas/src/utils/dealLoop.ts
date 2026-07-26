@@ -4,9 +4,55 @@ import type {
   DealProject,
   MatchNeed,
   OrgWallet,
+  PayMechanism,
   ScenePackage,
   WorkOrder,
 } from "../types";
+
+/** 三种支付机制：影响开单冻结比例与激励释放时点 */
+export const PAY_MECHANISMS: {
+  id: PayMechanism;
+  label: string;
+  buyerDesc: string;
+  supplierDesc: string;
+  /** 成交时立即冻结预算的比例 */
+  lockRatioOnOpen: number;
+  /** 履约消耗时是否立即把撮合费/激励打入可用余额 */
+  releaseIncentivesOnConsume: boolean;
+  rule: string;
+}[] = [
+  {
+    id: "预付",
+    label: "预付",
+    buyerDesc: "成交即冻结全部对价，按节点从托管池释放",
+    supplierDesc: "开工即有资金保障，激励随履约节点到账",
+    lockRatioOnOpen: 1,
+    releaseIncentivesOnConsume: true,
+    rule: "开单冻结 100% → 履约三拆即时入账 → 剩余结算退回",
+  },
+  {
+    id: "过程支付",
+    label: "过程支付",
+    buyerDesc: "先冻一部分，随里程碑追加冻结，现金流更平滑",
+    supplierDesc: "接受分阶段到账，适合长周期交付",
+    lockRatioOnOpen: 0.4,
+    releaseIncentivesOnConsume: true,
+    rule: "开单冻结 40% → 节点消耗时不足则追加冻结 → 激励即时入账",
+  },
+  {
+    id: "验收后支付",
+    label: "验收后支付",
+    buyerDesc: "资金仍托管作担保，但供给激励在验收结算后释放",
+    supplierDesc: "需信任验收节奏；可应征时要求改为预付/过程支付",
+    lockRatioOnOpen: 1,
+    releaseIncentivesOnConsume: false,
+    rule: "开单冻结 100% → 履约只记中心保留 → 撮合费/激励暂挂 → 验收结算释放",
+  },
+];
+
+export function payMeta(id?: PayMechanism) {
+  return PAY_MECHANISMS.find((p) => p.id === id) ?? PAY_MECHANISMS[0];
+}
 
 export const SCENE_PACKAGES: ScenePackage[] = [
   {
@@ -180,7 +226,11 @@ export function buildDealFromMatch(opts: {
   dealIndex: number;
   /** 演示可默认双边已确认并直接托管 */
   autoAccept?: boolean;
-}): { deal: DealProject; order: WorkOrder } {
+  payMechanism?: PayMechanism;
+  payMechanismSource?: DealProject["payMechanismSource"];
+  payMechanismNote?: string;
+  budgetOverride?: number;
+}): { deal: DealProject; order: WorkOrder; lockAmount: number } {
   const scene = findScene(opts.sceneId) ?? SCENE_PACKAGES[0];
   const id = `DEAL-${String(opts.dealIndex).padStart(3, "0")}`;
   const orderId = `WO-DEAL-${String(opts.dealIndex).padStart(3, "0")}`;
@@ -188,15 +238,21 @@ export function buildDealFromMatch(opts: {
   const due = new Date();
   due.setDate(due.getDate() + 7);
   const auto = opts.autoAccept !== false;
+  const payMechanism =
+    opts.payMechanism || opts.match.preferredPayMechanism || ("预付" as PayMechanism);
+  const pay = payMeta(payMechanism);
+  const budget = opts.budgetOverride && opts.budgetOverride > 0 ? opts.budgetOverride : scene.tokens;
+  const lockAmount = Math.round(budget * pay.lockRatioOnOpen);
+  const unfunded = Math.max(0, budget - lockAmount);
 
   const ledger: DealLedgerEntry[] = [
     {
       id: `${id}-L01`,
       type: "托管锁定",
-      amount: scene.tokens,
+      amount: lockAmount,
       actor: "联盟秘书处",
       actorRole: "broker",
-      note: `将对价冻结进托管池「${scene.name}」· 标的：${scene.consideration}`,
+      note: `支付机制「${payMechanism}」· 首笔冻结 ${lockAmount.toLocaleString()} / 预算 ${budget.toLocaleString()} · 标的：${scene.consideration}`,
       createdAt,
     },
   ];
@@ -239,21 +295,27 @@ export function buildDealFromMatch(opts: {
     sceneId: scene.id,
     sceneName: scene.name,
     consideration: scene.consideration,
+    payMechanism,
+    payMechanismSource: opts.payMechanismSource ?? "buyer",
+    payMechanismNote: opts.payMechanismNote || opts.match.payMechanismNote || pay.rule,
     buyerOrg: opts.match.org,
     supplierOrg: opts.supplierOrg,
     broker: "联盟秘书处",
     ...base,
-    budget: scene.tokens,
-    escrow: auto ? scene.tokens : 0,
+    budget,
+    escrow: auto ? lockAmount : 0,
+    unfunded,
     spent: 0,
     brokerEarned: 0,
     supplierEarned: 0,
     centerRetained: 0,
+    heldBroker: 0,
+    heldSupplier: 0,
     orderId,
     createdAt,
     updatedAt: createdAt,
     ...actions,
-    milestones: buildMilestones(scene),
+    milestones: buildMilestones({ ...scene, tokens: budget }),
     ledger,
   };
 
@@ -277,11 +339,11 @@ export function buildDealFromMatch(opts: {
               : "联盟-陈希",
     createdAt,
     dueAt: due.toISOString().slice(0, 10),
-    summary: `交易标的：${scene.consideration}｜撮合 ${opts.match.id}`,
+    summary: `机制：${payMechanism}｜标的：${scene.consideration}｜撮合 ${opts.match.id}`,
     dealId: id,
   };
 
-  return { deal, order };
+  return { deal, order, lockAmount };
 }
 
 /** 从可用余额冻结到 locked，并填入 deal.escrow */
@@ -310,6 +372,10 @@ function ensureWallet(wallets: OrgWallet[], org: string, role: OrgWallet["role"]
   return next.map((w) => ({ ...w, locked: w.locked ?? 0 }));
 }
 
+/**
+ * 履约消耗。验收后支付：撮合费/激励暂挂，不计入 earned。
+ * 过程支付：调用方应先确保 escrow 足够（可 topUpEscrow）。
+ */
 export function applyConsume(
   deal: DealProject,
   amount: number,
@@ -321,6 +387,7 @@ export function applyConsume(
   if (deal.status === "已结算" || deal.phase === "已闭环") return deal;
 
   const scene = findScene(deal.sceneId);
+  const pay = payMeta(deal.payMechanism);
   const spend = Math.min(amount, Math.max(0, deal.escrow));
   if (spend <= 0) return deal;
 
@@ -329,9 +396,10 @@ export function applyConsume(
   const centerKeep = Math.max(0, spend - brokerCut - supplierCut);
   const nextSpent = deal.spent + spend;
   const nextEscrow = deal.escrow - spend;
-  const settled = nextEscrow <= 0;
+  const settled = nextEscrow <= 0 && (deal.unfunded ?? 0) <= 0;
   const status = settled ? "已结算" : "履约中";
   const phase = settled ? "结算中" : "履约中";
+  const releaseNow = pay.releaseIncentivesOnConsume;
 
   let milestones = deal.milestones.map((m) => ({ ...m }));
   let left = spend;
@@ -359,7 +427,7 @@ export function applyConsume(
       actor,
       actorRole: "center",
       model,
-      note: `${note} · 自托管池释放`,
+      note: `${note} · 自托管池释放 · 机制「${deal.payMechanism || "预付"}」`,
       createdAt: today(),
     },
     ...deal.ledger,
@@ -371,7 +439,9 @@ export function applyConsume(
       amount: brokerCut,
       actor: deal.broker,
       actorRole: "broker",
-      note: `对价切割 ${Math.round((scene?.brokerFeeRate ?? 0) * 100)}% → 匹配/背书/盯单`,
+      note: releaseNow
+        ? `对价切割 ${Math.round((scene?.brokerFeeRate ?? 0) * 100)}% → 匹配/背书/盯单`
+        : `对价切割 ${Math.round((scene?.brokerFeeRate ?? 0) * 100)}% → 暂挂，待验收结算释放`,
       createdAt: today(),
     });
   }
@@ -382,7 +452,9 @@ export function applyConsume(
       amount: supplierCut,
       actor: deal.supplierOrg,
       actorRole: "supplier",
-      note: `对价切割 ${Math.round((scene?.supplierShare ?? 0) * 100)}% → 交付产能`,
+      note: releaseNow
+        ? `对价切割 ${Math.round((scene?.supplierShare ?? 0) * 100)}% → 交付产能`
+        : `对价切割 ${Math.round((scene?.supplierShare ?? 0) * 100)}% → 暂挂，待验收结算释放`,
       createdAt: today(),
     });
   }
@@ -402,23 +474,94 @@ export function applyConsume(
     ...deal,
     spent: nextSpent,
     escrow: nextEscrow,
-    brokerEarned: deal.brokerEarned + brokerCut,
-    supplierEarned: deal.supplierEarned + supplierCut,
+    brokerEarned: deal.brokerEarned + (releaseNow ? brokerCut : 0),
+    supplierEarned: deal.supplierEarned + (releaseNow ? supplierCut : 0),
     centerRetained: deal.centerRetained + centerKeep,
+    heldBroker: (deal.heldBroker ?? 0) + (releaseNow ? 0 : brokerCut),
+    heldSupplier: (deal.heldSupplier ?? 0) + (releaseNow ? 0 : supplierCut),
     status,
     phase,
     updatedAt: today(),
     milestones,
     ledger,
-    ...nextActions({ status, phase, buyerAccepted: deal.buyerAccepted, supplierAccepted: deal.supplierAccepted, center: deal.center }),
+    ...nextActions({
+      status,
+      phase,
+      buyerAccepted: deal.buyerAccepted,
+      supplierAccepted: deal.supplierAccepted,
+      center: deal.center,
+    }),
   };
   return updated;
 }
 
-/** 结算：未用托管退回买方可用余额 */
-export function settleDeal(deal: DealProject): { deal: DealProject; refund: number } {
+/** 过程支付：从买方可用余额追加冻结，减少 unfunded */
+export function topUpEscrow(
+  deal: DealProject,
+  wallets: OrgWallet[],
+  amount: number,
+): { deal: DealProject; wallets: OrgWallet[] } | null {
+  const need = Math.min(Math.max(0, amount), deal.unfunded ?? 0);
+  if (need <= 0) return { deal, wallets };
+  const locked = lockEscrow(wallets, deal.buyerOrg, need);
+  if (!locked) return null;
+  const ledger: DealLedgerEntry[] = [
+    {
+      id: `${deal.id}-L${String(deal.ledger.length + 1).padStart(2, "0")}`,
+      type: "补预算",
+      amount: need,
+      actor: deal.buyerOrg,
+      actorRole: "buyer",
+      note: `过程支付追加冻结 ${need.toLocaleString()}（剩余未冻 ${(deal.unfunded - need).toLocaleString()}）`,
+      createdAt: today(),
+    },
+    ...deal.ledger,
+  ];
+  return {
+    wallets: locked,
+    deal: {
+      ...deal,
+      escrow: deal.escrow + need,
+      unfunded: Math.max(0, (deal.unfunded ?? 0) - need),
+      updatedAt: today(),
+      ledger,
+    },
+  };
+}
+
+/** 结算：释放暂挂激励 + 未用托管退回买方 */
+export function settleDeal(deal: DealProject): {
+  deal: DealProject;
+  refund: number;
+  releasedBroker: number;
+  releasedSupplier: number;
+} {
   const refund = Math.max(0, deal.escrow);
+  const releasedBroker = Math.max(0, deal.heldBroker ?? 0);
+  const releasedSupplier = Math.max(0, deal.heldSupplier ?? 0);
   const ledger = [...deal.ledger];
+  if (releasedBroker > 0) {
+    ledger.unshift({
+      id: `${deal.id}-L${String(ledger.length + 1).padStart(2, "0")}`,
+      type: "撮合费",
+      amount: releasedBroker,
+      actor: deal.broker,
+      actorRole: "broker",
+      note: "验收结算 · 释放暂挂撮合费",
+      createdAt: today(),
+    });
+  }
+  if (releasedSupplier > 0) {
+    ledger.unshift({
+      id: `${deal.id}-L${String(ledger.length + 1).padStart(2, "0")}`,
+      type: "供给激励",
+      amount: releasedSupplier,
+      actor: deal.supplierOrg,
+      actorRole: "supplier",
+      note: "验收结算 · 释放暂挂供给激励",
+      createdAt: today(),
+    });
+  }
   if (refund > 0) {
     ledger.unshift({
       id: `${deal.id}-L${String(ledger.length + 1).padStart(2, "0")}`,
@@ -434,9 +577,16 @@ export function settleDeal(deal: DealProject): { deal: DealProject; refund: numb
   const phase = "已闭环" as const;
   return {
     refund,
+    releasedBroker,
+    releasedSupplier,
     deal: {
       ...deal,
       escrow: 0,
+      unfunded: 0,
+      heldBroker: 0,
+      heldSupplier: 0,
+      brokerEarned: deal.brokerEarned + releasedBroker,
+      supplierEarned: deal.supplierEarned + releasedSupplier,
       status,
       phase,
       updatedAt: today(),

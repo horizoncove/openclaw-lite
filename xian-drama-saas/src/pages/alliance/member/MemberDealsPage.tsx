@@ -67,11 +67,15 @@ export default function MemberDealsPage() {
                   <span className="tag blue">{d.status}</span>
                 </div>
                 <p>供给方：{d.supplierOrg}</p>
-                <p style={{ fontSize: "0.82rem" }}>标的：{d.consideration || d.sceneName}</p>
+                <p style={{ fontSize: "0.82rem" }}>
+                  标的：{d.consideration || d.sceneName} · 机制{" "}
+                  <span className="tag">{d.payMechanism || "预付"}</span>
+                </p>
                 <div className="deal-budget-bar"><div style={{ width: `${Math.round((d.spent / d.budget) * 100)}%` }} /></div>
                 <div className="deal-budget-labels">
                   <span>
                     托管剩余 {(d.escrow ?? d.budget - d.spent).toLocaleString()} / {d.budget.toLocaleString()}
+                    {(d.unfunded ?? 0) > 0 ? ` · 未冻 ${d.unfunded.toLocaleString()}` : ""}
                   </span>
                 </div>
                 <p className="deal-next"><b>你的下一步：</b>{d.nextActionBuyer}</p>
@@ -95,6 +99,14 @@ export default function MemberDealsPage() {
                   <span className="tag green">激励 {d.supplierEarned.toLocaleString()}</span>
                 </div>
                 <p>需求方：{d.buyerOrg}</p>
+                <p style={{ fontSize: "0.82rem" }}>
+                  机制 <span className="tag">{d.payMechanism || "预付"}</span>
+                  {(d.heldSupplier ?? 0) > 0 && (
+                    <span className="tag amber" style={{ marginLeft: 6 }}>
+                      暂挂 {d.heldSupplier.toLocaleString()}
+                    </span>
+                  )}
+                </p>
                 <p className="deal-next"><b>你的下一步：</b>{d.nextActionSupplier}</p>
               </div>
             ))

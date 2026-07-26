@@ -6,7 +6,15 @@ export const allianceSeed = (): Omit<AllianceState, "user"> => {
   const data = structuredClone(allianceJson) as Omit<AllianceState, "user">;
   return {
     ...data,
-    deals: data.deals ?? [],
+    deals: (data.deals ?? []).map((d) => ({
+      ...d,
+      payMechanism: d.payMechanism ?? "预付",
+      payMechanismSource: d.payMechanismSource ?? "buyer",
+      unfunded: d.unfunded ?? 0,
+      heldBroker: d.heldBroker ?? 0,
+      heldSupplier: d.heldSupplier ?? 0,
+      escrow: d.escrow ?? Math.max(0, (d.budget ?? 0) - (d.spent ?? 0)),
+    })),
     orgWallets: (data.orgWallets ?? []).map((w) => ({
       ...w,
       locked: w.locked ?? 0,
@@ -14,6 +22,7 @@ export const allianceSeed = (): Omit<AllianceState, "user"> => {
     scenePackages: data.scenePackages ?? [],
     works: data.works ?? [],
     venues: data.venues ?? [],
+    bids: data.bids ?? [],
   };
 };
 

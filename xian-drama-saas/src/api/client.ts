@@ -10,6 +10,7 @@ import type {
   MatchNeed,
   Member,
   MemberWork,
+  PayMechanism,
   Venue,
   OverseasProject,
   WorkOrder,
@@ -75,7 +76,16 @@ export const allianceApi = {
       request<Venue>(`/alliance/venues/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
   },
   deals: {
-    close: (body: { matchId: string; supplierOrg?: string; sceneId?: string }) =>
+    close: (body: {
+      matchId: string;
+      supplierOrg?: string;
+      sceneId?: string;
+      bidId?: string;
+      payMechanism?: PayMechanism;
+      payMechanismSource?: "buyer" | "supplier" | "negotiated";
+      payMechanismNote?: string;
+      budgetOverride?: number;
+    }) =>
       request<Omit<AllianceState, "user">>("/alliance/deals/close", {
         method: "POST",
         body: JSON.stringify(body),
@@ -94,6 +104,25 @@ export const allianceApi = {
       request<Omit<AllianceState, "user">>(`/alliance/deals/${id}/confirm`, {
         method: "POST",
         body: JSON.stringify(body),
+      }),
+  },
+  bids: {
+    place: (body: {
+      matchId: string;
+      supplierOrg: string;
+      acceptBuyerMechanism?: boolean;
+      proposedPayMechanism: PayMechanism;
+      note?: string;
+      quoteTokens?: number;
+    }) =>
+      request<Omit<AllianceState, "user">>("/alliance/bids", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+    review: (id: string, action: "accept" | "reject" | "withdraw") =>
+      request<Omit<AllianceState, "user">>(`/alliance/bids/${id}/review`, {
+        method: "POST",
+        body: JSON.stringify({ action }),
       }),
   },
   wallets: {

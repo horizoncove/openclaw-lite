@@ -286,7 +286,9 @@
       "updatedAt": "2026-07-23",
       "suggestedPartner": "丝路视界传媒",
       "sceneId": "SCENE-OVERSEAS",
-      "dealId": "DEAL-002"
+      "dealId": "DEAL-002",
+      "preferredPayMechanism": "预付",
+      "payMechanismNote": "出海译制全额预付，保障译制开工"
     },
     {
       "id": "N002",
@@ -297,7 +299,9 @@
       "owner": "联盟-陈希",
       "updatedAt": "2026-07-23",
       "suggestedPartner": "长安映缔影视",
-      "sceneId": "SCENE-DIST"
+      "sceneId": "SCENE-DIST",
+      "preferredPayMechanism": "过程支付",
+      "payMechanismNote": "冷启动分阶段释放，现金流更平滑"
     },
     {
       "id": "N003",
@@ -308,7 +312,9 @@
       "owner": "联盟-陈希",
       "updatedAt": "2026-07-22",
       "suggestedPartner": "曲江短剧工场",
-      "sceneId": "SCENE-AI"
+      "sceneId": "SCENE-AI",
+      "preferredPayMechanism": "验收后支付",
+      "payMechanismNote": "剧本交付验收后再释放供给激励"
     },
     {
       "id": "N004",
@@ -319,7 +325,9 @@
       "owner": "联盟-陈希",
       "updatedAt": "2026-07-21",
       "suggestedPartner": "丝路视界传媒",
-      "sceneId": "SCENE-OVERSEAS"
+      "sceneId": "SCENE-OVERSEAS",
+      "preferredPayMechanism": "预付",
+      "payMechanismNote": "片源采购建议预付锁产能"
     },
     {
       "id": "N005",
@@ -331,7 +339,9 @@
       "updatedAt": "2026-07-18",
       "suggestedPartner": "秦岭投放实验室",
       "sceneId": "SCENE-DIST",
-      "dealId": "DEAL-001"
+      "dealId": "DEAL-001",
+      "preferredPayMechanism": "过程支付",
+      "payMechanismNote": "投流冷启动按节点过程支付"
     },
     {
       "id": "N006",
@@ -342,7 +352,9 @@
       "owner": "联盟-陈希",
       "updatedAt": "2026-07-20",
       "suggestedPartner": "高新漫动科技",
-      "sceneId": "SCENE-VENUE"
+      "sceneId": "SCENE-VENUE",
+      "preferredPayMechanism": "验收后支付",
+      "payMechanismNote": "场地协调完成后验收支付激励"
     },
     {
       "id": "N007",
@@ -353,7 +365,9 @@
       "owner": "联盟-陈希",
       "updatedAt": "2026-07-19",
       "suggestedPartner": "曲江短剧工场",
-      "sceneId": "SCENE-VENUE"
+      "sceneId": "SCENE-VENUE",
+      "preferredPayMechanism": "过程支付",
+      "payMechanismNote": "许可协调分阶段冻结"
     },
     {
       "id": "N008",
@@ -364,7 +378,9 @@
       "owner": "联盟-陈希",
       "updatedAt": "2026-07-17",
       "suggestedPartner": "丝路视界传媒",
-      "sceneId": "SCENE-DIST"
+      "sceneId": "SCENE-DIST",
+      "preferredPayMechanism": "预付",
+      "payMechanismNote": "发行渠道对接优先预付"
     },
     {
       "id": "N009",
@@ -375,7 +391,9 @@
       "owner": "联盟-陈希",
       "updatedAt": "2026-07-23",
       "suggestedPartner": "长安映缔影视",
-      "sceneId": "SCENE-OVERSEAS"
+      "sceneId": "SCENE-OVERSEAS",
+      "preferredPayMechanism": "验收后支付",
+      "payMechanismNote": "配音成品验收后支付"
     },
     {
       "id": "N010",
@@ -386,7 +404,9 @@
       "owner": "联盟-陈希",
       "updatedAt": "2026-07-10",
       "suggestedPartner": "浐灞国际译制中心",
-      "sceneId": "SCENE-OVERSEAS"
+      "sceneId": "SCENE-OVERSEAS",
+      "preferredPayMechanism": "预付",
+      "payMechanismNote": "已关闭"
     }
   ],
   "orders": [
@@ -1009,7 +1029,7 @@
           "amount": 50000,
           "actor": "联盟秘书处",
           "actorRole": "broker",
-          "note": "成交冻结进托管池「投流冷启动包」，锁定项目预算",
+          "note": "支付机制「过程支付」· 演示样本已履约推进，托管按全额预算记账",
           "createdAt": "2026-07-18"
         }
       ],
@@ -1044,7 +1064,13 @@
           "releaseTokens": 16668,
           "released": 0
         }
-      ]
+      ],
+      "payMechanism": "过程支付",
+      "payMechanismSource": "buyer",
+      "payMechanismNote": "投流冷启动按节点过程支付（开单冻 40%）",
+      "unfunded": 0,
+      "heldBroker": 0,
+      "heldSupplier": 0
     },
     {
       "id": "DEAL-002",
@@ -1075,7 +1101,7 @@
           "amount": 80000,
           "actor": "联盟秘书处",
           "actorRole": "broker",
-          "note": "成交冻结进托管池「出海译制履约包」，锁定项目预算",
+          "note": "支付机制「预付」· 首笔冻结 80,000 / 预算 80,000 · 标的：译制产能 + 合规意见 + 海外选品诊断",
           "createdAt": "2026-07-23"
         }
       ],
@@ -1118,7 +1144,68 @@
           "releaseTokens": 20000,
           "released": 0
         }
-      ]
+      ],
+      "payMechanism": "预付",
+      "payMechanismSource": "buyer",
+      "payMechanismNote": "出海译制全额预付，保障译制开工",
+      "unfunded": 0,
+      "heldBroker": 0,
+      "heldSupplier": 0
+    }
+  ],
+  "bids": [
+    {
+      "id": "BID-001",
+      "matchId": "N002",
+      "supplierOrg": "长安映缔影视",
+      "acceptBuyerMechanism": true,
+      "proposedPayMechanism": "过程支付",
+      "note": "接受过程支付，可承接冷启动体检三单",
+      "quoteTokens": 50000,
+      "status": "待审",
+      "createdAt": "2026-07-24"
+    },
+    {
+      "id": "BID-002",
+      "matchId": "N003",
+      "supplierOrg": "曲江短剧工场",
+      "acceptBuyerMechanism": false,
+      "proposedPayMechanism": "预付",
+      "note": "古装承制周期长，要求改为预付以保障开机资金",
+      "quoteTokens": 30000,
+      "status": "待审",
+      "createdAt": "2026-07-23"
+    },
+    {
+      "id": "BID-003",
+      "matchId": "N003",
+      "supplierOrg": "高新漫动科技",
+      "acceptBuyerMechanism": true,
+      "proposedPayMechanism": "验收后支付",
+      "note": "可按验收后支付，配合 AI 分镜加速大纲落地",
+      "quoteTokens": 28000,
+      "status": "待审",
+      "createdAt": "2026-07-24"
+    },
+    {
+      "id": "BID-004",
+      "matchId": "N009",
+      "supplierOrg": "浐灞国际译制中心",
+      "acceptBuyerMechanism": false,
+      "proposedPayMechanism": "过程支付",
+      "note": "配音产能可锁档，建议过程支付替代纯验收后",
+      "status": "待审",
+      "createdAt": "2026-07-25"
+    },
+    {
+      "id": "BID-005",
+      "matchId": "N004",
+      "supplierOrg": "丝路视界传媒",
+      "acceptBuyerMechanism": true,
+      "proposedPayMechanism": "预付",
+      "note": "接受预付，可提供东南亚渠道清单",
+      "status": "待审",
+      "createdAt": "2026-07-22"
     }
   ]
 }

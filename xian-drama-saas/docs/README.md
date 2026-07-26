@@ -23,7 +23,7 @@ docs/reports/trae-mvp-report.md
 → 撮合费/供给激励/中心保留 → 剩余退回 → 项目闭环
 ```
 
-代码基线：`xian-drama-saas` v1.7.0（以 `/api/health` 为准）。详读 [`TRANSACTION.md`](./TRANSACTION.md)。
+代码基线：`xian-drama-saas` v1.8.0（以 `/api/health` 为准）。详读 [`TRANSACTION.md`](./TRANSACTION.md)。
 
 ## 本地一键
 

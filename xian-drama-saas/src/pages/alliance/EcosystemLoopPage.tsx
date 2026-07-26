@@ -1,6 +1,6 @@
 import { Handshake, Building2, Users, Bot, Coins, Scale } from "lucide-react";
 import { useAllianceStore } from "../../store/allianceStore";
-import { explainSplit, findScene } from "../../utils/dealLoop";
+import { explainSplit, findScene, PAY_MECHANISMS } from "../../utils/dealLoop";
 
 function pct(spent: number, budget: number) {
   return Math.min(100, Math.round((spent / Math.max(budget, 1)) * 100));
@@ -49,6 +49,14 @@ export default function EcosystemLoopPage() {
         <p style={{ color: "var(--muted)", fontSize: "0.85rem", margin: "0.75rem 0 0" }}>
           机构钱包同时展示 <b>可用</b> 与 <b>锁定</b>；锁定合计应约等于其作为买方的在途 escrow 之和。
         </p>
+        <div className="participant-grid" style={{ marginTop: "1rem" }}>
+          {PAY_MECHANISMS.map((p) => (
+            <article className="participant-card" key={p.id}>
+              <h4>{p.label}</h4>
+              <p>{p.rule}</p>
+            </article>
+          ))}
+        </div>
       </div>
 
       <div className="participant-grid">
@@ -127,7 +135,13 @@ export default function EcosystemLoopPage() {
                   <div>
                     <strong>{d.title}</strong>
                     <div className="deal-meta">
-                      {d.consideration || d.sceneName} · 阶段 {d.phase || d.status} · {d.id}
+                      {d.consideration || d.sceneName} · 机制 {d.payMechanism || "预付"}（
+                      {d.payMechanismSource === "supplier"
+                        ? "供方主张"
+                        : d.payMechanismSource === "negotiated"
+                          ? "协商"
+                          : "买方设定"}
+                      ） · 阶段 {d.phase || d.status} · {d.id}
                     </div>
                   </div>
                   <span className={`tag ${d.status === "已结算" ? "green" : d.status === "履约中" ? "amber" : "blue"}`}>
@@ -141,10 +155,14 @@ export default function EcosystemLoopPage() {
                   <span>
                     已释放 {d.spent.toLocaleString()} · 托管剩余 {(d.escrow ?? d.budget - d.spent).toLocaleString()} /{" "}
                     {d.budget.toLocaleString()}
+                    {(d.unfunded ?? 0) > 0 ? ` · 未冻 ${d.unfunded.toLocaleString()}` : ""}
                   </span>
                   <span>
                     费 {d.brokerEarned.toLocaleString()} · 激励 {d.supplierEarned.toLocaleString()} · 中心保留{" "}
                     {(d.centerRetained ?? 0).toLocaleString()}
+                    {(d.heldBroker ?? 0) + (d.heldSupplier ?? 0) > 0
+                      ? ` · 暂挂 ${((d.heldBroker ?? 0) + (d.heldSupplier ?? 0)).toLocaleString()}`
+                      : ""}
                   </span>
                 </div>
                 {d.milestones?.length > 0 && (

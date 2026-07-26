@@ -26,6 +26,8 @@ import {
   listVenues,
   patchVenue,
   closeMatchDeal,
+  placeMatchBid,
+  reviewMatchBid,
   consumeDealTokens,
   settleDealProject,
   confirmDealProject,
@@ -77,7 +79,7 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     service: "xian-drama-saas",
-    version: "1.7.0",
+    version: "1.8.0",
     storage: isPostgres() ? "postgresql" : "json",
     portals: ["alliance", "center"],
   });
@@ -146,6 +148,14 @@ app.put("/api/alliance/venues/:id", asyncHandler(async (req, res) => {
 app.post("/api/alliance/deals/close", asyncHandler(async (req, res) => {
   const state = await closeMatchDeal(req.body || {});
   res.json(state);
+}));
+
+app.post("/api/alliance/bids", asyncHandler(async (req, res) => {
+  res.json(await placeMatchBid(req.body || {}));
+}));
+
+app.post("/api/alliance/bids/:id/review", asyncHandler(async (req, res) => {
+  res.json(await reviewMatchBid({ bidId: req.params.id, ...(req.body || {}) }));
 }));
 
 app.post("/api/alliance/deals/:id/consume", asyncHandler(async (req, res) => {

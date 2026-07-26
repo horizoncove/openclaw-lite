@@ -178,6 +178,13 @@ GET /api/health
 后端：`server/dealLoop.mjs`（保持规则一致）  
 本质说明：[`TRANSACTION.md`](./TRANSACTION.md)
 
+### 支付机制与应征
+
+- `MatchNeed.preferredPayMechanism`：买方设定  
+- `MatchBid`：供应方应征，可 `proposedPayMechanism` 要求改条款  
+- `DealProject.payMechanism` / `unfunded` / `heldBroker` / `heldSupplier`  
+- API：`POST /alliance/bids`、`POST /alliance/bids/:id/review`；`close` 支持 `bidId`、`payMechanism`
+
 ### closeMatchDeal（冻结对价）
 
 1. 找 match；若已有 dealId → 抛错  
@@ -220,7 +227,7 @@ API 增量：`POST /alliance/deals/:id/settle`、`POST /alliance/deals/:id/confi
 - `scenePackages` 主要来自 seed 合并（配置型）
 
 迁移：`npm run db:migrate`  
-种子刷新版本：`DATA_SEED_VERSION`（当前期望 ≥ 6）。版本未写入时 migrate 会 reset 灌数。
+种子刷新版本：`DATA_SEED_VERSION`（当前期望 ≥ 8）。版本未写入时 migrate 会 reset 灌数。
 
 ---
 
