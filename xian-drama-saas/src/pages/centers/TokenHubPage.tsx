@@ -45,7 +45,8 @@ export default function TokenHubPage() {
           <p className="token-eyebrow">XD-ROUTER · API 聚合网关</p>
           <h3>标准化 Token 购买与模型路由</h3>
           <p>
-            参考 OpenRouter 统一接入多家大模型，按 Token 计费、统一 API Key、五大中心共享额度。
+            参考 OpenRouter 统一接入多家大模型。更重要的是：Token 应随撮合成交进入项目预算，
+            随中心履约扣减，并向秘书处与供给方回流激励——而不是停在充值页。
           </p>
         </div>
         <div className="token-balance-card">

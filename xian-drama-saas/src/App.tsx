@@ -21,6 +21,8 @@ import MemberServicesPage from "./pages/alliance/member/MemberServicesPage";
 import MemberWorksPage from "./pages/alliance/member/MemberWorksPage";
 import MemberDiscoverPage from "./pages/alliance/member/MemberDiscoverPage";
 import ShowcasePage from "./pages/alliance/ShowcasePage";
+import EcosystemLoopPage from "./pages/alliance/EcosystemLoopPage";
+import MemberDealsPage from "./pages/alliance/member/MemberDealsPage";
 import CenterDashboard from "./pages/centers/CenterDashboard";
 import CenterPanoramaPage from "./pages/centers/CenterPanoramaPage";
 import CenterOrdersPage from "./pages/centers/CenterOrdersPage";
@@ -56,6 +58,7 @@ export default function App() {
           <Route path="members" element={<MembersPage />} />
           <Route path="events" element={<EventsPage />} />
           <Route path="matching" element={<MatchingPage />} />
+          <Route path="loop" element={<EcosystemLoopPage />} />
           <Route path="showcase" element={<ShowcasePage />} />
           <Route path="orders" element={<AllianceOrdersPage />} />
           <Route path="kpi" element={<AllianceKpiPage />} />
@@ -68,6 +71,7 @@ export default function App() {
           <Route path="services" element={<MemberServicesPage />} />
           <Route path="works" element={<MemberWorksPage />} />
           <Route path="discover" element={<MemberDiscoverPage />} />
+          <Route path="deals" element={<MemberDealsPage />} />
         </Route>
       </Route>
 

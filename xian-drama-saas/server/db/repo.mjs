@@ -279,6 +279,8 @@ export async function resetAllianceState(seed) {
   await seedAlliance(seed);
   if (seed.works) await saveAllianceExtras("works", seed.works);
   if (seed.venues) await saveAllianceExtras("venues", seed.venues);
+  if (seed.deals) await saveAllianceExtras("deals", seed.deals);
+  if (seed.orgWallets) await saveAllianceExtras("orgWallets", seed.orgWallets);
   return getAllianceState();
 }
 
@@ -439,11 +441,15 @@ export async function saveTokenWallet(wallet) {
 }
 
 export async function getAllianceExtras() {
-  const r = await query("SELECT key, data FROM alliance_extras WHERE key IN ('works', 'venues')");
-  const out = { works: [], venues: [] };
+  const r = await query(
+    "SELECT key, data FROM alliance_extras WHERE key IN ('works', 'venues', 'deals', 'orgWallets')"
+  );
+  const out = { works: [], venues: [], deals: [], orgWallets: [] };
   for (const row of r.rows) {
     if (row.key === "works") out.works = row.data ?? [];
     if (row.key === "venues") out.venues = row.data ?? [];
+    if (row.key === "deals") out.deals = row.data ?? [];
+    if (row.key === "orgWallets") out.orgWallets = row.data ?? [];
   }
   return out;
 }

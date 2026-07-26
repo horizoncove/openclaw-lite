@@ -74,6 +74,28 @@ export const allianceApi = {
     update: (id: string, patch: Partial<Venue>) =>
       request<Venue>(`/alliance/venues/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
   },
+  deals: {
+    close: (body: { matchId: string; supplierOrg?: string; sceneId?: string }) =>
+      request<Omit<AllianceState, "user">>("/alliance/deals/close", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+    consume: (
+      id: string,
+      body: { amount: number; actor?: string; note?: string; model?: string },
+    ) =>
+      request<Omit<AllianceState, "user">>(`/alliance/deals/${id}/consume`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+  },
+  wallets: {
+    topup: (body: { org: string; amount: number }) =>
+      request<{ org: string; balance: number; credited: number }>("/alliance/wallets/topup", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+  },
 };
 
 export const centerApi = {

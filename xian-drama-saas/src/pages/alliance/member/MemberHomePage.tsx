@@ -1,14 +1,16 @@
 import { Link } from "react-router-dom";
-import { CalendarHeart, Megaphone, LifeBuoy, ShieldCheck, Film, Sparkles } from "lucide-react";
+import { CalendarHeart, Megaphone, LifeBuoy, ShieldCheck, Film, Sparkles, Wallet } from "lucide-react";
 import { useAllianceStore } from "../../../store/allianceStore";
 import { findMemberOrg } from "../../../utils/memberContext";
 
 export default function MemberHomePage() {
-  const { user, members, events, matches, orders, works, venues } = useAllianceStore();
+  const { user, members, events, matches, orders, works, venues, deals, orgWallets } = useAllianceStore();
   const org = findMemberOrg(user, members);
   const myMatches = matches.filter((m) => m.org === org?.name);
   const myOrders = orders.filter((o) => o.org === org?.name);
   const myWorks = works.filter((w) => w.org === org?.name);
+  const myDeals = deals.filter((d) => d.buyerOrg === org?.name || d.supplierOrg === org?.name);
+  const wallet = orgWallets.find((w) => w.org === org?.name);
   const openEvents = events.filter((e) => e.status === "报名中" || e.status === "筹备");
   const featuredWorks = works.filter((w) => w.featured).slice(0, 3);
 
@@ -19,7 +21,7 @@ export default function MemberHomePage() {
           <p className="member-hero-label">欢迎回来</p>
           <h3>{user?.name}，{org?.name ?? "会员企业"}</h3>
           <p className="member-hero-desc">
-            这里是您的会员服务门户：查看权益、展示作品、发现推荐场地、报名活动。
+            这里是您的会员门户：展示作品、发现场地、跟踪项目预算与 Token 流向。
           </p>
           <div className="member-tags">
             <span className={`tag ${org?.status === "有效" ? "green" : "amber"}`}>
@@ -34,12 +36,17 @@ export default function MemberHomePage() {
           </div>
         </div>
         <div className="member-hero-stat">
-          <div className="stat-value">{myOrders.filter((o) => !["完结", "关闭"].includes(o.status)).length}</div>
-          <div className="stat-label">进行中申请</div>
+          <div className="stat-value">{myDeals.length}</div>
+          <div className="stat-label">在途项目</div>
         </div>
       </section>
 
       <div className="member-quick-grid">
+        <Link to="/alliance/member/deals" className="member-quick-card">
+          <Wallet size={22} />
+          <strong>项目钱包</strong>
+          <span>{((wallet?.balance ?? 0) / 1000).toFixed(0)}k 余额</span>
+        </Link>
         <Link to="/alliance/member/works" className="member-quick-card">
           <Film size={22} />
           <strong>作品展示</strong>
@@ -50,11 +57,6 @@ export default function MemberHomePage() {
           <strong>推荐发现</strong>
           <span>{venues.filter((v) => v.featured).length} 个推荐场地</span>
         </Link>
-        <Link to="/alliance/member/events" className="member-quick-card">
-          <CalendarHeart size={22} />
-          <strong>活动报名</strong>
-          <span>{openEvents.length} 场可报名</span>
-        </Link>
         <Link to="/alliance/member/needs" className="member-quick-card">
           <Megaphone size={22} />
           <strong>发布供需</strong>
@@ -63,10 +65,15 @@ export default function MemberHomePage() {
       </div>
 
       <div className="member-quick-grid secondary">
+        <Link to="/alliance/member/events" className="member-quick-card">
+          <CalendarHeart size={22} />
+          <strong>活动报名</strong>
+          <span>{openEvents.length} 场可报名</span>
+        </Link>
         <Link to="/alliance/member/services" className="member-quick-card">
           <LifeBuoy size={22} />
           <strong>服务申请</strong>
-          <span>入会 / 对接 / 咨询</span>
+          <span>{myOrders.filter((o) => !["完结", "关闭"].includes(o.status)).length} 进行中</span>
         </Link>
         <Link to="/alliance/member/profile" className="member-quick-card">
           <ShieldCheck size={22} />

@@ -25,7 +25,9 @@ import {
   patchWork,
   listVenues,
   patchVenue,
-  getCenterState,
+  closeMatchDeal,
+  consumeDealTokens,
+  topUpOrgWallet,
   getCenterState,
   resetCenterState,
   getCenterStats,
@@ -73,7 +75,7 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     service: "xian-drama-saas",
-    version: "1.5.0",
+    version: "1.6.0",
     storage: isPostgres() ? "postgresql" : "json",
     portals: ["alliance", "center"],
   });
@@ -137,6 +139,20 @@ app.put("/api/alliance/venues/:id", asyncHandler(async (req, res) => {
   const item = await patchVenue(req.params.id, req.body);
   if (!item) return res.status(404).json({ error: "未找到" });
   res.json(item);
+}));
+
+app.post("/api/alliance/deals/close", asyncHandler(async (req, res) => {
+  const state = await closeMatchDeal(req.body || {});
+  res.json(state);
+}));
+
+app.post("/api/alliance/deals/:id/consume", asyncHandler(async (req, res) => {
+  const state = await consumeDealTokens({ dealId: req.params.id, ...(req.body || {}) });
+  res.json(state);
+}));
+
+app.post("/api/alliance/wallets/topup", asyncHandler(async (req, res) => {
+  res.json(await topUpOrgWallet(req.body || {}));
 }));
 
 // ── Center API（数据独立）──────────────────────────────────

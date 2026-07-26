@@ -630,3 +630,88 @@ tr:hover td { background: rgba(154, 52, 18, 0.03); }
   .work-grid { grid-template-columns: 1fr; }
   .member-quick-grid.secondary { grid-template-columns: 1fr; }
 }
+
+/* ── 生态闭环 · 参与者视角 ── */
+.loop-hero {
+  display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  padding: 1.25rem; border-radius: 16px; color: #fff;
+}
+.loop-hero.broker { background: linear-gradient(135deg, #1e3a8a, #2563eb); }
+.loop-hero.ecosystem { background: linear-gradient(135deg, #134e4a, #0f766e); }
+.loop-hero h3 { margin: 0.3rem 0; font-family: var(--display); color: #fff; max-width: 640px; }
+.loop-hero p { margin: 0; color: rgba(255,255,255,0.85); font-size: 0.9rem; max-width: 640px; line-height: 1.5; }
+.loop-eyebrow { margin: 0; font-size: 0.72rem; letter-spacing: 0.08em; opacity: 0.85; }
+.loop-hero-stats { display: flex; gap: 1rem; }
+.loop-hero-stats div {
+  min-width: 88px; padding: 0.65rem 0.85rem; border-radius: 12px; background: rgba(255,255,255,0.12); text-align: center;
+}
+.loop-hero-stats strong { display: block; font-size: 1.35rem; }
+.loop-hero-stats span { font-size: 0.75rem; opacity: 0.85; }
+.loop-alert {
+  padding: 0.75rem 1rem; border-radius: 10px; background: #fef3c7; color: #92400e; font-size: 0.9rem;
+}
+.loop-footnote {
+  display: flex; align-items: flex-start; gap: 0.4rem; margin: 0.85rem 0 0;
+  color: var(--muted); font-size: 0.85rem; line-height: 1.45;
+}
+.participant-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem;
+}
+.participant-card {
+  padding: 1rem; border-radius: 14px; border: 1px solid var(--line); background: #fff;
+}
+.participant-card h4 { margin: 0.4rem 0 0.25rem; font-family: var(--display); }
+.participant-card > p { color: var(--muted); font-size: 0.85rem; margin: 0 0 0.5rem; }
+.participant-card ul { margin: 0; padding-left: 1.1rem; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+.participant-card.buyer { border-top: 3px solid #2563eb; }
+.participant-card.supplier { border-top: 3px solid #0f766e; }
+.participant-card.broker { border-top: 3px solid #7c3aed; }
+.participant-card.center { border-top: 3px solid #9a3412; }
+.participant-card svg { color: inherit; opacity: 0.8; }
+.scene-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: 0.75rem; }
+.scene-grid.compact { grid-template-columns: repeat(5, 1fr); }
+.scene-card {
+  padding: 0.9rem; border-radius: 12px; border: 1px solid var(--line); background: #fafafa;
+}
+.scene-card-top { display: flex; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem; }
+.scene-card p { color: var(--muted); font-size: 0.82rem; margin: 0 0 0.5rem; }
+.scene-roles { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.78rem; color: var(--muted); }
+.scene-roles b { color: var(--brand-2); margin-right: 0.25rem; }
+.deal-card {
+  padding: 1rem 0; border-bottom: 1px solid var(--line);
+}
+.deal-card:last-child { border-bottom: none; }
+.deal-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
+.deal-meta { color: var(--muted); font-size: 0.82rem; margin-top: 0.15rem; }
+.deal-budget-bar {
+  height: 8px; background: #eee7dc; border-radius: 99px; overflow: hidden; margin: 0.55rem 0 0.25rem;
+}
+.deal-budget-bar > div {
+  height: 100%; background: linear-gradient(90deg, #0f766e, #14b8a6); border-radius: 99px;
+}
+.deal-budget-labels {
+  display: flex; justify-content: space-between; gap: 0.5rem; font-size: 0.78rem; color: var(--muted); flex-wrap: wrap;
+}
+.deal-next-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.75rem;
+}
+.deal-next-grid div {
+  padding: 0.55rem 0.7rem; border-radius: 10px; background: #f8fafc; font-size: 0.8rem; color: var(--muted); line-height: 1.4;
+}
+.deal-next-grid b { display: block; color: var(--brand-2); margin-bottom: 0.15rem; }
+.deal-ledger { margin-top: 0.5rem; }
+.deal-mini {
+  padding: 0.75rem 0; border-bottom: 1px solid var(--line);
+}
+.deal-mini:last-child { border-bottom: none; }
+.deal-mini p { margin: 0.25rem 0; font-size: 0.85rem; color: var(--muted); }
+.deal-next { font-size: 0.85rem !important; }
+@media (max-width: 1100px) {
+  .participant-grid { grid-template-columns: 1fr 1fr; }
+  .scene-grid, .scene-grid.compact { grid-template-columns: 1fr 1fr; }
+  .deal-next-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .participant-grid, .scene-grid, .scene-grid.compact { grid-template-columns: 1fr; }
+  .loop-hero-stats { width: 100%; justify-content: space-between; }
+}

@@ -5,7 +5,11 @@
       "name": "长安映缔影视",
       "tier": "核心会员",
       "type": "制作",
-      "tags": ["甜宠", "承制", "西安"],
+      "tags": [
+        "甜宠",
+        "承制",
+        "西安"
+      ],
       "contact": "王敏",
       "phone": "138****6601",
       "status": "有效",
@@ -17,7 +21,11 @@
       "name": "丝路视界传媒",
       "tier": "核心会员",
       "type": "平台/发行",
-      "tags": ["出海", "译制", "多语种"],
+      "tags": [
+        "出海",
+        "译制",
+        "多语种"
+      ],
       "contact": "李哲",
       "phone": "139****2288",
       "status": "有效",
@@ -29,7 +37,11 @@
       "name": "秦岭投放实验室",
       "tier": "专业会员",
       "type": "投放服务",
-      "tags": ["投流", "素材", "数据复盘"],
+      "tags": [
+        "投流",
+        "素材",
+        "数据复盘"
+      ],
       "contact": "赵倩",
       "phone": "137****9012",
       "status": "有效",
@@ -41,7 +53,11 @@
       "name": "未央青年创作社",
       "tier": "观察会员",
       "type": "工作室",
-      "tags": ["校园", "文旅", "竖屏"],
+      "tags": [
+        "校园",
+        "文旅",
+        "竖屏"
+      ],
       "contact": "周宁",
       "phone": "136****4410",
       "status": "待审",
@@ -53,7 +69,11 @@
       "name": "曲江短剧工场",
       "tier": "核心会员",
       "type": "制作",
-      "tags": ["古装", "文旅", "景区联名"],
+      "tags": [
+        "古装",
+        "文旅",
+        "景区联名"
+      ],
       "contact": "孙悦",
       "phone": "135****7720",
       "status": "有效",
@@ -65,7 +85,11 @@
       "name": "碑林剧本研究院",
       "tier": "专业会员",
       "type": "内容研发",
-      "tags": ["剧本", "IP改编", "原创"],
+      "tags": [
+        "剧本",
+        "IP改编",
+        "原创"
+      ],
       "contact": "陈墨",
       "phone": "133****5566",
       "status": "有效",
@@ -77,7 +101,11 @@
       "name": "高新漫动科技",
       "tier": "专业会员",
       "type": "技术/AI",
-      "tags": ["AIGC", "虚拟拍摄", "降本"],
+      "tags": [
+        "AIGC",
+        "虚拟拍摄",
+        "降本"
+      ],
       "contact": "何凯",
       "phone": "186****3301",
       "status": "有效",
@@ -89,7 +117,11 @@
       "name": "浐灞国际译制中心",
       "tier": "核心会员",
       "type": "出海服务",
-      "tags": ["译制", "字幕", "海外发行"],
+      "tags": [
+        "译制",
+        "字幕",
+        "海外发行"
+      ],
       "contact": "Maria·张",
       "phone": "188****9010",
       "status": "有效",
@@ -101,7 +133,11 @@
       "name": "莲湖星图经纪",
       "tier": "专业会员",
       "type": "艺人经纪",
-      "tags": ["达人", "直播", "商单"],
+      "tags": [
+        "达人",
+        "直播",
+        "商单"
+      ],
       "contact": "林薇",
       "phone": "159****4422",
       "status": "有效",
@@ -113,7 +149,11 @@
       "name": "咸阳农文旅影业",
       "tier": "观察会员",
       "type": "制作",
-      "tags": ["乡村振兴", "纪实", "微短剧"],
+      "tags": [
+        "乡村振兴",
+        "纪实",
+        "微短剧"
+      ],
       "contact": "郭强",
       "phone": "132****1188",
       "status": "有效",
@@ -125,7 +165,11 @@
       "name": "航天基地光影社",
       "tier": "专业会员",
       "type": "后期",
-      "tags": ["调色", "特效", "快剪"],
+      "tags": [
+        "调色",
+        "特效",
+        "快剪"
+      ],
       "contact": "宋洋",
       "phone": "177****6633",
       "status": "有效",
@@ -137,7 +181,11 @@
       "name": "古城配音联盟",
       "tier": "专业会员",
       "type": "配音",
-      "tags": ["配音", "多语种", "AI配音"],
+      "tags": [
+        "配音",
+        "多语种",
+        "AI配音"
+      ],
       "contact": "白雪",
       "phone": "150****8899",
       "status": "待审",
@@ -233,9 +281,12 @@
       "org": "长安映缔影视",
       "need": "寻找北美发行渠道与英语配音团队",
       "offer": "可提供 2 部已成片都市逆袭题材",
-      "status": "撮合中",
+      "status": "已成交",
       "owner": "联盟-陈希",
-      "updatedAt": "2026-07-23"
+      "updatedAt": "2026-07-23",
+      "suggestedPartner": "丝路视界传媒",
+      "sceneId": "SCENE-OVERSEAS",
+      "dealId": "DEAL-002"
     },
     {
       "id": "N002",
@@ -244,7 +295,9 @@
       "offer": "素材工厂 + 投流复盘",
       "status": "开放",
       "owner": "联盟-陈希",
-      "updatedAt": "2026-07-23"
+      "updatedAt": "2026-07-23",
+      "suggestedPartner": "长安映缔影视",
+      "sceneId": "SCENE-DIST"
     },
     {
       "id": "N003",
@@ -253,7 +306,9 @@
       "offer": "原创剧本 3 部，已完成分集大纲",
       "status": "开放",
       "owner": "联盟-陈希",
-      "updatedAt": "2026-07-22"
+      "updatedAt": "2026-07-22",
+      "suggestedPartner": "曲江短剧工场",
+      "sceneId": "SCENE-AI"
     },
     {
       "id": "N004",
@@ -262,7 +317,9 @@
       "offer": "英语/西语译制产能 500 分钟/月",
       "status": "撮合中",
       "owner": "联盟-陈希",
-      "updatedAt": "2026-07-21"
+      "updatedAt": "2026-07-21",
+      "suggestedPartner": "丝路视界传媒",
+      "sceneId": "SCENE-OVERSEAS"
     },
     {
       "id": "N005",
@@ -271,7 +328,10 @@
       "offer": "达人矩阵 20+，覆盖美妆/快消",
       "status": "已成交",
       "owner": "联盟-陈希",
-      "updatedAt": "2026-07-18"
+      "updatedAt": "2026-07-18",
+      "suggestedPartner": "秦岭投放实验室",
+      "sceneId": "SCENE-DIST",
+      "dealId": "DEAL-001"
     },
     {
       "id": "N006",
@@ -280,7 +340,9 @@
       "offer": "AI 分镜 + 数字人试拍方案",
       "status": "开放",
       "owner": "联盟-陈希",
-      "updatedAt": "2026-07-20"
+      "updatedAt": "2026-07-20",
+      "suggestedPartner": "高新漫动科技",
+      "sceneId": "SCENE-VENUE"
     },
     {
       "id": "N007",
@@ -289,7 +351,9 @@
       "offer": "文旅题材成片 5 部可联名",
       "status": "撮合中",
       "owner": "联盟-陈希",
-      "updatedAt": "2026-07-19"
+      "updatedAt": "2026-07-19",
+      "suggestedPartner": "曲江短剧工场",
+      "sceneId": "SCENE-VENUE"
     },
     {
       "id": "N008",
@@ -298,7 +362,9 @@
       "offer": "纪实微短剧 12 集",
       "status": "开放",
       "owner": "联盟-陈希",
-      "updatedAt": "2026-07-17"
+      "updatedAt": "2026-07-17",
+      "suggestedPartner": "丝路视界传媒",
+      "sceneId": "SCENE-DIST"
     },
     {
       "id": "N009",
@@ -307,7 +373,9 @@
       "offer": "中英日韩配音团队，48 小时交付",
       "status": "开放",
       "owner": "联盟-陈希",
-      "updatedAt": "2026-07-23"
+      "updatedAt": "2026-07-23",
+      "suggestedPartner": "长安映缔影视",
+      "sceneId": "SCENE-OVERSEAS"
     },
     {
       "id": "N010",
@@ -316,7 +384,9 @@
       "offer": "已出海成片库 30+ 部",
       "status": "关闭",
       "owner": "联盟-陈希",
-      "updatedAt": "2026-07-10"
+      "updatedAt": "2026-07-10",
+      "suggestedPartner": "浐灞国际译制中心",
+      "sceneId": "SCENE-OVERSEAS"
     }
   ],
   "orders": [
@@ -568,7 +638,11 @@
       "type": "影棚",
       "area": "1200㎡",
       "price": "¥3,800/天",
-      "tags": ["古装布景", "绿幕", "灯光齐全"],
+      "tags": [
+        "古装布景",
+        "绿幕",
+        "灯光齐全"
+      ],
       "contact": "张制片",
       "phone": "029-8888-1001",
       "featured": true,
@@ -582,7 +656,11 @@
       "type": "景区",
       "area": "外景",
       "price": "协议价",
-      "tags": ["文旅", "夜景", "人流保障"],
+      "tags": [
+        "文旅",
+        "夜景",
+        "人流保障"
+      ],
       "contact": "文旅运营部",
       "phone": "029-8888-2002",
       "featured": true,
@@ -596,7 +674,11 @@
       "type": "景区",
       "area": "外景",
       "price": "¥2,000/天",
-      "tags": ["汉服", "历史", "开阔"],
+      "tags": [
+        "汉服",
+        "历史",
+        "开阔"
+      ],
       "contact": "李主任",
       "phone": "029-8888-3003",
       "featured": true,
@@ -610,7 +692,11 @@
       "type": "文创园",
       "area": "600㎡",
       "price": "¥1,800/天",
-      "tags": ["现代都市场景", "虚拟拍摄", "AIGC"],
+      "tags": [
+        "现代都市场景",
+        "虚拟拍摄",
+        "AIGC"
+      ],
       "contact": "王场务",
       "phone": "029-8888-4004",
       "featured": false,
@@ -624,7 +710,11 @@
       "type": "演播厅",
       "area": "800㎡",
       "price": "¥2,500/天",
-      "tags": ["路演", "直播", "多机位"],
+      "tags": [
+        "路演",
+        "直播",
+        "多机位"
+      ],
       "contact": "Maria·张",
       "phone": "029-8888-5005",
       "featured": true,
@@ -638,7 +728,11 @@
       "type": "景区",
       "area": "多点位",
       "price": "¥1,200/天",
-      "tags": ["乡村", "民宿", "自然风光"],
+      "tags": [
+        "乡村",
+        "民宿",
+        "自然风光"
+      ],
       "contact": "郭强",
       "phone": "029-8888-6006",
       "featured": false,
@@ -652,7 +746,11 @@
       "type": "景区",
       "area": "外景",
       "price": "协议价",
-      "tags": ["书香", "庭院", "文人题材"],
+      "tags": [
+        "书香",
+        "庭院",
+        "文人题材"
+      ],
       "contact": "陈墨",
       "phone": "029-8888-7007",
       "featured": false,
@@ -666,12 +764,238 @@
       "type": "演播厅",
       "area": "400㎡",
       "price": "¥1,500/天",
-      "tags": ["达人经纪", "竖屏直播", "化妆间"],
+      "tags": [
+        "达人经纪",
+        "竖屏直播",
+        "化妆间"
+      ],
       "contact": "林薇",
       "phone": "029-8888-8008",
       "featured": false,
       "status": "紧张",
       "summary": "达人探店与竖屏直播拍摄，含达人经纪对接服务。"
+    }
+  ],
+  "scenePackages": [
+    {
+      "id": "SCENE-OVERSEAS",
+      "name": "出海译制履约包",
+      "tokens": 80000,
+      "center": "出海",
+      "brokerFeeRate": 0.08,
+      "supplierShare": 0.1,
+      "desc": "多语种译制、合规审查与海外选品诊断",
+      "forBuyer": "按项目锁定额度，译制节点清晰可见",
+      "forSupplier": "交付后获得激励 Token，沉淀履约信用",
+      "forBroker": "成交即计提撮合服务费",
+      "forCenter": "出海中心按任务扣费，避免超支"
+    },
+    {
+      "id": "SCENE-APPROVAL",
+      "name": "备案预检履约包",
+      "tokens": 20000,
+      "center": "审批",
+      "brokerFeeRate": 0.06,
+      "supplierShare": 0.05,
+      "desc": "材料预检、风险会诊与送审建议",
+      "forBuyer": "先预检再送审，少走冤枉路",
+      "forSupplier": "剧本/材料协作方可获微量激励",
+      "forBroker": "促成预检服务并记录链路",
+      "forCenter": "审批中心每次预检提交扣费"
+    },
+    {
+      "id": "SCENE-DIST",
+      "name": "投流冷启动包",
+      "tokens": 50000,
+      "center": "发行投流",
+      "brokerFeeRate": 0.07,
+      "supplierShare": 0.12,
+      "desc": "新剧体检、素材工厂与冷启动复盘",
+      "forBuyer": "预算与 ROI 同屏，知道钱花在哪",
+      "forSupplier": "投放实验室按效果结算激励",
+      "forBroker": "对接投放产能并跟进阶段",
+      "forCenter": "发行中心按复盘任务扣减"
+    },
+    {
+      "id": "SCENE-AI",
+      "name": "剧本/素材 AI 包",
+      "tokens": 30000,
+      "center": "AI",
+      "brokerFeeRate": 0.05,
+      "supplierShare": 0.08,
+      "desc": "分集大纲、素材产能与合规辅助",
+      "forBuyer": "按产线用量扣费，可随时补预算",
+      "forSupplier": "AIGC 能力方共享激励",
+      "forBroker": "推荐垂类模型与产能方",
+      "forCenter": "AI 中心跑批即扣"
+    },
+    {
+      "id": "SCENE-VENUE",
+      "name": "场地协调包",
+      "tokens": 15000,
+      "center": "联盟",
+      "brokerFeeRate": 0.1,
+      "supplierShare": 0.15,
+      "desc": "影棚/景区排期协调与联名拍摄支持",
+      "forBuyer": "锁档期前先锁协调预算",
+      "forSupplier": "场地方/协调方获得激励",
+      "forBroker": "场地撮合费清晰可查",
+      "forCenter": "联盟侧协调工单跟进"
+    }
+  ],
+  "orgWallets": [
+    {
+      "org": "长安映缔影视",
+      "balance": 160000,
+      "role": "mixed"
+    },
+    {
+      "org": "丝路视界传媒",
+      "balance": 95000,
+      "role": "mixed"
+    },
+    {
+      "org": "秦岭投放实验室",
+      "balance": 74160,
+      "role": "supplier"
+    },
+    {
+      "org": "浐灞国际译制中心",
+      "balance": 88000,
+      "role": "supplier"
+    },
+    {
+      "org": "曲江短剧工场",
+      "balance": 54000,
+      "role": "buyer"
+    },
+    {
+      "org": "碑林剧本研究院",
+      "balance": 42000,
+      "role": "buyer"
+    },
+    {
+      "org": "高新漫动科技",
+      "balance": 61000,
+      "role": "supplier"
+    },
+    {
+      "org": "莲湖星图经纪",
+      "balance": 38000,
+      "role": "buyer"
+    },
+    {
+      "org": "咸阳农文旅影业",
+      "balance": 30000,
+      "role": "buyer"
+    },
+    {
+      "org": "古城配音联盟",
+      "balance": 45000,
+      "role": "supplier"
+    },
+    {
+      "org": "联盟秘书处",
+      "balance": 19860,
+      "role": "broker"
+    }
+  ],
+  "deals": [
+    {
+      "id": "DEAL-001",
+      "matchId": "N005",
+      "title": "莲湖星图经纪 × 秦岭投放实验室",
+      "sceneId": "SCENE-DIST",
+      "sceneName": "投流冷启动包",
+      "buyerOrg": "莲湖星图经纪",
+      "supplierOrg": "秦岭投放实验室",
+      "broker": "联盟秘书处",
+      "center": "发行投流",
+      "status": "履约中",
+      "budget": 50000,
+      "spent": 18000,
+      "brokerEarned": 1260,
+      "supplierEarned": 2160,
+      "orderId": "WO-DEAL-001",
+      "createdAt": "2026-07-18",
+      "updatedAt": "2026-07-23",
+      "nextActionBuyer": "履约进行中，关注剩余预算与素材效果",
+      "nextActionSupplier": "继续交付冷启动复盘节点",
+      "nextActionBroker": "盯防逾期与双方沟通摩擦",
+      "nextActionCenter": "发行中心继续按任务扣费推进",
+      "ledger": [
+        {
+          "id": "DEAL-001-L04",
+          "type": "供给激励",
+          "amount": 2160,
+          "actor": "秦岭投放实验室",
+          "actorRole": "supplier",
+          "note": "供给方履约激励 12%",
+          "createdAt": "2026-07-23"
+        },
+        {
+          "id": "DEAL-001-L03",
+          "type": "撮合费",
+          "amount": 1260,
+          "actor": "联盟秘书处",
+          "actorRole": "broker",
+          "note": "从本次履约计提撮合服务费 7%",
+          "createdAt": "2026-07-23"
+        },
+        {
+          "id": "DEAL-001-L02",
+          "type": "消耗",
+          "amount": -18000,
+          "actor": "投流-苏晚",
+          "actorRole": "center",
+          "model": "bytedance/doubao-pro",
+          "note": "冷启动素材复盘与策略调整",
+          "createdAt": "2026-07-23"
+        },
+        {
+          "id": "DEAL-001-L01",
+          "type": "开预算",
+          "amount": 50000,
+          "actor": "联盟秘书处",
+          "actorRole": "broker",
+          "note": "成交开立「投流冷启动包」，锁定项目预算",
+          "createdAt": "2026-07-18"
+        }
+      ]
+    },
+    {
+      "id": "DEAL-002",
+      "matchId": "N001",
+      "title": "长安映缔影视 × 丝路视界传媒",
+      "sceneId": "SCENE-OVERSEAS",
+      "sceneName": "出海译制履约包",
+      "buyerOrg": "长安映缔影视",
+      "supplierOrg": "丝路视界传媒",
+      "broker": "联盟秘书处",
+      "center": "出海",
+      "status": "预算已开",
+      "budget": 80000,
+      "spent": 0,
+      "brokerEarned": 0,
+      "supplierEarned": 0,
+      "orderId": "WO-DEAL-002",
+      "createdAt": "2026-07-23",
+      "updatedAt": "2026-07-23",
+      "nextActionBuyer": "确认项目预算并关注履约节点；余额不足时可一键补购场景包",
+      "nextActionSupplier": "按约定准备英语配音与北美渠道方案",
+      "nextActionBroker": "跟进双方对接节奏，必要时升级中心工单优先级",
+      "nextActionCenter": "出海中心开始履约并按任务扣费",
+      "ledger": [
+        {
+          "id": "DEAL-002-L01",
+          "type": "开预算",
+          "amount": 80000,
+          "actor": "联盟秘书处",
+          "actorRole": "broker",
+          "note": "成交开立「出海译制履约包」，锁定项目预算",
+          "createdAt": "2026-07-23"
+        }
+      ]
     }
   ]
 }

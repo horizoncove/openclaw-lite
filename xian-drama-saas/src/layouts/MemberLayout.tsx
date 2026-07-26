@@ -7,6 +7,7 @@ import {
   LifeBuoy,
   Film,
   Sparkles,
+  Wallet,
   LogOut,
 } from "lucide-react";
 import { useAllianceStore } from "../store/allianceStore";
@@ -19,6 +20,7 @@ const nav = [
   { to: "/alliance/member/needs", label: "发布供需", icon: Megaphone },
   { to: "/alliance/member/works", label: "作品展示", icon: Film },
   { to: "/alliance/member/discover", label: "推荐发现", icon: Sparkles },
+  { to: "/alliance/member/deals", label: "项目钱包", icon: Wallet },
   { to: "/alliance/member/services", label: "服务申请", icon: LifeBuoy },
 ];
 
@@ -29,6 +31,7 @@ const titles: Record<string, string> = {
   "/alliance/member/needs": "供需发布",
   "/alliance/member/works": "会员作品展示",
   "/alliance/member/discover": "作品与场地推荐",
+  "/alliance/member/deals": "我的项目与钱包",
   "/alliance/member/services": "服务申请与进度",
 };
 

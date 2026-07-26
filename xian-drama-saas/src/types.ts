@@ -52,6 +52,72 @@ export interface MatchNeed {
   status: "开放" | "撮合中" | "已成交" | "关闭";
   owner: string;
   updatedAt: string;
+  /** 建议对接的供给方 */
+  suggestedPartner?: string;
+  /** 关联场景包 */
+  sceneId?: string;
+  /** 成交后的项目 Deal */
+  dealId?: string;
+}
+
+export type DealStatus = "预算已开" | "履约中" | "已结算" | "暂停";
+export type DealLedgerType = "开预算" | "消耗" | "撮合费" | "供给激励" | "补预算" | "退款";
+export type ParticipantRole = "buyer" | "supplier" | "broker" | "center";
+
+export interface DealLedgerEntry {
+  id: string;
+  type: DealLedgerType;
+  amount: number;
+  actor: string;
+  actorRole: ParticipantRole;
+  model?: string;
+  note: string;
+  createdAt: string;
+}
+
+export interface DealProject {
+  id: string;
+  matchId: string;
+  title: string;
+  sceneId: string;
+  sceneName: string;
+  buyerOrg: string;
+  supplierOrg: string;
+  broker: string;
+  center: string;
+  status: DealStatus;
+  budget: number;
+  spent: number;
+  brokerEarned: number;
+  supplierEarned: number;
+  orderId?: string;
+  createdAt: string;
+  updatedAt: string;
+  nextActionBuyer: string;
+  nextActionSupplier: string;
+  nextActionBroker: string;
+  nextActionCenter: string;
+  ledger: DealLedgerEntry[];
+}
+
+export interface ScenePackage {
+  id: string;
+  name: string;
+  tokens: number;
+  center: string;
+  brokerFeeRate: number;
+  supplierShare: number;
+  desc: string;
+  forBuyer: string;
+  forSupplier: string;
+  forBroker: string;
+  forCenter: string;
+}
+
+export interface OrgWallet {
+  org: string;
+  balance: number;
+  role: "buyer" | "supplier" | "broker" | "mixed";
 }
 
 export type WorkGenre = "甜宠" | "逆袭" | "古装" | "悬疑" | "文旅" | "都市" | "校园";
@@ -102,6 +168,7 @@ export interface WorkOrder {
   createdAt: string;
   dueAt: string;
   summary: string;
+  dealId?: string;
 }
 
 export interface ApprovalCase {
@@ -160,11 +227,14 @@ export interface AllianceState {
   orders: WorkOrder[];
   works: MemberWork[];
   venues: Venue[];
+  deals: DealProject[];
+  orgWallets: OrgWallet[];
+  scenePackages: ScenePackage[];
 }
 
 export type TokenModelCategory = "chat" | "embedding" | "image" | "video";
 export type TokenModelStatus = "可用" | "限流" | "维护";
-export type TokenTxType = "充值" | "消耗" | "退款";
+export type TokenTxType = "充值" | "消耗" | "退款" | "项目划拨" | "激励到账";
 
 export interface TokenModel {
   id: string;
@@ -196,6 +266,7 @@ export interface TokenTransaction {
   model?: string;
   note: string;
   createdAt: string;
+  dealId?: string;
 }
 
 export interface TokenWallet {

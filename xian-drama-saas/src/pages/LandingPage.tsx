@@ -75,7 +75,7 @@ export default function LandingPage() {
         </a>
       </section>
 
-      <footer className="landing-foot">西安微短剧产业服务中心 · 双入口 SaaS V1.4</footer>
+      <footer className="landing-foot">西安微短剧产业服务中心 · 双入口 SaaS V1.6 · 撮合×Token 生态闭环</footer>
     </div>
   );
 }

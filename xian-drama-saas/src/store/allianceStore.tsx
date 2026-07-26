@@ -39,6 +39,9 @@ type AllianceStore = AllianceState & {
   upsertWork: (w: MemberWork) => Promise<void>;
   updateWork: (id: string, patch: Partial<MemberWork>) => Promise<void>;
   updateVenue: (id: string, patch: Partial<Venue>) => Promise<void>;
+  closeDeal: (matchId: string, opts?: { supplierOrg?: string; sceneId?: string }) => Promise<void>;
+  consumeDeal: (dealId: string, amount: number, note?: string, model?: string) => Promise<void>;
+  topUpWallet: (org: string, amount: number) => Promise<void>;
   resetDemo: () => Promise<void>;
 };
 
@@ -237,6 +240,87 @@ export function AllianceStoreProvider({ children }: { children: ReactNode }) {
             ...s,
             venues: s.venues.map((x) => (x.id === id ? { ...x, ...patch } : x)),
           }));
+        }
+      },
+      closeDeal: async (matchId, opts) => {
+        if (apiOnline) {
+          const data = await allianceApi.deals.close({ matchId, ...opts });
+          setState((s) => ({ ...data, user: s.user }));
+        } else {
+          const { buildDealFromMatch, findScene, debitOrgWallet } = await import("../utils/dealLoop");
+          setState((s) => {
+            const match = s.matches.find((m) => m.id === matchId);
+            if (!match || match.dealId) return s;
+            const scene = findScene(opts?.sceneId || match.sceneId || "SCENE-OVERSEAS");
+            if (!scene) return s;
+            const partner = opts?.supplierOrg || match.suggestedPartner || "丝路视界传媒";
+            const wallets = debitOrgWallet(s.orgWallets, match.org, scene.tokens);
+            if (!wallets) return s;
+            const { deal, order } = buildDealFromMatch({
+              match,
+              supplierOrg: partner,
+              sceneId: scene.id,
+              dealIndex: s.deals.length + 1,
+            });
+            return {
+              ...s,
+              orgWallets: wallets,
+              deals: [deal, ...s.deals],
+              orders: [order, ...s.orders],
+              matches: s.matches.map((m) =>
+                m.id === matchId
+                  ? {
+                      ...m,
+                      status: "已成交" as const,
+                      dealId: deal.id,
+                      suggestedPartner: partner,
+                      sceneId: scene.id,
+                      updatedAt: new Date().toISOString().slice(0, 10),
+                    }
+                  : m
+              ),
+            };
+          });
+        }
+      },
+      consumeDeal: async (dealId, amount, note, model) => {
+        if (apiOnline) {
+          const data = await allianceApi.deals.consume(dealId, {
+            amount,
+            note,
+            model,
+            actor: state.user?.name,
+          });
+          setState((s) => ({ ...data, user: s.user }));
+        } else {
+          const { applyConsume, creditOrgWallet } = await import("../utils/dealLoop");
+          setState((s) => {
+            const deal = s.deals.find((d) => d.id === dealId);
+            if (!deal) return s;
+            const beforeB = deal.brokerEarned;
+            const beforeS = deal.supplierEarned;
+            const updated = applyConsume(deal, amount, state.user?.name ?? "中心专员", note ?? "履约扣费", model);
+            let wallets = s.orgWallets;
+            const bd = updated.brokerEarned - beforeB;
+            const sd = updated.supplierEarned - beforeS;
+            if (bd > 0) wallets = creditOrgWallet(wallets, "联盟秘书处", bd, "broker");
+            if (sd > 0) wallets = creditOrgWallet(wallets, deal.supplierOrg, sd, "supplier");
+            return {
+              ...s,
+              deals: s.deals.map((d) => (d.id === dealId ? updated : d)),
+              orgWallets: wallets,
+            };
+          });
+        }
+      },
+      topUpWallet: async (org, amount) => {
+        if (apiOnline) {
+          await allianceApi.wallets.topup({ org, amount });
+          const data = await allianceApi.state();
+          setState((s) => ({ ...data, user: s.user }));
+        } else {
+          const { topUpOrgWallet } = await import("../utils/dealLoop");
+          setState((s) => ({ ...s, orgWallets: topUpOrgWallet(s.orgWallets, org, amount) }));
         }
       },
       resetDemo: async () => {

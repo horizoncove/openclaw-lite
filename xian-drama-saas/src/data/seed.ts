@@ -2,8 +2,17 @@ import type { AllianceState, CenterState } from "../types";
 import allianceJson from "../../server/data/alliance-seed.json";
 import centerJson from "../../server/data/center-seed.json";
 
-export const allianceSeed = (): Omit<AllianceState, "user"> =>
-  structuredClone(allianceJson) as Omit<AllianceState, "user">;
+export const allianceSeed = (): Omit<AllianceState, "user"> => {
+  const data = structuredClone(allianceJson) as Omit<AllianceState, "user">;
+  return {
+    ...data,
+    deals: data.deals ?? [],
+    orgWallets: data.orgWallets ?? [],
+    scenePackages: data.scenePackages ?? [],
+    works: data.works ?? [],
+    venues: data.venues ?? [],
+  };
+};
 
 export const centerSeed = (): Omit<CenterState, "user"> =>
   structuredClone(centerJson) as Omit<CenterState, "user">;
