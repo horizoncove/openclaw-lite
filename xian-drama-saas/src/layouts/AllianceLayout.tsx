@@ -9,6 +9,7 @@ import {
   Film,
   GitBranch,
   BookOpen,
+  Wallet,
   LogOut,
   RotateCcw,
 } from "lucide-react";
@@ -21,6 +22,7 @@ const nav = [
   { to: "/alliance/console/events", label: "活动运营", icon: CalendarDays },
   { to: "/alliance/console/matching", label: "供需撮合", icon: Handshake },
   { to: "/alliance/console/loop", label: "生态闭环", icon: GitBranch },
+  { to: "/alliance/console/wallets", label: "托管钱包", icon: Wallet },
   { to: "/alliance/console/sop", label: "流程 SOP", icon: BookOpen },
   { to: "/alliance/console/showcase", label: "内容推荐", icon: Film },
   { to: "/alliance/console/orders", label: "联盟工单", icon: ClipboardList },
@@ -33,6 +35,7 @@ const titles: Record<string, string> = {
   "/alliance/console/events": "活动运营",
   "/alliance/console/matching": "供需撮合",
   "/alliance/console/loop": "生态闭环 · 参与者视角",
+  "/alliance/console/wallets": "托管钱包 · 可用/锁定/暂挂",
   "/alliance/console/sop": "全流程 SOP 速查",
   "/alliance/console/showcase": "作品与场地推荐",
   "/alliance/console/orders": "联盟工单",

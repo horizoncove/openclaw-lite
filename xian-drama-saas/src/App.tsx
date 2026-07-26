@@ -23,7 +23,10 @@ import MemberDiscoverPage from "./pages/alliance/member/MemberDiscoverPage";
 import ShowcasePage from "./pages/alliance/ShowcasePage";
 import EcosystemLoopPage from "./pages/alliance/EcosystemLoopPage";
 import SopGuidePage from "./pages/alliance/SopGuidePage";
+import WalletsPage from "./pages/alliance/WalletsPage";
 import MemberDealsPage from "./pages/alliance/member/MemberDealsPage";
+import MemberWalletsPage from "./pages/alliance/member/MemberWalletsPage";
+import WalletsRedirect from "./pages/WalletsRedirect";
 import CenterDashboard from "./pages/centers/CenterDashboard";
 import CenterPanoramaPage from "./pages/centers/CenterPanoramaPage";
 import CenterOrdersPage from "./pages/centers/CenterOrdersPage";
@@ -51,6 +54,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/wallets" element={<WalletsRedirect />} />
 
       <Route path="/alliance/login" element={<AllianceLoginPage />} />
       <Route element={<RequireAllianceAuth />}>
@@ -60,6 +64,7 @@ export default function App() {
           <Route path="events" element={<EventsPage />} />
           <Route path="matching" element={<MatchingPage />} />
           <Route path="loop" element={<EcosystemLoopPage />} />
+          <Route path="wallets" element={<WalletsPage />} />
           <Route path="sop" element={<SopGuidePage />} />
           <Route path="showcase" element={<ShowcasePage />} />
           <Route path="orders" element={<AllianceOrdersPage />} />
@@ -74,6 +79,7 @@ export default function App() {
           <Route path="works" element={<MemberWorksPage />} />
           <Route path="discover" element={<MemberDiscoverPage />} />
           <Route path="deals" element={<MemberDealsPage />} />
+          <Route path="wallets" element={<MemberWalletsPage />} />
         </Route>
       </Route>
 

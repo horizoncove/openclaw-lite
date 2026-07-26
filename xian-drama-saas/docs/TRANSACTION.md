@@ -184,7 +184,8 @@ MVP 用「下一步文案 + 流水」承载信任；下一迭代可加评分与�
 | 阶段/托管/机制/结算 | `src/utils/dealLoop.ts`、`server/dealLoop.mjs` |
 | API | `POST /alliance/deals/close`、`/bids`、`/confirm`、`/consume`、`/settle` |
 | 讲解页 | `/alliance/console/loop` 交易本质区 |
-| 会员感知 | `/alliance/member/needs` 发布机制+应征；`/deals` 钱包 |
+| 会员感知 | `/alliance/member/needs` 发布机制+应征；`/wallets` 托管钱包；`/deals` 项目 |
+| 钱包中心 | `/alliance/console/wallets`、`/alliance/member/wallets`、快捷 `/wallets` |
 
 ---
 

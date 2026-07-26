@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { Coins, Handshake, Package } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Coins, Handshake, Package, Wallet } from "lucide-react";
 import { useAllianceStore } from "../../../store/allianceStore";
 import { findMemberOrg } from "../../../utils/memberContext";
 
@@ -40,14 +41,20 @@ export default function MemberDealsPage() {
       <div className="member-card" style={{ marginTop: "1rem" }}>
         <div className="showcase-toolbar">
           <div>
-            <h3>企业钱包</h3>
+            <h3>企业钱包（摘要）</h3>
             <p className="member-page-intro" style={{ margin: 0 }}>
-              余额用于开立场景包。不足时一键补额，再去成交或履约。
+              可用 {((wallet?.balance ?? 0)).toLocaleString()} · 锁定 {((wallet?.locked ?? 0)).toLocaleString()}。
+              完整对账、暂挂与流水见托管钱包中心。
             </p>
           </div>
-          <button className="btn btn-primary" onClick={() => topUpWallet(org.name, 50000)}>
-            <Coins size={15} /> 补充 50k Tokens
-          </button>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Link className="btn btn-secondary" to="/alliance/member/wallets">
+              <Wallet size={15} /> 托管钱包
+            </Link>
+            <button className="btn btn-primary" onClick={() => topUpWallet(org.name, 50000)}>
+              <Coins size={15} /> 补充 50k
+            </button>
+          </div>
         </div>
       </div>
 

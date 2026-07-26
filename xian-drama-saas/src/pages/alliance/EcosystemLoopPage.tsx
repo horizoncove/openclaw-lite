@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Handshake, Building2, Users, Bot, Coins, Scale } from "lucide-react";
 import { useAllianceStore } from "../../store/allianceStore";
 import { explainSplit, findScene, PAY_MECHANISMS } from "../../utils/dealLoop";
@@ -320,6 +321,11 @@ export default function EcosystemLoopPage() {
               </strong>
             </div>
           ))}
+          <div style={{ marginTop: "0.75rem" }}>
+            <Link className="btn btn-secondary" to="/alliance/console/wallets">
+              打开托管钱包中心
+            </Link>
+          </div>
         </div>
       </div>
     </div>

@@ -42,10 +42,13 @@ export default function MemberHomePage() {
       </section>
 
       <div className="member-quick-grid">
-        <Link to="/alliance/member/deals" className="member-quick-card">
+        <Link to="/alliance/member/wallets" className="member-quick-card">
           <Wallet size={22} />
-          <strong>项目钱包</strong>
-          <span>{((wallet?.balance ?? 0) / 1000).toFixed(0)}k 余额</span>
+          <strong>托管钱包</strong>
+          <span>
+            可用 {((wallet?.balance ?? 0) / 1000).toFixed(0)}k · 锁{" "}
+            {(((wallet?.locked ?? 0) / 1000) || 0).toFixed(0)}k
+          </span>
         </Link>
         <Link to="/alliance/member/works" className="member-quick-card">
           <Film size={22} />

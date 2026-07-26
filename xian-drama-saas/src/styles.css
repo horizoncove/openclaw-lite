@@ -730,13 +730,69 @@ tr:hover td { background: rgba(154, 52, 18, 0.03); }
 }
 .milestone-chip.active { background: #ffedd5; color: #9a3412; border-color: #fed7aa; }
 .milestone-chip.done { background: #dcfce7; color: #166534; border-color: #86efac; }
+
+/* 托管钱包中心 */
+.wallet-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+.wallet-metric {
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.wallet-metric span { font-size: 0.8rem; color: var(--muted); display: flex; align-items: center; gap: 0.25rem; }
+.wallet-metric strong { font-size: 1.35rem; letter-spacing: -0.02em; }
+.wallet-metric small { font-size: 0.75rem; color: var(--muted); }
+.wallet-metric.free { background: linear-gradient(160deg, #ecfdf5, #fff); border-color: #99f6e4; }
+.wallet-metric.locked { background: linear-gradient(160deg, #fff7ed, #fff); border-color: #fed7aa; }
+.wallet-metric.held { background: linear-gradient(160deg, #fef3c7, #fff); border-color: #fcd34d; }
+.wallet-metric.earned { background: linear-gradient(160deg, #eff6ff, #fff); border-color: #bfdbfe; }
+.wallet-mech-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+}
+.wallet-mech-chip {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.82rem;
+  background: #fafaf9;
+}
+.wallet-mech-chip strong { font-size: 0.95rem; }
+.wallet-unfunded {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: #9a3412;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+}
+.wallet-row-active td { background: #ecfdf5; }
+.wallet-focus .showcase-toolbar { margin-bottom: 0.85rem; }
+.wallet-member-hero { margin-bottom: 0; }
+
 @media (max-width: 1100px) {
   .participant-grid { grid-template-columns: 1fr 1fr; }
   .scene-grid, .scene-grid.compact { grid-template-columns: 1fr 1fr; }
   .deal-next-grid { grid-template-columns: 1fr; }
   .tx-pipeline { grid-template-columns: repeat(3, 1fr); }
+  .wallet-metric-grid { grid-template-columns: 1fr 1fr; }
+  .wallet-mech-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 700px) {
   .participant-grid, .scene-grid, .scene-grid.compact { grid-template-columns: 1fr; }
   .loop-hero-stats { width: 100%; justify-content: space-between; }
+  .wallet-metric-grid { grid-template-columns: 1fr; }
 }
