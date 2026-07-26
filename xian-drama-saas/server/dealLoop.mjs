@@ -268,6 +268,7 @@ export function buildDealFromMatch({
 
 export function applyConsume(deal, amount, actor, note, model, scene) {
   if (deal.status === "待确认" || deal.phase === "待双边确认") return deal;
+  if (deal.status === "暂停") return deal;
   if (deal.status === "已结算" || deal.phase === "已闭环") return deal;
   const pay = payMeta(deal.payMechanism);
   const spend = Math.min(Number(amount) || 0, Math.max(0, deal.escrow ?? 0));

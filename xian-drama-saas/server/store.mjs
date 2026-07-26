@@ -38,6 +38,7 @@ function mergeAllianceExtras(base, seed) {
     deals: base.deals?.length ? base.deals : seed.deals ?? [],
     orgWallets: base.orgWallets?.length ? base.orgWallets : seed.orgWallets ?? [],
     bids: base.bids?.length ? base.bids : seed.bids ?? [],
+    disputes: base.disputes?.length ? base.disputes : seed.disputes ?? [],
     scenePackages: seed.scenePackages ?? base.scenePackages ?? [],
   };
 }
@@ -216,6 +217,7 @@ async function persistAllianceLoop(state) {
     await repo.saveAllianceExtras("works", state.works ?? []);
     await repo.saveAllianceExtras("venues", state.venues ?? []);
     await repo.saveAllianceExtras("bids", state.bids ?? []);
+    await repo.saveAllianceExtras("disputes", state.disputes ?? []);
     for (const m of state.matches ?? []) await repo.patchMatch(m.id, m);
     for (const o of state.orders ?? []) {
       if (o.center === "联盟" || o.dealId) await repo.upsertOrder(o);
@@ -227,6 +229,7 @@ async function persistAllianceLoop(state) {
     db.matches = state.matches;
     db.orders = state.orders;
     db.bids = state.bids ?? [];
+    db.disputes = state.disputes ?? [];
     jsonDb.saveDb("alliance", db);
   }
 }
@@ -418,6 +421,7 @@ export async function consumeDealTokens({ dealId, amount, actor, note, model }) 
   if (!deal) throw new Error("项目不存在");
   if (deal.status === "已结算" || deal.phase === "已闭环") throw new Error("项目已结算");
   if (deal.status === "待确认") throw new Error("双方尚未确认，托管未生效");
+  if (deal.status === "暂停") throw new Error("项目争议暂停中，须仲裁结案后才能继续履约");
 
   const scene = findScene(state.scenePackages, deal.sceneId);
   let want = Number(amount) || 0;
@@ -493,6 +497,7 @@ export async function settleDealProject(dealId) {
   const deal = state.deals.find((d) => d.id === dealId);
   if (!deal) throw new Error("项目不存在");
   if (deal.phase === "已闭环") throw new Error("项目已闭环");
+  if (deal.status === "暂停") throw new Error("争议暂停中，请先完成仲裁再结算");
 
   const { deal: updated, refund, releasedBroker, releasedSupplier } = settleDeal(deal);
   let wallets = state.orgWallets;
@@ -505,6 +510,199 @@ export async function settleDealProject(dealId) {
     o.dealId === dealId ? { ...o, status: "完结" } : o,
   );
   await persistAllianceLoop({ ...state, deals, orgWallets: wallets, orders });
+  return getAllianceState();
+}
+
+export async function raiseDispute({ dealId, raisedBy, raisedRole = "buyer", reason, claimTokens }) {
+  const { today } = await import("./dealLoop.mjs");
+  const state = await getAllianceState();
+  const deal = state.deals.find((d) => d.id === dealId);
+  if (!deal) throw new Error("项目不存在");
+  if (deal.phase === "已闭环" || deal.status === "已结算") throw new Error("已闭环项目不可提起争议");
+  if (deal.status === "暂停") throw new Error("已有进行中的争议");
+  const open = (state.disputes || []).find((d) => d.dealId === dealId && d.status === "调解中");
+  if (open) throw new Error("该项目已有调解中争议");
+
+  const claim = Math.max(0, Number(claimTokens) || 0);
+  const disputeId = `DSP-${String((state.disputes?.length || 0) + 1).padStart(3, "0")}`;
+  const orderId = `AL-DSP-${disputeId.slice(4)}`;
+  const createdAt = today();
+
+  const order = {
+    id: orderId,
+    product: `【争议】${deal.id} ${deal.sceneName}`,
+    center: "联盟",
+    org: deal.buyerOrg,
+    contact: raisedBy || deal.buyerOrg,
+    priority: "高",
+    status: "处理中",
+    assignee: "联盟-陈希",
+    createdAt,
+    dueAt: createdAt,
+    summary: reason || "履约争议待调解",
+    dealId: deal.id,
+  };
+
+  const dispute = {
+    id: disputeId,
+    dealId,
+    raisedBy: raisedBy || deal.buyerOrg,
+    raisedRole,
+    reason: reason || "交付或分账争议",
+    claimTokens: claim,
+    status: "调解中",
+    orderId,
+    createdAt,
+    updatedAt: createdAt,
+  };
+
+  const ledger = [
+    {
+      id: `${deal.id}-L${String((deal.ledger?.length || 0) + 1).padStart(2, "0")}`,
+      type: "仲裁",
+      amount: 0,
+      actor: raisedBy || deal.buyerOrg,
+      actorRole: raisedRole,
+      note: `提起争议 ${disputeId}：${dispute.reason}${claim ? ` · 诉请 ${claim.toLocaleString()} Tokens` : ""}`,
+      createdAt,
+    },
+    ...(deal.ledger || []),
+  ];
+
+  const updatedDeal = {
+    ...deal,
+    status: "暂停",
+    updatedAt: createdAt,
+    ledger,
+    nextActionBuyer: "争议调解中，补充证据并等待秘书处裁决",
+    nextActionSupplier: "争议调解中，准备交付证据与说明",
+    nextActionBroker: `主持调解 ${disputeId}；必要时出具 Token 调整裁定`,
+    nextActionCenter: "项目已暂停，停止新的托管消耗",
+  };
+
+  await persistAllianceLoop({
+    ...state,
+    deals: state.deals.map((d) => (d.id === dealId ? updatedDeal : d)),
+    disputes: [dispute, ...(state.disputes || [])],
+    orders: [order, ...state.orders],
+  });
+  return getAllianceState();
+}
+
+export async function decideDispute({
+  disputeId,
+  decision,
+  decidedBy = "联盟秘书处",
+  adjustBuyerRefund = 0,
+  adjustSupplierClawback = 0,
+}) {
+  const { today, unlockEscrow, creditWallet } = await import("./dealLoop.mjs");
+  const state = await getAllianceState();
+  const dispute = (state.disputes || []).find((d) => d.id === disputeId);
+  if (!dispute) throw new Error("争议不存在");
+  if (dispute.status !== "调解中") throw new Error("争议已处理");
+
+  const deal = state.deals.find((d) => d.id === dispute.dealId);
+  if (!deal) throw new Error("关联项目不存在");
+
+  const refund = Math.min(Math.max(0, Number(adjustBuyerRefund) || 0), deal.escrow || 0);
+  let clawback = Math.max(0, Number(adjustSupplierClawback) || 0);
+  const held = deal.heldSupplier || 0;
+  const earned = deal.supplierEarned || 0;
+  const fromHeld = Math.min(clawback, held);
+  let fromEarned = Math.min(Math.max(0, clawback - fromHeld), earned);
+  clawback = fromHeld + fromEarned;
+
+  let wallets = state.orgWallets.map((w) => ({ ...w, locked: w.locked ?? 0 }));
+  if (refund > 0) wallets = unlockEscrow(wallets, deal.buyerOrg, refund);
+
+  if (fromEarned > 0) {
+    const idx = wallets.findIndex((w) => w.org === deal.supplierOrg);
+    if (idx >= 0) {
+      const take = Math.min(fromEarned, wallets[idx].balance);
+      wallets[idx].balance -= take;
+      // 扣回部分退入买方可用
+      wallets = creditWallet(wallets, deal.buyerOrg, take, "buyer");
+      fromEarned = take;
+    } else {
+      fromEarned = 0;
+    }
+  }
+
+  const createdAt = today();
+  const ledger = [...(deal.ledger || [])];
+  if (refund > 0) {
+    ledger.unshift({
+      id: `${deal.id}-L${String(ledger.length + 1).padStart(2, "0")}`,
+      type: "仲裁",
+      amount: refund,
+      actor: decidedBy,
+      actorRole: "broker",
+      note: `仲裁裁决 · 托管退回买方 ${refund.toLocaleString()}`,
+      createdAt,
+    });
+  }
+  if (fromHeld > 0 || fromEarned > 0) {
+    ledger.unshift({
+      id: `${deal.id}-L${String(ledger.length + 1).padStart(2, "0")}`,
+      type: "仲裁",
+      amount: -(fromHeld + fromEarned),
+      actor: decidedBy,
+      actorRole: "broker",
+      note: `仲裁裁决 · 扣回供给激励 暂挂${fromHeld.toLocaleString()}/已入账${fromEarned.toLocaleString()}`,
+      createdAt,
+    });
+  }
+  ledger.unshift({
+    id: `${deal.id}-L${String(ledger.length + 1).padStart(2, "0")}`,
+    type: "仲裁",
+    amount: 0,
+    actor: decidedBy,
+    actorRole: "broker",
+    note: `争议 ${disputeId} 裁决：${decision || "按证据部分支持买方，恢复履约"}`,
+    createdAt,
+  });
+
+  const resumeStatus = deal.spent > 0 ? "履约中" : "预算已开";
+  const resumePhase = deal.spent > 0 ? "履约中" : "托管中";
+  const updatedDeal = {
+    ...deal,
+    escrow: Math.max(0, (deal.escrow || 0) - refund),
+    heldSupplier: Math.max(0, held - fromHeld),
+    supplierEarned: Math.max(0, earned - fromEarned),
+    status: resumeStatus,
+    phase: resumePhase,
+    updatedAt: createdAt,
+    ledger,
+    nextActionBuyer: "仲裁已执行，可继续验收或申请结算",
+    nextActionSupplier: "按裁决调整后继续交付剩余节点",
+    nextActionBroker: "监督裁决执行，推动收尾结算",
+    nextActionCenter: "可恢复从托管池履约扣费",
+  };
+
+  const updatedDispute = {
+    ...dispute,
+    status: "已执行",
+    decision: decision || "部分支持买方诉求并恢复履约",
+    decidedBy,
+    adjustBuyerRefund: refund,
+    adjustSupplierClawback: fromHeld + fromEarned,
+    updatedAt: createdAt,
+  };
+
+  const orders = state.orders.map((o) =>
+    o.id === dispute.orderId || (o.dealId === deal.id && String(o.product).startsWith("【争议】"))
+      ? { ...o, status: "完结", summary: `已裁决：${updatedDispute.decision}` }
+      : o,
+  );
+
+  await persistAllianceLoop({
+    ...state,
+    deals: state.deals.map((d) => (d.id === deal.id ? updatedDeal : d)),
+    disputes: (state.disputes || []).map((d) => (d.id === disputeId ? updatedDispute : d)),
+    orgWallets: wallets,
+    orders,
+  });
   return getAllianceState();
 }
 

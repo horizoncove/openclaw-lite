@@ -282,7 +282,7 @@ flowchart TB
 
 ## 9. 争议与仲裁 SOP
 
-> 当前代码无独立争议单实体；本章为**运营 SOP + 下一迭代数据模型约定**。演示期可用联盟工单标题加前缀「【争议】」。
+> v1.9+ 已落地 `DisputeCase`：`POST /alliance/disputes` 提起（项目暂停），`POST /alliance/disputes/:id/decide` 裁决执行（退回托管 / 扣回激励并恢复履约）。全流程模拟报告见 `docs/reports/full-deal-arbitration-sim.md`。
 
 ### 9.1 可仲裁范围
 - 交付是否达标（对照 consideration / 里程碑）  
@@ -383,7 +383,7 @@ R=执行 A=问责 C=协商 I=知情
 | 中心履约 | 工单+consume 模拟 | 工单状态自动 consume |
 | 确权登记 | 案件类型与状态 | 材料清单与文书 |
 | 验收结算 | settle 释放/退款 | 验收勾选清单 |
-| 仲裁 | 工单+暂停状态可借用 | Dispute 实体与执行器 |
+| 仲裁 | 争议单+暂停+裁决执行 Token 调整 | 评分/上诉二次仲裁 |
 
 ---
 

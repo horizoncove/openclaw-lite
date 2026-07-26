@@ -9,10 +9,21 @@ function pct(spent: number, budget: number) {
 const PHASES = ["要约中", "待双边确认", "托管中", "履约中", "结算中", "已闭环"] as const;
 
 export default function EcosystemLoopPage() {
-  const { deals, orgWallets, scenePackages, matches, consumeDeal, settleDeal } = useAllianceStore();
+  const {
+    deals,
+    orgWallets,
+    scenePackages,
+    matches,
+    disputes,
+    consumeDeal,
+    settleDeal,
+    raiseDispute,
+    decideDispute,
+  } = useAllianceStore();
   const brokerBal = orgWallets.find((w) => w.org === "联盟秘书处")?.balance ?? 0;
   const active = deals.filter((d) => d.phase !== "已闭环");
   const settled = deals.filter((d) => d.phase === "已闭环" || d.status === "已结算");
+  const openDisputes = (disputes || []).filter((d) => d.status === "调解中");
 
   return (
     <div className="grid" style={{ gap: "1rem" }}>
@@ -144,8 +155,18 @@ export default function EcosystemLoopPage() {
                       ） · 阶段 {d.phase || d.status} · {d.id}
                     </div>
                   </div>
-                  <span className={`tag ${d.status === "已结算" ? "green" : d.status === "履约中" ? "amber" : "blue"}`}>
-                    {d.phase || d.status}
+                  <span
+                    className={`tag ${
+                      d.status === "暂停"
+                        ? "red"
+                        : d.status === "已结算"
+                          ? "green"
+                          : d.status === "履约中"
+                            ? "amber"
+                            : "blue"
+                    }`}
+                  >
+                    {d.status === "暂停" ? "争议暂停" : d.phase || d.status}
                   </span>
                 </div>
                 <div className="deal-budget-bar">
@@ -187,7 +208,7 @@ export default function EcosystemLoopPage() {
                   <div style={{ display: "flex", gap: 8, marginTop: "0.75rem", flexWrap: "wrap" }}>
                     <button
                       className="btn btn-secondary"
-                      disabled={(d.escrow ?? 0) <= 0}
+                      disabled={(d.escrow ?? 0) <= 0 || d.status === "暂停"}
                       onClick={() =>
                         consumeDeal(
                           d.id,
@@ -202,9 +223,49 @@ export default function EcosystemLoopPage() {
                         费{split.brokerCut}/激励{split.supplierCut}/保留{split.centerKeep}
                       </small>
                     </button>
-                    <button className="btn btn-ghost" onClick={() => settleDeal(d.id)}>
+                    <button
+                      className="btn btn-ghost"
+                      disabled={d.status === "暂停"}
+                      onClick={() => settleDeal(d.id)}
+                    >
                       结算并退回剩余托管
                     </button>
+                    {d.status !== "暂停" && (
+                      <button
+                        className="btn btn-ghost"
+                        onClick={() =>
+                          raiseDispute({
+                            dealId: d.id,
+                            raisedRole: "buyer",
+                            reason: "里程碑交付未达约定，申请仲裁调整激励与部分退回托管",
+                            claimTokens: Math.min(5000, d.escrow || 0),
+                          })
+                        }
+                      >
+                        提起争议
+                      </button>
+                    )}
+                    {openDisputes
+                      .filter((x) => x.dealId === d.id)
+                      .map((dsp) => (
+                        <button
+                          key={dsp.id}
+                          className="btn btn-primary"
+                          onClick={() =>
+                            decideDispute(dsp.id, {
+                              decision:
+                                "部分支持买方：退回部分托管，扣回供给方部分激励，恢复履约后收尾结算",
+                              adjustBuyerRefund: Math.min(dsp.claimTokens || 3000, d.escrow || 0),
+                              adjustSupplierClawback: Math.min(
+                                1500,
+                                (d.heldSupplier || 0) + (d.supplierEarned || 0),
+                              ),
+                            })
+                          }
+                        >
+                          仲裁化解 {dsp.id}
+                        </button>
+                      ))}
                   </div>
                 )}
                 <div className="deal-ledger">

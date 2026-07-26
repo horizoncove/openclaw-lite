@@ -66,6 +66,20 @@ type AllianceStore = AllianceState & {
   consumeDeal: (dealId: string, amount: number, note?: string, model?: string) => Promise<void>;
   settleDeal: (dealId: string) => Promise<void>;
   confirmDeal: (dealId: string, side: "buyer" | "supplier") => Promise<void>;
+  raiseDispute: (opts: {
+    dealId: string;
+    reason: string;
+    claimTokens?: number;
+    raisedRole?: "buyer" | "supplier" | "broker";
+  }) => Promise<void>;
+  decideDispute: (
+    disputeId: string,
+    opts: {
+      decision: string;
+      adjustBuyerRefund?: number;
+      adjustSupplierClawback?: number;
+    },
+  ) => Promise<void>;
   topUpWallet: (org: string, amount: number) => Promise<void>;
   resetDemo: () => Promise<void>;
 };
@@ -97,6 +111,7 @@ export function AllianceStoreProvider({ children }: { children: ReactNode }) {
       setState((s) => ({
         ...data,
         bids: data.bids ?? [],
+        disputes: data.disputes ?? [],
         deals: (data.deals ?? []).map((d) => ({
           ...d,
           payMechanism: d.payMechanism ?? "预付",
@@ -531,6 +546,28 @@ export function AllianceStoreProvider({ children }: { children: ReactNode }) {
             const updated = confirmDealSide(deal, side, state.user?.name ?? side);
             return { ...s, deals: s.deals.map((d) => (d.id === dealId ? updated : d)) };
           });
+        }
+      },
+      raiseDispute: async (opts) => {
+        if (apiOnline) {
+          const data = await allianceApi.disputes.raise({
+            ...opts,
+            raisedBy: state.user?.org || state.user?.name,
+          });
+          setState((s) => ({ ...data, user: s.user }));
+        } else {
+          throw new Error("离线模式请连接 API 后使用仲裁");
+        }
+      },
+      decideDispute: async (disputeId, opts) => {
+        if (apiOnline) {
+          const data = await allianceApi.disputes.decide(disputeId, {
+            ...opts,
+            decidedBy: state.user?.name || "联盟秘书处",
+          });
+          setState((s) => ({ ...data, user: s.user }));
+        } else {
+          throw new Error("离线模式请连接 API 后使用仲裁");
         }
       },
       topUpWallet: async (org, amount) => {

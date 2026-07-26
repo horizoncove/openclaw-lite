@@ -384,6 +384,7 @@ export function applyConsume(
   model?: string,
 ): DealProject {
   if (deal.status === "待确认" || deal.phase === "待双边确认") return deal;
+  if (deal.status === "暂停") return deal;
   if (deal.status === "已结算" || deal.phase === "已闭环") return deal;
 
   const scene = findScene(deal.sceneId);

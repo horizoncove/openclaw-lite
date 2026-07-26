@@ -23,6 +23,7 @@ export const allianceSeed = (): Omit<AllianceState, "user"> => {
     works: data.works ?? [],
     venues: data.venues ?? [],
     bids: data.bids ?? [],
+    disputes: data.disputes ?? [],
   };
 };
 

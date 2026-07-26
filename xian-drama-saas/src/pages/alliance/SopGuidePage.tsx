@@ -148,13 +148,13 @@ const PHASES: { name: string; summary: string; steps: Step[] }[] = [
       {
         title: "争议仲裁",
         owner: "秘书处主持",
-        entry: "联盟工单标题加【争议】",
+        entry: "/alliance/console/loop · 提起争议 / 仲裁化解",
         points: [
-          "提起 → 立案暂停消耗 → 调解 → 裁决 → 按流水执行",
-          "以 ledger 为准，口头不对抗流水",
-          "下迭代独立 Dispute 实体（见 docs/SOP.md §9）",
+          "提起 → 项目暂停（禁 consume/settle）→ 裁决 Token 调整 → 恢复履约",
+          "可退回托管、扣回暂挂/已入账激励；自动完结【争议】工单",
+          "演练报告：docs/reports/full-deal-arbitration-sim.md",
         ],
-        status: "SOP 设计",
+        status: "已落地",
       },
     ],
   },

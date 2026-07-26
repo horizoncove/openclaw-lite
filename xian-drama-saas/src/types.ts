@@ -100,8 +100,31 @@ export type DealLedgerType =
   | "中心保留"
   | "补预算"
   | "退款"
-  | "确认";
+  | "确认"
+  | "仲裁";
 export type ParticipantRole = "buyer" | "supplier" | "broker" | "center";
+
+/** 争议仲裁单：履约中可提起，裁决后按 Token 调整执行 */
+export type DisputeStatus = "调解中" | "已裁决" | "已撤回" | "已执行";
+
+export interface DisputeCase {
+  id: string;
+  dealId: string;
+  raisedBy: string;
+  raisedRole: "buyer" | "supplier" | "broker";
+  reason: string;
+  claimTokens: number;
+  status: DisputeStatus;
+  decision?: string;
+  decidedBy?: string;
+  /** 裁决：从托管额外退回买方 */
+  adjustBuyerRefund?: number;
+  /** 裁决：从已入账/暂挂激励中扣回供给方 */
+  adjustSupplierClawback?: number;
+  orderId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface DealMilestone {
   id: string;
@@ -304,6 +327,7 @@ export interface AllianceState {
   orgWallets: OrgWallet[];
   scenePackages: ScenePackage[];
   bids: MatchBid[];
+  disputes: DisputeCase[];
 }
 
 export type TokenModelCategory = "chat" | "embedding" | "image" | "video";

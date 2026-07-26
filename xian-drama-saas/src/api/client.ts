@@ -125,6 +125,32 @@ export const allianceApi = {
         body: JSON.stringify({ action }),
       }),
   },
+  disputes: {
+    raise: (body: {
+      dealId: string;
+      raisedBy?: string;
+      raisedRole?: "buyer" | "supplier" | "broker";
+      reason: string;
+      claimTokens?: number;
+    }) =>
+      request<Omit<AllianceState, "user">>("/alliance/disputes", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+    decide: (
+      id: string,
+      body: {
+        decision: string;
+        decidedBy?: string;
+        adjustBuyerRefund?: number;
+        adjustSupplierClawback?: number;
+      },
+    ) =>
+      request<Omit<AllianceState, "user">>(`/alliance/disputes/${id}/decide`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+  },
   wallets: {
     topup: (body: { org: string; amount: number }) =>
       request<{ org: string; balance: number; locked?: number; credited: number }>(
