@@ -41,6 +41,8 @@ type AllianceStore = AllianceState & {
   updateVenue: (id: string, patch: Partial<Venue>) => Promise<void>;
   closeDeal: (matchId: string, opts?: { supplierOrg?: string; sceneId?: string }) => Promise<void>;
   consumeDeal: (dealId: string, amount: number, note?: string, model?: string) => Promise<void>;
+  settleDeal: (dealId: string) => Promise<void>;
+  confirmDeal: (dealId: string, side: "buyer" | "supplier") => Promise<void>;
   topUpWallet: (org: string, amount: number) => Promise<void>;
   resetDemo: () => Promise<void>;
 };
@@ -247,14 +249,14 @@ export function AllianceStoreProvider({ children }: { children: ReactNode }) {
           const data = await allianceApi.deals.close({ matchId, ...opts });
           setState((s) => ({ ...data, user: s.user }));
         } else {
-          const { buildDealFromMatch, findScene, debitOrgWallet } = await import("../utils/dealLoop");
+          const { buildDealFromMatch, findScene, lockEscrow } = await import("../utils/dealLoop");
           setState((s) => {
             const match = s.matches.find((m) => m.id === matchId);
             if (!match || match.dealId) return s;
             const scene = findScene(opts?.sceneId || match.sceneId || "SCENE-OVERSEAS");
             if (!scene) return s;
             const partner = opts?.supplierOrg || match.suggestedPartner || "丝路视界传媒";
-            const wallets = debitOrgWallet(s.orgWallets, match.org, scene.tokens);
+            const wallets = lockEscrow(s.orgWallets, match.org, scene.tokens);
             if (!wallets) return s;
             const { deal, order } = buildDealFromMatch({
               match,
@@ -293,14 +295,21 @@ export function AllianceStoreProvider({ children }: { children: ReactNode }) {
           });
           setState((s) => ({ ...data, user: s.user }));
         } else {
-          const { applyConsume, creditOrgWallet } = await import("../utils/dealLoop");
+          const { applyConsume, creditOrgWallet, releaseBuyerLocked } = await import("../utils/dealLoop");
           setState((s) => {
             const deal = s.deals.find((d) => d.id === dealId);
             if (!deal) return s;
             const beforeB = deal.brokerEarned;
             const beforeS = deal.supplierEarned;
-            const updated = applyConsume(deal, amount, state.user?.name ?? "中心专员", note ?? "履约扣费", model);
-            let wallets = s.orgWallets;
+            const spend = Math.min(amount, deal.escrow);
+            const updated = applyConsume(
+              deal,
+              amount,
+              state.user?.name ?? "中心专员",
+              note ?? "履约扣费",
+              model,
+            );
+            let wallets = releaseBuyerLocked(s.orgWallets, deal.buyerOrg, spend);
             const bd = updated.brokerEarned - beforeB;
             const sd = updated.supplierEarned - beforeS;
             if (bd > 0) wallets = creditOrgWallet(wallets, "联盟秘书处", bd, "broker");
@@ -310,6 +319,42 @@ export function AllianceStoreProvider({ children }: { children: ReactNode }) {
               deals: s.deals.map((d) => (d.id === dealId ? updated : d)),
               orgWallets: wallets,
             };
+          });
+        }
+      },
+      settleDeal: async (dealId) => {
+        if (apiOnline) {
+          const data = await allianceApi.deals.settle(dealId);
+          setState((s) => ({ ...data, user: s.user }));
+        } else {
+          const { settleDeal, unlockEscrow } = await import("../utils/dealLoop");
+          setState((s) => {
+            const deal = s.deals.find((d) => d.id === dealId);
+            if (!deal) return s;
+            const { deal: updated, refund } = settleDeal(deal);
+            const wallets = refund > 0 ? unlockEscrow(s.orgWallets, deal.buyerOrg, refund) : s.orgWallets;
+            return {
+              ...s,
+              deals: s.deals.map((d) => (d.id === dealId ? updated : d)),
+              orgWallets: wallets,
+            };
+          });
+        }
+      },
+      confirmDeal: async (dealId, side) => {
+        if (apiOnline) {
+          const data = await allianceApi.deals.confirm(dealId, {
+            side,
+            actor: state.user?.name,
+          });
+          setState((s) => ({ ...data, user: s.user }));
+        } else {
+          const { confirmDealSide } = await import("../utils/dealLoop");
+          setState((s) => {
+            const deal = s.deals.find((d) => d.id === dealId);
+            if (!deal) return s;
+            const updated = confirmDealSide(deal, side, state.user?.name ?? side);
+            return { ...s, deals: s.deals.map((d) => (d.id === dealId ? updated : d)) };
           });
         }
       },

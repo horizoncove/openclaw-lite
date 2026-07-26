@@ -27,13 +27,13 @@ export default function MemberDealsPage() {
           <p className="member-hero-label">我的项目与钱包</p>
           <h3>{org.name}</h3>
           <p className="member-hero-desc">
-            作为需求方：预算锁在项目里，超支有墙。作为供给方：交付节点自动拿激励。
-            你不用懂「¥/1M tokens」，只要看「这个合作还剩多少」。
+            可用余额可开新单；锁定余额在项目托管池里，按履约节点释放并切割对价。
+            你买的不是「Token 数字」，是译制/预检/投流等可交付标的。
           </p>
         </div>
         <div className="member-hero-stat">
           <div className="stat-value">{((wallet?.balance ?? 0) / 1000).toFixed(0)}k</div>
-          <div className="stat-label">企业 Token 余额</div>
+          <div className="stat-label">可用 · 锁定 {((wallet?.locked ?? 0) / 1000).toFixed(0)}k</div>
         </div>
       </section>
 
@@ -67,9 +67,12 @@ export default function MemberDealsPage() {
                   <span className="tag blue">{d.status}</span>
                 </div>
                 <p>供给方：{d.supplierOrg}</p>
+                <p style={{ fontSize: "0.82rem" }}>标的：{d.consideration || d.sceneName}</p>
                 <div className="deal-budget-bar"><div style={{ width: `${Math.round((d.spent / d.budget) * 100)}%` }} /></div>
                 <div className="deal-budget-labels">
-                  <span>{d.spent.toLocaleString()} / {d.budget.toLocaleString()}</span>
+                  <span>
+                    托管剩余 {(d.escrow ?? d.budget - d.spent).toLocaleString()} / {d.budget.toLocaleString()}
+                  </span>
                 </div>
                 <p className="deal-next"><b>你的下一步：</b>{d.nextActionBuyer}</p>
               </div>

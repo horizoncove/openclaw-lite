@@ -175,25 +175,33 @@ GET /api/health
 ## 5. 关键算法（实现对照）
 
 前端：`src/utils/dealLoop.ts`  
-后端：`server/dealLoop.mjs`（保持规则一致）
+后端：`server/dealLoop.mjs`（保持规则一致）  
+本质说明：[`TRANSACTION.md`](./TRANSACTION.md)
 
-### closeMatchDeal
+### closeMatchDeal（冻结对价）
 
 1. 找 match；若已有 dealId → 抛错  
-2. `findScene(scenePackages, sceneId)`  
-3. `debitWallet(orgWallets, buyer, scene.tokens)`；失败则抛错  
-4. `buildDealFromMatch` → deal + order  
-5. 更新 matches / deals / orders / orgWallets  
-6. 若 order.center ≠ 联盟，尝试镜像写入中心 orders（演示增强）  
-7. 返回完整 alliance state  
+2. `findScene`  
+3. **`lockEscrow(orgWallets, buyer, tokens)`**：`balance -= n`，`locked += n`  
+4. 创建 Deal：`escrow = budget`，`phase = 托管中`，写入「托管锁定」流水  
+5. 更新 matches / orders  
 
-### consumeDealTokens
+### consumeDealTokens（托管释放 + 三拆）
 
-1. 找 deal；已结算则抛错  
-2. `applyConsume` 计算 spend / 分账  
-3. 贷记秘书处、供给方钱包  
-4. 更新 deal、关联 order 状态文案  
-5. 尽力同步中心 `tokenWallet.usedThisMonth` 与流水（`dealId`）  
+1. 校验非待确认、非已闭环  
+2. `spend = min(amount, escrow)`  
+3. 三拆：`brokerCut` / `supplierCut` / `centerKeep`（来自同一笔 spend）  
+4. `escrow -= spend`；买方 `locked -= spend`  
+5. 贷记秘书处、供给方 **可用 balance**  
+6. 推进 milestones；escrow=0 时进入结算中  
+
+### settleDealProject
+
+1. `refund = escrow`  
+2. `unlockEscrow(buyer, refund)`：锁定转回可用  
+3. `phase = 已闭环`  
+
+API 增量：`POST /alliance/deals/:id/settle`、`POST /alliance/deals/:id/confirm`
 
 ---
 

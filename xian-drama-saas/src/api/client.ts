@@ -88,13 +88,23 @@ export const allianceApi = {
         method: "POST",
         body: JSON.stringify(body),
       }),
-  },
-  wallets: {
-    topup: (body: { org: string; amount: number }) =>
-      request<{ org: string; balance: number; credited: number }>("/alliance/wallets/topup", {
+    settle: (id: string) =>
+      request<Omit<AllianceState, "user">>(`/alliance/deals/${id}/settle`, { method: "POST" }),
+    confirm: (id: string, body: { side: "buyer" | "supplier"; actor?: string }) =>
+      request<Omit<AllianceState, "user">>(`/alliance/deals/${id}/confirm`, {
         method: "POST",
         body: JSON.stringify(body),
       }),
+  },
+  wallets: {
+    topup: (body: { org: string; amount: number }) =>
+      request<{ org: string; balance: number; locked?: number; credited: number }>(
+        "/alliance/wallets/topup",
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+        },
+      ),
   },
 };
 

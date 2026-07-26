@@ -788,7 +788,14 @@
       "forBuyer": "按项目锁定额度，译制节点清晰可见",
       "forSupplier": "交付后获得激励 Token，沉淀履约信用",
       "forBroker": "成交即计提撮合服务费",
-      "forCenter": "出海中心按任务扣费，避免超支"
+      "forCenter": "出海中心按任务扣费，避免超支",
+      "consideration": "译制产能 + 合规意见 + 海外选品诊断",
+      "milestones": [
+        "选品诊断",
+        "合规审查",
+        "译制交付",
+        "上线复盘"
+      ]
     },
     {
       "id": "SCENE-APPROVAL",
@@ -801,7 +808,13 @@
       "forBuyer": "先预检再送审，少走冤枉路",
       "forSupplier": "剧本/材料协作方可获微量激励",
       "forBroker": "促成预检服务并记录链路",
-      "forCenter": "审批中心每次预检提交扣费"
+      "forCenter": "审批中心每次预检提交扣费",
+      "consideration": "材料风险结论 + 送审建议",
+      "milestones": [
+        "收件预检",
+        "风险会诊",
+        "意见出具"
+      ]
     },
     {
       "id": "SCENE-DIST",
@@ -814,7 +827,13 @@
       "forBuyer": "预算与 ROI 同屏，知道钱花在哪",
       "forSupplier": "投放实验室按效果结算激励",
       "forBroker": "对接投放产能并跟进阶段",
-      "forCenter": "发行中心按复盘任务扣减"
+      "forCenter": "发行中心按复盘任务扣减",
+      "consideration": "发行体检 + 素材策略 + 冷启动复盘",
+      "milestones": [
+        "新剧体检",
+        "素材冷启动",
+        "数据复盘"
+      ]
     },
     {
       "id": "SCENE-AI",
@@ -827,7 +846,13 @@
       "forBuyer": "按产线用量扣费，可随时补预算",
       "forSupplier": "AIGC 能力方共享激励",
       "forBroker": "推荐垂类模型与产能方",
-      "forCenter": "AI 中心跑批即扣"
+      "forCenter": "AI 中心跑批即扣",
+      "consideration": "大纲/素材 AI 产能时段",
+      "milestones": [
+        "需求对齐",
+        "产线跑批",
+        "效果固化"
+      ]
     },
     {
       "id": "SCENE-VENUE",
@@ -840,64 +865,81 @@
       "forBuyer": "锁档期前先锁协调预算",
       "forSupplier": "场地方/协调方获得激励",
       "forBroker": "场地撮合费清晰可查",
-      "forCenter": "联盟侧协调工单跟进"
+      "forCenter": "联盟侧协调工单跟进",
+      "consideration": "档期与拍摄许可协调结果",
+      "milestones": [
+        "档期确认",
+        "许可协调",
+        "拍摄支持"
+      ]
     }
   ],
   "orgWallets": [
     {
       "org": "长安映缔影视",
       "balance": 160000,
-      "role": "mixed"
+      "role": "mixed",
+      "locked": 80000
     },
     {
       "org": "丝路视界传媒",
       "balance": 95000,
-      "role": "mixed"
+      "role": "mixed",
+      "locked": 0
     },
     {
       "org": "秦岭投放实验室",
       "balance": 74160,
-      "role": "supplier"
+      "role": "supplier",
+      "locked": 0
     },
     {
       "org": "浐灞国际译制中心",
       "balance": 88000,
-      "role": "supplier"
+      "role": "supplier",
+      "locked": 0
     },
     {
       "org": "曲江短剧工场",
       "balance": 54000,
-      "role": "buyer"
+      "role": "buyer",
+      "locked": 0
     },
     {
       "org": "碑林剧本研究院",
       "balance": 42000,
-      "role": "buyer"
+      "role": "buyer",
+      "locked": 0
     },
     {
       "org": "高新漫动科技",
       "balance": 61000,
-      "role": "supplier"
+      "role": "supplier",
+      "locked": 0
     },
     {
       "org": "莲湖星图经纪",
       "balance": 38000,
-      "role": "buyer"
+      "role": "buyer",
+      "locked": 32000
     },
     {
       "org": "咸阳农文旅影业",
       "balance": 30000,
-      "role": "buyer"
+      "role": "buyer",
+      "locked": 0
     },
     {
       "org": "古城配音联盟",
       "balance": 45000,
-      "role": "supplier"
+      "role": "supplier",
+      "locked": 0
     },
     {
       "org": "联盟秘书处",
       "balance": 19860,
-      "role": "broker"
+      "role": "broker",
+      "locked": 0
     }
   ],
   "deals": [
@@ -924,6 +966,15 @@
       "nextActionBroker": "盯防逾期与双方沟通摩擦",
       "nextActionCenter": "发行中心继续按任务扣费推进",
       "ledger": [
+        {
+          "id": "DEAL-001-L05",
+          "type": "中心保留",
+          "amount": 14580,
+          "actor": "发行投流中心",
+          "actorRole": "center",
+          "note": "对价切割剩余 → 中心履约成本",
+          "createdAt": "2026-07-23"
+        },
         {
           "id": "DEAL-001-L04",
           "type": "供给激励",
@@ -954,12 +1005,44 @@
         },
         {
           "id": "DEAL-001-L01",
-          "type": "开预算",
+          "type": "托管锁定",
           "amount": 50000,
           "actor": "联盟秘书处",
           "actorRole": "broker",
-          "note": "成交开立「投流冷启动包」，锁定项目预算",
+          "note": "成交冻结进托管池「投流冷启动包」，锁定项目预算",
           "createdAt": "2026-07-18"
+        }
+      ],
+      "consideration": "发行体检 + 素材策略 + 冷启动复盘",
+      "phase": "履约中",
+      "buyerAccepted": true,
+      "supplierAccepted": true,
+      "escrow": 32000,
+      "centerRetained": 14580,
+      "milestones": [
+        {
+          "id": "MS1",
+          "title": "新剧体检",
+          "weight": 33,
+          "status": "已完成",
+          "releaseTokens": 16666,
+          "released": 16666
+        },
+        {
+          "id": "MS2",
+          "title": "素材冷启动",
+          "weight": 33,
+          "status": "进行中",
+          "releaseTokens": 16666,
+          "released": 1334
+        },
+        {
+          "id": "MS3",
+          "title": "数据复盘",
+          "weight": 33,
+          "status": "未开始",
+          "releaseTokens": 16668,
+          "released": 0
         }
       ]
     },
@@ -988,12 +1071,52 @@
       "ledger": [
         {
           "id": "DEAL-002-L01",
-          "type": "开预算",
+          "type": "托管锁定",
           "amount": 80000,
           "actor": "联盟秘书处",
           "actorRole": "broker",
-          "note": "成交开立「出海译制履约包」，锁定项目预算",
+          "note": "成交冻结进托管池「出海译制履约包」，锁定项目预算",
           "createdAt": "2026-07-23"
+        }
+      ],
+      "consideration": "译制产能 + 合规意见 + 海外选品诊断",
+      "phase": "托管中",
+      "buyerAccepted": true,
+      "supplierAccepted": true,
+      "escrow": 80000,
+      "centerRetained": 0,
+      "milestones": [
+        {
+          "id": "MS1",
+          "title": "选品诊断",
+          "weight": 25,
+          "status": "进行中",
+          "releaseTokens": 20000,
+          "released": 0
+        },
+        {
+          "id": "MS2",
+          "title": "合规审查",
+          "weight": 25,
+          "status": "未开始",
+          "releaseTokens": 20000,
+          "released": 0
+        },
+        {
+          "id": "MS3",
+          "title": "译制交付",
+          "weight": 25,
+          "status": "未开始",
+          "releaseTokens": 20000,
+          "released": 0
+        },
+        {
+          "id": "MS4",
+          "title": "上线复盘",
+          "weight": 25,
+          "status": "未开始",
+          "releaseTokens": 20000,
+          "released": 0
         }
       ]
     }

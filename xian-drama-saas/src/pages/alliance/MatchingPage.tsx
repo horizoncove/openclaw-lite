@@ -54,8 +54,8 @@ export default function MatchingPage() {
           <p className="loop-eyebrow">BROKER VIEW · 秘书处</p>
           <h3>撮合不是改状态，是开一条可履约的资金与服务链路</h3>
           <p>
-            你替双方省下的是「找谁、谈什么、谁先付钱」。成交瞬间：锁定场景包预算 → 生成中心工单 →
-            Token 开始按节点流动。
+            你替双方省下的是「找谁、谈什么、钱先冻在哪」。成交瞬间：双边确认（演示自动）→ 冻结对价进托管 →
+            生成中心工单 → 履约时从托管池切割费用。
           </p>
         </div>
         <div className="loop-hero-stats">
@@ -184,8 +184,7 @@ export default function MatchingPage() {
           </table>
         </div>
         <p className="loop-footnote">
-          <ArrowRightLeft size={14} /> 成交后：买方钱包扣减场景包额度 → 项目子账户锁定预算 → 中心工单自动生成 →
-          履约扣费时分账给秘书处与供给方。
+          <ArrowRightLeft size={14} /> 成交后：买方可用→锁定（托管）→履约三拆（撮合费/供给激励/中心保留）→结算退回剩余。
         </p>
       </div>
     </div>

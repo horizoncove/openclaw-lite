@@ -83,14 +83,15 @@ PORT=3001 npm start
 
 ```bash
 curl http://localhost:3001/api/health
-curl http://localhost:3001/api/stats
-curl http://localhost:3001/api/members
+curl http://localhost:3001/api/alliance/state
+curl http://localhost:3001/api/center/tokens
 ```
 
 ## 目录
 
 ```
 xian-drama-saas/
+  docs/            # MVP 需求/技术/验证（Minimax & Trae）
   server/          # Express API
   src/             # React 前端
   demo/            # 离线演示手册

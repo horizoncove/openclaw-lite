@@ -60,9 +60,34 @@ export interface MatchNeed {
   dealId?: string;
 }
 
-export type DealStatus = "预算已开" | "履约中" | "已结算" | "暂停";
-export type DealLedgerType = "开预算" | "消耗" | "撮合费" | "供给激励" | "补预算" | "退款";
+export type DealStatus = "待确认" | "预算已开" | "履约中" | "已结算" | "暂停";
+export type DealPhase =
+  | "要约中"
+  | "待双边确认"
+  | "托管中"
+  | "履约中"
+  | "结算中"
+  | "已闭环";
+export type DealLedgerType =
+  | "开预算"
+  | "托管锁定"
+  | "消耗"
+  | "撮合费"
+  | "供给激励"
+  | "中心保留"
+  | "补预算"
+  | "退款"
+  | "确认";
 export type ParticipantRole = "buyer" | "supplier" | "broker" | "center";
+
+export interface DealMilestone {
+  id: string;
+  title: string;
+  weight: number;
+  status: "未开始" | "进行中" | "已完成";
+  releaseTokens: number;
+  released: number;
+}
 
 export interface DealLedgerEntry {
   id: string;
@@ -81,15 +106,23 @@ export interface DealProject {
   title: string;
   sceneId: string;
   sceneName: string;
+  /** 交易标的（人话） */
+  consideration: string;
   buyerOrg: string;
   supplierOrg: string;
   broker: string;
   center: string;
   status: DealStatus;
+  phase: DealPhase;
+  buyerAccepted: boolean;
+  supplierAccepted: boolean;
   budget: number;
+  /** 托管池剩余（未消耗） */
+  escrow: number;
   spent: number;
   brokerEarned: number;
   supplierEarned: number;
+  centerRetained: number;
   orderId?: string;
   createdAt: string;
   updatedAt: string;
@@ -97,6 +130,7 @@ export interface DealProject {
   nextActionSupplier: string;
   nextActionBroker: string;
   nextActionCenter: string;
+  milestones: DealMilestone[];
   ledger: DealLedgerEntry[];
 }
 
@@ -112,11 +146,17 @@ export interface ScenePackage {
   forSupplier: string;
   forBroker: string;
   forCenter: string;
+  /** 交易标的模板 */
+  consideration: string;
+  milestones: string[];
 }
 
 export interface OrgWallet {
   org: string;
+  /** 可自由支配 */
   balance: number;
+  /** 已进入项目托管、尚未消耗/退回 */
+  locked: number;
   role: "buyer" | "supplier" | "broker" | "mixed";
 }
 

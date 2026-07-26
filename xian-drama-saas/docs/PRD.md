@@ -261,4 +261,5 @@ Token 不是充值页上的数字，而是**项目履约燃料**。
 | 种子数据 | `server/data/alliance-seed.json`（deals/orgWallets/scenePackages） |
 
 配套技术文档：[`TECH.md`](./TECH.md)  
+交易本质：[`TRANSACTION.md`](./TRANSACTION.md)  
 验证清单：[`MVP-VALIDATION.md`](./MVP-VALIDATION.md)

@@ -7,7 +7,10 @@ export const allianceSeed = (): Omit<AllianceState, "user"> => {
   return {
     ...data,
     deals: data.deals ?? [],
-    orgWallets: data.orgWallets ?? [],
+    orgWallets: (data.orgWallets ?? []).map((w) => ({
+      ...w,
+      locked: w.locked ?? 0,
+    })),
     scenePackages: data.scenePackages ?? [],
     works: data.works ?? [],
     venues: data.venues ?? [],

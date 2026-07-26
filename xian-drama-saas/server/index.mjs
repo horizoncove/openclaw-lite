@@ -27,6 +27,8 @@ import {
   patchVenue,
   closeMatchDeal,
   consumeDealTokens,
+  settleDealProject,
+  confirmDealProject,
   topUpOrgWallet,
   getCenterState,
   resetCenterState,
@@ -75,7 +77,7 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     service: "xian-drama-saas",
-    version: "1.6.0",
+    version: "1.7.0",
     storage: isPostgres() ? "postgresql" : "json",
     portals: ["alliance", "center"],
   });
@@ -148,6 +150,15 @@ app.post("/api/alliance/deals/close", asyncHandler(async (req, res) => {
 
 app.post("/api/alliance/deals/:id/consume", asyncHandler(async (req, res) => {
   const state = await consumeDealTokens({ dealId: req.params.id, ...(req.body || {}) });
+  res.json(state);
+}));
+
+app.post("/api/alliance/deals/:id/settle", asyncHandler(async (req, res) => {
+  res.json(await settleDealProject(req.params.id));
+}));
+
+app.post("/api/alliance/deals/:id/confirm", asyncHandler(async (req, res) => {
+  const state = await confirmDealProject({ dealId: req.params.id, ...(req.body || {}) });
   res.json(state);
 }));
 
