@@ -24,8 +24,9 @@ docs/reports/trae-mvp-report.md
 → 撮合费/供给激励/中心保留 → 剩余退回 → 项目闭环
 ```
 
-代码基线：`xian-drama-saas` v1.8.1（以 `/api/health` 为准）。  
-交易看 [`TRANSACTION.md`](./TRANSACTION.md)；作业步骤看 [`SOP.md`](./SOP.md)；控制台速查 `/alliance/console/sop`。
+代码基线：`xian-drama-saas` v1.9.0（以 `/api/health` 为准）。  
+交易看 [`TRANSACTION.md`](./TRANSACTION.md)；作业步骤看 [`SOP.md`](./SOP.md)；控制台速查 `/alliance/console/sop`。  
+含仲裁的全流程模拟报告：[`reports/full-deal-arbitration-sim.md`](./reports/full-deal-arbitration-sim.md)。
 
 ## 本地一键
 
