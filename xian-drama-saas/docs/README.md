@@ -24,8 +24,10 @@ docs/reports/trae-mvp-report.md
 → 撮合费/供给激励/中心保留 → 剩余退回 → 项目闭环
 ```
 
-代码基线：`xian-drama-saas` v1.9.1（以 `/api/health` 为准）。  
-托管钱包中心：`/wallets`（按角色跳转）· `/alliance/console/wallets` · `/alliance/member/wallets`。  
+代码基线：`xian-drama-saas` v1.9.2（以 `/api/health` 为准）。  
+**HTML5 演示页**：[`/demo.html`](../public/demo.html)（品牌英雄 + 支付机制 + 可播放全流程/仲裁）。  
+托管钱包中心：`/wallets` · `/alliance/console/wallets` · `/alliance/member/wallets`。  
+
 
 交易看 [`TRANSACTION.md`](./TRANSACTION.md)；作业步骤看 [`SOP.md`](./SOP.md)；控制台速查 `/alliance/console/sop`。  
 含仲裁的全流程模拟报告：[`reports/full-deal-arbitration-sim.md`](./reports/full-deal-arbitration-sim.md)。
