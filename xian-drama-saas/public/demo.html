@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>西安微短剧产业服务中心 · 演示</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0c1f1a;
+      --forest: #14352c;
+      --jade: #1f6b56;
+      --mist: #d8e6df;
+      --paper: #f3f7f4;
+      --amber: #c47b2d;
+      --amber-soft: #e8b56a;
+      --film: #1a1410;
+      --line: rgba(20, 53, 44, 0.14);
+      --muted: #5c7268;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Instrument Sans", "Noto Sans SC", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.55;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: 0; }
+
+    /* —— Hero: one composition, brand first, full-bleed —— */
+    .hero {
+      min-height: 100vh;
+      min-height: 100dvh;
+      position: relative;
+      display: grid;
+      align-content: end;
+      padding: clamp(1.25rem, 3vw, 2.5rem);
+      overflow: hidden;
+      color: #f4faf7;
+      background:
+        radial-gradient(120% 80% at 80% 10%, rgba(196, 123, 45, 0.35), transparent 55%),
+        radial-gradient(90% 70% at 10% 90%, rgba(31, 107, 86, 0.55), transparent 50%),
+        linear-gradient(165deg, #0a1612 0%, #14352c 42%, #1a2820 72%, #241810 100%);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, #000 20%, transparent 85%);
+      pointer-events: none;
+      animation: gridDrift 28s linear infinite;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -8%;
+      top: 8%;
+      width: min(58vw, 640px);
+      height: min(58vw, 640px);
+      border-radius: 50%;
+      background:
+        conic-gradient(from 200deg, transparent 0 55%, rgba(232, 181, 106, 0.12) 70%, transparent 85%),
+        radial-gradient(circle at 40% 40%, rgba(255,255,255,0.08), transparent 62%);
+      border: 1px solid rgba(232, 181, 106, 0.18);
+      animation: reelSpin 48s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes gridDrift {
+      from { transform: translateY(0); }
+      to { transform: translateY(48px); }
+    }
+    @keyframes reelSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 920px;
+      padding-bottom: clamp(2rem, 8vh, 5rem);
+    }
+    .brand {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(2.4rem, 7vw, 4.6rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      margin-bottom: 1.1rem;
+      animation: riseIn 0.9s ease both;
+    }
+    .brand span {
+      display: block;
+      font-size: 0.34em;
+      font-weight: 600;
+      letter-spacing: 0.28em;
+      opacity: 0.72;
+      margin-top: 0.55rem;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(1.35rem, 3.2vw, 2rem);
+      font-weight: 600;
+      max-width: 18em;
+      line-height: 1.35;
+      margin-bottom: 0.85rem;
+      animation: riseIn 0.9s 0.12s ease both;
+    }
+    .hero p.lead {
+      max-width: 34em;
+      color: rgba(244, 250, 247, 0.78);
+      font-size: clamp(0.98rem, 1.6vw, 1.12rem);
+      margin-bottom: 1.6rem;
+      animation: riseIn 0.9s 0.22s ease both;
+    }
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      animation: riseIn 0.9s 0.32s ease both;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.85rem 1.25rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: var(--amber);
+      color: #1a1208;
+    }
+    .btn-primary:hover { background: var(--amber-soft); }
+    .btn-ghost {
+      background: transparent;
+      color: #f4faf7;
+      border: 1px solid rgba(244, 250, 247, 0.35);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.06); }
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* —— Sections —— */
+    section {
+      padding: clamp(3rem, 8vw, 5.5rem) clamp(1.25rem, 4vw, 3rem);
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--jade);
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+    section h2 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.25rem);
+      line-height: 1.25;
+      margin-bottom: 0.65rem;
+    }
+    .section-desc {
+      color: var(--muted);
+      max-width: 38em;
+      margin-bottom: 2rem;
+    }
+
+    .essence {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 2rem;
+      align-items: center;
+    }
+    .essence-visual {
+      aspect-ratio: 4/3;
+      border-radius: 6px;
+      background:
+        linear-gradient(135deg, rgba(196,123,45,0.15), transparent 40%),
+        linear-gradient(180deg, #14352c, #0c1f1a);
+      position: relative;
+      overflow: hidden;
+      color: #eef6f2;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .essence-visual .film-bar {
+      position: absolute;
+      left: 0; right: 0; top: 0;
+      height: 18px;
+      background: repeating-linear-gradient(
+        90deg,
+        #1a1410 0 10px,
+        #2a2218 10px 14px,
+        #1a1410 14px 24px
+      );
+      opacity: 0.85;
+    }
+    .flow-mini {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+    }
+    .flow-mini span {
+      padding: 0.3rem 0.55rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 3px;
+    }
+
+    /* mechanisms */
+    .mech-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .mech-tab {
+      text-align: left;
+      padding: 1rem 1.1rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: var(--ink);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .mech-tab strong { display: block; margin-bottom: 0.25rem; font-size: 1.05rem; }
+    .mech-tab small { color: var(--muted); font-size: 0.82rem; }
+    .mech-tab.active {
+      border-color: var(--jade);
+      background: #e8f3ee;
+    }
+    .mech-panel {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1.4rem 1.5rem;
+      display: none;
+    }
+    .mech-panel.active { display: block; animation: riseIn 0.35s ease; }
+    .mech-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .mech-stats div {
+      padding: 0.85rem;
+      background: var(--paper);
+      border-radius: 4px;
+    }
+    .mech-stats b { display: block; font-size: 1.35rem; color: var(--jade); }
+
+    /* playable demo */
+    .demo-stage {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .demo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #f8fbf9, #fff);
+    }
+    .demo-toolbar .status {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .demo-toolbar .status b { color: var(--ink); }
+    .steps {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 360px;
+    }
+    .step-list {
+      border-right: 1px solid var(--line);
+      padding: 0.75rem 0;
+      background: #f7faf8;
+    }
+    .step-item {
+      width: 100%;
+      text-align: left;
+      padding: 0.7rem 1rem;
+      background: transparent;
+      color: var(--muted);
+      border-left: 3px solid transparent;
+      font-size: 0.88rem;
+    }
+    .step-item.active {
+      color: var(--ink);
+      background: #fff;
+      border-left-color: var(--amber);
+      font-weight: 600;
+    }
+    .step-item.done { color: var(--jade); }
+    .step-body {
+      padding: 1.4rem 1.5rem;
+    }
+    .step-body h3 {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .meters {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin: 1.1rem 0;
+    }
+    .meter {
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--paper);
+    }
+    .meter label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    .bar {
+      height: 8px;
+      background: rgba(20,53,44,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .bar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--jade), var(--amber));
+      transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .log {
+      margin-top: 0.5rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.78rem;
+      color: var(--forest);
+      background: #eef6f2;
+      border-radius: 4px;
+      padding: 0.85rem 1rem;
+      min-height: 4.5rem;
+      white-space: pre-wrap;
+    }
+
+    .wallet-eq {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+    .wallet-eq span {
+      padding: 0.45rem 0.7rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+    }
+    .wallet-eq .op { border: 0; background: transparent; color: var(--muted); padding: 0 0.15rem; }
+
+    .band {
+      background:
+        linear-gradient(120deg, rgba(196,123,45,0.12), transparent 40%),
+        linear-gradient(180deg, #14352c, #0f2922);
+      color: #eef6f2;
+      padding: clamp(3rem, 7vw, 4.5rem) clamp(1.25rem, 4vw, 3rem);
+    }
+    .band-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.3fr auto;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .band h2 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      margin-bottom: 0.5rem;
+    }
+    .band p { color: rgba(238,246,242,0.75); max-width: 34em; }
+    footer {
+      padding: 1.5rem clamp(1.25rem, 4vw, 3rem) 2.5rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 860px) {
+      .essence, .steps, .band-inner, .mech-tabs, .mech-stats, .meters {
+        grid-template-columns: 1fr;
+      }
+      .step-list {
+        display: flex;
+        overflow-x: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        padding: 0.4rem;
+        gap: 0.25rem;
+      }
+      .step-item {
+        flex: 0 0 auto;
+        border-left: 0;
+        border-bottom: 3px solid transparent;
+        white-space: nowrap;
+      }
+      .step-item.active { border-bottom-color: var(--amber); }
+      .hero::after { opacity: 0.45; width: 70vw; height: 70vw; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero" id="top">
+    <div class="hero-inner">
+      <div class="brand">
+        西安微短剧
+        <span>产业服务中心</span>
+      </div>
+      <h1>把人情协作，变成可托管的履约契约</h1>
+      <p class="lead">
+        Token 是托管媒介，标的是译制、预检、投流等产能。
+        预付、过程支付、验收后支付可协商；争议可仲裁化解。
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#play">播放全流程演示</a>
+        <a class="btn btn-ghost" href="/alliance/login">进入运营系统</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="essence-wrap">
+    <p class="section-label">Transaction essence</p>
+    <h2>交易的七步，而不是一个状态按钮</h2>
+    <p class="section-desc">
+      要约 → 匹配 → 承诺 → 对价 → 托管 → 履约三拆 → 结算退回。激励来自买方冻结资金的切割，不是平台空投。
+    </p>
+    <div class="essence">
+      <div>
+        <p style="margin-bottom:1rem;color:var(--muted)">
+          秘书处撮合签注后，需求方可用余额按支付机制冻结进项目托管池；
+          五大中心按节点消耗并切割为撮合费、供给激励与中心保留；未用部分结算退回。
+        </p>
+        <div class="wallet-eq">
+          <span>可用 balance</span><span class="op">→</span>
+          <span>锁定 locked</span><span class="op">=</span>
+          <span>托管 escrow</span><span class="op">→</span>
+          <span>三拆 / 退回</span>
+        </div>
+      </div>
+      <div class="essence-visual" aria-hidden="true">
+        <div class="film-bar"></div>
+        <div class="flow-mini">
+          <span>要约</span><span>应征改条款</span><span>签注成交</span>
+          <span>冻结托管</span><span>履约消耗</span><span>仲裁可选</span><span>结算闭环</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="mechanisms">
+    <p class="section-label">Pay mechanisms</p>
+    <h2>三种支付机制，买方可设，供方可改</h2>
+    <p class="section-desc">点选机制，看首冻比例与激励释放时点如何改变资金占用。</p>
+    <div class="mech-tabs" role="tablist">
+      <button class="mech-tab active" data-mech="prepaid" role="tab">
+        <strong>预付</strong>
+        <small>开工即有资金保障</small>
+      </button>
+      <button class="mech-tab" data-mech="progress" role="tab">
+        <strong>过程支付</strong>
+        <small>现金流更平滑</small>
+      </button>
+      <button class="mech-tab" data-mech="acceptance" role="tab">
+        <strong>验收后支付</strong>
+        <small>激励暂挂待验收</small>
+      </button>
+    </div>
+    <div class="mech-panel active" id="panel-prepaid">
+      <p>成交即冻结预算 <b>100%</b>。履约时撮合费与供给激励即时入账，剩余结算退回买方。</p>
+      <div class="mech-stats">
+        <div><b>100%</b>开单冻结</div>
+        <div><b>即时</b>激励入账</div>
+        <div><b>退回</b>未用托管</div>
+      </div>
+    </div>
+    <div class="mech-panel" id="panel-progress">
+      <p>开单先冻 <b>40%</b>，其余记为未冻额度；节点消耗不足时从可用追加锁定，激励仍即时入账。</p>
+      <div class="mech-stats">
+        <div><b>40%</b>首笔冻结</div>
+        <div><b>追加</b>不足再冻</div>
+        <div><b>即时</b>激励入账</div>
+      </div>
+    </div>
+    <div class="mech-panel" id="panel-acceptance">
+      <p>开单冻 <b>100%</b> 作担保，但撮合费/供给激励进入<strong>暂挂</strong>，验收结算（或仲裁裁决）后才释放。</p>
+      <div class="mech-stats">
+        <div><b>100%</b>担保冻结</div>
+        <div><b>暂挂</b>费与激励</div>
+        <div><b>结算</b>释放入账</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="play">
+    <p class="section-label">Live walkthrough</p>
+    <h2>演示级全流程：从发布到仲裁化解</h2>
+    <p class="section-desc">
+      剧本取材真实模拟：碑林剧本研究院 × 曲江短剧工场 · 验收后支付 · 争议后退回托管并扣暂挂激励。
+    </p>
+    <div class="demo-stage">
+      <div class="demo-toolbar">
+        <div class="status">当前：<b id="demoStatus">待播放</b></div>
+        <div class="cta-row">
+          <button class="btn btn-primary" id="btnPlay" type="button">▶ 播放演示</button>
+          <button class="btn btn-ghost" id="btnReset" type="button" style="color:var(--ink);border-color:var(--line)">重置</button>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step-list" id="stepList"></div>
+        <div class="step-body">
+          <h3 id="stepTitle">准备就绪</h3>
+          <p id="stepDesc" style="color:var(--muted)">点击「播放演示」，逐步推进托管交易与仲裁。</p>
+          <div class="meters">
+            <div class="meter">
+              <label><span>买方可用</span><span id="vFree">42,000</span></label>
+              <div class="bar"><i id="bFree"></i></div>
+            </div>
+            <div class="meter">
+              <label><span>项目托管</span><span id="vEscrow">0</span></label>
+              <div class="bar"><i id="bEscrow"></i></div>
+            </div>
+            <div class="meter">
+              <label><span>激励暂挂</span><span id="vHeld">0</span></label>
+              <div class="bar"><i id="bHeld"></i></div>
+            </div>
+            <div class="meter">
+              <label><span>已释放消耗</span><span id="vSpent">0</span></label>
+              <div class="bar"><i id="bSpent"></i></div>
+            </div>
+          </div>
+          <div class="log" id="stepLog">等待开始…</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="band">
+    <div class="band-inner">
+      <div>
+        <h2>进入双门户运营系统</h2>
+        <p>联盟秘书处撮合与托管钱包；会员发布应征；五大中心履约扣费。演示账号已预置。</p>
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="/alliance/login">联盟入口</a>
+        <a class="btn btn-ghost" href="/center/login">五大中心</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    西安微短剧产业服务中心 · 演示页 v1.9 · 非法币结算，Token 为履约托管媒介
+  </footer>
+
+  <script>
+    const mechs = document.querySelectorAll(".mech-tab");
+    const panels = {
+      prepaid: document.getElementById("panel-prepaid"),
+      progress: document.getElementById("panel-progress"),
+      acceptance: document.getElementById("panel-acceptance"),
+    };
+    mechs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        mechs.forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        Object.values(panels).forEach((p) => p.classList.remove("active"));
+        panels[tab.dataset.mech].classList.add("active");
+      });
+    });
+
+    const STEPS = [
+      {
+        name: "发布供需",
+        title: "买方设定：验收后支付",
+        desc: "碑林剧本研究院发布古装承制需求，选择验收后支付，希望成品验收后再释放激励。",
+        free: 42000, escrow: 0, held: 0, spent: 0,
+        log: "MatchNeed N-SIM-001\npreferredPayMechanism = 验收后支付",
+      },
+      {
+        name: "供应应征",
+        title: "供方要求改为预付",
+        desc: "曲江短剧工场应征：承制需开机资金，主张将机制改为预付。",
+        free: 42000, escrow: 0, held: 0, spent: 0,
+        log: "MatchBid BID-006\nproposedPayMechanism = 预付 · acceptBuyerMechanism = false",
+      },
+      {
+        name: "撮合签注",
+        title: "协商维持验收后，冻结 30k",
+        desc: "秘书处拒绝改预付，采纳该供给方，以协商机制「验收后支付」开立 Deal，买方可用→锁定→托管。",
+        free: 12000, escrow: 30000, held: 0, spent: 0,
+        log: "DEAL-003 托管锁定 30,000\npayMechanismSource = negotiated",
+      },
+      {
+        name: "中心履约",
+        title: "消耗 18k，激励进入暂挂",
+        desc: "AI 中心推进分镜与大纲节点。验收后支付下，撮合费与供给激励暂挂，不进可用余额。",
+        free: 12000, escrow: 12000, held: 2340, spent: 18000,
+        log: "consume 10k + 8k\nheldBroker 900 · heldSupplier 1,440 · centerRetained 15,660",
+      },
+      {
+        name: "提起争议",
+        title: "项目暂停，禁止继续扣费",
+        desc: "买方主张第二里程碑与约定不符。系统生成【争议】工单，Deal 状态=暂停。",
+        free: 12000, escrow: 12000, held: 2340, spent: 18000,
+        log: "DSP-001 调解中\n暂停期 consume → 拦截：须仲裁结案后才能履约",
+      },
+      {
+        name: "仲裁化解",
+        title: "退回托管 5k，扣暂挂激励 1.2k",
+        desc: "秘书处部分支持买方：托管退回增加可用；扣回供给方暂挂激励；项目恢复履约。",
+        free: 17000, escrow: 7000, held: 1140, spent: 18000,
+        log: "decide DSP-001\nadjustBuyerRefund 5,000 · adjustSupplierClawback 1,200",
+      },
+      {
+        name: "结算闭环",
+        title: "释放剩余暂挂，退回未用托管",
+        desc: "补交付后再结算：暂挂激励入账，剩余 escrow 退回买方，phase=已闭环。",
+        free: 22000, escrow: 0, held: 0, spent: 20000,
+        log: "settle DEAL-003\n退款 5,000 · 释放撮合费 1,000 · 供给激励 400",
+      },
+    ];
+
+    const MAX = { free: 42000, escrow: 30000, held: 3000, spent: 30000 };
+    let timer = null;
+    let idx = -1;
+
+    const stepList = document.getElementById("stepList");
+    STEPS.forEach((s, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "step-item";
+      btn.textContent = `${i + 1}. ${s.name}`;
+      btn.addEventListener("click", () => go(i, false));
+      stepList.appendChild(btn);
+    });
+
+    function setBar(el, val, max) {
+      el.style.width = Math.min(100, Math.round((val / max) * 100)) + "%";
+    }
+    function fmt(n) { return n.toLocaleString("zh-CN"); }
+
+    function paint(step) {
+      document.getElementById("stepTitle").textContent = step.title;
+      document.getElementById("stepDesc").textContent = step.desc;
+      document.getElementById("stepLog").textContent = step.log;
+      document.getElementById("vFree").textContent = fmt(step.free);
+      document.getElementById("vEscrow").textContent = fmt(step.escrow);
+      document.getElementById("vHeld").textContent = fmt(step.held);
+      document.getElementById("vSpent").textContent = fmt(step.spent);
+      setBar(document.getElementById("bFree"), step.free, MAX.free);
+      setBar(document.getElementById("bEscrow"), step.escrow, MAX.escrow);
+      setBar(document.getElementById("bHeld"), step.held, MAX.held);
+      setBar(document.getElementById("bSpent"), step.spent, MAX.spent);
+      document.getElementById("demoStatus").textContent = step.name;
+      [...stepList.children].forEach((el, i) => {
+        el.classList.toggle("active", i === idx);
+        el.classList.toggle("done", i < idx);
+      });
+    }
+
+    function go(i, auto) {
+      idx = i;
+      paint(STEPS[idx]);
+      if (!auto && timer) {
+        clearInterval(timer);
+        timer = null;
+        document.getElementById("btnPlay").textContent = "▶ 播放演示";
+      }
+    }
+
+    function reset() {
+      if (timer) clearInterval(timer);
+      timer = null;
+      idx = -1;
+      document.getElementById("btnPlay").textContent = "▶ 播放演示";
+      document.getElementById("demoStatus").textContent = "待播放";
+      document.getElementById("stepTitle").textContent = "准备就绪";
+      document.getElementById("stepDesc").textContent = "点击「播放演示」，逐步推进托管交易与仲裁。";
+      document.getElementById("stepLog").textContent = "等待开始…";
+      ["vFree","vEscrow","vHeld","vSpent"].forEach((id, i) => {
+        document.getElementById(id).textContent = fmt([42000,0,0,0][i]);
+      });
+      ["bFree","bEscrow","bHeld","bSpent"].forEach((id) => {
+        document.getElementById(id).style.width = id === "bFree" ? "100%" : "0%";
+      });
+      [...stepList.children].forEach((el) => el.classList.remove("active", "done"));
+    }
+
+    document.getElementById("btnReset").addEventListener("click", reset);
+    document.getElementById("btnPlay").addEventListener("click", () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+        document.getElementById("btnPlay").textContent = "▶ 继续播放";
+        return;
+      }
+      if (idx >= STEPS.length - 1) reset();
+      document.getElementById("btnPlay").textContent = "❚❚ 暂停";
+      const tick = () => {
+        if (idx >= STEPS.length - 1) {
+          clearInterval(timer);
+          timer = null;
+          document.getElementById("btnPlay").textContent = "↻ 再播一次";
+          document.getElementById("demoStatus").textContent = "演示完成";
+          return;
+        }
+        go(idx + 1, true);
+      };
+      tick();
+      timer = setInterval(tick, 2200);
+    });
+
+    // initial free bar
+    setBar(document.getElementById("bFree"), 42000, MAX.free);
+  </script>
+</body>
+</html>

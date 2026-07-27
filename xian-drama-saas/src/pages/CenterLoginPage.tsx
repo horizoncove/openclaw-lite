@@ -21,8 +21,13 @@ export default function CenterLoginPage() {
         <p className="portal-tag center">中心入口</p>
         <h1>五大中心运营 SaaS</h1>
         <p className="sub">
-          审批、出海、发行投流、版权与 AI 研发运营。本入口数据与联盟会员完全隔离。
+          审批、出海、发行投流、版权与 AI 研发运营。含全景数据看板与标准化 Token 聚合购买（参考 OpenRouter）。
         </p>
+        <div className="center-login-features">
+          <span>全景看板</span>
+          <span>Token 聚合</span>
+          <span>多模型路由</span>
+        </div>
         <div className="role-grid">
           {roles.map((role) => (
             <button

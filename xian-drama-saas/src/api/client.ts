@@ -9,6 +9,9 @@ import type {
   EventItem,
   MatchNeed,
   Member,
+  MemberWork,
+  PayMechanism,
+  Venue,
   OverseasProject,
   WorkOrder,
 } from "../types";
@@ -62,6 +65,102 @@ export const allianceApi = {
     update: (id: string, patch: Partial<WorkOrder>) =>
       request<WorkOrder>(`/alliance/orders/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
   },
+  works: {
+    save: (w: MemberWork) =>
+      request<MemberWork>("/alliance/works", { method: "POST", body: JSON.stringify(w) }),
+    update: (id: string, patch: Partial<MemberWork>) =>
+      request<MemberWork>(`/alliance/works/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
+  },
+  venues: {
+    update: (id: string, patch: Partial<Venue>) =>
+      request<Venue>(`/alliance/venues/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
+  },
+  deals: {
+    close: (body: {
+      matchId: string;
+      supplierOrg?: string;
+      sceneId?: string;
+      bidId?: string;
+      payMechanism?: PayMechanism;
+      payMechanismSource?: "buyer" | "supplier" | "negotiated";
+      payMechanismNote?: string;
+      budgetOverride?: number;
+    }) =>
+      request<Omit<AllianceState, "user">>("/alliance/deals/close", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+    consume: (
+      id: string,
+      body: { amount: number; actor?: string; note?: string; model?: string },
+    ) =>
+      request<Omit<AllianceState, "user">>(`/alliance/deals/${id}/consume`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+    settle: (id: string) =>
+      request<Omit<AllianceState, "user">>(`/alliance/deals/${id}/settle`, { method: "POST" }),
+    confirm: (id: string, body: { side: "buyer" | "supplier"; actor?: string }) =>
+      request<Omit<AllianceState, "user">>(`/alliance/deals/${id}/confirm`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+  },
+  bids: {
+    place: (body: {
+      matchId: string;
+      supplierOrg: string;
+      acceptBuyerMechanism?: boolean;
+      proposedPayMechanism: PayMechanism;
+      note?: string;
+      quoteTokens?: number;
+    }) =>
+      request<Omit<AllianceState, "user">>("/alliance/bids", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+    review: (id: string, action: "accept" | "reject" | "withdraw") =>
+      request<Omit<AllianceState, "user">>(`/alliance/bids/${id}/review`, {
+        method: "POST",
+        body: JSON.stringify({ action }),
+      }),
+  },
+  disputes: {
+    raise: (body: {
+      dealId: string;
+      raisedBy?: string;
+      raisedRole?: "buyer" | "supplier" | "broker";
+      reason: string;
+      claimTokens?: number;
+    }) =>
+      request<Omit<AllianceState, "user">>("/alliance/disputes", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+    decide: (
+      id: string,
+      body: {
+        decision: string;
+        decidedBy?: string;
+        adjustBuyerRefund?: number;
+        adjustSupplierClawback?: number;
+      },
+    ) =>
+      request<Omit<AllianceState, "user">>(`/alliance/disputes/${id}/decide`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+  },
+  wallets: {
+    topup: (body: { org: string; amount: number }) =>
+      request<{ org: string; balance: number; locked?: number; credited: number }>(
+        "/alliance/wallets/topup",
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+        },
+      ),
+  },
 };
 
 export const centerApi = {
@@ -101,5 +200,24 @@ export const centerApi = {
       request<WorkOrder>("/center/orders", { method: "POST", body: JSON.stringify(o) }),
     update: (id: string, patch: Partial<WorkOrder>) =>
       request<WorkOrder>(`/center/orders/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
+  },
+  tokens: {
+    get: () =>
+      request<{
+        tokenModels: CenterState["tokenModels"];
+        tokenPackages: CenterState["tokenPackages"];
+        tokenWallet: CenterState["tokenWallet"];
+      }>("/center/tokens"),
+    purchase: (packageId: string) =>
+      request<{
+        tokenWallet: CenterState["tokenWallet"];
+        tokenModels: CenterState["tokenModels"];
+        tokenPackages: CenterState["tokenPackages"];
+      }>("/center/tokens/purchase", { method: "POST", body: JSON.stringify({ packageId }) }),
+    regenerateKey: () =>
+      request<{ apiKey: string; tokenWallet: CenterState["tokenWallet"] }>(
+        "/center/tokens/regenerate-key",
+        { method: "POST" },
+      ),
   },
 };

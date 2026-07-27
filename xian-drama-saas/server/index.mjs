@@ -20,9 +20,25 @@ import {
   listAllianceOrders,
   upsertAllianceOrder,
   patchAllianceOrder,
+  listWorks,
+  upsertWork,
+  patchWork,
+  listVenues,
+  patchVenue,
+  closeMatchDeal,
+  placeMatchBid,
+  reviewMatchBid,
+  consumeDealTokens,
+  settleDealProject,
+  confirmDealProject,
+  raiseDispute,
+  decideDispute,
+  topUpOrgWallet,
   getCenterState,
   resetCenterState,
   getCenterStats,
+  purchaseCenterTokens,
+  regenerateCenterApiKey,
   listApprovals,
   patchApproval,
   listOverseas,
@@ -65,7 +81,7 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     service: "xian-drama-saas",
-    version: "1.2.1",
+    version: "1.9.2",
     storage: isPostgres() ? "postgresql" : "json",
     portals: ["alliance", "center"],
   });
@@ -116,11 +132,90 @@ app.put("/api/alliance/orders/:id", asyncHandler(async (req, res) => {
   res.json(item);
 }));
 
+app.get("/api/alliance/works", asyncHandler(async (_req, res) => res.json(await listWorks())));
+app.post("/api/alliance/works", asyncHandler(async (req, res) => res.json(await upsertWork(req.body))));
+app.put("/api/alliance/works/:id", asyncHandler(async (req, res) => {
+  const item = await patchWork(req.params.id, req.body);
+  if (!item) return res.status(404).json({ error: "未找到" });
+  res.json(item);
+}));
+
+app.get("/api/alliance/venues", asyncHandler(async (_req, res) => res.json(await listVenues())));
+app.put("/api/alliance/venues/:id", asyncHandler(async (req, res) => {
+  const item = await patchVenue(req.params.id, req.body);
+  if (!item) return res.status(404).json({ error: "未找到" });
+  res.json(item);
+}));
+
+app.post("/api/alliance/deals/close", asyncHandler(async (req, res) => {
+  const state = await closeMatchDeal(req.body || {});
+  res.json(state);
+}));
+
+app.post("/api/alliance/bids", asyncHandler(async (req, res) => {
+  res.json(await placeMatchBid(req.body || {}));
+}));
+
+app.post("/api/alliance/bids/:id/review", asyncHandler(async (req, res) => {
+  res.json(await reviewMatchBid({ bidId: req.params.id, ...(req.body || {}) }));
+}));
+
+app.post("/api/alliance/deals/:id/consume", asyncHandler(async (req, res) => {
+  const state = await consumeDealTokens({ dealId: req.params.id, ...(req.body || {}) });
+  res.json(state);
+}));
+
+app.post("/api/alliance/deals/:id/settle", asyncHandler(async (req, res) => {
+  res.json(await settleDealProject(req.params.id));
+}));
+
+app.post("/api/alliance/deals/:id/confirm", asyncHandler(async (req, res) => {
+  const state = await confirmDealProject({ dealId: req.params.id, ...(req.body || {}) });
+  res.json(state);
+}));
+
+app.post("/api/alliance/disputes", asyncHandler(async (req, res) => {
+  res.json(await raiseDispute(req.body || {}));
+}));
+
+app.post("/api/alliance/disputes/:id/decide", asyncHandler(async (req, res) => {
+  res.json(await decideDispute({ disputeId: req.params.id, ...(req.body || {}) }));
+}));
+
+app.post("/api/alliance/wallets/topup", asyncHandler(async (req, res) => {
+  res.json(await topUpOrgWallet(req.body || {}));
+}));
+
 // ── Center API（数据独立）──────────────────────────────────
 
 app.get("/api/center/state", asyncHandler(async (_req, res) => res.json(await getCenterState())));
 app.post("/api/center/reset", asyncHandler(async (_req, res) => res.json(await resetCenterState())));
 app.get("/api/center/stats", asyncHandler(async (_req, res) => res.json(await getCenterStats())));
+
+app.get("/api/center/tokens", asyncHandler(async (_req, res) => {
+  const state = await getCenterState();
+  res.json({
+    tokenModels: state.tokenModels,
+    tokenPackages: state.tokenPackages,
+    tokenWallet: state.tokenWallet,
+  });
+}));
+
+app.post("/api/center/tokens/purchase", asyncHandler(async (req, res) => {
+  const { packageId } = req.body || {};
+  if (!packageId) return res.status(400).json({ error: "缺少 packageId" });
+  const state = await purchaseCenterTokens(packageId);
+  res.json({
+    tokenWallet: state.tokenWallet,
+    tokenModels: state.tokenModels,
+    tokenPackages: state.tokenPackages,
+  });
+}));
+
+app.post("/api/center/tokens/regenerate-key", asyncHandler(async (_req, res) => {
+  const wallet = await regenerateCenterApiKey();
+  res.json({ apiKey: wallet.apiKey, tokenWallet: wallet });
+}));
 
 app.post("/api/center/auth/login", (req, res) => {
   const { role } = req.body || {};

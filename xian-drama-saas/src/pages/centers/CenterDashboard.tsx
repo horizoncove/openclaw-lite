@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import { useCenterStore } from "../../store/centerStore";
 
 export default function CenterDashboard() {
-  const { orders, approvals, overseas, distributions, copyrights, ais } = useCenterStore();
+  const { orders, approvals, overseas, distributions, copyrights, ais, tokenWallet } =
+    useCenterStore();
   const openOrders = orders.filter((o) => o.status !== "完结" && o.status !== "关闭");
   const highRisk = approvals.filter((a) => a.risk === "高" || a.stage === "会诊");
 
@@ -22,9 +23,18 @@ export default function CenterDashboard() {
           <div className="stat-label">出海项目</div>
         </div>
         <div className="card">
-          <div className="stat-value">{ais.length}</div>
-          <div className="stat-label">AI 接入</div>
+          <div className="stat-value">{(tokenWallet.balance / 1000).toFixed(1)}k</div>
+          <div className="stat-label">Token 余额</div>
         </div>
+      </div>
+
+      <div className="center-quick-links">
+        <Link className="center-quick-link" to="/center/console/panorama">
+          全景数据看板 →
+        </Link>
+        <Link className="center-quick-link" to="/center/console/tokens">
+          Token 聚合购买 →
+        </Link>
       </div>
 
       <div className="grid grid-2">

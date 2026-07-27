@@ -1,0 +1,138 @@
+import { useMemo } from "react";
+import { Link } from "react-router-dom";
+import { Coins, Handshake, Package, Wallet } from "lucide-react";
+import { useAllianceStore } from "../../../store/allianceStore";
+import { findMemberOrg } from "../../../utils/memberContext";
+
+export default function MemberDealsPage() {
+  const { user, members, deals, orgWallets, scenePackages, topUpWallet } = useAllianceStore();
+  const org = findMemberOrg(user, members);
+  const wallet = orgWallets.find((w) => w.org === org?.name);
+
+  const asBuyer = useMemo(() => deals.filter((d) => d.buyerOrg === org?.name), [deals, org]);
+  const asSupplier = useMemo(() => deals.filter((d) => d.supplierOrg === org?.name), [deals, org]);
+
+  if (!org) {
+    return (
+      <div className="member-card">
+        <h3>未绑定企业</h3>
+        <p style={{ color: "var(--muted)" }}>请使用会员演示账号登录以查看项目钱包。</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="member-page">
+      <section className="member-hero-card">
+        <div>
+          <p className="member-hero-label">我的项目与钱包</p>
+          <h3>{org.name}</h3>
+          <p className="member-hero-desc">
+            可用余额可开新单；锁定余额在项目托管池里，按履约节点释放并切割对价。
+            你买的不是「Token 数字」，是译制/预检/投流等可交付标的。
+          </p>
+        </div>
+        <div className="member-hero-stat">
+          <div className="stat-value">{((wallet?.balance ?? 0) / 1000).toFixed(0)}k</div>
+          <div className="stat-label">可用 · 锁定 {((wallet?.locked ?? 0) / 1000).toFixed(0)}k</div>
+        </div>
+      </section>
+
+      <div className="member-card" style={{ marginTop: "1rem" }}>
+        <div className="showcase-toolbar">
+          <div>
+            <h3>企业钱包（摘要）</h3>
+            <p className="member-page-intro" style={{ margin: 0 }}>
+              可用 {((wallet?.balance ?? 0)).toLocaleString()} · 锁定 {((wallet?.locked ?? 0)).toLocaleString()}。
+              完整对账、暂挂与流水见托管钱包中心。
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Link className="btn btn-secondary" to="/alliance/member/wallets">
+              <Wallet size={15} /> 托管钱包
+            </Link>
+            <button className="btn btn-primary" onClick={() => topUpWallet(org.name, 50000)}>
+              <Coins size={15} /> 补充 50k
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-2" style={{ marginTop: "1rem" }}>
+        <div className="member-card">
+          <div className="discover-section-head">
+            <Package size={18} />
+            <h3>我是需求方 · {asBuyer.length} 个项目</h3>
+          </div>
+          {asBuyer.length === 0 ? (
+            <p style={{ color: "var(--muted)" }}>暂无买方项目。发布供需并由秘书处成交后会出现在这里。</p>
+          ) : (
+            asBuyer.map((d) => (
+              <div className="deal-mini" key={d.id}>
+                <div className="deal-card-head">
+                  <strong>{d.sceneName}</strong>
+                  <span className="tag blue">{d.status}</span>
+                </div>
+                <p>供给方：{d.supplierOrg}</p>
+                <p style={{ fontSize: "0.82rem" }}>
+                  标的：{d.consideration || d.sceneName} · 机制{" "}
+                  <span className="tag">{d.payMechanism || "预付"}</span>
+                </p>
+                <div className="deal-budget-bar"><div style={{ width: `${Math.round((d.spent / d.budget) * 100)}%` }} /></div>
+                <div className="deal-budget-labels">
+                  <span>
+                    托管剩余 {(d.escrow ?? d.budget - d.spent).toLocaleString()} / {d.budget.toLocaleString()}
+                    {(d.unfunded ?? 0) > 0 ? ` · 未冻 ${d.unfunded.toLocaleString()}` : ""}
+                  </span>
+                </div>
+                <p className="deal-next"><b>你的下一步：</b>{d.nextActionBuyer}</p>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="member-card">
+          <div className="discover-section-head">
+            <Handshake size={18} />
+            <h3>我是供给方 · {asSupplier.length} 个项目</h3>
+          </div>
+          {asSupplier.length === 0 ? (
+            <p style={{ color: "var(--muted)" }}>暂无卖方项目。被撮合为供给方后，激励会回流到此。</p>
+          ) : (
+            asSupplier.map((d) => (
+              <div className="deal-mini" key={d.id}>
+                <div className="deal-card-head">
+                  <strong>{d.sceneName}</strong>
+                  <span className="tag green">激励 {d.supplierEarned.toLocaleString()}</span>
+                </div>
+                <p>需求方：{d.buyerOrg}</p>
+                <p style={{ fontSize: "0.82rem" }}>
+                  机制 <span className="tag">{d.payMechanism || "预付"}</span>
+                  {(d.heldSupplier ?? 0) > 0 && (
+                    <span className="tag amber" style={{ marginLeft: 6 }}>
+                      暂挂 {d.heldSupplier.toLocaleString()}
+                    </span>
+                  )}
+                </p>
+                <p className="deal-next"><b>你的下一步：</b>{d.nextActionSupplier}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      <div className="member-card" style={{ marginTop: "1rem" }}>
+        <h3>可选场景包（成交时锁定）</h3>
+        <div className="scene-grid compact">
+          {scenePackages.map((s) => (
+            <article className="scene-card" key={s.id}>
+              <strong>{s.name}</strong>
+              <span className="tag">{(s.tokens / 1000).toFixed(0)}k</span>
+              <p>{s.forBuyer}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

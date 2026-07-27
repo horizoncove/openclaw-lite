@@ -8,14 +8,19 @@ import {
   Bot,
   ClipboardList,
   ChartColumnIncreasing,
+  Monitor,
+  Coins,
   LogOut,
   RotateCcw,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useCenterStore } from "../store/centerStore";
 import { CENTER_ROLE_LABEL } from "../types";
 
 const nav = [
   { to: "/center/console", label: "中心总览", icon: LayoutDashboard, end: true },
+  { to: "/center/console/panorama", label: "全景看板", icon: Monitor },
+  { to: "/center/console/tokens", label: "Token 服务", icon: Coins },
   { to: "/center/console/approval", label: "审批中心", icon: Stamp },
   { to: "/center/console/overseas", label: "出海中心", icon: Globe2 },
   { to: "/center/console/distribution", label: "发行投流", icon: Megaphone },
@@ -27,6 +32,8 @@ const nav = [
 
 const titles: Record<string, string> = {
   "/center/console": "五大中心运营总览",
+  "/center/console/panorama": "五大中心全景数据看板",
+  "/center/console/tokens": "Token 聚合购买服务",
   "/center/console/approval": "审批中心运营",
   "/center/console/overseas": "出海中心运营",
   "/center/console/distribution": "发行投流中心运营",
@@ -37,7 +44,7 @@ const titles: Record<string, string> = {
 };
 
 export default function CenterLayout() {
-  const { user, logout, resetDemo, apiOnline, loading } = useCenterStore();
+  const { user, logout, resetDemo, apiOnline, loading, tokenWallet } = useCenterStore();
   const navFn = useNavigate();
   const loc = useLocation();
   const title = titles[loc.pathname] ?? "五大中心运营 SaaS";
@@ -71,6 +78,10 @@ export default function CenterLayout() {
         <header className="topbar">
           <h2>{title}</h2>
           <div className="topbar-actions">
+            <Link className="token-balance-chip" to="/center/console/tokens">
+              <Coins size={14} />
+              {(tokenWallet.balance / 1000).toFixed(1)}k Tokens
+            </Link>
             <span className={`api-badge ${apiOnline ? "on" : "off"}`}>
               {apiOnline ? "中心 API" : "离线模式"}
             </span>

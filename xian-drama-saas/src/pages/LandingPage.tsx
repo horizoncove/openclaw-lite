@@ -34,6 +34,9 @@ export default function LandingPage() {
           <Link className="btn btn-primary btn-lg portal-btn center" to="/center/login">
             <Stamp size={18} /> 五大中心入口 <ArrowRight size={16} />
           </Link>
+          <a className="btn btn-secondary btn-lg" href="/demo.html">
+            HTML5 全流程演示 <ArrowRight size={16} />
+          </a>
         </div>
       </section>
 
@@ -56,7 +59,7 @@ export default function LandingPage() {
               <Bot size={18} />
             </div>
             <h3>五大中心侧</h3>
-            <p>审批、出海、发行投流、版权、AI 研发运营与中心工单</p>
+            <p>审批、出海、发行投流、版权、AI 研发 · 全景看板 · Token 聚合 API</p>
             <Link className="btn btn-secondary" to="/center/login">
               进入中心 →
             </Link>
@@ -70,12 +73,12 @@ export default function LandingPage() {
           <h3>数据完全隔离</h3>
           <p>联盟 API（/api/alliance）与中心 API（/api/center）独立存储，各自重置、各自运营。</p>
         </div>
-        <a className="btn btn-secondary" href="/demo/saas-demo.pdf">
-          下载演示 PDF
+        <a className="btn btn-secondary" href="/demo.html">
+          打开 HTML5 演示页
         </a>
       </section>
 
-      <footer className="landing-foot">西安微短剧产业服务中心 · 双入口 SaaS V1.2</footer>
+      <footer className="landing-foot">西安微短剧产业服务中心 · 双入口 SaaS · 撮合×托管×仲裁</footer>
     </div>
   );
 }

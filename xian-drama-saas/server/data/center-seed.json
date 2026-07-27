@@ -38,6 +38,123 @@
       "createdAt": "2026-07-22",
       "dueAt": "2026-07-27",
       "summary": "待补充前三集成片链接"
+    },
+    {
+      "id": "WO-2026-021",
+      "product": "P02 备案材料预检",
+      "center": "审批",
+      "org": "曲江短剧工场",
+      "contact": "孙悦",
+      "priority": "中",
+      "status": "新建",
+      "assignee": "审批-刘芳",
+      "createdAt": "2026-07-22",
+      "dueAt": "2026-07-28",
+      "summary": "古装文旅题材 60 集"
+    },
+    {
+      "id": "WO-2026-022",
+      "product": "P08 海外合规审查",
+      "center": "出海",
+      "org": "浐灞国际译制中心",
+      "contact": "Maria·张",
+      "priority": "高",
+      "status": "处理中",
+      "assignee": "出海-韩磊",
+      "createdAt": "2026-07-21",
+      "dueAt": "2026-07-26",
+      "summary": "北美平台内容分级评估"
+    },
+    {
+      "id": "WO-2026-023",
+      "product": "P06 投流策略复盘",
+      "center": "发行投流",
+      "org": "秦岭投放实验室",
+      "contact": "赵倩",
+      "priority": "高",
+      "status": "处理中",
+      "assignee": "投流-苏晚",
+      "createdAt": "2026-07-20",
+      "dueAt": "2026-07-24",
+      "summary": "《职场逆袭日记》冷启动数据复盘"
+    },
+    {
+      "id": "WO-2026-024",
+      "product": "P09 剧本确权登记",
+      "center": "版权",
+      "org": "碑林剧本研究院",
+      "contact": "陈墨",
+      "priority": "中",
+      "status": "处理中",
+      "assignee": "版权-顾清",
+      "createdAt": "2026-07-19",
+      "dueAt": "2026-07-31",
+      "summary": "原创剧本 3 部著作权登记"
+    },
+    {
+      "id": "WO-2026-025",
+      "product": "P11 AI 素材产线接入",
+      "center": "AI",
+      "org": "高新漫动科技",
+      "contact": "何凯",
+      "priority": "中",
+      "status": "新建",
+      "assignee": "AI-蒋一",
+      "createdAt": "2026-07-23",
+      "dueAt": "2026-08-05",
+      "summary": "虚拟拍摄素材工厂试点"
+    },
+    {
+      "id": "WO-2026-026",
+      "product": "P03 成片合规会诊",
+      "center": "审批",
+      "org": "丝路视界传媒",
+      "contact": "李哲",
+      "priority": "高",
+      "status": "待客户",
+      "assignee": "审批-刘芳",
+      "createdAt": "2026-07-18",
+      "dueAt": "2026-07-25",
+      "summary": "《丝路信使》敏感情节复核"
+    },
+    {
+      "id": "WO-2026-027",
+      "product": "P05 新剧发行体检",
+      "center": "发行投流",
+      "org": "莲湖星图经纪",
+      "contact": "林薇",
+      "priority": "低",
+      "status": "完结",
+      "assignee": "投流-苏晚",
+      "createdAt": "2026-07-10",
+      "dueAt": "2026-07-15",
+      "summary": "达人短剧投放方案评估"
+    },
+    {
+      "id": "WO-2026-028",
+      "product": "P10 授权合同审阅",
+      "center": "版权",
+      "org": "长安映缔影视",
+      "contact": "王敏",
+      "priority": "高",
+      "status": "处理中",
+      "assignee": "版权-顾清",
+      "createdAt": "2026-07-22",
+      "dueAt": "2026-07-27",
+      "summary": "海外独家授权条款审核"
+    },
+    {
+      "id": "WO-2026-029",
+      "product": "P12 译制提速方案",
+      "center": "AI",
+      "org": "古城配音联盟",
+      "contact": "白雪",
+      "priority": "中",
+      "status": "新建",
+      "assignee": "AI-蒋一",
+      "createdAt": "2026-07-23",
+      "dueAt": "2026-08-02",
+      "summary": "多语种配音 AI 辅助流程"
     }
   ],
   "approvals": [
@@ -57,6 +174,56 @@
       "stage": "已出具意见",
       "result": "通过建议",
       "updatedAt": "2026-07-22"
+    },
+    {
+      "id": "AP-013",
+      "title": "《大唐幻夜录》",
+      "org": "曲江短剧工场",
+      "risk": "中",
+      "stage": "会诊",
+      "updatedAt": "2026-07-21"
+    },
+    {
+      "id": "AP-014",
+      "title": "《校园微光》",
+      "org": "未央青年创作社",
+      "risk": "低",
+      "stage": "收件",
+      "updatedAt": "2026-07-23"
+    },
+    {
+      "id": "AP-015",
+      "title": "《秦岭人家》",
+      "org": "咸阳农文旅影业",
+      "risk": "低",
+      "stage": "已送审",
+      "result": "修改后送审",
+      "updatedAt": "2026-07-19"
+    },
+    {
+      "id": "AP-016",
+      "title": "《逆袭女王归来》",
+      "org": "长安映缔影视",
+      "risk": "高",
+      "stage": "预检中",
+      "updatedAt": "2026-07-20"
+    },
+    {
+      "id": "AP-017",
+      "title": "《星际快递站》",
+      "org": "高新漫动科技",
+      "risk": "中",
+      "stage": "已出具意见",
+      "result": "通过建议",
+      "updatedAt": "2026-07-17"
+    },
+    {
+      "id": "AP-018",
+      "title": "《古城恋歌》",
+      "org": "碑林剧本研究院",
+      "risk": "低",
+      "stage": "已送审",
+      "updatedAt": "2026-07-15"
     }
   ],
   "overseas": [
@@ -77,6 +244,60 @@
       "score": 76,
       "owner": "出海-韩磊",
       "updatedAt": "2026-07-23"
+    },
+    {
+      "id": "OS-008",
+      "title": "《长安夜市》",
+      "market": "日韩",
+      "stage": "选品",
+      "score": 71,
+      "owner": "出海-韩磊",
+      "updatedAt": "2026-07-22"
+    },
+    {
+      "id": "OS-009",
+      "title": "《农门小福妻》",
+      "market": "东南亚",
+      "stage": "合规",
+      "score": 68,
+      "owner": "出海-韩磊",
+      "updatedAt": "2026-07-21"
+    },
+    {
+      "id": "OS-010",
+      "title": "《霸总别追我》",
+      "market": "北美",
+      "stage": "上线",
+      "score": 88,
+      "owner": "出海-韩磊",
+      "updatedAt": "2026-07-18"
+    },
+    {
+      "id": "OS-011",
+      "title": "《大唐幻夜录》",
+      "market": "中东",
+      "stage": "选品",
+      "score": 74,
+      "owner": "出海-韩磊",
+      "updatedAt": "2026-07-20"
+    },
+    {
+      "id": "OS-012",
+      "title": "《职场逆袭日记》",
+      "market": "拉美",
+      "stage": "译制",
+      "score": 79,
+      "owner": "出海-韩磊",
+      "updatedAt": "2026-07-19"
+    },
+    {
+      "id": "OS-013",
+      "title": "《星际快递站》",
+      "market": "欧洲",
+      "stage": "谈判",
+      "score": 65,
+      "owner": "出海-韩磊",
+      "updatedAt": "2026-07-16"
     }
   ],
   "distributions": [
@@ -86,6 +307,7 @@
       "platform": "红果/抖音",
       "budget": "80 万",
       "stage": "冷启动",
+      "roi": "1:1.6",
       "owner": "投流-苏晚"
     },
     {
@@ -94,6 +316,57 @@
       "platform": "多平台",
       "budget": "120 万",
       "stage": "体检",
+      "owner": "投流-苏晚"
+    },
+    {
+      "id": "DS-005",
+      "title": "《重生后我只搞钱》",
+      "platform": "快手/微信",
+      "budget": "60 万",
+      "stage": "放量",
+      "roi": "1:2.1",
+      "owner": "投流-苏晚"
+    },
+    {
+      "id": "DS-006",
+      "title": "《校园微光》",
+      "platform": "B站/小红书",
+      "budget": "35 万",
+      "stage": "冷启动",
+      "owner": "投流-苏晚"
+    },
+    {
+      "id": "DS-007",
+      "title": "《霸总别追我》",
+      "platform": "抖音",
+      "budget": "150 万",
+      "stage": "复盘",
+      "roi": "1:2.8",
+      "owner": "投流-苏晚"
+    },
+    {
+      "id": "DS-008",
+      "title": "《农门小福妻》",
+      "platform": "红果",
+      "budget": "45 万",
+      "stage": "体检",
+      "owner": "投流-苏晚"
+    },
+    {
+      "id": "DS-009",
+      "title": "《大唐幻夜录》",
+      "platform": "多平台",
+      "budget": "200 万",
+      "stage": "冷启动",
+      "owner": "投流-苏晚"
+    },
+    {
+      "id": "DS-010",
+      "title": "《秦岭人家》",
+      "platform": "视频号",
+      "budget": "25 万",
+      "stage": "复盘",
+      "roi": "1:1.3",
       "owner": "投流-苏晚"
     }
   ],
@@ -113,6 +386,54 @@
       "status": "转介",
       "org": "长安映缔影视",
       "updatedAt": "2026-07-21"
+    },
+    {
+      "id": "CR-011",
+      "title": "《大唐幻夜录》IP 全链条确权",
+      "type": "确权",
+      "status": "进行中",
+      "org": "曲江短剧工场",
+      "updatedAt": "2026-07-22"
+    },
+    {
+      "id": "CR-012",
+      "title": "原创剧本著作权登记辅导",
+      "type": "登记辅导",
+      "status": "进行中",
+      "org": "碑林剧本研究院",
+      "updatedAt": "2026-07-20"
+    },
+    {
+      "id": "CR-013",
+      "title": "《霸总别追我》海外改编授权",
+      "type": "授权",
+      "status": "已完成",
+      "org": "长安映缔影视",
+      "updatedAt": "2026-07-15"
+    },
+    {
+      "id": "CR-014",
+      "title": "音乐素材侵权维权",
+      "type": "维权",
+      "status": "进行中",
+      "org": "秦岭投放实验室",
+      "updatedAt": "2026-07-19"
+    },
+    {
+      "id": "CR-015",
+      "title": "《校园微光》形象权授权",
+      "type": "授权",
+      "status": "进行中",
+      "org": "未央青年创作社",
+      "updatedAt": "2026-07-23"
+    },
+    {
+      "id": "CR-016",
+      "title": "《农门小福妻》分账协议审阅",
+      "type": "授权",
+      "status": "转介",
+      "org": "咸阳农文旅影业",
+      "updatedAt": "2026-07-18"
     }
   ],
   "ais": [
@@ -129,7 +450,238 @@
       "org": "丝路视界传媒",
       "line": "译制提速",
       "status": "接入中",
+      "lift": "译制周期 -30%",
+      "owner": "AI-蒋一"
+    },
+    {
+      "id": "AI-004",
+      "org": "高新漫动科技",
+      "line": "剧本辅助",
+      "status": "试点",
+      "lift": "大纲产出 +60%",
+      "owner": "AI-蒋一"
+    },
+    {
+      "id": "AI-005",
+      "org": "碑林剧本研究院",
+      "line": "剧本辅助",
+      "status": "已固化",
+      "lift": "改稿效率 +50%",
+      "owner": "AI-蒋一"
+    },
+    {
+      "id": "AI-006",
+      "org": "长安映缔影视",
+      "line": "合规辅助",
+      "status": "接入中",
+      "lift": "预检命中率 +25%",
+      "owner": "AI-蒋一"
+    },
+    {
+      "id": "AI-007",
+      "org": "古城配音联盟",
+      "line": "译制提速",
+      "status": "试点",
+      "lift": "配音成本 -20%",
       "owner": "AI-蒋一"
     }
-  ]
+  ],
+  "tokenModels": [
+    {
+      "id": "openai/gpt-4o-mini",
+      "provider": "OpenAI",
+      "name": "GPT-4o Mini",
+      "category": "chat",
+      "inputPrice": 1.2,
+      "outputPrice": 4.8,
+      "contextWindow": 128000,
+      "status": "可用",
+      "tags": ["通用", "低成本"]
+    },
+    {
+      "id": "anthropic/claude-3.5-sonnet",
+      "provider": "Anthropic",
+      "name": "Claude 3.5 Sonnet",
+      "category": "chat",
+      "inputPrice": 4.5,
+      "outputPrice": 22,
+      "contextWindow": 200000,
+      "status": "可用",
+      "tags": ["长文本", "剧本"]
+    },
+    {
+      "id": "google/gemini-2.0-flash",
+      "provider": "Google",
+      "name": "Gemini 2.0 Flash",
+      "category": "chat",
+      "inputPrice": 0.8,
+      "outputPrice": 3.2,
+      "contextWindow": 1000000,
+      "status": "可用",
+      "tags": ["多模态", "高速"]
+    },
+    {
+      "id": "alibaba/qwen-max",
+      "provider": "通义千问",
+      "name": "Qwen Max",
+      "category": "chat",
+      "inputPrice": 2.4,
+      "outputPrice": 9.6,
+      "contextWindow": 32000,
+      "status": "可用",
+      "tags": ["中文", "合规"]
+    },
+    {
+      "id": "baidu/ernie-4.0",
+      "provider": "文心一言",
+      "name": "ERNIE 4.0",
+      "category": "chat",
+      "inputPrice": 3,
+      "outputPrice": 12,
+      "contextWindow": 128000,
+      "status": "可用",
+      "tags": ["备案", "政务"]
+    },
+    {
+      "id": "deepseek/deepseek-v3",
+      "provider": "DeepSeek",
+      "name": "DeepSeek V3",
+      "category": "chat",
+      "inputPrice": 1,
+      "outputPrice": 2,
+      "contextWindow": 64000,
+      "status": "可用",
+      "tags": ["推理", "性价比"]
+    },
+    {
+      "id": "bytedance/doubao-pro",
+      "provider": "豆包",
+      "name": "Doubao Pro",
+      "category": "chat",
+      "inputPrice": 1.5,
+      "outputPrice": 6,
+      "contextWindow": 128000,
+      "status": "限流",
+      "tags": ["投放", "素材"]
+    },
+    {
+      "id": "xian-drama/script-v1",
+      "provider": "西安中心",
+      "name": "微短剧剧本助手 V1",
+      "category": "chat",
+      "inputPrice": 0.6,
+      "outputPrice": 2.4,
+      "contextWindow": 32000,
+      "status": "可用",
+      "tags": ["垂类", "分集大纲"]
+    },
+    {
+      "id": "openai/text-embedding-3-small",
+      "provider": "OpenAI",
+      "name": "Embedding 3 Small",
+      "category": "embedding",
+      "inputPrice": 0.2,
+      "outputPrice": 0,
+      "contextWindow": 8192,
+      "status": "可用",
+      "tags": ["检索", "RAG"]
+    },
+    {
+      "id": "runway/gen-3-alpha",
+      "provider": "Runway",
+      "name": "Gen-3 Alpha",
+      "category": "video",
+      "inputPrice": 48,
+      "outputPrice": 0,
+      "contextWindow": 0,
+      "status": "维护",
+      "tags": ["视频生成", "预告片"]
+    }
+  ],
+  "tokenPackages": [
+    {
+      "id": "PKG-STARTER",
+      "name": "入门包",
+      "tokens": 50000,
+      "price": 49,
+      "bonus": 0,
+      "desc": "适合小团队试用，覆盖剧本辅助与合规预检"
+    },
+    {
+      "id": "PKG-STANDARD",
+      "name": "标准包",
+      "tokens": 200000,
+      "price": 179,
+      "bonus": 20000,
+      "popular": true,
+      "desc": "五大中心日常运营推荐，含 10% 赠送额度"
+    },
+    {
+      "id": "PKG-PRO",
+      "name": "专业包",
+      "tokens": 1000000,
+      "price": 799,
+      "bonus": 150000,
+      "desc": "多模型并行调用，适合译制与素材产线"
+    },
+    {
+      "id": "PKG-ENTERPRISE",
+      "name": "企业包",
+      "tokens": 5000000,
+      "price": 3499,
+      "bonus": 1000000,
+      "desc": "统一结算、专属路由，支持私有化模型接入"
+    }
+  ],
+  "tokenWallet": {
+    "balance": 128400,
+    "usedThisMonth": 45600,
+    "monthlyQuota": 200000,
+    "apiKey": "xd-center-sk-live-demo-8f3a2b1c",
+    "transactions": [
+      {
+        "id": "TX-20260720-001",
+        "type": "充值",
+        "amount": 220000,
+        "balance": 128400,
+        "note": "购买标准包（含赠送 20,000）",
+        "createdAt": "2026-07-20"
+      },
+      {
+        "id": "TX-20260721-002",
+        "type": "消耗",
+        "amount": -12400,
+        "balance": 108400,
+        "model": "anthropic/claude-3.5-sonnet",
+        "note": "审批中心 · 备案材料智能预检",
+        "createdAt": "2026-07-21"
+      },
+      {
+        "id": "TX-20260722-003",
+        "type": "消耗",
+        "amount": -8600,
+        "balance": 99800,
+        "model": "xian-drama/script-v1",
+        "note": "AI 研发 · 分集大纲批量生成",
+        "createdAt": "2026-07-22"
+      },
+      {
+        "id": "TX-20260722-004",
+        "type": "消耗",
+        "amount": -15200,
+        "balance": 84600,
+        "model": "alibaba/qwen-max",
+        "note": "出海中心 · 多语种译制字幕",
+        "createdAt": "2026-07-22"
+      },
+      {
+        "id": "TX-20260723-005",
+        "type": "充值",
+        "amount": 43800,
+        "balance": 128400,
+        "note": "购买入门包补充额度",
+        "createdAt": "2026-07-23"
+      }
+    ]
+  }
 }
