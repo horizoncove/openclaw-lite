@@ -81,7 +81,7 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     service: "xian-drama-saas",
-    version: "1.9.1",
+    version: "1.9.2",
     storage: isPostgres() ? "postgresql" : "json",
     portals: ["alliance", "center"],
   });
