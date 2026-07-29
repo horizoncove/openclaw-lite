@@ -35,8 +35,11 @@ xpark-dev/
 ```bash
 cd xpark-dev
 python3 -m http.server 8080
-# 浏览器访问 http://localhost:8080/pages/index.html
+# 浏览器访问 http://localhost:8080/ （自动跳转首页）
+# 或直接打开 http://localhost:8080/pages/index.html
 ```
+
+> 注意：必须在 `xpark-dev` 目录内启动服务器。若在仓库根目录启动，请访问 `/xpark-dev/` 路径。
 
 ## 设计 Token 体系
 
