@@ -58,19 +58,35 @@
   function renderCategoryChart() {
     const el = document.getElementById('cat-chart');
     if (!el || !BRANDS.length) return;
+    renderBarChart(el, countBy((b) => b.cat));
+  }
+
+  function renderZoneChart() {
+    const el = document.getElementById('zone-chart');
+    if (!el || !BRANDS.length) return;
+    const street = BRANDS.filter((b) => !b.zone?.includes('非街铺'));
+    renderBarChart(el, countBy((b) => b.macroLabel || '待定', street));
+  }
+
+  function countBy(fn, list = BRANDS) {
     const counts = {};
-    BRANDS.forEach((b) => {
-      counts[b.cat] = (counts[b.cat] || 0) + 1;
+    list.forEach((b) => {
+      const key = fn(b);
+      counts[key] = (counts[key] || 0) + 1;
     });
+    return counts;
+  }
+
+  function renderBarChart(el, counts) {
     const max = Math.max(...Object.values(counts));
     const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
     el.innerHTML = sorted
       .map(
-        ([cat, n]) => `
+        ([label, n]) => `
         <div class="cat-bar-item">
-          <div class="cat-name">${cat}</div>
+          <div class="cat-name">${label}</div>
           <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${Math.round((n / max) * 100)}%"></div></div>
-          <div class="cat-num">${n} 个品牌</div>
+          <div class="cat-num">${n} 个</div>
         </div>`
       )
       .join('');
@@ -83,9 +99,10 @@
     el.innerHTML = list
       .map(
         (b) => `
-        <div class="handbook-brand-chip">
+        <div class="handbook-brand-chip" title="${b.zone || ''}">
           <img src="../assets/${b.logo}" alt="${b.name}" loading="lazy">
           <span>${b.name}</span>
+          ${b.zone ? `<span class="handbook-brand-zone xpark-caption">${b.building}${b.side && b.side !== '—' ? ' · ' + b.side : ''}</span>` : ''}
         </div>`
       )
       .join('');
@@ -117,6 +134,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     renderTierCards();
     renderCategoryChart();
+    renderZoneChart();
     renderTierBrands('A', 'tier-a-brands');
     renderTierBrands('B', 'tier-b-brands');
     initToc();

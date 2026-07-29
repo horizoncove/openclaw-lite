@@ -14,7 +14,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/蜜雪冰城.png",
     "tierTag": "coral",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "002",
@@ -31,7 +36,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/瑞幸.png",
     "tierTag": "coral",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-office",
+    "macroLabel": "办公商务",
+    "building": "3#",
+    "side": "内侧",
+    "zone": "3# · 1F 内侧"
   },
   {
     "id": "003",
@@ -48,7 +58,12 @@ window.XPARK_BRANDS = [
     "rent": "高（常要免租期）",
     "logo": "logos/麦当劳.png",
     "tierTag": "coral",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-office",
+    "macroLabel": "办公商务",
+    "building": "3#",
+    "side": "外侧",
+    "zone": "3# · 1F 外侧"
   },
   {
     "id": "004",
@@ -65,7 +80,12 @@ window.XPARK_BRANDS = [
     "rent": "高（常要免租期）",
     "logo": "logos/肯德基.png",
     "tierTag": "coral",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-office",
+    "macroLabel": "办公商务",
+    "building": "3#",
+    "side": "外侧",
+    "zone": "3# · 1F 外侧"
   },
   {
     "id": "005",
@@ -82,7 +102,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/海底捞-校园店-嗨捞.png",
     "tierTag": "coral",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 2F 内侧"
   },
   {
     "id": "006",
@@ -99,7 +124,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/海伦司.png",
     "tierTag": "coral",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 日咖夜酒"
   },
   {
     "id": "007",
@@ -116,7 +146,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/好特卖.png",
     "tierTag": "coral",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "5#",
+    "side": "—",
+    "zone": "5# · 1F"
   },
   {
     "id": "008",
@@ -133,7 +168,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/嗨特购.png",
     "tierTag": "coral",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "5#",
+    "side": "—",
+    "zone": "5# · 1F"
   },
   {
     "id": "009",
@@ -150,7 +190,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/魅ktv.png",
     "tierTag": "coral",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "—",
+    "zone": "7# · 3F–4F"
   },
   {
     "id": "010",
@@ -167,7 +212,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/罗森.png",
     "tierTag": "coral",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "外侧",
+    "zone": "4# · 1F 外侧"
   },
   {
     "id": "011",
@@ -184,7 +234,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/唐久-每一天.svg",
     "tierTag": "coral",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "外侧",
+    "zone": "4# · 1F 外侧"
   },
   {
     "id": "012",
@@ -201,7 +256,12 @@ window.XPARK_BRANDS = [
     "rent": "自营/摊位费",
     "logo": "logos/外摆美食市集.svg",
     "tierTag": "coral",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "方形广场",
+    "building": "方形广场",
+    "side": "—",
+    "zone": "方形广场 · 外摆市集"
   },
   {
     "id": "013",
@@ -218,7 +278,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/魏家凉皮.png",
     "tierTag": "coral",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "内侧",
+    "zone": "4# · 1F 内侧美食街"
   },
   {
     "id": "014",
@@ -235,7 +300,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/霸王茶姬.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "015",
@@ -252,7 +322,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/茶百道.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "016",
@@ -269,7 +344,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/古茗.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "017",
@@ -286,7 +366,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/沪上阿姨.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "018",
@@ -303,7 +388,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/书亦烧仙草.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "019",
@@ -320,7 +410,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/coco都可.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "020",
@@ -337,7 +432,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/茶话弄.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "021",
@@ -354,7 +454,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/茉酸奶.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "022",
@@ -371,7 +476,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/库迪.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "023",
@@ -388,7 +498,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/幸运咖.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "024",
@@ -405,7 +520,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/塔斯汀.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "025",
@@ -422,7 +542,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/正新鸡排.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "026",
@@ -439,7 +564,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/华莱士.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "027",
@@ -456,7 +586,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/米村拌饭.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "028",
@@ -473,7 +608,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/乡村基.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "029",
@@ -490,7 +630,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/杨国福.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "030",
@@ -507,7 +652,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/张亮.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "031",
@@ -524,7 +674,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/袁记云饺.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "032",
@@ -541,7 +696,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/遇见小面.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "033",
@@ -558,7 +718,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/无名缘米粉-五谷渔粉.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "034",
@@ -575,7 +740,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/好利来.png",
     "tierTag": "lime",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "内侧",
+    "zone": "4# · 1F 内侧美食街"
   },
   {
     "id": "035",
@@ -592,7 +762,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/鲍师傅.svg",
     "tierTag": "lime",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "内侧",
+    "zone": "4# · 1F 内侧美食街"
   },
   {
     "id": "036",
@@ -609,7 +784,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/御品轩.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "内侧",
+    "zone": "4# · 1F 内侧美食街"
   },
   {
     "id": "037",
@@ -626,7 +806,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/马路边边.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "038",
@@ -643,7 +828,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/袁记串串香.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "039",
@@ -660,7 +850,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/九田家.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "040",
@@ -677,7 +872,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/酒拾烤肉.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "041",
@@ -694,7 +894,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/半天妖.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "042",
@@ -711,7 +916,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/兰湘子.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "043",
@@ -728,7 +938,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/连锁烧烤-精酿-如聚点串吧.svg",
     "tierTag": "lime",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "044",
@@ -745,7 +960,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/perry-s.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 日咖夜酒"
   },
   {
     "id": "045",
@@ -762,7 +982,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/乐刻.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "—",
+    "zone": "7# · 3F–4F"
   },
   {
     "id": "046",
@@ -779,7 +1004,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/连锁台球俱乐部-星牌-乔氏.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "—",
+    "zone": "7# · 3F–4F"
   },
   {
     "id": "047",
@@ -796,7 +1026,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/电竞馆-网咖-杰拉-网鱼.svg",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "—",
+    "zone": "7# · 3F–4F"
   },
   {
     "id": "048",
@@ -813,7 +1048,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/top-toy.png",
     "tierTag": "lime",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F"
   },
   {
     "id": "049",
@@ -830,7 +1070,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/名创优品.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "5#",
+    "side": "—",
+    "zone": "5# · 1F"
   },
   {
     "id": "050",
@@ -847,7 +1092,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/甜啦啦.png",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "051",
@@ -864,7 +1114,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/益禾堂.png",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "052",
@@ -881,7 +1136,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/一只酸奶牛.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "053",
@@ -898,7 +1158,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/柠季-linlee.png",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "054",
@@ -915,7 +1180,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/冒大仙-三顾冒菜.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "055",
@@ -932,7 +1202,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/螺霸王-好欢螺螺蛳粉店.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "056",
@@ -949,7 +1224,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/重庆小面类.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "057",
@@ -966,7 +1246,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/绝味鸭脖.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "058",
@@ -983,7 +1268,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/周黑鸭.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "059",
@@ -1000,7 +1290,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/夸父炸串.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "060",
@@ -1017,7 +1312,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/正新-第一佳大鸡排类.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "061",
@@ -1034,7 +1334,12 @@ window.XPARK_BRANDS = [
     "rent": "低",
     "logo": "logos/煎饼-烤冷面档口.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-plaza",
+    "macroLabel": "方形广场",
+    "building": "方形广场",
+    "side": "—",
+    "zone": "方形广场 · 档口/花车"
   },
   {
     "id": "062",
@@ -1051,7 +1356,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/沙野轻食等.svg",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-plaza",
+    "macroLabel": "中央连接",
+    "building": "6#",
+    "side": "—",
+    "zone": "6# · 1F 填铺"
   },
   {
     "id": "063",
@@ -1068,7 +1378,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/鲜芋仙.png",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "内侧",
+    "zone": "4# · 1F 内侧美食街"
   },
   {
     "id": "064",
@@ -1085,7 +1400,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/满记甜品.svg",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "内侧",
+    "zone": "4# · 1F 内侧美食街"
   },
   {
     "id": "065",
@@ -1102,7 +1422,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/鸡公煲-黄焖鸡.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "066",
@@ -1119,7 +1444,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/单人烤鱼饭.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "067",
@@ -1136,7 +1466,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/韩式拌饭-部队锅.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "068",
@@ -1153,7 +1488,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/平价寿司-日式拉面.svg",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "069",
@@ -1170,7 +1510,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/陕西本地面馆-泡馍.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "070",
@@ -1187,7 +1532,12 @@ window.XPARK_BRANDS = [
     "rent": "低",
     "logo": "logos/社区精酿酒吧.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 日咖夜酒"
   },
   {
     "id": "071",
@@ -1204,7 +1554,12 @@ window.XPARK_BRANDS = [
     "rent": "低",
     "logo": "logos/剧本杀-桌游吧.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "—",
+    "zone": "7# · 3F–4F"
   },
   {
     "id": "072",
@@ -1221,7 +1576,12 @@ window.XPARK_BRANDS = [
     "rent": "低",
     "logo": "logos/密室逃脱.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "—",
+    "zone": "7# · 3F–4F"
   },
   {
     "id": "073",
@@ -1238,7 +1598,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/抓娃娃专门店.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F"
   },
   {
     "id": "074",
@@ -1255,7 +1620,12 @@ window.XPARK_BRANDS = [
     "rent": "低",
     "logo": "logos/tufting-手工diy店.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F"
   },
   {
     "id": "075",
@@ -1272,7 +1642,12 @@ window.XPARK_BRANDS = [
     "rent": "低",
     "logo": "logos/自助台球厅.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "—",
+    "zone": "7# · 3F–4F"
   },
   {
     "id": "076",
@@ -1289,7 +1664,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/the-green-party.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "5#",
+    "side": "—",
+    "zone": "5# · 1F"
   },
   {
     "id": "077",
@@ -1306,7 +1686,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/三福时尚.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "5#",
+    "side": "—",
+    "zone": "5# · 1F"
   },
   {
     "id": "078",
@@ -1323,7 +1708,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/晨光-得力文创店.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "—",
+    "zone": "4#/5# · 1F"
   },
   {
     "id": "079",
@@ -1340,7 +1730,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/手机快修-贴膜.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-west",
+    "macroLabel": "西侧配套",
+    "building": "8#",
+    "side": "—",
+    "zone": "8# · 1F 办公配套"
   },
   {
     "id": "080",
@@ -1357,7 +1752,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/loho-宝岛眼镜.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-west",
+    "macroLabel": "西侧配套",
+    "building": "8#",
+    "side": "—",
+    "zone": "8# · 1F 办公配套"
   },
   {
     "id": "081",
@@ -1374,7 +1774,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/快剪-星客多类.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "外侧",
+    "zone": "4# · 1F 外侧"
   },
   {
     "id": "082",
@@ -1391,7 +1796,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/潮流理发店.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "—",
+    "zone": "4# · 2F 配套"
   },
   {
     "id": "083",
@@ -1408,7 +1818,12 @@ window.XPARK_BRANDS = [
     "rent": "低",
     "logo": "logos/美甲美睫工作室.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "—",
+    "zone": "4# · 2F 配套"
   },
   {
     "id": "084",
@@ -1425,7 +1840,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/打印文印店.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "外侧",
+    "zone": "4# · 1F 外侧"
   },
   {
     "id": "085",
@@ -1442,7 +1862,12 @@ window.XPARK_BRANDS = [
     "rent": "低",
     "logo": "logos/干洗-洗鞋店.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "外侧",
+    "zone": "4# · 1F 外侧"
   },
   {
     "id": "086",
@@ -1459,7 +1884,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/怡康-老百姓大药房.png",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "外侧",
+    "zone": "4# · 1F 外侧"
   },
   {
     "id": "087",
@@ -1476,7 +1906,12 @@ window.XPARK_BRANDS = [
     "rent": "低",
     "logo": "logos/驾校报名点.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "—",
+    "zone": "4# · 2F 配套"
   },
   {
     "id": "088",
@@ -1493,7 +1928,12 @@ window.XPARK_BRANDS = [
     "rent": "低",
     "logo": "logos/证件照-写真馆.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-hotel",
+    "macroLabel": "酒店生活",
+    "building": "4#",
+    "side": "—",
+    "zone": "4# · 2F 配套"
   },
   {
     "id": "089",
@@ -1510,7 +1950,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/考研机构-文都-新东方考研.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-office",
+    "macroLabel": "办公商务",
+    "building": "3#",
+    "side": "—",
+    "zone": "3# · 3F+ 教培（非街铺）"
   },
   {
     "id": "090",
@@ -1527,7 +1972,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/考公-教资培训.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-office",
+    "macroLabel": "办公商务",
+    "building": "3#",
+    "side": "—",
+    "zone": "3# · 3F+ 教培（非街铺）"
   },
   {
     "id": "091",
@@ -1544,7 +1994,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/manner.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧形象店"
   },
   {
     "id": "092",
@@ -1561,7 +2016,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/m-stand.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧形象店"
   },
   {
     "id": "093",
@@ -1578,7 +2038,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/喜茶.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-office",
+    "macroLabel": "办公商务",
+    "building": "3#",
+    "side": "外侧",
+    "zone": "3# · 1F 外侧"
   },
   {
     "id": "094",
@@ -1595,7 +2060,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/奈雪.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-office",
+    "macroLabel": "办公商务",
+    "building": "3#",
+    "side": "内侧",
+    "zone": "3# · 1F 内侧"
   },
   {
     "id": "095",
@@ -1612,7 +2082,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/达美乐.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-office",
+    "macroLabel": "办公商务",
+    "building": "3#",
+    "side": "外侧",
+    "zone": "3# · 1F 外侧"
   },
   {
     "id": "096",
@@ -1629,7 +2104,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/赛百味.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-office",
+    "macroLabel": "办公商务",
+    "building": "3#",
+    "side": "外侧",
+    "zone": "3# · 1F 外侧"
   },
   {
     "id": "097",
@@ -1646,7 +2126,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/怂火锅.svg",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "098",
@@ -1663,7 +2148,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/西塔老太太.svg",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "099",
@@ -1680,7 +2170,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/太二酸菜鱼.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "100",
@@ -1697,7 +2192,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/滨寿司-争鲜.svg",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 内侧"
   },
   {
     "id": "101",
@@ -1714,7 +2214,12 @@ window.XPARK_BRANDS = [
     "rent": "低（流量价值大）",
     "logo": "logos/小型livehouse-疆进酒-mao类.svg",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 日咖夜酒"
   },
   {
     "id": "102",
@@ -1731,7 +2236,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/commune公社.svg",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F–2F 日咖夜酒"
   },
   {
     "id": "103",
@@ -1748,7 +2258,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/超级猩猩.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "—",
+    "zone": "7# · 3F–4F"
   },
   {
     "id": "104",
@@ -1765,7 +2280,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/汤姆熊-大玩家电玩城.svg",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "—",
+    "zone": "7# · 3F–4F"
   },
   {
     "id": "105",
@@ -1782,7 +2302,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/泡泡玛特.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "内侧",
+    "zone": "7# · 1F 内侧 · 谷子/潮玩"
   },
   {
     "id": "106",
@@ -1799,7 +2324,12 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/小米之家.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-office",
+    "macroLabel": "办公商务",
+    "building": "3#",
+    "side": "外侧",
+    "zone": "3# · 1F 外侧"
   },
   {
     "id": "107",
@@ -1816,7 +2346,12 @@ window.XPARK_BRANDS = [
     "rent": "一事一议",
     "logo": "logos/西安-西北首店级品牌1-2个.svg",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-landmark",
+    "macroLabel": "地标广场",
+    "building": "地标广场",
+    "side": "—",
+    "zone": "地标广场 · 首店/快闪"
   },
   {
     "id": "108",
@@ -1833,7 +2368,12 @@ window.XPARK_BRANDS = [
     "rent": "联营/中高",
     "logo": "logos/滔搏-胜道体育-多品牌奥莱店.png",
     "tierTag": "coral",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧 · 400–600㎡"
   },
   {
     "id": "109",
@@ -1850,7 +2390,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/李宁奥莱店-工厂店.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "110",
@@ -1867,7 +2412,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/安踏奥莱店.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "111",
@@ -1884,7 +2434,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/特步工厂店.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "112",
@@ -1901,7 +2456,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/361-奥莱店.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "113",
@@ -1918,7 +2478,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/鸿星尔克.png",
     "tierTag": "lime",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "114",
@@ -1935,7 +2500,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/斯凯奇奥莱店.png",
     "tierTag": "lime",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "115",
@@ -1952,7 +2522,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/匡威-vans折扣店.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "116",
@@ -1969,7 +2544,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/new-balance奥莱店.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "117",
@@ -1986,7 +2566,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/骆驼-探路者折扣店.png",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "118",
@@ -2003,7 +2588,12 @@ window.XPARK_BRANDS = [
     "rent": "自营",
     "logo": "logos/多品牌运动折扣集合店-自采模式.svg",
     "tierTag": "ink-outline",
-    "probTag": "lime"
+    "probTag": "lime",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "119",
@@ -2020,7 +2610,12 @@ window.XPARK_BRANDS = [
     "rent": "联营",
     "logo": "logos/nike-factory-store-直营奥莱.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "120",
@@ -2037,7 +2632,12 @@ window.XPARK_BRANDS = [
     "rent": "联营",
     "logo": "logos/adidas-factory-outlet.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "121",
@@ -2054,7 +2654,12 @@ window.XPARK_BRANDS = [
     "rent": "中高",
     "logo": "logos/puma奥莱店.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "122",
@@ -2071,7 +2676,12 @@ window.XPARK_BRANDS = [
     "rent": "中",
     "logo": "logos/under-armour奥莱店.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   },
   {
     "id": "123",
@@ -2088,6 +2698,11 @@ window.XPARK_BRANDS = [
     "rent": "高",
     "logo": "logos/the-north-face-始祖鸟折扣.png",
     "tierTag": "ink-outline",
-    "probTag": "ink-outline"
+    "probTag": "ink-outline",
+    "macro": "hub-ent",
+    "macroLabel": "娱乐 Hub",
+    "building": "7#",
+    "side": "外侧",
+    "zone": "7# · 1F 外侧"
   }
 ];
