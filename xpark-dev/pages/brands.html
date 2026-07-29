@@ -40,7 +40,7 @@
         <div>
           <p class="xpark-eyebrow">XPARK · 入驻品牌</p>
           <h1 class="xpark-display">Merchant Brands</h1>
-          <p class="xpark-lead">11 家独立品牌，覆盖餐饮、零售、设计与生活方式。每家都有独特故事，共同构成 Xpark 街区气质。</p>
+          <p class="xpark-lead">123 个招商目标品牌，按 ABCD 四档分级。覆盖茶饮、餐饮、零售、文体娱乐与运动奥莱，服务 10 万+ 高校师生客群。</p>
         </div>
         <div class="intro-photo">
           <img src="../assets/images/scenes/district-night.jpg" alt="Xpark 街区夜景" loading="lazy">
@@ -50,15 +50,20 @@
 
     <section class="page-block alt-bg">
       <div class="container">
+        <div class="brands-summary" id="brands-summary"></div>
         <div class="brands-toolbar">
-          <div class="brands-filter">
-            <span class="badge lime active">全部</span>
-            <span class="badge ink-outline">餐饮</span>
-            <span class="badge ink-outline">零售</span>
-            <span class="badge ink-outline">设计</span>
-            <span class="badge ink-outline">生活方式</span>
+          <div class="brands-filter-group">
+            <p class="filter-label xpark-caption">分档筛选</p>
+            <div class="brands-filter" id="tier-filter"></div>
           </div>
-          <input id="brand-search" class="input input-search" type="search" placeholder="搜索品牌、活动">
+          <div class="brands-filter-group">
+            <p class="filter-label xpark-caption">业态筛选</p>
+            <div class="brands-filter brands-filter--wrap" id="cat-filter"></div>
+          </div>
+          <div class="brands-search-row">
+            <input id="brand-search" class="input input-search" type="search" placeholder="搜索品牌、业态、分档">
+            <span class="brand-count mono" id="brand-count"></span>
+          </div>
         </div>
         <div class="brands-grid" id="brands-grid"></div>
       </div>
@@ -114,6 +119,7 @@
   </footer>
 
   <script src="../js/xpark-shared.js"></script>
+  <script src="../js/brands-data.js"></script>
   <script src="../js/page-brands.js"></script>
 </body>
 </html>

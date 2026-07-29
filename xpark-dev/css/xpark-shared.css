@@ -401,6 +401,11 @@ a {
   object-fit: contain;
 }
 
+.brand-logo-box img {
+  max-height: 40px;
+  max-width: 120px;
+}
+
 .card-vert .card-body {
   padding: var(--space-4) var(--space-5) var(--space-5);
 }

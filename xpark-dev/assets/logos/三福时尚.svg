@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img">
+  <rect width="120" height="120" rx="16" fill="#FEFCF8"/>
+  <rect x="8" y="8" width="104" height="104" rx="12" fill="#1A1918" opacity="0.12"/>
+  <text x="60" y="68" text-anchor="middle" font-family="'Noto Sans SC',sans-serif" font-size="22" font-weight="700" fill="#1A1918">三福时尚</text>
+</svg>
