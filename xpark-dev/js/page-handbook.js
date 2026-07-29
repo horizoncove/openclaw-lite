@@ -120,5 +120,46 @@
     renderTierBrands('A', 'tier-a-brands');
     renderTierBrands('B', 'tier-b-brands');
     initToc();
+    initFloorplan();
   });
+
+  function initFloorplan() {
+    const viewer = document.getElementById('floorplan-viewer');
+    if (!viewer) return;
+
+    const tabs = viewer.querySelectorAll('.floorplan-tab');
+    const panels = viewer.querySelectorAll('.floorplan-panel');
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const plan = tab.dataset.plan;
+        tabs.forEach((t) => {
+          const active = t === tab;
+          t.classList.toggle('active', active);
+          t.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        panels.forEach((p) => {
+          const show = p.dataset.plan === plan;
+          p.classList.toggle('active', show);
+          p.hidden = !show;
+        });
+      });
+    });
+
+    viewer.querySelectorAll('.floorplan-panel img').forEach((img) => {
+      img.addEventListener('click', () => {
+        const lb = document.createElement('div');
+        lb.className = 'floorplan-lightbox';
+        lb.innerHTML = `<button class="floorplan-lightbox-close" aria-label="关闭">×</button><img src="${img.src}" alt="${img.alt}">`;
+        lb.addEventListener('click', (e) => {
+          if (e.target === lb || e.target.closest('.floorplan-lightbox-close')) {
+            lb.remove();
+            document.body.style.overflow = '';
+          }
+        });
+        document.body.appendChild(lb);
+        document.body.style.overflow = 'hidden';
+      });
+    });
+  }
 })();
