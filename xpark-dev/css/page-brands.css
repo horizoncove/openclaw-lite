@@ -37,23 +37,20 @@
 }
 
 .brand-card .card-media {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-5);
-  background: var(--xpark-cream-100);
+  aspect-ratio: unset;
+  display: block;
+  padding: 0;
+  background: transparent;
 }
 
 .brand-card .card-media img {
-  max-height: 120px;
+  max-height: none;
   width: auto;
-  object-fit: contain;
-  transition: transform 0.4s ease;
+  object-fit: unset;
 }
 
-.brand-card:hover .card-media img {
-  transform: scale(1.05);
+.brand-card .photo-media {
+  aspect-ratio: 4/3;
 }
 
 .brand-card .card-body {

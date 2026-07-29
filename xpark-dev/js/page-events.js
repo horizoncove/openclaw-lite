@@ -1,11 +1,11 @@
 (function () {
   const EVENTS = [
-    { day: 5, month: 7, title: '街区音乐市集', desc: '中央广场户外 Live，15 组独立音乐人', tag: '音乐', limited: false },
-    { day: 12, month: 7, title: 'Xpark 设计沙龙', desc: '邀请本地设计工作室分享街区视觉共创', tag: '沙龙', limited: false },
-    { day: 19, month: 7, title: '限量联名发售', desc: '5 家品牌联合推出街区限定周边', tag: '限量', limited: true },
-    { day: 26, month: 7, title: '亲子创意工坊', desc: '可持续材料手作，适合 6–12 岁', tag: '亲子', limited: false },
-    { day: 2, month: 8, title: '夜光跑步派对', desc: '荧光装备 + 酸橙绿路线灯光', tag: '运动', limited: false },
-    { day: 16, month: 8, title: '独立电影放映', desc: '屋顶露台露天影院', tag: '电影', limited: true },
+    { day: 5, month: 7, title: '街区音乐市集', desc: '中央广场户外 Live，15 组独立音乐人', tag: '音乐', limited: false, img: 'events/music-market.jpg' },
+    { day: 12, month: 7, title: 'Xpark 设计沙龙', desc: '邀请本地设计工作室分享街区视觉共创', tag: '沙龙', limited: false, img: 'events/design-salon.jpg' },
+    { day: 19, month: 7, title: '限量联名发售', desc: '5 家品牌联合推出街区限定周边', tag: '限量', limited: true, img: 'events/limited-drop.jpg' },
+    { day: 26, month: 7, title: '亲子创意工坊', desc: '可持续材料手作，适合 6–12 岁', tag: '亲子', limited: false, img: 'events/workshop.jpg' },
+    { day: 2, month: 8, title: '夜光跑步派对', desc: '荧光装备 + 酸橙绿路线灯光', tag: '运动', limited: false, img: 'events/night-run.jpg' },
+    { day: 16, month: 8, title: '独立电影放映', desc: '屋顶露台露天影院', tag: '电影', limited: true, img: 'events/cinema.jpg' },
   ];
 
   const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -51,8 +51,11 @@
     const list = document.getElementById('event-list');
     if (!list) return;
 
-    list.innerHTML = EVENTS.map((e, i) => `
+    list.innerHTML = EVENTS.map((e) => `
       <article class="event-card" data-month="${e.month}" data-day="${e.day}">
+        <div class="event-thumb">
+          <img src="../assets/images/${e.img}" alt="${e.title}" loading="lazy">
+        </div>
         <div class="event-date">
           <div class="day-num">${e.day}</div>
           <div class="day-mon">${MONTHS[e.month - 1]}</div>
