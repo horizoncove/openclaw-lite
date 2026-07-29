@@ -39,7 +39,7 @@
         </dl>
         <div class="coord-uni-summary">
           <span class="badge lime">现有 ${sum.existingUniversities || 0} 所高校</span>
-          <span class="badge coral-outline">规划 ${sum.plannedUniversities || 0} 所</span>
+          <span class="badge ink-outline">规划 ${sum.plannedUniversities || 0} 所</span>
           <span class="xpark-caption">在校 ${sum.existingStudents || '—'} · 规划增量 ${sum.plannedStudents || '—'}</span>
         </div>
         <div class="coord-links">
