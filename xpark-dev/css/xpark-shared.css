@@ -737,17 +737,6 @@ a {
   object-fit: cover;
 }
 
-@media (max-width: 900px) {
-  .intro-photo-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .intro-photo {
-    order: -1;
-    max-height: 280px;
-  }
-}
-
 .page-toolbar {
   display: flex;
   flex-wrap: wrap;
