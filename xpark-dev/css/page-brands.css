@@ -109,14 +109,29 @@
   background: transparent;
 }
 
-.brand-card .card-media img {
-  max-height: none;
-  width: auto;
-  object-fit: unset;
+.brand-logo-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 148px;
+  padding: var(--space-6) var(--space-5);
+  background: var(--bg-muted);
+  border-bottom: 1px solid var(--color-border);
 }
 
-.brand-card .photo-media {
-  aspect-ratio: 4/3;
+.brand-logo-panel img {
+  max-height: 80px;
+  max-width: 85%;
+  width: auto;
+  object-fit: contain;
+}
+
+.brand-card--preview .brand-logo-panel {
+  min-height: 132px;
+}
+
+.brand-card--preview .brand-logo-panel img {
+  max-height: 72px;
 }
 
 .brand-card .card-body {
@@ -155,12 +170,6 @@
 
 .brand-card .tier-badge {
   flex-shrink: 0;
-}
-
-.brand-logo-box img {
-  max-height: 40px;
-  max-width: 120px;
-  object-fit: contain;
 }
 
 .brand-card.is-hidden {

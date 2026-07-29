@@ -61,11 +61,8 @@
 
     grid.innerHTML = BRANDS.map((b) => `
       <article class="card card-vert brand-card" data-tier="${b.tier}" data-category="${b.cat}" data-search="${[b.name, b.cat, b.subcat, b.probDesc, b.tier].join(' ').toLowerCase()}">
-        <div class="card-media photo-media">
-          <img class="photo-bg" src="../assets/images/${b.photo}" alt="${b.name}" loading="lazy">
-          <div class="logo-overlay brand-logo-box">
-            <img src="../assets/${b.logo}" alt="${b.name} logo">
-          </div>
+        <div class="brand-logo-panel">
+          <img src="../assets/${b.logo}" alt="${b.name} logo" loading="lazy">
         </div>
         <div class="card-body">
           <div class="brand-meta">

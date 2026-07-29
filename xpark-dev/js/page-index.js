@@ -7,12 +7,9 @@
   grid.innerHTML = featured
     .map(
       (b) => `
-      <a href="brands.html" class="card card-vert">
-        <div class="card-media photo-media">
-          <img class="photo-bg" src="../assets/images/${b.photo}" alt="${b.name}" loading="lazy">
-          <div class="logo-overlay brand-logo-box">
-            <img src="../assets/${b.logo}" alt="${b.name}">
-          </div>
+      <a href="brands.html" class="card card-vert brand-card brand-card--preview">
+        <div class="brand-logo-panel">
+          <img src="../assets/${b.logo}" alt="${b.name}" loading="lazy">
         </div>
         <div class="card-body">
           <span class="badge ${b.tierTag}">${b.tier}档 · ${b.cat}</span>
