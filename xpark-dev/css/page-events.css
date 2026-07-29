@@ -1,20 +1,17 @@
-/* Events page */
-.events-hero {
-  padding-block: var(--space-7) var(--space-5);
-}
-
+/* Events — aligned with VI page system */
 .events-layout {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 300px 1fr;
   gap: var(--space-6);
   align-items: start;
 }
 
 .calendar-widget {
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-5);
+  box-shadow: var(--shadow-1);
   position: sticky;
   top: calc(var(--nav-height) + var(--space-4));
 }
@@ -27,22 +24,25 @@
 }
 
 .calendar-header button {
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   width: 32px;
   height: 32px;
   cursor: pointer;
   transition: var(--transition);
+  color: var(--fg);
 }
 
 .calendar-header button:hover {
   border-color: var(--accent);
+  background: var(--xpark-primary-50);
 }
 
 .calendar-month {
   font-family: var(--font-display);
   font-weight: 500;
+  font-size: 0.9375rem;
 }
 
 .calendar-grid {
@@ -57,6 +57,7 @@
   font-weight: 600;
   color: var(--muted-foreground);
   padding: var(--space-2);
+  font-size: 0.75rem;
 }
 
 .calendar-grid .day {
@@ -74,6 +75,11 @@
   background: var(--accent);
   color: var(--xpark-ink-900);
   font-weight: 600;
+}
+
+.calendar-grid .day.selected {
+  outline: 2px solid var(--xpark-primary-700);
+  outline-offset: 1px;
 }
 
 .calendar-grid .day.has-event::after {
@@ -98,19 +104,24 @@
 
 .event-card {
   display: grid;
-  grid-template-columns: 80px 1fr auto;
+  grid-template-columns: 72px 1fr auto;
   gap: var(--space-4);
   align-items: center;
   padding: var(--space-4) var(--space-5);
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
   transition: var(--transition);
 }
 
 .event-card:hover {
   border-color: var(--accent);
   box-shadow: var(--shadow-2);
+}
+
+.event-card.is-hidden {
+  display: none;
 }
 
 .event-date {
@@ -129,9 +140,17 @@
 }
 
 .event-date .day-mon {
-  font-size: 0.75rem;
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
   color: var(--xpark-primary-700);
-  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.event-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
 }
 
 @media (max-width: 900px) {

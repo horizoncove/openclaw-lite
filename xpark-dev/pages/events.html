@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../css/xpark-shared.css">
   <link rel="stylesheet" href="../css/page-events.css">
 </head>
-<body>
+<body class="xpark-page">
   <nav class="nav nav--condensed">
     <div class="container nav-inner">
       <a href="index.html" class="nav-logo">X<span>park</span></a>
@@ -27,50 +27,76 @@
         <li><a href="vi.html">VI 系统</a></li>
       </ul>
       <div class="nav-actions">
+        <a href="#" class="btn primary sm nav-join">加入会员</a>
         <button class="theme-toggle" aria-label="切换主题">🌙</button>
         <button class="nav-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
       </div>
     </div>
   </nav>
 
-  <section class="events-hero">
-    <div class="container">
-      <p class="xpark-eyebrow">EVENTS</p>
-      <h1 class="xpark-h1">活动日历</h1>
-      <p class="xpark-lead">街区活动季——音乐、设计、限量发售与亲子工坊，让每次到访都有新发现。</p>
-    </div>
-  </section>
-
-  <section class="section" style="padding-top:0">
-    <div class="container events-layout">
-      <aside class="calendar-widget">
-        <div class="calendar-header">
-          <button id="cal-prev" aria-label="上个月">‹</button>
-          <span class="calendar-month" id="calendar-month"></span>
-          <button id="cal-next" aria-label="下个月">›</button>
-        </div>
-        <div class="calendar-grid" id="calendar-grid"></div>
-        <p class="xpark-caption" style="margin-top:var(--space-4)">● 标记日期有活动安排</p>
-      </aside>
-
-      <div>
-        <div class="section-header">
-          <h2 class="xpark-h3">近期活动</h2>
-        </div>
-        <div class="event-list" id="event-list"></div>
+  <main>
+    <section class="page-intro">
+      <div class="container">
+        <p class="xpark-eyebrow">XPARK · 活动日历</p>
+        <h1 class="xpark-display">Event Calendar</h1>
+        <p class="xpark-lead">街区活动季——音乐、设计、限量发售与亲子工坊，让每次到访都有新发现。</p>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <section class="page-block alt-bg">
+      <div class="container events-layout">
+        <aside class="calendar-widget">
+          <div class="calendar-header">
+            <button id="cal-prev" aria-label="上个月">‹</button>
+            <span class="calendar-month" id="calendar-month"></span>
+            <button id="cal-next" aria-label="下个月">›</button>
+          </div>
+          <div class="calendar-grid" id="calendar-grid"></div>
+          <p class="xpark-caption" style="margin-top:var(--space-4)">● 标记日期有活动安排</p>
+          <a href="#" id="clear-filter" class="cta-link" style="margin-top:var(--space-3);display:inline-flex;font-size:0.8125rem">清除日期筛选</a>
+        </aside>
+
+        <div>
+          <div class="page-block-head">
+            <p class="xpark-eyebrow">UPCOMING</p>
+            <h2 class="xpark-h3">近期活动</h2>
+          </div>
+          <div class="event-list" id="event-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <footer class="site-footer">
-    <div class="container">
-      <div class="footer-bottom" style="border:none;padding:0">
-        <span>© 2026 Xpark 街区</span>
-        <div style="display:flex;gap:24px">
-          <a href="brands.html" class="cta-link">入驻品牌</a>
-          <a href="index.html" class="cta-link">返回首页</a>
-        </div>
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo">X<span>park</span></div>
+        <p class="xpark-caption">大学城创意街区</p>
       </div>
+      <div class="footer-col">
+        <h4>街区探索</h4>
+        <ul>
+          <li><a href="index.html">探索街区</a></li>
+          <li><a href="events.html">活动日历</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>品牌入驻</h4>
+        <ul>
+          <li><a href="brands.html">入驻品牌</a></li>
+          <li><a href="#">加入我们</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>设计规范</h4>
+        <ul>
+          <li><a href="vi.html">VI 系统</a></li>
+          <li><a href="vi.html#tokens">设计令牌</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© 2025 Xpark. All rights reserved.</span>
     </div>
   </footer>
 

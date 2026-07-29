@@ -1,19 +1,23 @@
-/* Brands page */
-.brands-hero {
-  padding-block: var(--space-7) var(--space-5);
-  border-bottom: 1px solid var(--color-border);
+/* Brands — aligned with VI page system */
+.brands-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
 }
 
 .brands-filter {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-  margin-bottom: var(--space-6);
 }
 
 .brands-filter .badge {
   cursor: pointer;
   transition: var(--transition);
+  user-select: none;
 }
 
 .brands-filter .badge.active {
@@ -25,6 +29,11 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: var(--space-5);
+}
+
+.brand-card {
+  padding: 0;
+  overflow: hidden;
 }
 
 .brand-card .card-media {
@@ -40,6 +49,15 @@
   max-height: 120px;
   width: auto;
   object-fit: contain;
+  transition: transform 0.4s ease;
+}
+
+.brand-card:hover .card-media img {
+  transform: scale(1.05);
+}
+
+.brand-card .card-body {
+  padding: var(--space-4) var(--space-5) var(--space-5);
 }
 
 .brand-card .brand-meta {
@@ -47,30 +65,37 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
+  margin-bottom: var(--space-1);
 }
 
 .brand-card .brand-floor {
+  font-family: var(--font-display);
   font-size: 0.75rem;
   color: var(--muted-foreground);
+}
+
+.brand-card.is-hidden {
+  display: none;
 }
 
 .brand-detail-panel {
   margin-top: var(--space-7);
   padding: var(--space-6);
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
 }
 
-.brand-detail-panel .detail-grid {
+.brand-detail-panel .panel-grid {
   display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: var(--space-6);
-  align-items: start;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-5);
+  align-items: center;
 }
 
 @media (max-width: 640px) {
-  .brand-detail-panel .detail-grid {
+  .brand-detail-panel .panel-grid {
     grid-template-columns: 1fr;
   }
 }

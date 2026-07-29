@@ -8,7 +8,9 @@
     { day: 16, month: 8, title: '独立电影放映', desc: '屋顶露台露天影院', tag: '电影', limited: true },
   ];
 
+  const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
   let current = new Date();
+  let selectedDay = null;
 
   function renderCalendar() {
     const grid = document.getElementById('calendar-grid');
@@ -30,35 +32,52 @@
     for (let d = 1; d <= days; d++) {
       const isToday = today.getFullYear() === y && today.getMonth() === m && today.getDate() === d;
       const hasEvent = eventDays.has(d);
-      html += `<div class="day${isToday ? ' today' : ''}${hasEvent ? ' has-event' : ''}" data-day="${d}">${d}</div>`;
+      const isSelected = selectedDay === d && current.getMonth() === m;
+      html += `<div class="day${isToday ? ' today' : ''}${hasEvent ? ' has-event' : ''}${isSelected ? ' selected' : ''}" data-day="${d}">${d}</div>`;
     }
 
     grid.innerHTML = html;
+
+    grid.querySelectorAll('.day[data-day]').forEach((el) => {
+      el.addEventListener('click', () => {
+        selectedDay = Number(el.dataset.day);
+        renderCalendar();
+        filterEvents();
+      });
+    });
   }
 
   function renderEvents() {
     const list = document.getElementById('event-list');
     if (!list) return;
 
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-
-    list.innerHTML = EVENTS.map((e) => `
-      <article class="event-card">
+    list.innerHTML = EVENTS.map((e, i) => `
+      <article class="event-card" data-month="${e.month}" data-day="${e.day}">
         <div class="event-date">
           <div class="day-num">${e.day}</div>
-          <div class="day-mon">${months[e.month - 1]}</div>
+          <div class="day-mon">${MONTHS[e.month - 1]}</div>
         </div>
         <div>
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+          <div class="event-meta">
             <span class="badge lime">${e.tag}</span>
-            ${e.limited ? '<span class="badge coral">限量</span>' : ''}
+            ${e.limited ? '<span class="badge coral">限时</span>' : ''}
           </div>
           <h3 class="xpark-h4" style="margin:0 0 4px">${e.title}</h3>
-          <p class="xpark-body text-muted" style="margin:0">${e.desc}</p>
+          <p class="xpark-body text-muted" style="margin:0;font-size:0.9375rem">${e.desc}</p>
+          <p class="xpark-caption mono" style="margin-top:8px">10:00 — 20:00 · 中央广场</p>
         </div>
-        <a href="#" class="btn ghost">详情</a>
+        <a href="#" class="btn ghost sm">详情</a>
       </article>
     `).join('');
+  }
+
+  function filterEvents() {
+    const m = current.getMonth() + 1;
+    document.querySelectorAll('.event-card').forEach((card) => {
+      const matchMonth = Number(card.dataset.month) === m;
+      const matchDay = selectedDay === null || Number(card.dataset.day) === selectedDay;
+      card.classList.toggle('is-hidden', !(matchMonth && matchDay));
+    });
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -67,11 +86,22 @@
 
     document.getElementById('cal-prev')?.addEventListener('click', () => {
       current.setMonth(current.getMonth() - 1);
+      selectedDay = null;
       renderCalendar();
+      filterEvents();
     });
     document.getElementById('cal-next')?.addEventListener('click', () => {
       current.setMonth(current.getMonth() + 1);
+      selectedDay = null;
       renderCalendar();
+      filterEvents();
+    });
+
+    document.getElementById('clear-filter')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      selectedDay = null;
+      renderCalendar();
+      filterEvents();
     });
   });
 })();
