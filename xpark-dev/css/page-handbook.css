@@ -606,6 +606,106 @@
   margin-bottom: 2px;
 }
 
+.mp-macro-filter {
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.mp-macro-filter:hover,
+.mp-macro-filter.is-active {
+  box-shadow: var(--shadow-2);
+  transform: translateY(-1px);
+  border-color: var(--macro-color, var(--accent));
+}
+
+.mp-macro-count {
+  margin-top: var(--space-1);
+}
+
+.masterplan-brand-roster {
+  margin: var(--space-6) 0;
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.mp-roster-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.mp-roster-head .xpark-h4 {
+  margin: 0;
+}
+
+.mp-roster-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.mp-roster-filters .badge {
+  cursor: pointer;
+}
+
+.mp-roster-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.mp-roster-zone {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.mp-roster-brands {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.mp-roster-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 4px 10px 4px 4px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  background: var(--bg);
+}
+
+.mp-roster-tier {
+  font-size: 0.625rem;
+  padding: 2px 6px;
+  min-width: 1.25rem;
+  text-align: center;
+}
+
+.mp-roster-more {
+  color: var(--muted-foreground);
+  font-weight: 600;
+}
+
+.mp-zone-brands {
+  margin-bottom: var(--space-3);
+}
+
+.mp-zone-brands .xpark-caption {
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
 .masterplan-brand-map {
   margin: var(--space-6) 0;
 }
