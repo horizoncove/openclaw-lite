@@ -93,16 +93,23 @@
 
   function initToc() {
     const links = document.querySelectorAll('.handbook-toc a');
+    const mobileToc = document.getElementById('handbook-toc-mobile');
+    if (mobileToc) {
+      mobileToc.innerHTML = [...links]
+        .map((a) => `<a href="${a.getAttribute('href')}">${a.textContent.replace(/^\d+\s*/, '')}</a>`)
+        .join('');
+    }
+    const allLinks = document.querySelectorAll('.handbook-toc a, .handbook-toc-mobile a');
     const sections = [...document.querySelectorAll('.handbook-section')];
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            links.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${entry.target.id}`));
+            allLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${entry.target.id}`));
           }
         });
       },
-      { rootMargin: '-30% 0px -60% 0px' }
+      { rootMargin: '-20% 0px -65% 0px' }
     );
     sections.forEach((s) => observer.observe(s));
   }

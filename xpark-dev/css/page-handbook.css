@@ -439,22 +439,144 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 900px) {
+.handbook-toc-mobile {
+  display: none;
+  overflow-x: auto;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, #000 94%, transparent 100%);
+}
+
+.handbook-toc-mobile::-webkit-scrollbar {
+  display: none;
+}
+
+.handbook-toc-mobile a {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  font-size: 0.8125rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: var(--bg);
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.handbook-toc-mobile a.active,
+.handbook-toc-mobile a:hover {
+  background: var(--xpark-primary-100);
+  border-color: var(--xpark-primary-300);
+}
+
+@media (max-width: 1024px) {
   .handbook-layout {
     grid-template-columns: 1fr;
   }
 
   .handbook-toc {
-    position: static;
     display: none;
+  }
+
+  .handbook-toc-mobile {
+    display: flex;
   }
 
   .two-col {
     grid-template-columns: 1fr;
   }
 
+  .tier-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cat-chart {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .biz-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .handbook-hero .container {
+    padding-block: var(--space-6);
+  }
+
+  .handbook-meta {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+  }
+
+  .handbook-meta-item {
+    min-width: 0;
+  }
+
+  .tier-grid,
+  .cat-chart,
+  .biz-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .path-card {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .handbook-brand-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: var(--space-2);
+  }
+
+  .handbook-brand-chip {
+    padding: var(--space-2);
+  }
+
+  .handbook-brand-chip img {
+    max-height: 28px;
+  }
+
+  .handbook-brand-chip span {
+    font-size: 0.625rem;
+  }
+
   .cta-panel {
     grid-template-columns: 1fr;
+    padding: var(--space-5);
+  }
+
+  .cta-panel .btn {
+    width: 100%;
+  }
+
+  .feature-list-item {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .section-num {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+  }
+
+  .handbook-section {
+    padding-bottom: var(--space-5);
+    margin-bottom: var(--space-5);
+  }
+}
+
+@media (max-width: 480px) {
+  .handbook-meta {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .handbook-meta-item strong {
+    font-size: 1.125rem;
   }
 }
 
