@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1918"/>
+      <stop offset="100%" stop-color="#2a2928"/>
+    </linearGradient>
+    <linearGradient id="lime" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#A0E828" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#A0E828" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <rect width="800" height="600" fill="url(#lime)"/>
+  <rect x="80" y="120" width="280" height="360" rx="8" fill="#FEFCF8" opacity="0.06"/>
+  <rect x="400" y="80" width="320" height="200" rx="8" fill="#A0E828" opacity="0.12"/>
+  <rect x="400" y="320" width="150" height="160" rx="8" fill="#FF5436" opacity="0.15"/>
+  <rect x="570" y="320" width="150" height="160" rx="8" fill="#FEFCF8" opacity="0.08"/>
+  <text x="80" y="560" font-family="Space Grotesk, sans-serif" font-size="48" font-weight="300" fill="#FEFCF8" opacity="0.9">XPARK</text>
+  <text x="80" y="590" font-family="Noto Sans SC, sans-serif" font-size="16" fill="#A0E828">W: ∑ ÏÀ¡L ∑ Œ;</text>
+</svg>

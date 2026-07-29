@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VI 视觉识别系统 — Xpark 街区</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --color-xpark-lime: #A0E828;
+      --color-xpark-coral: #FF5436;
+      --color-xpark-ink: #1A1918;
+      --color-xpark-cream: #FEFCF8;
+    }
+  </style>
+  <link rel="stylesheet" href="../css/xpark-shared.css">
+  <link rel="stylesheet" href="../css/page-vi.css">
+</head>
+<body>
+  <nav class="nav nav--condensed">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">X<span>park</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="brands.html">入驻品牌</a></li>
+        <li><a href="events.html">活动日历</a></li>
+        <li><a href="vi.html">VI 系统</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="theme-toggle" aria-label="切换主题">🌙</button>
+        <button class="nav-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="vi-hero">
+    <div class="container">
+      <p class="xpark-eyebrow">VISUAL IDENTITY</p>
+      <h1 class="xpark-display">VI 视觉识别系统</h1>
+      <p class="xpark-lead">Xpark 街区完整设计规范——色彩、字体、组件与间距，确保品牌体验一致。</p>
+    </div>
+  </section>
+
+  <section class="vi-section" id="logo">
+    <div class="container">
+      <p class="xpark-eyebrow">LOGO</p>
+      <h2 class="xpark-h2">标识规范</h2>
+      <div class="logo-showcase" style="margin-top:var(--space-5)">
+        <div class="logo-variant light"><div class="nav-logo">X<span>park</span></div></div>
+        <div class="logo-variant dark"><div class="nav-logo">X<span>park</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="vi-section" id="colors">
+    <div class="container">
+      <p class="xpark-eyebrow">COLORS</p>
+      <h2 class="xpark-h2">色彩体系</h2>
+      <div class="color-grid" style="margin-top:var(--space-5)">
+        <div class="color-swatch"><div class="swatch-preview" style="background:var(--xpark-primary-500)"></div><div class="swatch-info"><div class="swatch-name">Primary 500</div><div class="swatch-hex">#A0E828</div></div></div>
+        <div class="color-swatch"><div class="swatch-preview" style="background:var(--xpark-coral-500)"></div><div class="swatch-info"><div class="swatch-name">Coral 500</div><div class="swatch-hex">#FF5436</div></div></div>
+        <div class="color-swatch"><div class="swatch-preview" style="background:var(--xpark-ink-800)"></div><div class="swatch-info"><div class="swatch-name">Ink 800</div><div class="swatch-hex">#1A1918</div></div></div>
+        <div class="color-swatch"><div class="swatch-preview" style="background:var(--xpark-cream-50);border-bottom:1px solid var(--color-border)"></div><div class="swatch-info"><div class="swatch-name">Cream 50</div><div class="swatch-hex">#FEFCF8</div></div></div>
+        <div class="color-swatch"><div class="swatch-preview" style="background:var(--xpark-success-500)"></div><div class="swatch-info"><div class="swatch-name">Success</div><div class="swatch-hex">#22B43C</div></div></div>
+        <div class="color-swatch"><div class="swatch-preview" style="background:var(--xpark-warning-500)"></div><div class="swatch-info"><div class="swatch-name">Warning</div><div class="swatch-hex">#F0B020</div></div></div>
+        <div class="color-swatch"><div class="swatch-preview" style="background:var(--xpark-error-500)"></div><div class="swatch-info"><div class="swatch-name">Error</div><div class="swatch-hex">#F03030</div></div></div>
+        <div class="color-swatch"><div class="swatch-preview" style="background:var(--xpark-info-500)"></div><div class="swatch-info"><div class="swatch-name">Info</div><div class="swatch-hex">#2078F0</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="vi-section" id="typography">
+    <div class="container">
+      <p class="xpark-eyebrow">TYPOGRAPHY</p>
+      <h2 class="xpark-h2">排版系统</h2>
+      <div style="margin-top:var(--space-5)">
+        <div class="type-specimen"><div class="spec-label">.xpark-display · Space Grotesk 300 · 56px</div><div class="xpark-display">Display 展示标题</div></div>
+        <div class="type-specimen"><div class="spec-label">.xpark-h1 · Space Grotesk 300 · 40px</div><div class="xpark-h1">Heading 1 一级标题</div></div>
+        <div class="type-specimen"><div class="spec-label">.xpark-h2 · Space Grotesk 400 · 32px</div><div class="xpark-h2">Heading 2 二级标题</div></div>
+        <div class="type-specimen"><div class="spec-label">.xpark-lead · Noto Sans SC 400 · 18px</div><p class="xpark-lead">Lead 引导段落——用于区块简介与辅助说明文字。</p></div>
+        <div class="type-specimen"><div class="spec-label">.xpark-body · Noto Sans SC 400 · 16px</div><p class="xpark-body">Body 正文——标准段落文字，适用于大部分内容区域。</p></div>
+        <div class="type-specimen"><div class="spec-label">.xpark-eyebrow · Noto Sans SC 600 · 11px</div><p class="xpark-eyebrow">EYEBROW 标签</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="vi-section" id="components">
+    <div class="container">
+      <p class="xpark-eyebrow">COMPONENTS</p>
+      <h2 class="xpark-h2">组件库</h2>
+      <h3 class="xpark-h4" style="margin-top:var(--space-5)">Buttons</h3>
+      <div class="component-showcase">
+        <button class="btn primary">Primary</button>
+        <button class="btn secondary">Secondary</button>
+        <button class="btn ghost">Ghost</button>
+        <button class="btn danger">Danger</button>
+      </div>
+      <h3 class="xpark-h4">Badges</h3>
+      <div class="component-showcase">
+        <span class="badge lime">Lime</span>
+        <span class="badge coral">Coral</span>
+        <span class="badge ink-outline">Outline</span>
+      </div>
+      <h3 class="xpark-h4">CTA Link</h3>
+      <div class="component-showcase"><a href="#" class="cta-link">查看更多</a></div>
+      <h3 class="xpark-h4">Input</h3>
+      <div class="component-showcase" style="max-width:360px"><input class="input" placeholder="输入搜索关键词…"></div>
+    </div>
+  </section>
+
+  <section class="vi-section" id="spacing">
+    <div class="container">
+      <p class="xpark-eyebrow">SPACING</p>
+      <h2 class="xpark-h2">间距规范</h2>
+      <div class="spacing-demo" style="margin-top:var(--space-5)">
+        <div class="spacing-row"><span class="spacing-label">--space-1 · 4px</span><div class="spacing-bar" style="width:4px"></div></div>
+        <div class="spacing-row"><span class="spacing-label">--space-2 · 8px</span><div class="spacing-bar" style="width:8px"></div></div>
+        <div class="spacing-row"><span class="spacing-label">--space-4 · 16px</span><div class="spacing-bar" style="width:16px"></div></div>
+        <div class="spacing-row"><span class="spacing-label">--space-5 · 24px</span><div class="spacing-bar" style="width:24px"></div></div>
+        <div class="spacing-row"><span class="spacing-label">--space-6 · 32px</span><div class="spacing-bar" style="width:32px"></div></div>
+        <div class="spacing-row"><span class="spacing-label">--space-7 · 48px</span><div class="spacing-bar" style="width:48px"></div></div>
+        <div class="spacing-row"><span class="spacing-label">--space-8 · 64px</span><div class="spacing-bar" style="width:64px"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border:none;padding:0">
+        <span>© 2026 Xpark 街区</span>
+        <div style="display:flex;gap:24px">
+          <a href="index.html" class="cta-link">首页</a>
+          <a href="brands.html" class="cta-link">入驻品牌</a>
+          <a href="events.html" class="cta-link">活动日历</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/xpark-shared.js"></script>
+</body>
+</html>

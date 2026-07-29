@@ -1,0 +1,76 @@
+/* Brands page */
+.brands-hero {
+  padding-block: var(--space-7) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.brands-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.brands-filter .badge {
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.brands-filter .badge.active {
+  background: var(--accent);
+  color: var(--xpark-ink-900);
+}
+
+.brands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-5);
+}
+
+.brand-card .card-media {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: var(--xpark-cream-100);
+}
+
+.brand-card .card-media img {
+  max-height: 120px;
+  width: auto;
+  object-fit: contain;
+}
+
+.brand-card .brand-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.brand-card .brand-floor {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.brand-detail-panel {
+  margin-top: var(--space-7);
+  padding: var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.brand-detail-panel .detail-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .brand-detail-panel .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

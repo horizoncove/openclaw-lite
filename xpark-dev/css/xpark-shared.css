@@ -1,0 +1,637 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+/* ============================================================
+   Xpark Design Tokens
+   ============================================================ */
+:root {
+  /* Primary — Lime */
+  --xpark-primary-50: #f4fce8;
+  --xpark-primary-100: #e6f9c4;
+  --xpark-primary-200: #cff391;
+  --xpark-primary-300: #b5ea5a;
+  --xpark-primary-400: #a8ef3d;
+  --xpark-primary-500: #a0e828;
+  --xpark-primary-600: #7fbe18;
+  --xpark-primary-700: #609012;
+  --xpark-primary-800: #4d7212;
+  --xpark-primary-900: #416014;
+
+  /* Coral */
+  --xpark-coral-50: #fff3f0;
+  --xpark-coral-100: #ffe0d9;
+  --xpark-coral-200: #ffc1b3;
+  --xpark-coral-300: #ff9780;
+  --xpark-coral-400: #ff6b4f;
+  --xpark-coral-500: #ff5436;
+  --xpark-coral-600: #e8381a;
+  --xpark-coral-700: #c22a10;
+  --xpark-coral-800: #9f2612;
+  --xpark-coral-900: #832516;
+
+  /* Ink */
+  --xpark-ink-50: #f5f5f4;
+  --xpark-ink-100: #e8e7e5;
+  --xpark-ink-200: #d1cfcc;
+  --xpark-ink-300: #b0ada8;
+  --xpark-ink-400: #8a8680;
+  --xpark-ink-500: #6f6b65;
+  --xpark-ink-600: #5f5b56;
+  --xpark-ink-700: #4f4c48;
+  --xpark-ink-800: #1a1918;
+  --xpark-ink-900: #0f0e0d;
+
+  /* Cream */
+  --xpark-cream-50: #fefcf8;
+  --xpark-cream-100: #faf6ef;
+  --xpark-cream-200: #f3ece0;
+  --xpark-cream-300: #e9dcc8;
+  --xpark-cream-400: #dcc9ad;
+  --xpark-cream-500: #cdb592;
+
+  /* Status */
+  --xpark-success-500: #22b43c;
+  --xpark-warning-500: #f0b020;
+  --xpark-error-500: #f03030;
+  --xpark-info-500: #2078f0;
+
+  /* Semantic aliases */
+  --bg: var(--xpark-cream-50);
+  --fg: var(--xpark-ink-800);
+  --surface: var(--xpark-cream-100);
+  --accent: var(--xpark-primary-500);
+  --secondary: var(--xpark-coral-500);
+  --muted-foreground: var(--xpark-ink-400);
+  --color-border: var(--xpark-ink-100);
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-1: 0 1px 2px rgba(26, 25, 24, 0.04);
+  --shadow-2: 0 2px 8px rgba(26, 25, 24, 0.06);
+  --shadow-3: 0 4px 16px rgba(26, 25, 24, 0.08);
+  --shadow-4: 0 8px 32px rgba(26, 25, 24, 0.1);
+  --shadow-5: 0 16px 48px rgba(26, 25, 24, 0.14);
+
+  /* Layout */
+  --container-max: 1200px;
+  --nav-height: 72px;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Noto Sans SC', sans-serif;
+  --transition: 0.25s ease;
+}
+
+.dark {
+  --bg: var(--xpark-ink-900);
+  --fg: var(--xpark-cream-50);
+  --surface: var(--xpark-ink-800);
+  --accent: var(--xpark-primary-400);
+  --secondary: var(--xpark-coral-400);
+  --muted-foreground: var(--xpark-ink-300);
+  --color-border: var(--xpark-ink-700);
+}
+
+/* ============================================================
+   Reset & Base
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.container {
+  width: min(var(--container-max), calc(100% - var(--space-6)));
+  margin-inline: auto;
+}
+
+/* ============================================================
+   Typography
+   ============================================================ */
+.xpark-display {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.xpark-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 300;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.xpark-h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.xpark-h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.xpark-h4 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.xpark-body {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.xpark-lead {
+  font-size: 1.125rem;
+  font-weight: 400;
+  color: var(--muted-foreground);
+  line-height: 1.7;
+}
+
+.xpark-caption {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+
+.xpark-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* ============================================================
+   Components — Button
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.btn.primary {
+  background: var(--accent);
+  color: var(--xpark-ink-900);
+}
+
+.btn.primary:hover {
+  background: var(--xpark-primary-400);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-2);
+}
+
+.btn.secondary {
+  background: var(--secondary);
+  color: #fff;
+}
+
+.btn.secondary:hover {
+  background: var(--xpark-coral-600);
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--fg);
+  border-color: var(--color-border);
+}
+
+.btn.ghost:hover {
+  background: var(--surface);
+  border-color: var(--fg);
+}
+
+.btn.danger {
+  background: var(--xpark-error-500);
+  color: #fff;
+}
+
+/* ============================================================
+   Components — Badge
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
+}
+
+.badge.lime {
+  background: var(--xpark-primary-100);
+  color: var(--xpark-primary-800);
+}
+
+.badge.coral {
+  background: var(--xpark-coral-100);
+  color: var(--xpark-coral-700);
+}
+
+.badge.ink-outline {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--fg);
+}
+
+/* ============================================================
+   Components — Card
+   ============================================================ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-1);
+  transition: var(--transition);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-3);
+  transform: translateY(-2px);
+}
+
+.card-vert {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overflow: hidden;
+  padding: 0;
+}
+
+.card-vert .card-media {
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  background: var(--xpark-cream-200);
+}
+
+.card-vert .card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.card-vert:hover .card-media img {
+  transform: scale(1.04);
+}
+
+.card-vert .card-body {
+  padding: var(--space-4) var(--space-5) var(--space-5);
+}
+
+/* ============================================================
+   Components — CTA Link
+   ============================================================ */
+.cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  color: var(--accent);
+  transition: var(--transition);
+}
+
+.cta-link::after {
+  content: '→';
+  transition: transform var(--transition);
+}
+
+.cta-link:hover::after {
+  transform: translateX(4px);
+}
+
+/* ============================================================
+   Components — Input
+   ============================================================ */
+.input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(160, 232, 40, 0.2);
+}
+
+/* ============================================================
+   Components — Nav
+   ============================================================ */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--nav-height);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nav .nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.nav .nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.nav .nav-logo span {
+  color: var(--accent);
+}
+
+.nav .nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav .nav-links a {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  transition: var(--transition);
+}
+
+.nav .nav-links a:hover,
+.nav .nav-links a.active {
+  color: var(--fg);
+}
+
+.nav .nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.nav--condensed {
+  --nav-height: 56px;
+}
+
+.nav--condensed .nav-logo {
+  font-size: 1.25rem;
+}
+
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-2);
+}
+
+.nav-toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--fg);
+  transition: var(--transition);
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.site-footer {
+  margin-top: var(--space-8);
+  padding: var(--space-7) 0 var(--space-5);
+  background: var(--xpark-ink-800);
+  color: var(--xpark-cream-100);
+}
+
+.site-footer a {
+  color: var(--xpark-cream-300);
+  transition: var(--transition);
+}
+
+.site-footer a:hover {
+  color: var(--accent);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr repeat(3, 1fr);
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.footer-brand .nav-logo {
+  color: var(--xpark-cream-50);
+  margin-bottom: var(--space-3);
+}
+
+.footer-col h4 {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0 0 var(--space-3);
+  color: var(--xpark-cream-50);
+}
+
+.footer-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-col li {
+  margin-bottom: var(--space-2);
+}
+
+.footer-col a {
+  font-size: 0.875rem;
+}
+
+.footer-bottom {
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--xpark-ink-700);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-size: 0.8125rem;
+  color: var(--xpark-ink-400);
+}
+
+/* ============================================================
+   Utilities
+   ============================================================ */
+.section {
+  padding-block: var(--space-8);
+}
+
+.section-header {
+  margin-bottom: var(--space-6);
+  max-width: 640px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-5);
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (max-width: 900px) {
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav .nav-links {
+    display: none;
+    position: absolute;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: var(--bg);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-4);
+    gap: var(--space-3);
+  }
+
+  .nav .nav-links.open {
+    display: flex;
+  }
+
+  .nav-toggle {
+    display: flex;
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
