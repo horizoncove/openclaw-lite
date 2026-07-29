@@ -182,7 +182,7 @@ window.XPARK_BRANDS = [
     "floor": "一层",
     "area": "60-100㎡",
     "rent": "中高",
-    "logo": "logos/唐久-每一天.png",
+    "logo": "logos/唐久-每一天.svg",
     "tierTag": "coral",
     "probTag": "lime"
   },
@@ -301,7 +301,7 @@ window.XPARK_BRANDS = [
     "floor": "一层",
     "area": "40-60㎡",
     "rent": "中高",
-    "logo": "logos/书亦烧仙草.png",
+    "logo": "logos/书亦烧仙草.svg",
     "tierTag": "lime",
     "probTag": "lime"
   },
@@ -794,7 +794,7 @@ window.XPARK_BRANDS = [
     "floor": "二层",
     "area": "300-500㎡",
     "rent": "中",
-    "logo": "logos/电竞馆-网咖-杰拉-网鱼.png",
+    "logo": "logos/电竞馆-网咖-杰拉-网鱼.svg",
     "tierTag": "lime",
     "probTag": "lime"
   },
