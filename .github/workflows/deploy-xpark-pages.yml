@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -22,17 +22,37 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/configure-pages@v5
-
-      - uses: actions/upload-pages-artifact@v3
+      - name: Publish static site to gh-pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          path: xpark-dev
+          folder: xpark-dev
+          branch: gh-pages
+          clean: true
+          single-commit: true
+          commit-message: 'Deploy Xpark site from ${{ github.sha }}'
 
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Try enabling GitHub Pages (requires repo admin)
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api "repos/${{ github.repository }}/pages" \
+            -X POST \
+            -f "build_type=legacy" \
+            -f "source[branch]=gh-pages" \
+            -f "source[path]=/" \
+            2>/dev/null || echo "Pages enable skipped — enable manually in repo Settings → Pages → gh-pages branch"
+
+      - name: Deployment summary
+        run: |
+          echo "## Xpark GitHub Pages" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Static files pushed to \`gh-pages\` branch." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**If Pages is enabled**, site URL:" >> "$GITHUB_STEP_SUMMARY"
+          echo "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pages/handbook.html" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "One-time setup (repo admin): **Settings → Pages → Deploy from branch \`gh-pages\` / \`/\`**" >> "$GITHUB_STEP_SUMMARY"
