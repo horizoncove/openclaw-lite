@@ -764,6 +764,73 @@
   gap: var(--space-2);
 }
 
+.mp-method-list {
+  margin: var(--space-4) 0;
+  padding-left: var(--space-5);
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.mp-disclaimer {
+  padding: var(--space-3) var(--space-4);
+  background: var(--xpark-warning-50, #FFF8E6);
+  border-left: 3px solid var(--xpark-warning-500, #F0B020);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-4);
+}
+
+.masterplan-flow-wrap {
+  margin: var(--space-5) 0;
+}
+
+.masterplan-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.mp-flow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  min-width: 140px;
+}
+
+.mp-flow-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--xpark-ink-900);
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.mp-flow-step strong {
+  display: block;
+  font-size: 0.875rem;
+}
+
+.mp-flow-step p {
+  margin: 2px 0 0;
+}
+
+.mp-flow-arrow {
+  color: var(--muted-foreground);
+  font-size: 1.25rem;
+}
+
 .floorplan-lightbox {
   position: fixed;
   inset: 0;
@@ -1304,6 +1371,16 @@
 
   .map-filters .map-filter {
     flex-shrink: 0;
+  }
+
+  .masterplan-summary,
+  .masterplan-mix-bars,
+  .masterplan-zones {
+    grid-template-columns: 1fr;
+  }
+
+  .mp-mix-row {
+    grid-template-columns: 4.5rem 1fr 5rem;
   }
 }
 
