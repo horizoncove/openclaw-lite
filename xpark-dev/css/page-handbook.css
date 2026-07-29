@@ -646,6 +646,49 @@
   margin-top: var(--space-5);
 }
 
+.masterplan-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  align-items: stretch;
+}
+
+.masterplan-ref-card {
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-muted);
+  box-shadow: var(--shadow-2);
+}
+
+.masterplan-ref-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  min-height: 280px;
+  object-fit: contain;
+  background: #fff;
+}
+
+.masterplan-ref-card figcaption {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  background: var(--surface);
+}
+
+.handbook-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.handbook-hero-actions .btn.ghost {
+  border-color: rgba(254, 252, 248, 0.35);
+  color: var(--xpark-cream-50);
+}
+
 .masterplan-diagram-head {
   display: flex;
   flex-wrap: wrap;
@@ -1430,7 +1473,8 @@
   .masterplan-summary,
   .masterplan-macro,
   .masterplan-zones,
-  .mix-dual-grid {
+  .mix-dual-grid,
+  .masterplan-compare {
     grid-template-columns: 1fr;
   }
 
