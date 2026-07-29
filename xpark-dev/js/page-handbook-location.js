@@ -27,6 +27,7 @@
     const el = document.getElementById('location-coords');
     if (!el) return;
     const p = DATA.project;
+    const sum = DATA.summary || {};
     el.innerHTML = `
       <div class="coord-card coord-card--primary">
         <span class="badge coral">项目中心</span>
@@ -36,6 +37,11 @@
           <div><dt>GCJ-02（高德/腾讯）</dt><dd>${p.gcj02.lat}, ${p.gcj02.lng}</dd></div>
           <div><dt>WGS84（Google/OSM）</dt><dd>${p.wgs84.lat}, ${p.wgs84.lng}</dd></div>
         </dl>
+        <div class="coord-uni-summary">
+          <span class="badge lime">现有 ${sum.existingUniversities || 0} 所高校</span>
+          <span class="badge coral-outline">规划 ${sum.plannedUniversities || 0} 所</span>
+          <span class="xpark-caption">在校 ${sum.existingStudents || '—'} · 规划增量 ${sum.plannedStudents || '—'}</span>
+        </div>
         <div class="coord-links">
           <a href="${p.links.amap}" target="_blank" rel="noopener" class="btn sm primary">高德地图</a>
           <a href="${p.links.google}" target="_blank" rel="noopener" class="btn sm ghost">Google</a>
@@ -45,7 +51,7 @@
       <div class="coord-stats">
         ${DATA.zones.map((z) => `
           <div class="coord-stat" data-zone="${z.id}" style="--zone-color:${z.color}">
-            <strong>${DATA.schools.filter((s) => s.zone === z.id).length}</strong>
+            <strong>${DATA.schools.filter((s) => s.zone === z.id && s.category !== 'transport').length}</strong>
             <span>${z.label}</span>
             <p class="xpark-caption">${z.desc}</p>
           </div>`).join('')}
@@ -76,14 +82,24 @@
       return { x: cx + ringR * Math.cos(angle), y: cy + ringR * Math.sin(angle) };
     }
 
-    const schoolsForDiagram = DATA.schools.filter((s) => s.type !== '交通').slice(0, 14);
-    let pinsHtml = schoolsForDiagram.map((s, i) => {
+    const diagramItems = DATA.schools
+      .filter((s) => s.category !== 'transport')
+      .sort((a, b) => {
+        const rank = { university: 0, k12: 1 };
+        const sa = rank[a.category] ?? 2;
+        const sb = rank[b.category] ?? 2;
+        if (sa !== sb) return sa - sb;
+        if (a.status !== b.status) return a.status === 'existing' ? -1 : 1;
+        return 0;
+      })
+      .slice(0, 18);
+    let pinsHtml = diagramItems.map((s, i) => {
       const p = posForSchool(s, i);
       placed.push({ ...s, ...p });
       return `
-        <g class="zone-pin" data-zone="${s.zone}" data-name="${s.name}" tabindex="0">
-          <circle cx="${p.x}" cy="${p.y}" r="6" fill="${ZONE_COLORS[s.zone]}" stroke="#FEFCF8" stroke-width="2"/>
-          <title>${s.name} · ${s.dist}</title>
+        <g class="zone-pin${s.category === 'university' ? ' zone-pin--uni' : ''}" data-zone="${s.zone}" data-name="${s.name}" tabindex="0">
+          <circle cx="${p.x}" cy="${p.y}" r="${s.category === 'university' ? 7 : 6}" fill="${ZONE_COLORS[s.zone]}" stroke="#FEFCF8" stroke-width="2"/>
+          <title>${s.name} · ${s.dist}${s.students && s.students !== '—' ? ' · ' + s.students : ''}</title>
         </g>`;
     }).join('');
 
@@ -132,12 +148,17 @@
   }
 
   function renderSchoolTables() {
-    ['existing', 'future'].forEach((kind) => {
-      const el = document.getElementById(kind === 'existing' ? 'school-table-existing' : 'school-table-future');
+    const tableMap = {
+      'school-table-existing-uni': (s) => s.status === 'existing' && s.category === 'university',
+      'school-table-existing-k12': (s) => s.status === 'existing' && s.category === 'k12',
+      'school-table-future-uni': (s) => (s.status === 'building' || s.status === 'planned') && s.category === 'university',
+      'school-table-future-other': (s) => (s.status === 'building' || s.status === 'planned') && s.category !== 'university',
+    };
+
+    Object.entries(tableMap).forEach(([id, filterFn]) => {
+      const el = document.getElementById(id);
       if (!el) return;
-      const list = DATA.schools.filter((s) =>
-        kind === 'existing' ? s.status === 'existing' : s.status === 'building' || s.status === 'planned'
-      );
+      const list = DATA.schools.filter(filterFn);
       el.innerHTML = list.map((s) => `
         <tr class="school-row" data-zone="${s.zone}" data-name="${s.name}">
           <td><span class="zone-dot" style="background:${ZONE_COLORS[s.zone]}"></span> ${s.name}</td>
@@ -145,13 +166,21 @@
           <td>${s.dist}</td>
           <td>${s.students || '—'}</td>
           <td>${s.note || '—'}</td>
-          <td><button type="button" class="btn sm ghost locate-btn" data-name="${s.name}">地图</button></td>
+          <td>${s.category !== 'transport' ? `<button type="button" class="btn sm ghost locate-btn" data-name="${s.name}">地图</button>` : '—'}</td>
         </tr>`).join('');
 
       el.querySelectorAll('.locate-btn').forEach((btn) => {
         btn.addEventListener('click', () => focusSchoolOnMap(btn.dataset.name));
       });
     });
+  }
+
+  function pinLabel(s) {
+    if (s.category === 'university') return '大';
+    if (s.type.includes('幼')) return '幼';
+    if (s.type.includes('小')) return '小';
+    if (s.type.includes('中') || s.type.includes('985') || s.type.includes('一贯')) return '中';
+    return '校';
   }
 
   function initMap() {
@@ -179,15 +208,16 @@
       .addTo(markersLayer);
 
     DATA.schools.forEach((s) => {
-      if (s.type === '交通') return;
+      if (s.category === 'transport') return;
       const icon = L.divIcon({
-        className: `map-pin map-pin--${s.zone}`,
-        html: `<span>${s.type.includes('幼') ? '幼' : s.type.includes('小') ? '小' : s.type.includes('中') || s.type.includes('985') ? '中' : '校'}</span>`,
+        className: `map-pin map-pin--${s.zone}${s.category === 'university' ? ' map-pin--uni' : ''}`,
+        html: `<span>${pinLabel(s)}</span>`,
         iconSize: [28, 28],
         iconAnchor: [14, 14],
       });
+      const statusLabel = s.status === 'building' ? '在建' : s.status === 'planned' ? '规划' : '';
       const marker = L.marker([s.lat, s.lng], { icon })
-        .bindPopup(`<strong>${s.name}</strong><br>${s.type} · ${s.dist}<br>${s.note || ''}`);
+        .bindPopup(`<strong>${s.name}</strong><br>${s.type}${statusLabel ? ' · ' + statusLabel : ''} · ${s.dist}<br>${s.students && s.students !== '—' ? '规模 ' + s.students + '<br>' : ''}${s.note || ''}`);
       marker.addTo(markersLayer);
       schoolMarkers.push({ marker, zone: s.zone });
     });

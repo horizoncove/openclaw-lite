@@ -792,6 +792,28 @@
   gap: var(--space-2);
 }
 
+.coord-uni-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.coord-uni-summary .xpark-caption {
+  width: 100%;
+  margin: 0;
+}
+
+.location-uni-note {
+  margin: var(--space-2) 0 var(--space-3);
+  max-width: 52rem;
+}
+
+.school-table--future tbody tr:first-child td {
+  font-weight: 600;
+}
+
 .coord-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -942,7 +964,7 @@
 
 .insight-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-4);
 }
 
@@ -968,6 +990,15 @@
   font-size: 0.875rem;
   color: var(--xpark-ink-200);
   line-height: 1.55;
+}
+
+.insight-card--highlight {
+  background: rgba(160, 232, 40, 0.12);
+  border-color: rgba(160, 232, 40, 0.35);
+}
+
+.insight-card--highlight .insight-num {
+  color: var(--xpark-primary-400);
 }
 
 /* Leaflet custom pins */
@@ -1003,19 +1034,34 @@
 .map-pin--far span { background: #6B7280; }
 .map-pin--future span { background: #FF5436; }
 
+.map-pin--uni span {
+  width: 30px;
+  height: 30px;
+  font-size: 0.75rem;
+  border-width: 2.5px;
+}
+
+.map-pin--uni.map-pin--future span {
+  background: linear-gradient(135deg, #FF5436 0%, #ff8a70 100%);
+}
+
 @media (max-width: 1024px) {
   .location-coords {
     grid-template-columns: 1fr;
   }
 
   .insight-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
   .coord-stats {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .insight-grid {
+    grid-template-columns: 1fr;
   }
 
   .handbook-map {
