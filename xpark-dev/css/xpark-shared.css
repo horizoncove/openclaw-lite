@@ -4,55 +4,61 @@
    Xpark Design Tokens
    ============================================================ */
 :root {
-  /* Primary — Lime */
-  --xpark-primary-50: #f4fce8;
-  --xpark-primary-100: #e6f9c4;
-  --xpark-primary-200: #cff391;
-  --xpark-primary-300: #b5ea5a;
-  --xpark-primary-400: #a8ef3d;
+  /* Primary — Acid Lime */
+  --xpark-primary-50: #f6ffdb;
+  --xpark-primary-100: #ebffba;
+  --xpark-primary-200: #ddff90;
+  --xpark-primary-300: #ccff5a;
+  --xpark-primary-400: #c8ff3f;
   --xpark-primary-500: #a0e828;
-  --xpark-primary-600: #7fbe18;
-  --xpark-primary-700: #609012;
-  --xpark-primary-800: #4d7212;
-  --xpark-primary-900: #416014;
+  --xpark-primary-600: #7cb818;
+  --xpark-primary-700: #5a8e10;
+  --xpark-primary-800: #3e660a;
+  --xpark-primary-900: #284408;
 
   /* Coral */
-  --xpark-coral-50: #fff3f0;
-  --xpark-coral-100: #ffe0d9;
-  --xpark-coral-200: #ffc1b3;
-  --xpark-coral-300: #ff9780;
-  --xpark-coral-400: #ff6b4f;
+  --xpark-coral-50: #fff2ee;
+  --xpark-coral-100: #ffdccb;
+  --xpark-coral-200: #ffc09e;
+  --xpark-coral-300: #ff9a70;
+  --xpark-coral-400: #ff724a;
   --xpark-coral-500: #ff5436;
-  --xpark-coral-600: #e8381a;
-  --xpark-coral-700: #c22a10;
-  --xpark-coral-800: #9f2612;
-  --xpark-coral-900: #832516;
+  --xpark-coral-600: #e03b1e;
+  --xpark-coral-700: #b82d15;
+  --xpark-coral-800: #8e2310;
+  --xpark-coral-900: #6a1a0c;
 
   /* Ink */
-  --xpark-ink-50: #f5f5f4;
-  --xpark-ink-100: #e8e7e5;
-  --xpark-ink-200: #d1cfcc;
-  --xpark-ink-300: #b0ada8;
-  --xpark-ink-400: #8a8680;
-  --xpark-ink-500: #6f6b65;
-  --xpark-ink-600: #5f5b56;
-  --xpark-ink-700: #4f4c48;
+  --xpark-ink-50: #ebe4dc;
+  --xpark-ink-100: #d4cfc4;
+  --xpark-ink-200: #b0a99b;
+  --xpark-ink-300: #8a8279;
+  --xpark-ink-400: #6b6460;
+  --xpark-ink-500: #524e4a;
+  --xpark-ink-600: #3a3735;
+  --xpark-ink-700: #2a2826;
   --xpark-ink-800: #1a1918;
-  --xpark-ink-900: #0f0e0d;
+  --xpark-ink-900: #0e0e12;
 
   /* Cream */
   --xpark-cream-50: #fefcf8;
-  --xpark-cream-100: #faf6ef;
-  --xpark-cream-200: #f3ece0;
-  --xpark-cream-300: #e9dcc8;
-  --xpark-cream-400: #dcc9ad;
-  --xpark-cream-500: #cdb592;
+  --xpark-cream-100: #f8f4ee;
+  --xpark-cream-200: #f2ede5;
+  --xpark-cream-300: #eae3db;
 
-  /* Status */
+  /* Status scales */
+  --xpark-success-50: #eafbee;
   --xpark-success-500: #22b43c;
+  --xpark-success-900: #0a3e14;
+  --xpark-warning-50: #fffae5;
   --xpark-warning-500: #f0b020;
+  --xpark-warning-900: #5c4408;
+  --xpark-error-50: #fff0f0;
   --xpark-error-500: #f03030;
+  --xpark-error-900: #540a0a;
+  --xpark-info-50: #eef5ff;
   --xpark-info-500: #2078f0;
+  --xpark-info-900: #0a2354;
 
   /* Semantic aliases */
   --bg: var(--xpark-cream-50);
@@ -85,6 +91,11 @@
   --shadow-3: 0 4px 16px rgba(26, 25, 24, 0.08);
   --shadow-4: 0 8px 32px rgba(26, 25, 24, 0.1);
   --shadow-5: 0 16px 48px rgba(26, 25, 24, 0.14);
+
+  /* Icon sizes */
+  --size-icon-sm: 16px;
+  --size-icon-md: 20px;
+  --size-icon-lg: 24px;
 
   /* Layout */
   --container-max: 1200px;
@@ -263,6 +274,24 @@ a {
   color: #fff;
 }
 
+.btn.sm {
+  padding: var(--space-2) var(--space-4);
+  font-size: 0.8125rem;
+}
+
+.btn.lg {
+  padding: var(--space-4) var(--space-6);
+  font-size: 1rem;
+}
+
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 /* ============================================================
    Components — Badge
    ============================================================ */
@@ -378,6 +407,48 @@ a {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(160, 232, 40, 0.2);
+}
+
+.input-underline {
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  padding-inline: 0;
+  background: transparent;
+}
+
+.input-underline:focus {
+  border-color: var(--accent);
+  box-shadow: none;
+}
+
+.input-search {
+  padding-left: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236B6460' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242 1.006a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 12px center;
+}
+
+.cta-link.underline {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cta-link.underline::after {
+  content: none;
+}
+
+.brand-mark {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.brand-mark .dot {
+  color: var(--accent);
 }
 
 /* ============================================================
