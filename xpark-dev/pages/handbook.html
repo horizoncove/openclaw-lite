@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>招商手册 — Xpark 街区</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --color-xpark-lime: #A0E828;
+      --color-xpark-coral: #FF5436;
+      --color-xpark-ink: #1A1918;
+      --color-xpark-cream: #FEFCF8;
+    }
+  </style>
+  <link rel="stylesheet" href="../css/xpark-shared.css">
+  <link rel="stylesheet" href="../css/xpark-responsive.css">
+  <link rel="stylesheet" href="../css/page-handbook.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+</head>
+<body class="xpark-page">
+  <nav class="nav nav--condensed">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">X<span>park</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="brands.html">入驻品牌</a></li>
+        <li><a href="handbook.html">招商手册</a></li>
+        <li><a href="events.html">活动日历</a></li>
+        <li><a href="vi.html">VI 系统</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="#contact" class="btn primary sm nav-join">联系招商</a>
+        <button class="theme-toggle" aria-label="切换主题">🌙</button>
+        <button class="nav-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="handbook-hero">
+      <div class="handbook-hero-bg">
+        <img src="../assets/images/handbook-hero-bg.jpg" alt="A橙天地文化中心夜景航拍">
+      </div>
+      <div class="container">
+        <p class="xpark-eyebrow">XPARK · INVESTMENT HANDBOOK</p>
+        <h1 class="xpark-display">招商手册</h1>
+            <p class="xpark-lead">沣西新城大学城商业街 · 8000㎡ 创意街区<br>五大功能板块 · 123 个目标品牌 · ABCD 四档分级招商</p>
+        <div class="handbook-meta">
+          <div class="handbook-meta-item"><strong>8000㎡</strong><span class="xpark-caption">项目体量</span></div>
+          <div class="handbook-meta-item"><strong>10万+</strong><span class="xpark-caption">核心客群</span></div>
+          <div class="handbook-meta-item"><strong>123</strong><span class="xpark-caption">目标品牌</span></div>
+          <div class="handbook-meta-item"><strong>5</strong><span class="xpark-caption">功能板块</span></div>
+        </div>
+        <div class="handbook-hero-actions">
+          <a href="#masterplan-zoning" class="btn primary sm">查看业态分区</a>
+          <a href="brand-placement.html" class="btn ghost sm">品牌落位清单</a>
+          <a href="brands.html" class="btn ghost sm">123 品牌库</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-block">
+      <div class="container">
+        <nav class="handbook-toc-mobile" id="handbook-toc-mobile" aria-label="章节目录"></nav>
+        <div class="handbook-layout">
+        <aside class="handbook-toc">
+          <h4>目录</h4>
+          <ol>
+            <li><a href="#overview">01 项目概览</a></li>
+            <li><a href="#floorplan">02 项目平面图</a></li>
+            <li><a href="#location">03 区位与教育</a></li>
+            <li><a href="#advantage">04 核心优势</a></li>
+            <li><a href="#tiers">05 ABCD 分档策略</a></li>
+            <li><a href="#mix">06 业态配比</a></li>
+            <li><a href="#sports">07 运动奥莱专题</a></li>
+            <li><a href="#brands-a">08 A 档锚点品牌</a></li>
+            <li><a href="#brands-b">09 B 档主力品牌</a></li>
+            <li><a href="#business">10 商务条件</a></li>
+            <li><a href="#alerts">11 关键提醒</a></li>
+            <li><a href="#contact">12 联系招商</a></li>
+          </ol>
+        </aside>
+
+        <div class="handbook-content">
+          <!-- 01 项目概览 -->
+          <section class="handbook-section" id="overview">
+            <p class="xpark-eyebrow"><span class="section-num">1</span>PROJECT OVERVIEW</p>
+            <h2 class="xpark-h2">项目概览</h2>
+            <p class="xpark-lead">Xpark 位于沣西新城大学城核心区域，按项目方标注总平面划分为五大功能板块，服务高校师生、周边社区与科创园区白领。</p>
+            <div class="two-col">
+              <div>
+                <h3 class="xpark-h4">基本信息</h3>
+                <div class="data-table-wrap">
+                  <table class="data-table">
+                    <tbody>
+                      <tr><td>项目名称</td><td>A橙天地文化中心 · Xpark 大学城创意街区</td></tr>
+                      <tr><td>位置</td><td>沣西新城 · 康定路 · 大学城（交大创新港为核心辐射圈）</td></tr>
+                      <tr><td>体量</td><td>约 8000㎡ 街铺商业（1F–2F）</td></tr>
+                      <tr><td>功能板块</td><td>娱乐 Hub（7#）· 办公商务（3#）· 酒店生活（4#/5#）· 方形广场 · 地标广场</td></tr>
+                      <tr><td>核心客群</td><td>10 万+ 高校师生（研究生为主）+ 周边社区 + 科创园区白领</td></tr>
+                      <tr><td>品牌库</td><td>123 个目标品牌，按板块 + ABCD 四档分级管理</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div>
+                <img src="../assets/images/scenes/district-night.jpg" alt="Xpark 街区" style="width:100%;border-radius:var(--radius-lg);object-fit:cover;aspect-ratio:4/3">
+              </div>
+            </div>
+          </section>
+
+          <!-- 02 项目平面图 -->
+          <section class="handbook-section" id="floorplan">
+            <p class="xpark-eyebrow"><span class="section-num">2</span>FLOOR PLAN</p>
+            <h2 class="xpark-h2">A橙天地文化中心 · 项目平面图</h2>
+            <p class="xpark-lead">康定路沿线商业综合体，含总平面图及 1F / 2F 组合平面图。商业铺位分布于多层街区，人行出入口与广场区域标注清晰。</p>
+
+            <div class="floorplan-viewer" id="floorplan-viewer">
+              <div class="floorplan-tabs" role="tablist">
+                <button type="button" class="floorplan-tab active" data-plan="master" role="tab" aria-selected="true">总平面图</button>
+                <button type="button" class="floorplan-tab" data-plan="1f" role="tab" aria-selected="false">1F 组合平面</button>
+                <button type="button" class="floorplan-tab" data-plan="2f" role="tab" aria-selected="false">2F 组合平面</button>
+              </div>
+              <div class="floorplan-stage">
+                <figure class="floorplan-panel active" data-plan="master">
+                  <img src="../assets/images/floorplan/master-plan.jpg" alt="A橙天地文化中心 总平面图" loading="lazy">
+                  <figcaption class="xpark-caption">总平面图 · 康定路 · 商业（人行）出入口 · 地下车库出入口</figcaption>
+                </figure>
+                <figure class="floorplan-panel" data-plan="1f" hidden>
+                  <img src="../assets/images/floorplan/floor-1f.jpg" alt="A橙天地文化中心 1F 组合平面图" loading="lazy">
+                  <figcaption class="xpark-caption">1F 组合平面图 · 一层商业铺位布局</figcaption>
+                </figure>
+                <figure class="floorplan-panel" data-plan="2f" hidden>
+                  <img src="../assets/images/floorplan/floor-2f.jpg" alt="A橙天地文化中心 2F 组合平面图" loading="lazy">
+                  <figcaption class="xpark-caption">2F 组合平面图 · 二层商业铺位布局</figcaption>
+                </figure>
+              </div>
+              <p class="floorplan-hint xpark-caption">点击平面图可放大查看 · 手机端支持双指缩放</p>
+            </div>
+
+            <div class="floorplan-legend">
+              <div class="legend-item"><span class="legend-dot legend-dot--entry"></span>商业（人行）出入口</div>
+              <div class="legend-item"><span class="legend-dot legend-dot--fire"></span>消防车（车行、人行）出入口</div>
+              <div class="legend-item"><span class="legend-dot legend-dot--parking"></span>地下车库出入口</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#FF5436"></span>方形广场 · 市集外摆</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#F5C518"></span>地标广场 · 首店活动</div>
+            </div>
+
+            <div class="masterplan-zoning" id="masterplan-zoning">
+              <h3 class="xpark-h4" style="margin-top:var(--space-7)">业态功能定位</h3>
+              <p class="xpark-lead">以项目方标注总平面业态分区稿为准：娱乐 Hub（7#）· 办公商务（3#）· 酒店生活（4#/5#）· 方形广场 + 地标广场；逐栋核对 1F 外侧/内侧与 2F 以上功能，并映射 123 品牌库落位。</p>
+
+              <div class="masterplan-methodology" id="masterplan-methodology"></div>
+
+              <div class="masterplan-summary" id="masterplan-summary"></div>
+
+              <div class="masterplan-macro" id="masterplan-macro"></div>
+
+              <div class="masterplan-flow-wrap">
+                <h4 class="xpark-h4">消费动线</h4>
+                <div class="masterplan-flow" id="masterplan-flow"></div>
+              </div>
+
+              <div class="masterplan-diagram-wrap">
+                <div class="masterplan-diagram-head">
+                  <h4 class="xpark-h4">标注稿对照 · 分区示意</h4>
+                  <p class="xpark-caption" id="masterplan-tip">左侧为项目总平面 · 右侧为业态分区交互示意 · 悬停/点击卡片查看楼层明细</p>
+                </div>
+                <div class="masterplan-compare">
+                  <figure class="masterplan-ref-card">
+                    <img src="../assets/images/floorplan/master-plan.jpg" alt="项目方标注总平面图" loading="lazy">
+                    <figcaption class="xpark-caption">项目方总平面标注稿 · 3#–7# 楼栋 + 双广场</figcaption>
+                  </figure>
+                  <div class="masterplan-diagram-card">
+                    <svg id="masterplan-schematic" class="masterplan-schematic" viewBox="0 0 100 100" role="img" aria-label="总平面业态分区示意图"></svg>
+                  </div>
+                </div>
+                <div class="masterplan-diagram-legend">
+                  <span class="legend-item"><span class="legend-dot" style="background:#FF8C42"></span>娱乐 Hub · 7#</span>
+                  <span class="legend-item"><span class="legend-dot" style="background:#2D8CFF"></span>办公商务 · 3#</span>
+                  <span class="legend-item"><span class="legend-dot" style="background:#22B43C"></span>酒店生活 · 4#/5#</span>
+                  <span class="legend-item"><span class="legend-dot" style="background:#FF5436"></span>方形广场</span>
+                  <span class="legend-item"><span class="legend-dot" style="background:#F5C518"></span>地标广场</span>
+                </div>
+              </div>
+
+              <div class="masterplan-brand-map" id="masterplan-brand-map"></div>
+
+              <div class="masterplan-brand-roster" id="masterplan-brand-roster"></div>
+
+              <div class="masterplan-zones" id="masterplan-zones"></div>
+            </div>
+          </section>
+
+          <!-- 03 区位与教育 -->
+          <section class="handbook-section" id="location">
+            <p class="xpark-eyebrow"><span class="section-num">3</span>LOCATION</p>
+            <h2 class="xpark-h2">区位与教育配套</h2>
+            <p class="xpark-lead">A橙天地文化中心位于沣西新城大学园核心，现有 5 所高校 9.5 万+ 师生；规划 3 所「双一流」新校区（西工大 / 西大 / 西安理工）增量 5 万+，合计辐射 15 万+ 高校客群。</p>
+
+            <div class="location-coords" id="location-coords"></div>
+
+            <div class="location-diagram-wrap">
+              <div class="location-diagram-head">
+                <h3 class="xpark-h4">精美区位图</h3>
+                <p class="xpark-caption" id="zone-diagram-tip">悬停圆点查看学校 · 点击定位到地图</p>
+              </div>
+              <div class="zone-diagram-card">
+                <svg id="zone-diagram-svg" class="zone-diagram-svg" viewBox="0 0 800 640" role="img" aria-label="A橙天地文化中心区位示意图"></svg>
+              </div>
+            </div>
+
+            <div class="location-map-wrap">
+              <div class="location-map-head">
+                <h3 class="xpark-h4">交互地图</h3>
+                <div class="map-filters">
+                  <span class="badge ink-outline map-filter active" data-zone="all">全部</span>
+                  <span class="badge ink-outline map-filter" data-zone="core">500m 核心圈</span>
+                  <span class="badge ink-outline map-filter" data-zone="near">2km 辐射圈</span>
+                  <span class="badge ink-outline map-filter" data-zone="far">7km 高校圈</span>
+                  <span class="badge ink-outline map-filter" data-zone="future">规划在建</span>
+                </div>
+              </div>
+              <div id="handbook-map" class="handbook-map" aria-label="学校分布交互地图"></div>
+              <p class="xpark-caption map-footnote">虚线圆圈：500m 核心圈 / 2km 辐射圈 · 数据基于公开地理信息与项目测算</p>
+            </div>
+
+            <h3 class="xpark-h4" style="margin-top:var(--space-6)">现有高校（5 所）</h3>
+            <div class="data-table-wrap">
+              <table class="data-table school-table">
+                <thead>
+                  <tr><th>高校</th><th>类型</th><th>距离</th><th>规模</th><th>备注</th><th></th></tr>
+                </thead>
+                <tbody id="school-table-existing-uni"></tbody>
+              </table>
+            </div>
+
+            <h3 class="xpark-h4" style="margin-top:var(--space-5)">现有 K12 配套（11 所）</h3>
+            <div class="data-table-wrap">
+              <table class="data-table school-table">
+                <thead>
+                  <tr><th>学校</th><th>类型</th><th>距离</th><th>规模</th><th>备注</th><th></th></tr>
+                </thead>
+                <tbody id="school-table-existing-k12"></tbody>
+              </table>
+            </div>
+
+            <h3 class="xpark-h4" style="margin-top:var(--space-5)">规划高校（3 所）</h3>
+            <p class="xpark-caption location-uni-note">沣西新城正迎来新一轮「双一流」扩张潮，以下三校均已签约或开工，未来 2–3 年陆续投用。</p>
+            <div class="data-table-wrap">
+              <table class="data-table school-table school-table--future">
+                <thead>
+                  <tr><th>高校</th><th>类型</th><th>距离</th><th>规划规模</th><th>进展</th><th></th></tr>
+                </thead>
+                <tbody id="school-table-future-uni"></tbody>
+              </table>
+            </div>
+
+            <h3 class="xpark-h4" style="margin-top:var(--space-5)">规划配套 / 在建（3 项）</h3>
+            <div class="data-table-wrap">
+              <table class="data-table school-table">
+                <thead>
+                  <tr><th>项目</th><th>类型</th><th>距离</th><th>规模</th><th>进展</th><th></th></tr>
+                </thead>
+                <tbody id="school-table-future-other"></tbody>
+              </table>
+            </div>
+
+            <div class="location-insight">
+              <h3 class="xpark-h4">客群结论</h3>
+              <div class="insight-grid">
+                <article class="insight-card">
+                  <span class="insight-num">2–3万</span>
+                  <p class="xpark-body">500m 核心圈：商贸学院 + 服装学院 + 镐京学院 + 周边中小学即时客群</p>
+                </article>
+                <article class="insight-card">
+                  <span class="insight-num">9.5万+</span>
+                  <p class="xpark-body">现有 5 所高校在校师生（含创新港 3 万+、咸阳职院 2 万+）</p>
+                </article>
+                <article class="insight-card">
+                  <span class="insight-num">5万+</span>
+                  <p class="xpark-body">规划 3 所新校区增量：西工大 1.8 万 + 西大 1.2 万 + 西安理工 2 万</p>
+                </article>
+                <article class="insight-card insight-card--highlight">
+                  <span class="insight-num">15万+</span>
+                  <p class="xpark-body">沣西大学园现有 + 规划高校 + 创新港 + 社区综合辐射（与 Excel 清单一致）</p>
+                </article>
+              </div>
+            </div>
+          </section>
+
+          <!-- 04 核心优势 -->
+          <section class="handbook-section" id="advantage">
+            <p class="xpark-eyebrow"><span class="section-num">4</span>CORE ADVANTAGES</p>
+            <h2 class="xpark-h2">核心优势</h2>
+            <div class="feature-list">
+              <div class="feature-list-item">
+                <div class="feat-icon">🎓</div>
+                <div>
+                  <h4 class="xpark-h4">高校客群密度高</h4>
+                  <p class="xpark-body text-muted">10 万+ 师生构成保底流量，研究生与教师群体消费频次高、对品质品牌有刚需。</p>
+                </div>
+              </div>
+              <div class="feature-list-item">
+                <div class="feat-icon">🏪</div>
+                <div>
+                  <h4 class="xpark-h4">五大板块，双面 1F 策略</h4>
+                  <p class="xpark-body text-muted">娱乐 Hub（7#）· 办公商务（3#）· 酒店生活（4#/5#）· 方形广场 · 地标广场。1F 外侧临路做锚点引流，内侧临广场做体验消费。</p>
+                </div>
+              </div>
+              <div class="feature-list-item">
+                <div class="feat-icon">📊</div>
+                <div>
+                  <h4 class="xpark-h4">板块 + 分档，双重落位</h4>
+                  <p class="xpark-body text-muted">123 个品牌先按功能板块落位，再按 ABCD 四档定商务条件。锚点占外侧，填铺进 6#/8# 连接块。</p>
+                </div>
+              </div>
+              <div class="feature-list-item">
+                <div class="feat-icon">⚡</div>
+                <div>
+                  <h4 class="xpark-h4">7# 娱乐 Hub + 运动奥莱</h4>
+                  <p class="xpark-body text-muted">7# 1F 外侧运动奥莱集群（1000–1500㎡），内侧年轻餐饮 + 2F 餐娱，3–4F 健身/KTV/电竞上移，形成全时段消费。</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 05 ABCD 分档 -->
+          <section class="handbook-section" id="tiers">
+            <p class="xpark-eyebrow"><span class="section-num">5</span>TIER STRATEGY</p>
+            <h2 class="xpark-h2">ABCD 四档招商策略</h2>
+            <p class="xpark-lead">A 档全部首批接触；D 档由决策层亲自出面；B/C 档交招商团队按表推进。</p>
+            <div class="tier-grid" id="tier-cards"></div>
+            <div class="data-table-wrap" style="margin-top:var(--space-6)">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>分档</th>
+                    <th>品牌数</th>
+                    <th>定位</th>
+                    <th>推进策略</th>
+                    <th>责任人</th>
+                    <th>签约目标</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><span class="badge coral">A 档</span></td><td>14</td><td>锚点压舱石</td><td>首批全部接触，最优商务条件（免租期/装补）</td><td>HC 亲自盯</td><td>开业前 7–9 个</td></tr>
+                  <tr><td><span class="badge lime">B 档</span></td><td>42</td><td>主力店群</td><td>A 档签约后借势推广，标准商务条件</td><td>招商团队</td><td>15–20 个</td></tr>
+                  <tr><td><span class="badge ink-outline">C 档</span></td><td>45</td><td>填铺养铺</td><td>门槛低、决策快，优先抗假期业态</td><td>招商团队</td><td>15–20 个</td></tr>
+                  <tr><td><span class="badge ink-outline">D 档</span></td><td>22</td><td>机会爆点</td><td>一事一议，谈下 1–2 个标杆即可</td><td>HC</td><td>1–2 个首店</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- 06 业态配比 -->
+          <section class="handbook-section" id="mix">
+            <p class="xpark-eyebrow"><span class="section-num">6</span>CATEGORY MIX</p>
+            <h2 class="xpark-h2">业态配比规划</h2>
+            <p class="xpark-lead">123 品牌按业态类别与功能板块双重规划：餐饮零售为主力，7# 娱乐 Hub 承载运动奥莱与三层娱乐，3#/4# 分别承接商务与酒店生活。</p>
+            <div class="mix-dual-grid">
+              <div>
+                <h3 class="xpark-h4">业态类别</h3>
+                <div class="cat-chart" id="cat-chart"></div>
+              </div>
+              <div>
+                <h3 class="xpark-h4">功能板块落位</h3>
+                <div class="cat-chart" id="zone-chart"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 07 运动奥莱 -->
+          <section class="handbook-section" id="sports">
+            <p class="xpark-eyebrow"><span class="section-num">7</span>SPORTS OUTLET</p>
+            <h2 class="xpark-h2">运动奥莱专题</h2>
+            <p class="xpark-lead">运动奥莱锚定 <strong>7# 娱乐 Hub · 1F 外侧</strong>，总面积建议 1000–1500㎡（占街铺 12–18%），与内侧年轻餐饮、2F 餐娱、3–4F 文体娱乐形成垂直叠加。</p>
+
+            <h3 class="xpark-h4" style="margin-top:var(--space-6)">为什么适合本项目</h3>
+            <div class="feature-list">
+              <div class="feature-list-item">
+                <div class="feat-icon">👟</div>
+                <div>
+                  <h4 class="xpark-h4">客群吻合</h4>
+                  <p class="xpark-body text-muted">学生对阿迪、耐克、李宁的需求是刚需，折扣店解决「想要品牌、预算有限」的矛盾，转化率在零售业态中最高。</p>
+                </div>
+              </div>
+              <div class="feature-list-item">
+                <div class="feat-icon">📅</div>
+                <div>
+                  <h4 class="xpark-h4">抗空档期</h4>
+                  <p class="xpark-body text-muted">运动服饰同时覆盖社区居民和园区白领，寒暑假仍有生意，对冲学生客流波动。</p>
+                </div>
+              </div>
+              <div class="feature-list-item">
+                <div class="feat-icon">🧲</div>
+                <div>
+                  <h4 class="xpark-h4">引流能力</h4>
+                  <p class="xpark-body text-muted">目的性消费，学生愿意专程来逛，带动整条街的餐饮和娱乐消费。</p>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="xpark-h4" style="margin-top:var(--space-6)">三种开店路径</h3>
+            <div class="path-cards">
+              <article class="path-card recommended">
+                <div class="path-rank">1</div>
+                <div>
+                  <span class="badge lime">首选</span>
+                  <h4 class="xpark-h4">招代理商多品牌奥莱店</h4>
+                  <p class="xpark-body text-muted">招滔搏 / 胜道等耐克阿迪核心代理商，400–600㎡ 多品牌折扣集合店。货品正品保障、可挂品牌授权标识，收租金或联营扣点，零库存风险。行业惯例：运动户外折扣 5–7 折。</p>
+                </div>
+              </article>
+              <article class="path-card">
+                <div class="path-rank">2</div>
+                <div>
+                  <h4 class="xpark-h4">国产品牌奥莱店组合</h4>
+                  <p class="xpark-body text-muted">李宁、安踏、特步、361°、鸿星尔克加盟渠道开放、落地快，200–300㎡/家，组成「国潮运动折扣区」。学生客单价 100–300 元，走量稳。</p>
+                </div>
+              </article>
+              <article class="path-card">
+                <div class="path-rank">3</div>
+                <div>
+                  <h4 class="xpark-h4">自营多品牌折扣集合店（谨慎）</h4>
+                  <p class="xpark-body text-muted">从授权分销商拿货，无加盟费。注意：不能直接用 Nike/Adidas logo 做门头，务必核验授权链条完整。启动资金约 50–200 万。</p>
+                </div>
+              </article>
+            </div>
+
+            <h3 class="xpark-h4" style="margin-top:var(--space-6)">7# 落位与商务条件</h3>
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <tbody>
+                  <tr><td>板块</td><td><strong>7# 娱乐 Hub</strong>（橙色区域）— 项目差异化核心</td></tr>
+                  <tr><td>1F 外侧</td><td>400–600㎡ 多品牌奥莱集合店（路径 1）+ 2–3 家国牌 150–300㎡；外侧另配茶饮形象店</td></tr>
+                  <tr><td>1F 内侧</td><td>日咖夜酒 · 谷子/二次元 · 火锅/串串 · 韩式烤肉（不与奥莱混排）</td></tr>
+                  <tr><td>2F</td><td>火锅 · 自助 · 网红打卡餐饮 · 日咖夜酒延伸</td></tr>
+                  <tr><td>3F–4F</td><td>健身 · KTV · 电竞 · 台球（非 1F 街铺，与奥莱垂直分流）</td></tr>
+                  <tr><td>租金模式</td><td>首选联营扣点（销售额 8–12%）或「保底 + 扣点取高」</td></tr>
+                  <tr><td>铺位配比</td><td>运动奥莱 1000–1500㎡，占 7# 1F 外侧主力面积</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- 08 A档品牌 -->
+          <section class="handbook-section" id="brands-a">
+            <p class="xpark-eyebrow"><span class="section-num">8</span>TIER A BRANDS</p>
+            <h2 class="xpark-h2">A 档锚点品牌（14 个）</h2>
+            <p class="xpark-lead">首批全部接触，给最优商务条件。A 档优先占 <strong>3# 外侧 / 7# 外侧</strong> 锚点铺，竞品橙堡 MALL 也在抢茶饮/健身，要抢在之前锁定。</p>
+            <div class="handbook-brand-grid" id="tier-a-brands"></div>
+          </section>
+
+          <!-- 09 B档品牌 -->
+          <section class="handbook-section" id="brands-b">
+            <p class="xpark-eyebrow"><span class="section-num">9</span>TIER B BRANDS</p>
+            <h2 class="xpark-h2">B 档主力品牌（42 个）</h2>
+            <p class="xpark-lead">A 档签约后借势推广。完整品牌清单含板块落位，见 <a href="brands.html" class="cta-link">入驻品牌页</a>（可按功能板块筛选）。</p>
+            <div class="handbook-brand-grid" id="tier-b-brands"></div>
+          </section>
+
+          <!-- 10 商务条件 -->
+          <section class="handbook-section" id="business">
+            <p class="xpark-eyebrow"><span class="section-num">10</span>BUSINESS TERMS</p>
+            <h2 class="xpark-h2">商务条件与合作模式</h2>
+            <p class="xpark-lead xpark-caption" style="margin-bottom:var(--space-5)">落位原则：<strong>外侧引流锚点 · 内侧体验消费 · 上楼层办公/酒店</strong>。3F 及以上（办公、酒店、教培、医美）不在 8000㎡ 街铺招商范围。</p>
+            <div class="biz-grid">
+              <article class="biz-card">
+                <span class="badge coral">A 档</span>
+                <h4 class="xpark-h4">锚点品牌</h4>
+                <p class="xpark-caption">免租期 + 装修补贴 · <strong>3#/7# 1F 外侧</strong>优先 · 一事一议最优条件</p>
+              </article>
+              <article class="biz-card">
+                <span class="badge lime">B 档</span>
+                <h4 class="xpark-h4">主力品牌</h4>
+                <p class="xpark-caption">标准商务条件 · 7# 内侧/2F 餐饮 · 4# 美食街 · 固定租金或联营扣点</p>
+              </article>
+              <article class="biz-card">
+                <span class="badge ink-outline">C 档</span>
+                <h4 class="xpark-h4">填铺品牌</h4>
+                <p class="xpark-caption"><strong>6#/8# 连接块</strong>快速填铺 · 4# 外侧生活配套 · 灵活面积</p>
+              </article>
+              <article class="biz-card">
+                <span class="badge ink-outline">D 档</span>
+                <h4 class="xpark-h4">机会品牌</h4>
+                <p class="xpark-caption"><strong>地标广场</strong>首店/标杆一事一议 · 决策层直接对接</p>
+              </article>
+              <article class="biz-card">
+                <span class="badge lime">运动奥莱</span>
+                <h4 class="xpark-h4">7# 联营模式</h4>
+                <p class="xpark-caption">7# 1F 外侧 · 扣点 8–12% 或保底+扣点取高 · 代理商联营首选</p>
+              </article>
+              <article class="biz-card">
+                <span class="badge coral">方形广场</span>
+                <h4 class="xpark-h4">市集/外摆</h4>
+                <p class="xpark-caption">花车 · 地摊 · 文创零售 · 季节市集 · 弹性面积自营可控</p>
+              </article>
+            </div>
+          </section>
+
+          <!-- 11 关键提醒 -->
+          <section class="handbook-section" id="alerts">
+            <p class="xpark-eyebrow"><span class="section-num">11</span>KEY REMINDERS</p>
+            <h2 class="xpark-h2">关键提醒</h2>
+            <div class="alert-list">
+              <div class="alert-item"><span class="alert-num">01</span><span>竞品橙堡 MALL 也在抢茶饮/健身，A 档茶饮咖啡要抢在它之前锁定。</span></div>
+              <div class="alert-item"><span class="alert-num">02</span><span>C 档里优先保留抗寒暑假业态（药房、培训、社区配套），对冲学生客流波动。</span></div>
+              <div class="alert-item"><span class="alert-num">03</span><span>D 档喜茶/泡泡玛特即使谈不下，谈判过程也可作为对其他品牌的招商素材。</span></div>
+              <div class="alert-item"><span class="alert-num">04</span><span>麦当劳/肯德基常要求较长免租期与工程条件，尽早启动工程对接。</span></div>
+              <div class="alert-item"><span class="alert-num">05</span><span>运动奥莱自采模式必须拿到完整授权链条，否则品牌方打假会波及商场声誉。</span></div>
+              <div class="alert-item"><span class="alert-num">06</span><span>折扣店货品是过季/断码款，尺码不全属正常现象，不要按正价店坪效标准承诺。</span></div>
+            </div>
+          </section>
+
+          <!-- 12 联系招商 -->
+          <section class="handbook-section" id="contact">
+            <p class="xpark-eyebrow"><span class="section-num">12</span>CONTACT</p>
+            <h2 class="xpark-h2">联系招商</h2>
+            <div class="cta-panel">
+              <div>
+                <p class="xpark-eyebrow">JOIN XPARK</p>
+                <h3 class="xpark-h3" style="color:var(--xpark-cream-50)">欢迎优质品牌入驻 Xpark</h3>
+                <p class="xpark-lead">我们寻找有独立审美、有故事、愿意与街区共创的伙伴。A 档品牌优先对接，B/C 档品牌可通过招商团队提交资料。</p>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+                <a href="brands.html" class="btn primary lg">查看 123 个目标品牌</a>
+                <a href="#" class="btn ghost lg" style="border-color:var(--xpark-ink-400);color:var(--xpark-cream-50)">提交入驻申请</a>
+              </div>
+            </div>
+          </section>
+        </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo">X<span>park</span></div>
+        <p class="xpark-caption">大学城创意街区</p>
+      </div>
+      <div class="footer-col">
+        <h4>街区探索</h4>
+        <ul>
+          <li><a href="index.html">探索街区</a></li>
+          <li><a href="handbook.html">招商手册</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>品牌入驻</h4>
+        <ul>
+          <li><a href="brands.html">入驻品牌</a></li>
+          <li><a href="#contact">联系招商</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>设计规范</h4>
+        <ul>
+          <li><a href="vi.html">VI 系统</a></li>
+          <li><a href="vi.html#components">组件库</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© 2025 Xpark. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="../js/xpark-shared.js"></script>
+  <script src="../js/brands-data.js"></script>
+  <script src="../js/handbook-location-data.js"></script>
+  <script src="../js/handbook-masterplan-data.js"></script>
+  <script src="../js/page-handbook.js"></script>
+  <script src="../js/page-handbook-masterplan.js"></script>
+  <script src="../js/page-handbook-location.js"></script>
+</body>
+</html>

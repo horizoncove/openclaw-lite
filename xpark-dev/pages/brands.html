@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>入驻品牌 — Xpark 街区</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --color-xpark-lime: #A0E828;
+      --color-xpark-coral: #FF5436;
+      --color-xpark-ink: #1A1918;
+      --color-xpark-cream: #FEFCF8;
+    }
+  </style>
+  <link rel="stylesheet" href="../css/xpark-shared.css">
+  <link rel="stylesheet" href="../css/xpark-responsive.css">
+  <link rel="stylesheet" href="../css/page-brands.css">
+</head>
+<body class="xpark-page">
+  <nav class="nav nav--condensed">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">X<span>park</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="brands.html">入驻品牌</a></li>
+        <li><a href="handbook.html">招商手册</a></li>
+        <li><a href="brand-placement.html">品牌落位清单</a></li>
+        <li><a href="events.html">活动日历</a></li>
+        <li><a href="vi.html">VI 系统</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="#" class="btn primary sm nav-join">加入会员</a>
+        <button class="theme-toggle" aria-label="切换主题">🌙</button>
+        <button class="nav-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="page-intro page-intro--photo">
+      <div class="container intro-photo-grid">
+        <div>
+          <p class="xpark-eyebrow">XPARK · 入驻品牌</p>
+          <h1 class="xpark-display">Merchant Brands</h1>
+          <p class="xpark-lead">123 个招商目标品牌，按功能板块 + ABCD 四档分级。娱乐 Hub（7#）· 办公商务（3#）· 酒店生活（4#/5#）· 双广场，服务 10 万+ 高校师生客群。</p>
+        </div>
+        <div class="intro-photo">
+          <img src="../assets/images/scenes/district-night.jpg" alt="Xpark 街区夜景" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <section class="page-block alt-bg">
+      <div class="container">
+        <div class="brands-summary" id="brands-summary"></div>
+        <div class="brands-toolbar">
+          <div class="brands-filter-group">
+            <p class="filter-label xpark-caption">分档筛选</p>
+            <div class="brands-filter" id="tier-filter"></div>
+          </div>
+          <div class="brands-filter-group">
+            <p class="filter-label xpark-caption">业态筛选</p>
+            <div class="brands-filter brands-filter--wrap" id="cat-filter"></div>
+          </div>
+          <div class="brands-filter-group">
+            <p class="filter-label xpark-caption">功能板块</p>
+            <div class="brands-filter brands-filter--wrap" id="zone-filter"></div>
+          </div>
+          <div class="brands-search-row">
+            <input id="brand-search" class="input input-search" type="search" placeholder="搜索品牌、业态、分档">
+            <span class="brand-count mono" id="brand-count"></span>
+          </div>
+        </div>
+        <div class="brands-grid" id="brands-grid"></div>
+      </div>
+    </section>
+
+    <section class="page-block">
+      <div class="container">
+        <div class="brand-detail-panel">
+          <div class="panel-grid">
+            <div>
+              <p class="xpark-eyebrow">BRAND ONBOARDING</p>
+              <h2 class="xpark-h3">品牌入驻</h2>
+              <p class="xpark-lead" style="margin:0">Xpark 街区持续开放品牌入驻申请。我们寻找有独立审美、有故事、愿意与街区共创的伙伴。</p>
+            </div>
+            <a href="#" class="btn primary">提交入驻申请</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo">X<span>park</span></div>
+        <p class="xpark-caption">大学城创意街区</p>
+      </div>
+      <div class="footer-col">
+        <h4>街区探索</h4>
+        <ul>
+          <li><a href="index.html">探索街区</a></li>
+          <li><a href="events.html">活动日历</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>品牌入驻</h4>
+        <ul>
+          <li><a href="brands.html">入驻品牌</a></li>
+          <li><a href="#">加入我们</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>设计规范</h4>
+        <ul>
+          <li><a href="vi.html">VI 系统</a></li>
+          <li><a href="vi.html#components">组件库</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© 2025 Xpark. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script src="../js/xpark-shared.js"></script>
+  <script src="../js/brands-data.js"></script>
+  <script src="../js/page-brands.js"></script>
+</body>
+</html>

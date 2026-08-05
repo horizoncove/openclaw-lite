@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A橙天地文化中心 · 品牌落位清单</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --color-xpark-lime: #A0E828;
+      --color-xpark-coral: #FF5436;
+      --color-xpark-ink: #1A1918;
+      --color-xpark-cream: #FEFCF8;
+    }
+  </style>
+  <link rel="stylesheet" href="../css/xpark-shared.css">
+  <link rel="stylesheet" href="../css/xpark-responsive.css">
+  <link rel="stylesheet" href="../css/page-brand-placement.css">
+</head>
+<body class="xpark-page placement-page">
+  <nav class="nav nav--condensed no-print">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">X<span>park</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="brands.html">入驻品牌</a></li>
+        <li><a href="handbook.html">招商手册</a></li>
+        <li><a href="brand-placement.html">品牌落位清单</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button type="button" class="btn primary sm" id="btn-print">打印 / 导出 PDF</button>
+        <button class="theme-toggle" aria-label="切换主题">🌙</button>
+        <button class="nav-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="placement-doc">
+    <header class="placement-header">
+      <div class="container">
+        <p class="xpark-eyebrow">A橙天地文化中心 · XPARK</p>
+        <h1 class="xpark-display">品牌落位清单</h1>
+        <p class="xpark-lead">123 个目标品牌 · 按功能板块 + 楼栋落位 · ABCD 四档分级</p>
+        <div class="placement-meta" id="placement-meta"></div>
+      </div>
+    </header>
+
+    <section class="page-block">
+      <div class="container">
+        <div class="placement-toolbar no-print">
+          <div class="placement-filters" id="placement-filters"></div>
+          <input id="placement-search" class="input input-search" type="search" placeholder="搜索品牌、业态、落位…">
+        </div>
+
+        <div id="placement-summary" class="placement-summary"></div>
+        <div id="placement-content"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer no-print">
+    <div class="container footer-bottom">
+      <span>© 2025 Xpark · A橙天地文化中心</span>
+      <span class="xpark-caption">数据来源：项目方标注总平面 + 123 品牌库</span>
+    </div>
+  </footer>
+
+  <script src="../js/xpark-shared.js"></script>
+  <script src="../js/brands-data.js"></script>
+  <script src="../js/page-brand-placement.js"></script>
+</body>
+</html>
