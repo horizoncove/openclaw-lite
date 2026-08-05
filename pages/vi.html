@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VI 视觉识别系统 — Xpark 街区</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --color-xpark-lime: #A0E828;
+      --color-xpark-coral: #FF5436;
+      --color-xpark-ink: #1A1918;
+      --color-xpark-cream: #FEFCF8;
+    }
+  </style>
+  <link rel="stylesheet" href="../css/xpark-shared.css">
+  <link rel="stylesheet" href="../css/xpark-responsive.css">
+  <link rel="stylesheet" href="../css/page-vi.css">
+</head>
+<body class="xpark-page vi-page">
+  <nav class="nav nav--condensed">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">X<span>park</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="brands.html">入驻品牌</a></li>
+        <li><a href="handbook.html">招商手册</a></li>
+        <li><a href="events.html">活动日历</a></li>
+        <li><a href="vi.html">VI 系统</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="#" class="btn primary sm nav-join">加入会员</a>
+        <button class="theme-toggle" aria-label="切换主题">🌙</button>
+        <button class="nav-toggle" aria-label="菜单"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="page-intro">
+      <div class="container">
+        <p class="xpark-eyebrow">XPARK · 视觉识别系统</p>
+        <h1 class="xpark-display">VI Visual Identity</h1>
+        <p class="xpark-lead">本系统定义 Xpark 街区的品牌色彩、字体、组件与设计语言，为街区的数字与物理触点提供一致、可扩展的视觉基础。</p>
+      </div>
+    </section>
+
+    <section class="page-block" id="logo">
+      <div class="container">
+        <div class="page-block-head">
+          <p class="xpark-eyebrow">品牌标识</p>
+          <h2 class="xpark-h2">Brand Mark</h2>
+        </div>
+        <div class="logo-showcase">
+          <div class="logo-variant light">
+            <div class="brand-mark">Xpark<span class="dot">.</span></div>
+            <div class="logo-caption">浅色背景 · cream-50</div>
+          </div>
+          <div class="logo-variant dark">
+            <div class="brand-mark">Xpark<span class="dot">.</span></div>
+            <div class="logo-caption">深色背景 · ink-900</div>
+          </div>
+        </div>
+        <p class="vi-note">标识采用 Space Grotesk Display 字族，句号圆点使用酸橙绿（primary-500）作为视觉锚点，象征街区活力与创意能量。最小使用尺寸 24px，四周保留 0.5× 字高的安全空间。</p>
+      </div>
+    </section>
+
+    <section class="page-block alt-bg" id="colors">
+      <div class="container">
+        <div class="page-block-head">
+          <p class="xpark-eyebrow">色彩系统</p>
+          <h2 class="xpark-h2">Color System</h2>
+        </div>
+
+        <div class="palette-group">
+          <h3 class="palette-title">酸橙绿 Primary <span>— xpark-primary-50 → 900</span></h3>
+          <div class="scale-row" id="scale-primary"></div>
+        </div>
+
+        <div class="palette-group">
+          <h3 class="palette-title">珊瑚 Coral <span>— xpark-coral-50 → 900</span></h3>
+          <div class="scale-row" id="scale-coral"></div>
+        </div>
+
+        <div class="palette-group">
+          <h3 class="palette-title">墨色 Ink <span>— xpark-ink-50 → 900</span></h3>
+          <div class="scale-row" id="scale-ink"></div>
+        </div>
+
+        <div class="palette-group">
+          <h3 class="palette-title">奶油 Cream <span>— xpark-cream-50 → 300</span></h3>
+          <div class="scale-row" id="scale-cream"></div>
+        </div>
+
+        <div class="palette-group">
+          <h3 class="palette-title">语义色 Semantic</h3>
+          <div class="semantic-row">
+            <div class="semantic-group">
+              <h4 class="palette-title">成功 Success</h4>
+              <div class="scale-row" id="scale-success"></div>
+            </div>
+            <div class="semantic-group">
+              <h4 class="palette-title">警告 Warning</h4>
+              <div class="scale-row" id="scale-warning"></div>
+            </div>
+            <div class="semantic-group">
+              <h4 class="palette-title">错误 Error</h4>
+              <div class="scale-row" id="scale-error"></div>
+            </div>
+          </div>
+          <div class="semantic-group" style="margin-top:var(--space-4);max-width:240px">
+            <h4 class="palette-title">信息 Info</h4>
+            <div class="scale-row" id="scale-info"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-block" id="typography">
+      <div class="container">
+        <div class="page-block-head">
+          <p class="xpark-eyebrow">字体系统</p>
+          <h2 class="xpark-h2">Typography</h2>
+        </div>
+        <div class="type-table">
+          <div class="type-row">
+            <div class="sample xpark-display">Xpark 街区语言</div>
+            <div class="type-meta"><div class="role">DISPLAY</div><div class="spec">Space Grotesk · 56px · 300</div></div>
+          </div>
+          <div class="type-row">
+            <div class="sample xpark-h1">一级标题 Heading 1</div>
+            <div class="type-meta"><div class="role">HEADING 1</div><div class="spec">Space Grotesk · 40px · 300</div></div>
+          </div>
+          <div class="type-row">
+            <div class="sample xpark-h2">二级标题 Heading 2</div>
+            <div class="type-meta"><div class="role">HEADING 2</div><div class="spec">Space Grotesk · 32px · 400</div></div>
+          </div>
+          <div class="type-row">
+            <div class="sample xpark-h3">三级标题 Heading 3</div>
+            <div class="type-meta"><div class="role">HEADING 3</div><div class="spec">Space Grotesk · 24px · 500</div></div>
+          </div>
+          <div class="type-row">
+            <div class="sample xpark-h4">四级标题 Heading 4</div>
+            <div class="type-meta"><div class="role">HEADING 4</div><div class="spec">Space Grotesk · 20px · 500</div></div>
+          </div>
+          <div class="type-row">
+            <div class="sample xpark-lead">引导段落用于区块简介，传达街区气质与核心价值主张。</div>
+            <div class="type-meta"><div class="role">LEAD</div><div class="spec">Noto Sans SC · 18px · 400</div></div>
+          </div>
+          <div class="type-row">
+            <div class="sample xpark-body">正文用于大部分内容区域，行高 1.6，保证中文阅读舒适度。</div>
+            <div class="type-meta"><div class="role">BODY</div><div class="spec">Noto Sans SC · 16px · 400</div></div>
+          </div>
+          <div class="type-row">
+            <div class="sample xpark-caption">辅助说明 · 营业时间 10:00–22:00 · L2 B08</div>
+            <div class="type-meta"><div class="role">CAPTION</div><div class="spec">Noto Sans SC · 12px · 400</div></div>
+          </div>
+          <div class="type-row">
+            <div class="sample xpark-eyebrow">EYEBROW TEXT</div>
+            <div class="type-meta"><div class="role">EYEBROW</div><div class="spec">Noto Sans SC · 11px · 600</div></div>
+          </div>
+          <div class="type-row">
+            <div class="sample mono">07:30 — 22:00 · ¥28.00</div>
+            <div class="type-meta"><div class="role">MONO</div><div class="spec">Space Grotesk · 14px · 400</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-block alt-bg" id="components">
+      <div class="container">
+        <div class="page-block-head">
+          <p class="xpark-eyebrow">组件展示</p>
+          <h2 class="xpark-h2">Components</h2>
+        </div>
+
+        <div class="comp-group">
+          <div class="comp-label">按钮 Button · 变体</div>
+          <div class="comp-panel comp-row">
+            <button class="btn primary">主要按钮</button>
+            <button class="btn secondary">次要按钮</button>
+            <button class="btn ghost">幽灵按钮</button>
+            <button class="btn danger">危险按钮</button>
+          </div>
+        </div>
+
+        <div class="comp-group">
+          <div class="comp-label">按钮 · 尺寸</div>
+          <div class="comp-panel comp-row">
+            <button class="btn primary sm">小</button>
+            <button class="btn primary">中</button>
+            <button class="btn primary lg">大</button>
+          </div>
+        </div>
+
+        <div class="comp-group">
+          <div class="comp-label">按钮 · 禁用</div>
+          <div class="comp-panel comp-row">
+            <button class="btn primary" disabled>主要按钮</button>
+            <button class="btn ghost" disabled>幽灵按钮</button>
+          </div>
+        </div>
+
+        <div class="comp-group">
+          <div class="comp-label">徽标 Badge</div>
+          <div class="comp-panel comp-row">
+            <span class="badge lime">酸柠檬</span>
+            <span class="badge coral">限时</span>
+            <span class="badge ink-outline">活动</span>
+          </div>
+        </div>
+
+        <div class="comp-group">
+          <div class="comp-label">行动链接 CTA Link</div>
+          <div class="comp-panel comp-row">
+            <a href="#" class="cta-link">箭头样式</a>
+            <a href="#" class="cta-link underline">下划线样式</a>
+          </div>
+        </div>
+
+        <div class="comp-group">
+          <div class="comp-label">卡片 Card</div>
+          <div class="cards-demo">
+            <div>
+              <div class="vi-card-demo">
+                <div class="thumb"><img src="../assets/images/brands/retail.jpg" alt="纵向卡片示例" loading="lazy"></div>
+                <div class="body">
+                  <span class="badge lime">NEW</span>
+                  <h3 class="xpark-h4" style="margin:8px 0 4px">纵向卡片</h3>
+                  <p class="xpark-caption">媒体 · 图文</p>
+                  <a href="#" class="cta-link" style="margin-top:12px;display:inline-flex">查看详情</a>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="vi-card-demo horizontal">
+                <div class="thumb"><img src="../assets/images/events/design-salon.jpg" alt="横向卡片示例" loading="lazy"></div>
+                <div class="body">
+                  <span class="badge coral">热门</span>
+                  <h3 class="xpark-h4" style="margin:8px 0 4px">横向卡片</h3>
+                  <p class="xpark-body text-muted" style="font-size:0.875rem;margin:0 0 8px">适合活动列表与品牌推荐，支持图文混排。</p>
+                  <a href="#" class="cta-link">了解更多</a>
+                </div>
+              </div>
+              <blockquote class="vi-quote" style="margin-top:var(--space-5)">编辑视角：街区是年轻人的客厅。 — Xpark 主理人</blockquote>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp-group">
+          <div class="comp-label">输入框 Input</div>
+          <div class="comp-panel" style="display:grid;gap:var(--space-4);max-width:480px">
+            <input class="input input-underline" placeholder="输入邮箱地址">
+            <input class="input input-underline" value="hello@xpark.cn">
+            <input class="input input-search" placeholder="搜索品牌、活动">
+          </div>
+        </div>
+
+        <div class="comp-group">
+          <div class="comp-label">导航 Navigation</div>
+          <div class="nav-demo">
+            <div class="nav-logo">X<span>park</span></div>
+            <div class="links">
+              <span>首页</span>
+              <span class="active">入驻品牌</span>
+              <span>活动日历</span>
+            </div>
+            <button class="btn primary sm">加入会员</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-block" id="tokens">
+      <div class="container">
+        <div class="page-block-head">
+          <p class="xpark-eyebrow">设计令牌</p>
+          <h2 class="xpark-h2">Design Tokens</h2>
+        </div>
+
+        <div class="comp-group">
+          <div class="comp-label">间距 Spacing</div>
+          <div class="token-spacing" id="token-spacing"></div>
+        </div>
+
+        <div class="comp-group">
+          <div class="comp-label">圆角 Radius</div>
+          <div class="radius-demo">
+            <div class="radius-item"><div class="shape" style="border-radius:var(--radius-sm)"></div><div class="token">--radius-sm · 4px</div></div>
+            <div class="radius-item"><div class="shape" style="border-radius:var(--radius-md)"></div><div class="token">--radius-md · 8px</div></div>
+            <div class="radius-item"><div class="shape" style="border-radius:var(--radius-lg)"></div><div class="token">--radius-lg · 12px</div></div>
+            <div class="radius-item"><div class="shape" style="border-radius:var(--radius-full)"></div><div class="token">--radius-full</div></div>
+          </div>
+        </div>
+
+        <div class="comp-group">
+          <div class="comp-label">阴影 Shadow</div>
+          <div class="shadow-demo">
+            <div class="shadow-card" style="box-shadow:var(--shadow-1)"><div><div class="token">--shadow-1</div><div class="label">Card</div></div></div>
+            <div class="shadow-card" style="box-shadow:var(--shadow-2)"><div><div class="token">--shadow-2</div><div class="label">Hover</div></div></div>
+            <div class="shadow-card" style="box-shadow:var(--shadow-3)"><div><div class="token">--shadow-3</div><div class="label">Float</div></div></div>
+            <div class="shadow-card" style="box-shadow:var(--shadow-4)"><div><div class="token">--shadow-4</div><div class="label">Modal</div></div></div>
+            <div class="shadow-card" style="box-shadow:var(--shadow-5)"><div><div class="token">--shadow-5</div><div class="label">Overlay</div></div></div>
+          </div>
+        </div>
+
+        <div class="comp-group">
+          <div class="comp-label">图标尺寸 Icon Size</div>
+          <div class="icon-size-demo">
+            <div class="icon-size-item"><div class="icon-box sm"></div><div class="token">--size-icon-sm · 16px</div></div>
+            <div class="icon-size-item"><div class="icon-box md"></div><div class="token">--size-icon-md · 20px</div></div>
+            <div class="icon-size-item"><div class="icon-box lg"></div><div class="token">--size-icon-lg · 24px</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" style="margin-top:0">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo">X<span>park</span></div>
+        <p class="xpark-caption">大学城创意街区</p>
+      </div>
+      <div class="footer-col">
+        <h4>街区探索</h4>
+        <ul>
+          <li><a href="index.html">探索街区</a></li>
+          <li><a href="events.html">活动日历</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>品牌入驻</h4>
+        <ul>
+          <li><a href="brands.html">入驻品牌</a></li>
+          <li><a href="#">加入我们</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>设计规范</h4>
+        <ul>
+          <li><a href="vi.html">VI 系统</a></li>
+          <li><a href="vi.html#colors">色彩规范</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© 2025 Xpark. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script src="../js/xpark-shared.js"></script>
+  <script src="../js/page-vi.js"></script>
+</body>
+</html>

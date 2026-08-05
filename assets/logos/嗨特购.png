@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hitgoo.com -- Premium Domain for Sale --</title>
+<meta name="robots" content="noindex, nofollow">
+
+<style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    --teal-deep:  #0b4f4f;
+    --teal-mid:   #0d6b6b;
+    --teal-light: #e8f4f4;
+    --teal-pale:  #f2f9f9;
+    --accent:     #7a3030;
+    --text:       #1a2020;
+    --text-soft:  #4a5a5a;
+    --text-faint: #8a9a9a;
+    --border:     #d0dede;
+    --bg:         #f5f8f8;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+   
+  header {
+    background: var(--teal-deep);
+    padding: 0 29px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--teal-mid);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+   
+  .logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    height: 36px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    border: 1.5px solid rgba(255,255,255,0.25);
+  }
+
+  .logo-fore {
+    background: var(--teal-mid);
+    color: var(--teal-light);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 20px;
+    padding: 0 5px 0 11px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.01em;
+  }
+
+   
+  .logo-sep {
+    background: linear-gradient(to right, var(--teal-mid) 50%, var(--teal-light) 50%);
+    width: 12px;
+    height: 100%;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+   
+   
+  .logo-sep::after {
+    content: '';
+    position: absolute;
+    top: 65%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: linear-gradient(to right, var(--teal-light) 50%, var(--teal-mid) 50%);
+  }
+
+  .logo-ext {
+    background: var(--teal-light);
+    color: var(--teal-deep);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 20px;
+    padding: 0 7px 0 4px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.01em;
+  }
+
+   
+  .tagline {
+    color: rgba(255,255,255,0.45);
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 300;
+  }
+
+   
+  .lang-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.85);
+    font: 500 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    letter-spacing: 0.1em;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .lang-btn:hover {
+    background: rgba(255,255,255,0.18);
+    border-color: rgba(255,255,255,0.5);
+    color: #fff;
+  }
+
+   
+  .hero {
+    background: linear-gradient(160deg, var(--teal-light) 0%, var(--teal-pale) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 29px 29px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -54px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 540px;
+    height: 180px;
+    background: radial-gradient(ellipse, rgba(13,107,107,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-domain {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-weight: 300;
+    font-size: clamp(27px, 6.3vw, 54px);
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    line-height: 1;
+    margin-bottom: 13px;
+    position: relative;
+  }
+
+  .hero-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .hero-status-zh {
+    font-size: clamp(14px, 2.7vw, 20px);
+    color: var(--teal-deep);
+    font-weight: 300;
+    letter-spacing: 0.08em;
+  }
+
+  .hero-status-en {
+    font-size: clamp(11px, 1.8vw, 14px);
+    color: var(--text-soft);
+    font-weight: 300;
+    letter-spacing: 0.01em;
+  }
+
+   
+  .main {
+    flex: 1;
+    max-width: 684px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: 1fr 234px;
+    gap: 36px;
+    align-items: center;
+  }
+
+   
+  .inquiry-block {
+    animation: slideUp 0.5s ease both;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .inquiry-label {
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--teal-mid);
+    font-weight: 500;
+    margin-bottom: 13px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .inquiry-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .inquiry-text {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-soft);
+    margin-bottom: 18px;
+  }
+
+  .inquiry-text b {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .inquiry-list {
+    list-style: none;
+    counter-reset: li;
+    margin: 11px 0 14px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .inquiry-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 13px;
+    color: var(--text-soft);
+    line-height: 1.5;
+  }
+
+  .inquiry-list li::before {
+    content: counter(li);
+    counter-increment: li;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--teal-deep);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+
+  .inquiry-note {
+    font-size: 12px;
+    color: var(--text-faint);
+    font-style: italic;
+    line-height: 1.6;
+    padding-top: 9px;
+    border-top: 1px solid var(--border);
+  }
+
+   
+  .contact-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 16px rgba(11,79,79,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    animation: slideUp 0.5s 0.1s ease both;
+  }
+
+  .contact-card-title {
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .contact-divider {
+    height: 1px;
+    background: var(--border);
+  }
+
+   
+  .contact-email-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .contact-email-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .contact-email {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 14px;
+    color: var(--teal-deep);
+    text-decoration: none;
+    transition: color 0.2s;
+    display: block;
+    word-break: break-all;
+  }
+
+  .contact-email:hover {
+    color: var(--teal-mid);
+  }
+
+   
+  .chat-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--teal-mid), var(--teal-deep));
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 18px;
+    font: 500 13px system-ui, sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(11,79,79,0.25);
+    letter-spacing: 0.02em;
+  }
+
+  .chat-btn:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(11,79,79,0.32);
+  }
+
+  .chat-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(11,79,79,0.2);
+  }
+
+  .chat-icon {
+    width: 18px;
+    height: 18px;
+    fill: #fff;
+  }
+
+   
+  .contact-hint {
+    font-size: 11px;
+    color: var(--text-faint);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+   
+  footer {
+    background: var(--teal-deep);
+    padding: 16px 29px;
+    text-align: center;
+  }
+
+  footer p {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.12em;
+    line-height: 1.6;
+  }
+
+   
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 9998;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-content {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(378px, 92vw);
+    z-index: 9999;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    background: #fff;
+  }
+
+  .modal-header {
+    background: var(--teal-deep);
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 15px;
+    color: #fff;
+    font-weight: 400;
+  }
+
+  .modal-close {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    border-radius: 6px;
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.28); }
+
+  .modal-body {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-weight: 500;
+  }
+
+  .form-input,
+  .form-textarea {
+    background: var(--teal-pale);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 13px;
+    font: 300 13px system-ui, sans-serif;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .form-input:focus,
+  .form-textarea:focus {
+    border-color: var(--teal-mid);
+  }
+  .form-textarea {
+    resize: vertical;
+    min-height: 81px;
+  }
+
+  .form-submit {
+    background: linear-gradient(135deg, var(--teal-mid), var(--teal-deep));
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font: 500 14px system-ui, sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.04em;
+    margin-top: 4px;
+  }
+  .form-submit:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+  }
+  .form-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .form-result {
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.5;
+    min-height: 18px;
+  }
+  .form-result.success { color: var(--teal-mid); }
+  .form-result.error   { color: var(--accent); }
+
+  .modal-show { display: block !important; }
+
+   
+  @media (max-width: 640px) {
+    header {
+      padding: 0 16px;
+      height: 56px;
+    }
+
+    .tagline { display: none; }
+
+    .hero { padding: 36px 20px 32px; }
+
+    .main {
+      grid-template-columns: 1fr;
+      padding: 28px 16px;
+      gap: 28px;
+    }
+
+    footer { padding: 16px 20px; }
+  }
+</style>
+<link rel="icon" type="image/svg+xml" href="/img/standard/icon_h.svg">
+</head>
+<body style="visibility:hidden">
+
+
+<header>
+  
+  <a class="logo" href="/">
+    <span class="logo-fore">hitgoo</span>
+    <span class="logo-sep"></span>
+    <span class="logo-ext">com</span>
+  </a>
+
+  <span class="tagline">Private domain portfolio</span>
+
+  <button class="lang-btn" onclick="toggleLang()">EN / 日 / 中</button>
+</header>
+
+
+<section class="hero">
+  <div class="hero-domain">HITGOO.<span style="font-size:0.75em">COM</span></div>
+  <div class="hero-status">
+    <div class="hero-status-zh" id="status-line1">此网站域名或可出售</div>
+    <div class="hero-status-en" id="status-line2">This domain name is likely for sale.</div>
+  </div>
+</section>
+
+
+<div class="main">
+
+  
+  <div class="inquiry-block">
+    <div class="inquiry-label">Acquisition Inquiry</div>
+    <p class="inquiry-text" id="inquiry-intro">
+      To inquire about the availability of <b>hitgoo.com</b>, please include the following in your message:
+    </p>
+    <ol class="inquiry-list" id="inquiry-list">
+      <li>The domain name you are interested in.</li>
+      <li>Your budget for the purchase.</li>
+      <li>Your email address or contact number.</li>
+    </ol>
+    <p class="inquiry-note" id="inquiry-note">
+      If the domain is available and your budget aligns with expectations, you will receive a response.
+    </p>
+  </div>
+
+  
+  <div class="contact-card">
+    <p class="contact-card-title">Contact</p>
+    <div class="contact-divider"></div>
+
+    <div class="contact-email-block">
+      <span class="contact-email-label">Email</span>
+      <a href="mailto:dn4biz@gmail.com" class="contact-email">dn4biz@gmail.com</a>
+    </div>
+
+    <div class="contact-email-block" id="also-at-block-en" style="display:none">
+      <span class="contact-email-label">Also at</span>
+      <a href="mailto:dn4biz@hotmail.com" class="contact-email">dn4biz@hotmail.com</a>
+    </div>
+
+    <div class="contact-email-block" id="also-at-block-zh" style="display:none">
+      <span class="contact-email-label">电话&amp;微信</span>
+      <span class="contact-email">+86 18653356707</span>
+    </div>
+    <script>
+      (function(){
+        var langs = [navigator.language].concat(Array.from(navigator.languages || []));
+        var has = function(l){ return langs.some(function(x){ return (x||'').toLowerCase().slice(0,2) === l; }); };
+        if (has('zh')) {
+          document.getElementById('also-at-block-zh').style.display = '';
+        } else {
+          document.getElementById('also-at-block-en').style.display = '';
+        }
+      })();
+    </script>
+
+    <div class="contact-divider"></div>
+
+    <button class="chat-btn" onclick="openChat(event)" id="chat-btn-label">
+      <svg class="chat-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+      </svg>
+      Online Chat
+    </button>
+
+    <p class="contact-hint" id="contact-hint">
+      Serious offers only.<br>Casual inquiries may be ignored.
+    </p>
+  </div>
+
+</div>
+
+
+<footer>
+  <p id="footer-text">
+    This site is privately owned and not affiliated with any company, product, service, or brand.<br>
+    If you arrived here searching for a product or service, please note it is unrelated.
+  </p>
+</footer>
+
+
+<div class="modal-overlay" id="modalOverlay"></div>
+<div class="modal-content" id="modalContent">
+  <div class="modal-header">
+    <span class="modal-title" id="modal-title"></span>
+    <button class="modal-close" onclick="closeChat()">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label class="form-label" id="form-email-label">Reply-to Email</label>
+      <input class="form-input" type="email" id="form-email" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label" id="form-budget-label">Budget</label>
+      <input class="form-input" type="text" id="form-budget" placeholder="$">
+    </div>
+    <div class="form-group">
+      <label class="form-label" id="form-msg-label">Message</label>
+      <textarea class="form-textarea" id="form-msg" placeholder="Tell us about your interest..."></textarea>
+    </div>
+    <button class="form-submit" id="form-submit" onclick="submitForm()">Send Message</button>
+    <p class="form-result" id="form-result"></p>
+  </div>
+</div>
+
+<script>
+const DOMAIN = 'hitgoo.com';
+let lang = 'en';
+let cachedIP = '';
+let clickTimer = null;
+
+
+(function() {
+  const langs = [navigator.language].concat(Array.from(navigator.languages || []));
+  const has = l => langs.some(x => (x||'').toLowerCase().slice(0,2) === l);
+  if (has('zh')) lang = 'zh';
+  else if (has('ja')) lang = 'ja';
+  else lang = 'en';
+})();
+
+
+async function fetchIP() {
+  if (cachedIP) return cachedIP;
+  try {
+    const r = await fetch('https://api.ipify.org?format=json');
+    const d = await r.json();
+    cachedIP = d.ip || '';
+  } catch(e) {
+    cachedIP = '';
+  }
+  return cachedIP;
+}
+const content = {
+  en: {
+    s1: 'This domain name',
+    s2: 'is likely for sale.',
+    intro: `To inquire about the availability of <b>${DOMAIN}</b>, please include the following in your message:`,
+    list: [
+      'The domain name you are interested in.',
+      'Your budget for the purchase.',
+      'Your email address or contact number.'
+    ],
+    note: 'If the domain is available and your budget aligns with expectations, you will receive a response.',
+    chat: 'Online Chat',
+    hint: 'Serious offers only.<br>Casual inquiries may be ignored.',
+    footer: 'This is a private site and not affiliated with any brand or service. Any products or services you searched for are unrelated.',
+    modalTitle: (d) => 'Inquiry for ' + d.toUpperCase(),
+    emailLabel: 'Reply-to Email', budgetLabel: 'Budget', msgLabel: 'Message',
+    emailPh: 'your@email.com', budgetPh: '$', msgPh: 'Tell us about your interest...',
+    submitBtn: 'Send Message',
+    successMsg: 'Message sent. We will be in touch.',
+    errorMsg: 'Something went wrong. Please try again.',
+    rateLimitMsg: (s) => `Please wait ${s} seconds before submitting again.`,
+    emailInvalid: 'Please enter a valid email address.'
+  },
+  zh: {
+    s1: '此网站域名或可出售',
+    s2: 'This domain name is likely for sale.',
+    intro: `如果您想知道 <b>${DOMAIN}</b> 域名可否出售，请邮件咨询或在线咨询，并请注明如下事项：`,
+    list: [
+      '拟收购的域名，',
+      '您的购买预算，',
+      '您的电子邮件或电话。'
+    ],
+    note: '如果域名可出售，且您提交的预算在考虑范围之内，您将得到回复。',
+    chat: '在线联系',
+    hint: '仅接受认真询盘<br>随意报价可能不予回复。',
+    footer: '本站为私人所有，与任何企业和品牌无关。如果访问目的是某产品或某服务，则此网站非您所需，请关闭网页离开。',
+    modalTitle: (d) => '您对域名 ' + d + ' 的询盘',
+    emailLabel: '回复邮箱', budgetLabel: '预算', msgLabel: '留言',
+    emailPh: 'your@email.com', budgetPh: '¥', msgPh: '请描述您的需求...',
+    submitBtn: '发送',
+    successMsg: '消息已发送，我们将尽快回复。<br><br>如情况紧急，可直接联系域名持有人：<br><b>+86 186 5335 6707</b>（微信同号）',
+    errorMsg: '发送失败，请重试。',
+    rateLimitMsg: (s) => `请等待 ${s} 秒后再次提交。`,
+    emailInvalid: '请输入有效的邮箱地址。'
+  },
+  ja: {
+    s1: 'このドメイン名は、',
+    s2: 'おそらく販売可能です。',
+    intro: `<b>${DOMAIN}</b> の売却可否についてお問い合わせの場合は、以下の情報を明記してください：`,
+    list: [
+      '取得希望のドメイン名。',
+      'ご購入予算。',
+      'メールアドレスまたは電話番号。'
+    ],
+    note: 'ドメインが売却可能で、ご提示の予算が検討範囲内であれば、ご連絡差し上げます。',
+    chat: 'ご相談',
+    hint: '真剣なお問い合わせのみ。<br>低額提案は返信しない場合があります',
+    footer: '本サイトは個人が運営するもので、企業やブランドとは一切関係ありません。製品やサービスに関する情報をお探しの方はご注意ください。',
+    modalTitle: (d) => d.toUpperCase() + ' へのお問い合わせ',
+    emailLabel: '返信メール', budgetLabel: '予算', msgLabel: 'メッセージ',
+    emailPh: 'your@email.com', budgetPh: '¥', msgPh: 'ご要望をお書きください...',
+    submitBtn: '送信',
+    successMsg: 'メッセージを送信しました。折り返しご連絡いたします。',
+    errorMsg: '送信に失敗しました。もう一度お試しください。',
+    rateLimitMsg: (s) => `${s} 秒後に再度送信してください。`,
+    emailInvalid: '有効なメールアドレスを入力してください。'
+  }
+};
+
+function applyLang() {
+  const c = content[lang];
+  document.getElementById('status-line1').textContent = c.s1;
+  document.getElementById('status-line2').textContent = c.s2;
+  document.getElementById('inquiry-intro').innerHTML = c.intro;
+  const list = document.getElementById('inquiry-list');
+  list.innerHTML = c.list.map(t => `<li>${t}</li>`).join('');
+  document.getElementById('inquiry-note').textContent = c.note;
+  document.getElementById('chat-btn-label').innerHTML =
+    `<svg class="chat-icon" viewBox="0 0 24 24"><path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>${c.chat}`;
+  document.getElementById('contact-hint').innerHTML = c.hint;
+  document.getElementById('footer-text').innerHTML = c.footer;
+  
+  applyModalLang();
+}
+
+function applyModalLang() {
+  const c = content[lang];
+  document.getElementById('modal-title').textContent = c.modalTitle(DOMAIN);
+  document.getElementById('form-email-label').textContent = c.emailLabel;
+  document.getElementById('form-budget-label').textContent = c.budgetLabel;
+  document.getElementById('form-msg-label').textContent = c.msgLabel;
+  document.getElementById('form-email').placeholder = c.emailPh;
+  document.getElementById('form-budget').placeholder = c.budgetPh;
+  document.getElementById('form-msg').placeholder = c.msgPh;
+  document.getElementById('form-submit').textContent = c.submitBtn;
+}
+
+function toggleLang() {
+  const order = ['en', 'zh', 'ja'];
+  lang = order[(order.indexOf(lang) + 1) % order.length];
+  applyLang();
+}
+
+function openChat(e) {
+  e && e.preventDefault();
+  
+  const resultEl = document.getElementById('form-result');
+  if (resultEl.className.indexOf('success') >= 0) {
+    document.getElementById('form-email').value = '';
+    document.getElementById('form-budget').value = '';
+    document.getElementById('form-msg').value = '';
+    
+  } else {
+    resultEl.textContent = '';
+    resultEl.className = 'form-result';
+  }
+  document.getElementById('form-submit').disabled = false;
+  applyModalLang();
+
+  document.getElementById('modalOverlay').classList.add('modal-show');
+  document.getElementById('modalContent').classList.add('modal-show');
+  document.body.style.overflow = 'hidden';
+
+  
+  
+
+}
+
+function closeChat() {
+  clearTimeout(clickTimer);
+  clickTimer = null;
+  document.getElementById('modalOverlay').classList.remove('modal-show');
+  document.getElementById('modalContent').classList.remove('modal-show');
+  document.body.style.overflow = '';
+}
+
+async function submitForm() {
+  const email  = document.getElementById('form-email').value.trim();
+  const budget = document.getElementById('form-budget').value.trim();
+  const msg    = document.getElementById('form-msg').value.trim();
+  const result = document.getElementById('form-result');
+  const btn    = document.getElementById('form-submit');
+  const c      = content[lang];
+
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRe.test(email)) {
+    result.textContent = c.emailInvalid;
+    result.className = 'form-result error';
+    return;
+  }
+
+  btn.disabled = true;
+  result.textContent = '';
+  result.className = 'form-result';
+
+  const ip = await fetchIP();
+
+  try {
+    const resp = await fetch('/send_msg', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domain: DOMAIN, email, budget, message: msg, ip })
+    });
+    const data = await resp.json();
+    if (!data.ok) {
+      result.textContent = c.rateLimitMsg(data.wait);
+      result.className = 'form-result error';
+      btn.disabled = false;
+      return;
+    }
+    if (lang === 'zh') { result.innerHTML = c.successMsg; } else { result.textContent = c.successMsg; }
+    result.className = 'form-result success';
+    
+    document.getElementById('form-email').value = '';
+    document.getElementById('form-budget').value = '';
+    document.getElementById('form-msg').value = '';
+  } catch(e) {
+    result.textContent = c.errorMsg;
+    result.className = 'form-result error';
+    btn.disabled = false;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  applyLang();
+  document.body.style.visibility = '';
+  document.getElementById('modalOverlay').addEventListener('click', closeChat);
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChat(); });
+</script>
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof LA !== 'undefined') LA.init({id:"KW30hXEW3EbJX3tp",ck:"KW30hXEW3EbJX3tp"});
+  });
+</script>
+
+</body>
+</html>

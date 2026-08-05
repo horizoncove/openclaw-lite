@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" rx="16" fill="#FEFCF8"/>
+  <circle cx="100" cy="88" r="42" fill="#D97706" opacity="0.15"/>
+  <text x="100" y="98" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="22" font-weight="600" fill="#D97706">GRAIN</text>
+  <text x="100" y="130" text-anchor="middle" font-family="Noto Sans SC, sans-serif" font-size="11" fill="#8a8680">天然面包</text>
+</svg>

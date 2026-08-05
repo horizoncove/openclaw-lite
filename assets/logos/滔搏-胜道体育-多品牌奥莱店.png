@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>YYsports胜道体育</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="YYsports胜道体育, 胜道体育, 胜道, YYsports, YYsports官方网站
+yysports, YYSPORTS, 宝胜, 宝胜国际, 宝成" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="baidu-site-verification" content="bpTZ1LffhJ" />
+    <link href="/assets/images/other-images/favicon-e598cd.png" type="image/x-icon" rel="shortcut icon">
+    <link rel="stylesheet" href="/assets/styles/vendor-default.css">
+    <link rel="stylesheet" href="/assets/styles/eevee-layout-677c65.css">
+    <!-- pokeball iconfont ,修改请找端点王凯凯 -->
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1466485617_047616.css" />
+    <!-- feebas 前台的iconfont -->
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_kn0nyurl0zjb57b9.css" />
+    <!-- pousheng 前台的iconfont，请修改这个链接 -->
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_306943_st0si2zjytd42t9.css" />
+    <link rel="stylesheet" href="/assets/styles/app-front-default.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css">
+    <script>//百度统计
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?3aea8d2df4321c77875a40d361d444be";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  </head>
+  <body data-design="" style="background-color: #ffffff;">
+    <div class='auth-container js-comp eve-component' data-comp-path='common/auth_container'>  <div id="auth-div" data-auth="null"></div>
+</div>
+      <div class="eve-page-part"><div><div class="eve-grid-auto eve-col-align-center"><div class="eve-row"><div class="eve-col-cu" style="width:100%;background-image:url(https://e1xossfilehdd.blob.core.chinacloudapi.cn/fileserver01/2017/11/21/af12d237-e069-4380-be64-be2a26a7e4f3.png);height:64px;"><div class="eve-component"><span style="color:transparent">Invoke service for component [design/community_navbar] error: [500 - Server Error] {&quot;timestamp&quot;:1785297200554,&quot;status&quot;:500,&quot;error&quot;:&quot;Internal Server Error&quot;,&quot;exception&quot;:&quot;io.terminus.common.exception.JsonResponseException&quot;,&quot;message&quot;:&quot;list.article.channel.failed&quot;,&quot;path&quot;:&quot;/community/api/pc/article-channel/list&quot;}</span></div></div></div></div></div></div>
+  <div class="eve-page-part"><div><div class="eve-grid-auto eve-col-align-center" style="background-color:#F5F5F5;"><div class="eve-row"><div class="eve-col-cu eve-col-align-center" style="width:100%;background-repeat:repeat-x;background-position:50% 50%;background-color:#F5F5F5;"><div class="eve-row"><div class="eve-col-cu eve-col-align-center" style="width:100%;z-index:2;position:relative;"><div class="eve-component"><div class='eve-image eve-component' data-comp-name='图片' data-comp-path='eevee/image'><div >
+
+<img alt="" style="width: 100%" data-original="https://e1xossfilehdd.blob.core.chinacloudapi.cn/fileserver01/2022/06/23/8ed3d307-3616-4ebf-a70f-ebafae867265.jpeg">
+
+</div>
+</div></div></div></div></div></div><div class="eve-row"><div class="eve-col-cu eve-col-align-center" style="width:1100px;margin-top:10px;background-color:#F5F5F5;padding-bottom:30px;margin-bottom:50px;"><div class="eve-row"><div class="eve-col-cu" style="width:980px;margin-top:40px;background-color:#FFFFFF;height:550px;"><div class="eve-row"><div class="eve-col-cu" style="width:100%;"><div class="eve-component"><div class='eve-image eve-component' data-comp-name='图片' data-comp-path='eevee/image'><div >
+<a href="http://www.yysports.com/channel/" target="_blank">
+<img alt="" style="width: 100%" data-original="http://e1xossfilehdd.blob.core.chinacloudapi.cn/fileserver01/2017/11/10/70b9472d-971d-4c0c-8168-550722fb2dcb.jpg">
+</a>
+</div>
+</div></div></div></div><div class="eve-row"><div class="eve-col-cu" style="width:980px;margin-top:26px;margin-bottom:50px;height:450px;"><div class="eve-component"><span style="color:transparent">Invoke service for component [design/article_list] error: [500 - Server Error] {&quot;timestamp&quot;:1785297200570,&quot;status&quot;:500,&quot;error&quot;:&quot;Internal Server Error&quot;,&quot;exception&quot;:&quot;io.terminus.common.exception.JsonResponseException&quot;,&quot;message&quot;:&quot;文章信息查询失败&quot;,&quot;path&quot;:&quot;/community/api/pc/article/paging-with-channel&quot;}</span></div></div></div></div></div></div></div></div></div></div>
+  <div class="eve-page-part"><div><div class="eve-grid-auto eve-col-align-center" style="background-color:#171717;"><div class="eve-row"><div class="eve-col-cu eve-col-align-center" style="width:100%;background-color:#171717;"><div class="eve-row"><div class="eve-col-cu eve-col-align-center" style="width:1184px;background-color:#171717;"><div class="eve-row"><div class="eve-col-cu eve-col-align-center" style="width:1184px;background-color:#171717;z-index:1;position:relative;"><div class="eve-row"><div class="eve-col-cu" style="width:700px;height:230px;"><div class="eve-row"><div class="eve-col-cu" style="width:150px;height:100px;margin-top:40px;"><div class="eve-component"><div class='eve-image eve-component' data-comp-name='图片' data-comp-path='eevee/image'><div >
+
+<img alt="" style="width: 100%" data-original="https://e1xossfilehdd.blob.core.chinacloudapi.cn/fileserver01/2021/06/17/05c1aaee-f09f-43d8-b53e-f570d2aef22e.png">
+
+</div>
+</div></div></div><div class="eve-col-cu" style="width:60px;height:100px;"></div><div class="eve-col-cu" style="width:150px;height:150px;margin-top:40px;"><div class="eve-row"><div class="eve-col-cu" style="width:100%;height:30px;"><div class="eve-row"><div class="eve-col-cu" style="width:100%;height:15px;margin-top:10px;"><div class="eve-component"><div class='eve-text eve-component' data-comp-name='文字' data-comp-path='eevee/text'>   <div class="text-content" style="line-height:18px;">
+       
+       <p class=""><span style="font-weight: bold; vertical-align: sub; color: rgb(255, 255, 255); font-size: 16px;">关于我们</span></p>
+   
+   </div>
+</div></div></div></div><div class="eve-row"><div class="eve-col-cu" style="width:150px;margin-top:30px;"><div class="eve-component"><div class='eve-text eve-component' data-comp-name='文字' data-comp-path='eevee/text'>   <div class="text-content" style="line-height:14px;">
+       
+       
+       <p class=""><span style="color: rgb(255, 255, 255); font-weight: bold; font-size: 12px;"><a href="/d/aboutyysports" target="_blank" rel="noopener noreferrer">品牌介绍</a></span></p><p class=""><span style="color: rgb(255, 255, 255); font-weight: bold; font-size: 14px;"><br></span></p><p class=""><span style="color: rgb(255, 255, 255); font-weight: bold; font-size: 12px;"><a href="/index" target="_blank" rel="noopener noreferrer">最新动态</a></span></p>
+   
+   
+   </div>
+</div></div></div></div></div></div></div><div class="eve-col-cu" style="width:20px;height:100px;"></div><div class="eve-col-cu" style="width:150px;margin-top:40px;height:160px;"><div class="eve-row"><div class="eve-col-cu" style="width:100%;height:30px;"><div class="eve-row"><div class="eve-col-cu" style="width:100%;height:15px;margin-top:10px;"><div class="eve-component"><div class='eve-text eve-component' data-comp-name='文字' data-comp-path='eevee/text'>   <div class="text-content">
+       <p><span style="color: rgb(255, 255, 255);"><span style="font-family: inherit; font-weight: bold; font-size: 16px;">Contact</span><span style="font-family: inherit; font-weight: bold; font-size: 16px;">&nbsp;U</span><span style="font-family: inherit; font-weight: bold; font-size: 16px;">s</span></span><br></p>
+   
+   
+   
+   </div>
+</div></div></div></div><div class="eve-row"><div class="eve-col-cu" style="width:150px;margin-top:30px;"><div class="eve-component"><div class='eve-text eve-component' data-comp-name='文字' data-comp-path='eevee/text'>   <div class="text-content" style="line-height:14px;">
+       
+       <p class=""><span style="font-weight: bold; color: rgb(255, 255, 255); font-size: 12px;"><a href="https://pousheng.udesk.cn/im_client/?web_plugin_id=164314" target="_blank" rel="noopener noreferrer" style="">在线客服</a></span></p><p class=""><br></p><p class=""><span style="color: rgb(255, 255, 255); font-weight: bold; font-family: inherit; font-size: 12px;" class="">客服电话</span><br></p><p class=""><span style="font-weight: bold; color: rgb(255, 255, 255); font-size: 10px;" class="">400-6666-966</span></p>
+   
+   </div>
+</div></div></div></div></div></div></div></div></div><div class="eve-col-cu eve-col-align-right" style="width:450px;height:230px;z-index:2;position:relative;padding-top:20px;"><div class="eve-row"><div class="eve-col-cu eve-col-align-center" style="width:45%;margin-top:15px;"><div class="eve-row"><div class="eve-col-cu eve-col-align-center" style="width:65%;"><div class="eve-component"><div class='eve-image eve-component' data-comp-name='图片' data-comp-path='eevee/image'><div >
+
+<img alt="" style="width: 100%" data-original="https://e1xossfilehdd.blob.core.chinacloudapi.cn/fileserver01/2021/06/24/543f3a6e-33da-4134-9262-44d548d8de41.png">
+
+</div>
+</div></div></div></div><div class="eve-row"><div class="eve-col-cu eve-col-align-center" style="width:80%;height:18px;z-index:2;position:relative;margin-top:5px;"><div class="eve-component"><div class='eve-text eve-component' data-comp-name='文字' data-comp-path='eevee/text'>   <div class="text-content" style="text-align:center;">
+       <p><span style="font-size: 12px; color: rgb(255, 255, 255); font-weight: bold;">YYsports 抖音号</span></p>
+   </div>
+</div></div></div></div></div><div class="eve-col-cu eve-col-align-center" style="width:30%;margin-top:15px;"><div class="eve-row"><div class="eve-col-cu eve-col-align-center" style="width:85%;margin-top:10px;margin-bottom:12px;"><div class="eve-component"><div class='eve-image eve-component' data-comp-name='图片' data-comp-path='eevee/image'><div >
+
+<img alt="" style="width: 100%" data-original="https://e1xossfilehdd.blob.core.chinacloudapi.cn/fileserver01/2021/06/22/c3e21bb2-e90e-4877-9a86-f3707229d716.png">
+
+</div>
+</div></div></div></div><div class="eve-row"><div class="eve-col-cu eve-col-align-center" style="width:80%;height:18px;margin-top:8px;"><div class="eve-component"><div class='eve-text eve-component' data-comp-name='文字' data-comp-path='eevee/text'>   <div class="text-content" style="text-align:center;">
+       <p><span style="color: rgb(255, 255, 255); font-weight: bold; font-size: 12px;">YYsports 微博</span></p>
+   </div>
+</div></div></div></div></div></div></div></div><div class="eve-row"><div class="eve-col-cu eve-col-align-center" style="width:100%;height:10px;margin-top:20px;z-index:1;position:relative;"></div></div></div></div><div class="eve-row"><div class="eve-col-cu" style="width:1184px;margin-bottom:15px;padding-top:10px;border-top:1px solid #cccccc;background-color:#171717;"><div class="eve-row"><div class="eve-col-cu" style="width:400px;padding-left:10px;"><div class="eve-component"><div class='eve-text eve-component' data-comp-name='文字' data-comp-path='eevee/text'>   <div class="text-content">
+       <p><span style="color: rgb(255, 255, 255);">
+       上海宝原体育用品商贸有限公司 版权所有
+   </span></p>
+   </div>
+</div></div></div><div class="eve-col-cu" style="width:200px;height:17px;"><div class="eve-component"><div class='eve-text eve-component' data-comp-name='文字' data-comp-path='eevee/text'>   <div class="text-content">
+       <p><span style="color: rgb(255, 255, 255);"><a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank" rel="noopener noreferrer">
+       沪ICP备16020555号-1
+   </a></span></p>
+   </div>
+</div></div></div><div class="eve-col-cu" style="width:300px;height:17px;"><div class="eve-component"><div class='eve-text eve-component' data-comp-name='文字' data-comp-path='eevee/text'>   <div class="text-content">
+       <p><span style="color: rgb(255, 255, 255);"><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=31010902002082" target="_blank" rel="noopener noreferrer">沪公网安备 31010902002082号</a></span></p>
+   </div>
+</div></div></div><div class="eve-col-cu eve-col-align-right" style="width:270px;height:17px;"><div class="eve-component"><div class='eve-text eve-component' data-comp-name='文字' data-comp-path='eevee/text'>   <div class="text-content" style="text-align:right;">
+       
+       
+       <p><br></p>
+   
+   
+   </div>
+</div></div></div></div></div></div></div></div></div></div></div></div></div>
+
+    <script src="/assets/scripts/vendor-48d385.js"></script>
+    <script src="/assets/scripts/templates-front-b9c53e.js"></script>
+    <script src="/assets/scripts/app-front-15faa6.js"></script>
+    <script src="https://webapi.amap.com/maps?v=1.3&key=2f32e8a72877013c4e35140f765caeaf&plugin=AMap.DistrictSearch,AMap.Geocoder,AMap.CitySearch"></script>
+    <!--
+      <div class='customer-service js-comp eve-component' data-comp-name='在线客服' data-comp-path='common/customer_service'>  <i class="js-customer" data-info="{&quot;groupId&quot;:725447,&quot;staffId&quot;:196245}"></i>
+  <script src="https://qiyukf.com/script/c60328d1bd9647e2d9c56e36e754e7f8.js"></script>
+</div>
+    -->
+    <script>
+      window.i18nEnv = {"lng":"zh-CN","ns":["all_mix"],"defaultNS":"all_mix"};
+      i18nIniter({
+        cache: { enable: false },
+        resourceFormat: 'json',
+        callback: function() {
+          require("app")()
+        }
+      });
+      $('.online-customer-service').on('click', function() {
+        ysf.open();
+      });
+    </script>
+  </body>
+</html>
