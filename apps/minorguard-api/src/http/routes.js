@@ -12,7 +12,7 @@ import {
   seedDemoEvents,
 } from "../domain/events/store.js";
 import { recordAudit } from "../domain/audit/log.js";
-import { requireAdmin } from "../domain/auth/admin.js";
+import { requireAdmin, requireService, serviceAuthRequired } from "../domain/auth/tokens.js";
 import {
   buildEventStats,
   buildEventsMarkdown,
@@ -44,12 +44,31 @@ function healthPayload() {
     provider: cloudEnabled() ? "deepseek" : "local",
     model: cloudEnabled() ? config.DEEPSEEK_MODEL : "local-rules",
     authRequired: authRequired(),
-    authMode: authRequired() ? config.AUTH_MODE : "demo_open",
+    apiAuthRequired: serviceAuthRequired(),
+    authMode: config.AUTH_MODE || "demo_open",
     storage: "sqlite",
+    integration: {
+      analyze: "POST /api/v1/analyze",
+      chat: "POST /api/v1/chat",
+      docs: "/docs/integration.html",
+    },
   };
 }
 
 async function serveStatic(pathname, res) {
+  // expose JS SDK without duplicating into public/
+  if (pathname === "/sdk/minorguard.js") {
+    try {
+      const content = await readFile(path.join(config.ROOT, "sdk/js/minorguard.js"));
+      res.writeHead(200, { "Content-Type": "application/javascript; charset=utf-8" });
+      res.end(content);
+      return;
+    } catch {
+      sendText(res, 404, "SDK not found");
+      return;
+    }
+  }
+
   const safePath = pathname === "/" ? "/index.html" : pathname;
   const normalized = path.normalize(decodeURIComponent(safePath)).replace(/^(\.\.[/\\])+/, "");
   const filePath = path.join(config.PUBLIC_DIR, normalized);
@@ -85,6 +104,7 @@ export async function handleRequest(req, res) {
     }
 
     if (req.method === "POST" && api === "/local-analyze") {
+      if (!requireService(req, res, sendJson)) return;
       const body = await readJson(req);
       const result = await analyzeLocalOnly(String(body.conversation || ""));
       sendJson(res, 200, result);
@@ -92,13 +112,14 @@ export async function handleRequest(req, res) {
     }
 
     if (req.method === "POST" && api === "/analyze") {
+      if (!requireService(req, res, sendJson)) return;
       const body = await readJson(req);
       const conversation = String(body.conversation ?? body.text ?? "").slice(0, 12000);
       const result = await analyzeConversation(conversation);
       let event = null;
       if (shouldSaveEvent(body)) {
         event = createRiskEvent({
-          source: "manual-analysis",
+          source: body.source || "manual-analysis",
           inputText: conversation,
           result,
         });
@@ -108,13 +129,14 @@ export async function handleRequest(req, res) {
     }
 
     if (req.method === "POST" && api === "/chat") {
+      if (!requireService(req, res, sendJson)) return;
       const body = await readJson(req);
       try {
         const out = await chat(body.messages, { save: body.save });
         let event = null;
         if (shouldSaveEvent(body)) {
           event = createRiskEvent({
-            source: "realtime-chat",
+            source: body.source || "realtime-chat",
             inputText: out.userText,
             result: out.risk,
             reply: out.reply,

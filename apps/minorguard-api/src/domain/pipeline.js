@@ -731,6 +731,47 @@ function applyForcedHighRisk(text, result) {
     boostCategory(result, "tool", 88, "出现考试作弊、规避监考或隐蔽传递答案的工具滥用请求。", ["考试作弊", "规避检测", "隐蔽工具"]);
     setOverall(result, "高风险", "出现考试作弊或规避监考的工具请求，建议阻断并复核。");
   }
+
+  if (/(身份证|证件照|学生证).{0,40}(发|发给|发送|上传|给)/u.test(normalized)
+    || /(发|发给|发送|上传).{0,20}(身份证|证件照|学生证)/u.test(normalized)
+    || /(家里地址|家庭地址|住址).{0,30}(发|发给|发送)/u.test(normalized)
+    || /(发|发给|发送).{0,20}(家里地址|家庭地址|住址)/u.test(normalized)) {
+    boostCategory(result, "data", 90, "出现向他人发送证件、住址等敏感信息的请求。", ["证件信息", "住址泄露", "陌生人索取"]);
+    setOverall(result, "高风险", "疑似向陌生人提供证件或住址等敏感信息，建议阻断并复核。");
+  }
+
+  if (/(不要告诉|别告诉|别跟|不要跟).{0,12}(爸妈|家长|老师|父母).{0,40}(见面|出来|线下|商场|咖啡)/u.test(normalized)
+    || /(见面|出来|线下).{0,40}(不要告诉|别告诉).{0,12}(爸妈|家长|老师|父母)/u.test(normalized)
+    || /(网友|陌生人).{0,40}(单独|私下).{0,20}(见面|出来)/u.test(normalized)
+    || /(晚上|周末).{0,20}(单独).{0,20}(见面|去商场|出来)/u.test(normalized)) {
+    boostCategory(result, "interaction", 90, "出现隐瞒监护人的线下见面诱导。", ["线下见面", "监护规避", "陌生人诱导"]);
+    setOverall(result, "高风险", "疑似陌生人诱导隐瞒家长进行线下见面，建议阻断并复核。");
+  }
+
+  if (
+    !/(不想伤害自己|不会伤害自己|不要伤害自己)/u.test(normalized)
+    && (
+      /(伤害自己|自伤|自杀|不想活|活着没意思).{0,40}(别告诉|不要告诉|别劝|保密)/u.test(normalized)
+      || /(别告诉|不要告诉).{0,20}(别人|老师|家长|爸妈).{0,40}(伤害自己|自伤|自杀)/u.test(normalized)
+      || /(有伤害自己的念头|(?<!不)想伤害自己)/u.test(normalized)
+    )
+  ) {
+    boostCategory(result, "content", 92, "出现自伤危机并请求保密。", ["自伤危机", "保密请求"]);
+    setOverall(result, "高风险", "出现自伤相关危机表达，建议阻断危险回应并引导现实求助。");
+  }
+
+  if (/(15岁|14岁|13岁|未成年|初中|小学生).{0,40}(露骨|色情|性爱|亲密内容|黄色)/u.test(normalized)
+    || /(露骨|色情|性爱|亲密内容).{0,40}(15岁|14岁|13岁|未成年|别告诉.*爸妈)/u.test(normalized)) {
+    boostCategory(result, "content", 92, "未成年人场景下的不适龄亲密内容请求。", ["不适龄内容", "未成年人保护"]);
+    setOverall(result, "高风险", "未成年人请求不适龄亲密内容，建议阻断并复核。");
+  }
+
+  if (/(父母|爸妈|家长).{0,12}(手机号|验证码)/u.test(normalized)
+    || /(手机号|验证码).{0,20}(父母|爸妈|家长)/u.test(normalized)
+    || /(领奖).{0,40}(手机号|验证码)/u.test(normalized)) {
+    boostCategory(result, "data", 90, "出现监护人手机号或验证码被索取/转发的风险。", ["监护人手机号", "验证码", "领奖诱饵"]);
+    setOverall(result, "高风险", "疑似以领奖等理由索取监护人手机号或验证码，建议阻断并复核。");
+  }
 }
 
 function applyMediumRiskGuards(text, result) {

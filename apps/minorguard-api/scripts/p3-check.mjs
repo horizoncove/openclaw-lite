@@ -131,6 +131,73 @@ async function main() {
     child.kill("SIGTERM");
   }
 
+  // Second process: strict API-token mode for app integration
+  const API = "p3-app-token";
+  const child2 = spawn(process.execPath, ["src/index.js"], {
+    cwd: ROOT,
+    env: {
+      ...process.env,
+      PORT: String(PORT + 1),
+      HOST: "127.0.0.1",
+      CLOUD_LLM_ENABLED: "false",
+      DEEPSEEK_API_KEY: "",
+      AUTH_MODE: "strict",
+      MINORGUARD_API_TOKEN: API,
+      MINORGUARD_ADMIN_TOKEN: TOKEN,
+      DB_PATH: path.join(ROOT, "data", "p3-check-strict.db"),
+    },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  const base2 = `http://127.0.0.1:${PORT + 1}`;
+  const req2 = async (method, urlPath, opts = {}) => {
+    const headers = { "Content-Type": "application/json" };
+    if (opts.token) headers.Authorization = `Bearer ${opts.token}`;
+    const res = await fetch(`${base2}${urlPath}`, {
+      method,
+      headers,
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+    });
+    const json = await res.json().catch(() => ({}));
+    return { status: res.status, json };
+  };
+  try {
+    let ready2 = false;
+    for (let i = 0; i < 40; i += 1) {
+      await wait(100);
+      try {
+        const h = await req2("GET", "/api/v1/health");
+        if (h.status === 200) {
+          ready2 = true;
+          break;
+        }
+      } catch {
+        /* retry */
+      }
+    }
+    check("strict boot", ready2);
+    if (ready2) {
+      const denied = await req2("POST", "/api/v1/analyze", {
+        body: { conversation: "用户：你好", save: false },
+      });
+      check("strict analyze without token", denied.status === 401, `status=${denied.status}`);
+      const ok = await req2("POST", "/api/v1/analyze", {
+        token: API,
+        body: {
+          conversation: "用户：我是初中生，网友让我发手机号，别告诉爸妈。",
+          save: false,
+          source: "p3-check",
+        },
+      });
+      check(
+        "strict analyze with api token",
+        ok.status === 200 && ok.json?.actionCode,
+        `action=${ok.json?.actionCode}`,
+      );
+    }
+  } finally {
+    child2.kill("SIGTERM");
+  }
+
   const failed = checks.filter((c) => !c.ok);
   if (failed.length) {
     console.error(`\nP3 check failed: ${failed.length}/${checks.length}`);

@@ -1,5 +1,11 @@
 # MinorGuard 文档工作日志
 
+## 2026-08-08 — App 接入能力
+
+- `AUTH_MODE=strict` + `MINORGUARD_API_TOKEN` 服务鉴权；CORS 可配置
+- 文档：`INTEGRATION.md`；SDK：`sdk/js/minorguard.js`；示例 Node/Python/cURL
+- 联调页：`/docs/integration.html`；全量 `npm run redteam`
+
 ## 2026-08-08 — P3 编码启动（Epic A–D）
 
 - 新增 `apps/minorguard-api`：模块化 API、SQLite、`/api`+`/api/v1`、Demo 静态页

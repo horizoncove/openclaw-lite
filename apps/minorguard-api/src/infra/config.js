@@ -23,14 +23,16 @@ loadDotEnv(path.join(ROOT, ".env"));
 loadDotEnv(path.join(ROOT, "ds.env"));
 
 const AUTH_MODE = (process.env.AUTH_MODE || "").trim() || (
-  process.env.MINORGUARD_ADMIN_TOKEN ? "admin_token" : "demo_open"
+  process.env.MINORGUARD_ADMIN_TOKEN || process.env.MINORGUARD_API_TOKEN
+    ? "admin_token"
+    : "demo_open"
 );
 
 export const config = {
   ROOT,
   PORT: Number(process.env.PORT || 5178),
   HOST: process.env.HOST || "0.0.0.0",
-  APP_VERSION: "0.4.0-p3-mvp",
+  APP_VERSION: "0.4.1-p3-integrate",
   POLICY_VERSION: process.env.POLICY_VERSION || "minor-safety-policy-2026-08-08",
   RULE_SET_VERSION: process.env.RULE_SET_VERSION || "ruleset-p2.1",
   DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY || "",
@@ -41,7 +43,10 @@ export const config = {
   ),
   LLM_TIMEOUT_MS: Number(process.env.LLM_TIMEOUT_MS || 45000),
   ADMIN_TOKEN: process.env.MINORGUARD_ADMIN_TOKEN || "",
+  API_TOKEN: process.env.MINORGUARD_API_TOKEN || "",
+  API_TOKENS: process.env.MINORGUARD_API_TOKENS || "",
   AUTH_MODE,
+  CORS_ORIGIN: process.env.CORS_ORIGIN || "",
   DB_PATH: process.env.DB_PATH || path.join(ROOT, "data", "minorguard.db"),
   PUBLIC_DIR: process.env.PUBLIC_DIR || path.join(ROOT, "public"),
   EVENT_RETENTION_DAYS: Number(process.env.EVENT_RETENTION_DAYS || 180),
