@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { AllianceRole } from "../types";
 import { ALLIANCE_ROLE_LABEL } from "../types";
@@ -8,6 +9,8 @@ const roles: AllianceRole[] = ["alliance", "member"];
 export default function AllianceLoginPage() {
   const { login } = useAllianceStore();
   const nav = useNavigate();
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
   return (
     <div className="login-page alliance-login">
@@ -22,10 +25,19 @@ export default function AllianceLoginPage() {
             <button
               key={role}
               type="button"
+              disabled={busy}
               className={role === "member" ? "role-member" : "role-secretariat"}
               onClick={async () => {
-                await login(role);
-                nav(role === "member" ? "/alliance/member" : "/alliance/console");
+                setBusy(true);
+                setError("");
+                try {
+                  await login(role);
+                  nav(role === "member" ? "/alliance/member" : "/alliance/console");
+                } catch (e) {
+                  setError(e instanceof Error ? e.message : "登录失败");
+                } finally {
+                  setBusy(false);
+                }
               }}
             >
               <strong>{ALLIANCE_ROLE_LABEL[role]}</strong>
@@ -37,6 +49,7 @@ export default function AllianceLoginPage() {
             </button>
           ))}
         </div>
+        {error ? <p className="form-error">{error}</p> : null}
         <p className="login-switch">
           五大中心运营？<a href="/center/login">前往中心入口 →</a>
         </p>
