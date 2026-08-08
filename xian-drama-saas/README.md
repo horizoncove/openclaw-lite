@@ -16,13 +16,18 @@
 ```bash
 cd xian-drama-saas
 npm install
+# 建议本地也设置密钥（生产必须）
+export AUTH_SECRET='请换成随机长串'
+# 可选：开启演示访问码（生产强烈建议）
+# export DEMO_ACCESS_CODE='your-demo-code'
 npm run dev
 ```
 
-- 前端：`http://localhost:5173`
+- 前端：`http://localhost:5178`
 - API：`http://localhost:3001/api`
 
-打开浏览器 → 官网 → **进入平台** → 选择角色登录。
+打开浏览器 → 官网 → **进入平台** → 选择角色登录。  
+安全审核与加固说明见 [`SECURITY_AUDIT.md`](./SECURITY_AUDIT.md)。
 
 ## 生产部署
 
@@ -72,8 +77,11 @@ PORT=3001 npm start
 
 ```bash
 curl http://localhost:3001/api/health
-curl http://localhost:3001/api/stats
-curl http://localhost:3001/api/members
+# 业务接口需 Bearer Token（先登录）
+TOKEN=$(curl -s -X POST http://localhost:3001/api/alliance/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"role":"alliance"}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["token"])')
+curl -s http://localhost:3001/api/alliance/state -H "Authorization: Bearer $TOKEN" | head
 ```
 
 ## 目录

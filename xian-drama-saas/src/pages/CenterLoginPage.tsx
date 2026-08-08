@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { CenterRole } from "../types";
 import { CENTER_ROLE_LABEL } from "../types";
@@ -14,6 +15,8 @@ const roles: CenterRole[] = [
 export default function CenterLoginPage() {
   const { login } = useCenterStore();
   const nav = useNavigate();
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
   return (
     <div className="login-page center-login">
@@ -28,9 +31,18 @@ export default function CenterLoginPage() {
             <button
               key={role}
               type="button"
+              disabled={busy}
               onClick={async () => {
-                await login(role);
-                nav("/center/console");
+                setBusy(true);
+                setError("");
+                try {
+                  await login(role);
+                  nav("/center/console");
+                } catch (e) {
+                  setError(e instanceof Error ? e.message : "登录失败");
+                } finally {
+                  setBusy(false);
+                }
               }}
             >
               <strong>{CENTER_ROLE_LABEL[role]}</strong>
@@ -38,6 +50,7 @@ export default function CenterLoginPage() {
             </button>
           ))}
         </div>
+        {error ? <p className="form-error">{error}</p> : null}
         <p className="login-switch">
           联盟会员服务？<a href="/alliance/login">前往联盟入口 →</a>
         </p>

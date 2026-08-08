@@ -1,0 +1,96 @@
+{
+  "splits": {
+    "train": {
+      "n": 8000,
+      "labels": {
+        "privacy_request": 612,
+        "__empty__": 3322,
+        "contact_request": 610,
+        "school_request": 587,
+        "emotional_manipulation": 619,
+        "age_probe": 662,
+        "photo_request": 550,
+        "offline_meeting": 680,
+        "threat": 613
+      },
+      "levels": {
+        "S2": 2540,
+        "S0": 3322,
+        "S1": 1165,
+        "S3": 973
+      }
+    },
+    "dev": {
+      "n": 3296,
+      "labels": {
+        "emotional_manipulation": 362,
+        "__empty__": 433,
+        "privacy_request": 372,
+        "contact_request": 377,
+        "age_probe": 380,
+        "photo_request": 396,
+        "threat": 388,
+        "offline_meeting": 365,
+        "school_request": 382
+      },
+      "levels": {
+        "S1": 675,
+        "S0": 433,
+        "S2": 1589,
+        "S3": 599
+      }
+    },
+    "test": {
+      "n": 4439,
+      "labels": {
+        "contact_request": 529,
+        "threat": 469,
+        "__empty__": 497,
+        "age_probe": 552,
+        "school_request": 523,
+        "privacy_request": 551,
+        "offline_meeting": 512,
+        "emotional_manipulation": 479,
+        "photo_request": 502
+      },
+      "levels": {
+        "S3": 749,
+        "S0": 497,
+        "S1": 953,
+        "S2": 2240
+      }
+    },
+    "adv": {
+      "n": 240,
+      "labels": {
+        "threat": 20,
+        "privacy_request": 28,
+        "contact_request": 38,
+        "school_request": 37,
+        "emotional_manipulation": 24,
+        "photo_request": 22,
+        "offline_meeting": 36,
+        "age_probe": 35
+      },
+      "levels": {
+        "S3": 40,
+        "S2": 141,
+        "S1": 59
+      }
+    }
+  },
+  "per_label_test_pos": {
+    "age_probe": 552,
+    "privacy_request": 551,
+    "contact_request": 529,
+    "school_request": 523,
+    "photo_request": 502,
+    "offline_meeting": 512,
+    "emotional_manipulation": 479,
+    "threat": 469
+  },
+  "refusal": 320,
+  "version": "v0.2",
+  "seed": 42,
+  "content_hash": "2e2120016278b102"
+}

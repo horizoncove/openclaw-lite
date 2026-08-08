@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://horizoncove.local/schemas/minors-ai-p1-sample.json",
+  "title": "P1SyntheticSample",
+  "type": "object",
+  "required": [
+    "id",
+    "text",
+    "labels",
+    "expected_level",
+    "reason_codes",
+    "split",
+    "source",
+    "review_status",
+    "annotator",
+    "ts"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 3 },
+    "text": { "type": "string", "minLength": 2, "maxLength": 500 },
+    "labels": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "age_probe",
+          "privacy_request",
+          "contact_request",
+          "school_request",
+          "photo_request",
+          "offline_meeting",
+          "emotional_manipulation",
+          "threat"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "expected_level": {
+      "type": "string",
+      "enum": ["S0", "S1", "S2", "S3"]
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "R_AGE_PROBE",
+          "R_PRIVACY_REQUEST",
+          "R_CONTACT_REQUEST",
+          "R_SCHOOL_REQUEST",
+          "R_PHOTO_REQUEST",
+          "R_OFFLINE_MEETING",
+          "R_EMOTIONAL_MANIPULATION",
+          "R_THREAT",
+          "R_FREQ_ESCALATE",
+          "R_COMBO_ESCALATE",
+          "R_SECRECY_ESCALATE",
+          "R_NEEDS_REVIEW"
+        ]
+      }
+    },
+    "split": {
+      "type": "string",
+      "enum": ["train", "dev", "test", "adv"]
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "seed_p0",
+        "seed_golden",
+        "template",
+        "paraphrase",
+        "combo",
+        "normal",
+        "hard_negative",
+        "adversarial"
+      ]
+    },
+    "review_status": {
+      "type": "string",
+      "enum": ["auto", "imported", "spot_checked", "needs_review", "rejected"]
+    },
+    "annotator": { "type": "string" },
+    "notes": { "type": "string" },
+    "ts": { "type": "string" }
+  },
+  "additionalProperties": false
+}

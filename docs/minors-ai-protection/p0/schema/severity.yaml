@@ -1,0 +1,104 @@
+version: "1.0.0"
+status: human_signed_p0_v1
+updated: "2026-08-08"
+levels:
+  S0: { name: 正常, action: allow, mvp: true }
+  S1: { name: 可疑, action: warn, mvp: true }
+  S2: { name: 高风险, action: block, mvp: true }
+  S3: { name: 严重风险, action: alert, mvp: true }
+  S4: { name: 强制处置, action: escalate, mvp: false, note: 仅预留接口 }
+default_label_level:
+  age_probe: S1
+  privacy_request: S2
+  contact_request: S2
+  school_request: S2
+  photo_request: S2
+  offline_meeting: S2
+  emotional_manipulation: S1
+  threat: S3
+level_order: [S0, S1, S2, S3, S4]
+actions: [allow, warn, block, alert, escalate]
+upgrade_rules:
+  - id: U01
+    when: same_s1_count_in_window >= 3
+    window_minutes: 10
+    then_min_level: S2
+    reason_code: R_FREQ_ESCALATE
+  - id: U02
+    when: cooccur_any
+    labels: [age_probe, contact_request]
+    adjacency: same_or_adjacent_turn
+    then_min_level: S2
+    reason_code: R_COMBO_ESCALATE
+  - id: U03
+    when: offline_meeting_and_time_or_place
+    then_min_level: S3
+    reason_code: R_OFFLINE_MEETING
+  - id: U04
+    when: label_present
+    labels: [threat]
+    then_level: S3
+    reason_code: R_THREAT
+  - id: U05
+    when: cooccur_any
+    labels: [photo_request]
+    with_any: [privacy_request, school_request]
+    then_min_level: S2
+    reason_code: R_COMBO_ESCALATE
+  - id: U06
+    when: cooccur_any
+    labels: [emotional_manipulation]
+    with_any: [contact_request, photo_request, offline_meeting]
+    then_min_level: S2
+    reason_code: R_COMBO_ESCALATE
+  - id: U07
+    when: cooccur_any
+    labels: [school_request, offline_meeting]
+    then_min_level: S2
+    if_pickup_words: S3
+    pickup_lexicon: [接你, 送到, 校门口等, 来接]
+    reason_code: R_COMBO_ESCALATE
+  - id: U08
+    when: cooccur_any
+    labels: [privacy_request, offline_meeting]
+    then_min_level: S2
+    reason_code: R_COMBO_ESCALATE
+  - id: U09
+    when: secrecy_plus_high_risk
+    secrecy_lexicon: [别告诉家长, 不要和别人说, 保密, 偷偷]
+    high_risk_labels: [contact_request, photo_request, offline_meeting, school_request]
+    then_min_level: S2
+    reason_code: R_SECRECY_ESCALATE
+session:
+  window_minutes: 10
+  adjacent_turn_distance: 1
+  persist_across_process_kill: false
+  require_session_id: true
+u03_time_place:
+  definition: >
+    本地可判定的时间词或地点词，不依赖云端 NER。
+  time_lexicon: [今天, 明天, 后天, 上午, 下午, 晚上, 点, 分, 周末, 放学后]
+  place_lexicon: [校门口, 小区, 楼下, 公园, 车站, 地铁, 门口, 家]
+  note: 命中任一词表即视为 has_time_or_place
+# 唯一权威审计字段（与 runtime_redlines.md 对齐）
+audit_fields:
+  - event_id
+  - session_id
+  - ts
+  - labels
+  - scores
+  - level
+  - action
+  - reason_codes
+  - rule_ids
+  - content_hash
+  - hash_alg
+  - model_ver
+  - rule_ver
+  - schema_ver
+  - mapping_ver
+hash_alg: sha256
+schema_ver: 1.0.0
+mapping_ver: 0.1.0-draft
+forbid_raw_text_logging: true
+forbid_raw_text_in_audit_or_export: true

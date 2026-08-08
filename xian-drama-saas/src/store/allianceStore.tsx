@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { allianceApi } from "../api/client";
+import { allianceApi, getAllianceToken, setAllianceToken } from "../api/client";
 import { allianceSeed } from "../data/seed";
 import type {
   AllianceRole,
@@ -19,9 +19,11 @@ import type {
   Member,
   WorkOrder,
 } from "../types";
-import { ALLIANCE_ROLE_LABEL } from "../types";
 
 const USER_KEY = "xian-drama-alliance-user";
+const ALLOW_OFFLINE =
+  import.meta.env.VITE_ALLOW_OFFLINE_AUTH === "1" ||
+  import.meta.env.VITE_ALLOW_OFFLINE_AUTH === "true";
 
 type AllianceStore = AllianceState & {
   loading: boolean;
@@ -60,11 +62,30 @@ export function AllianceStoreProvider({ children }: { children: ReactNode }) {
     try {
       await allianceApi.health();
       setApiOnline(true);
-      const data = await allianceApi.state();
-      setState((s) => ({ ...data, user: s.user }));
+      if (!getAllianceToken()) {
+        setState({ ...allianceSeed(), user: null });
+        return;
+      }
+      try {
+        const { user } = await allianceApi.me();
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+        const data = await allianceApi.state();
+        setState({ ...data, user });
+      } catch {
+        // forged / expired session
+        setAllianceToken(null);
+        localStorage.removeItem(USER_KEY);
+        setState({ ...allianceSeed(), user: null });
+      }
     } catch {
       setApiOnline(false);
-      setState((s) => ({ ...allianceSeed(), user: s.user }));
+      if (!ALLOW_OFFLINE) {
+        setAllianceToken(null);
+        localStorage.removeItem(USER_KEY);
+        setState({ ...allianceSeed(), user: null });
+      } else {
+        setState((s) => ({ ...allianceSeed(), user: s.user }));
+      }
     } finally {
       setLoading(false);
     }
@@ -80,22 +101,19 @@ export function AllianceStoreProvider({ children }: { children: ReactNode }) {
       loading,
       apiOnline,
       login: async (role) => {
+        const { user, token } = await allianceApi.login(role);
+        setAllianceToken(token);
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+        setApiOnline(true);
         try {
-          const { user } = await allianceApi.login(role);
-          localStorage.setItem(USER_KEY, JSON.stringify(user));
-          setState((s) => ({ ...s, user }));
+          const data = await allianceApi.state();
+          setState({ ...data, user });
         } catch {
-          const fallback: AllianceUser = {
-            id: `u-${role}`,
-            name: ALLIANCE_ROLE_LABEL[role].split("/")[0].trim(),
-            role,
-            org: ALLIANCE_ROLE_LABEL[role],
-          };
-          localStorage.setItem(USER_KEY, JSON.stringify(fallback));
-          setState((s) => ({ ...s, user: fallback }));
+          setState((s) => ({ ...s, user }));
         }
       },
       logout: () => {
+        setAllianceToken(null);
         localStorage.removeItem(USER_KEY);
         setState((s) => ({ ...s, user: null }));
       },

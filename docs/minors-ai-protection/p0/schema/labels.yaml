@@ -1,0 +1,111 @@
+version: "1.0.0"
+status: human_signed_p0_v1
+updated: "2026-08-08"
+owner: Agent-001
+multi_label: true
+uncertain_label: needs_review
+labels:
+  - key: age_probe
+    zh: 年龄试探
+    default_level: S1
+    reason_code: R_AGE_PROBE
+    definition: 试探或确认对方年龄、年级或是否未成年
+    includes:
+      - 直接询问年龄或年级
+      - 猜测年龄或确认是否成年
+      - 以小朋友等称呼刺探年龄段
+    excludes:
+      - 讨论内容年龄分级本身
+      - 官方年龄验证提示文案
+    mvp: true
+  - key: privacy_request
+    zh: 隐私索取
+    default_level: S2
+    reason_code: R_PRIVACY_REQUEST
+    definition: 索要住址、作息、家庭成员动态、独居情况等生活隐私
+    includes:
+      - 具体住址或小区门牌
+      - 父母是否在家或是否独居
+      - 详细作息与可被利用的家庭环境信息
+    excludes:
+      - 一般兴趣爱好
+      - 仅城市级模糊位置
+      - 索要微信号或电话（归 contact_request）
+    mvp: true
+  - key: contact_request
+    zh: 联系方式索取
+    default_level: S2
+    reason_code: R_CONTACT_REQUEST
+    definition: 索要或诱导提供站外联系方式
+    includes:
+      - 微信 QQ 手机号邮箱
+      - 换到其他 App 私聊
+    excludes:
+      - 平台内加好友产品文案
+      - 官方客服热线公示
+    mvp: true
+  - key: school_request
+    zh: 学校信息索取
+    default_level: S2
+    reason_code: R_SCHOOL_REQUEST
+    definition: 索要可用于定位或接触的学校相关信息
+    includes:
+      - 校名校区班级
+      - 校门位置与放学路线
+    excludes:
+      - 纯学业问题
+      - 无定位意图的上学累不累
+    mvp: true
+  - key: photo_request
+    zh: 照片诱导
+    default_level: S2
+    reason_code: R_PHOTO_REQUEST
+    definition: 索要或诱导发送个人照片；不建模色情内容
+    includes:
+      - 自拍近照正脸照
+      - 互换个人照片
+    excludes:
+      - 题目风景截图等非肖像索取
+      - 表情包互发
+    mvp: true
+  - key: offline_meeting
+    zh: 线下见面诱导
+    default_level: S2
+    reason_code: R_OFFLINE_MEETING
+    definition: 诱导或约定线下见面、接送、上门或前往指定地点
+    includes:
+      - 见面邀约
+      - 接放学或上门
+      - 指定时间地点
+    excludes:
+      - 无个人邀约的线下活动新闻
+      - 学校或家长组织的官方集体通知
+    mvp: true
+  - key: emotional_manipulation
+    zh: 情感操控
+    default_level: S1
+    reason_code: R_EMOTIONAL_MANIPULATION
+    definition: 以愧疚孤立冷暴力或依赖绑定施压削弱拒绝能力
+    includes:
+      - 拒绝即不在乎类话术
+      - 贬低他人以形成依赖
+    excludes:
+      - 正常安慰鼓励道歉
+      - 平等表达失望但无控制胁迫
+    mvp: true
+  - key: threat
+    zh: 胁迫威胁
+    default_level: S3
+    reason_code: R_THREAT
+    definition: 以恐吓勒索扬言伤害或曝光等方式胁迫服从
+    includes:
+      - 威胁伤害或公开隐私
+      - 勒索财物或强迫行为
+    excludes:
+      - 影视剧情讨论
+      - 安全教育教学示例且明确标注教学用途
+    mvp: true
+deferred_labels:
+  - gift_exchange
+  - grooming_sequence
+  - help_request

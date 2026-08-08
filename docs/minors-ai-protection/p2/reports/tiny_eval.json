@@ -1,0 +1,176 @@
+{
+  "model_meta": {
+    "model": "tiny_roberta_l2h128_multilabel",
+    "backbone": "uer/chinese_roberta_L-2_H-128",
+    "labels": [
+      "age_probe",
+      "privacy_request",
+      "contact_request",
+      "school_request",
+      "photo_request",
+      "offline_meeting",
+      "emotional_manipulation",
+      "threat"
+    ],
+    "data_version": "v0.4",
+    "n_train": 30000,
+    "n_dev": 10494,
+    "epochs": 2,
+    "batch_size": 64,
+    "lr": 0.0003,
+    "max_length": 64,
+    "seed": 42,
+    "device": "cpu",
+    "n_params": 3184520,
+    "approx_fp32_mb": 12.15,
+    "train_seconds": 55.05,
+    "threshold": 0.4,
+    "dev_macro_f1_best": 0.9992,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.1365,
+        "dev_macro_f1": 0.9989,
+        "dev_micro_f1": 0.9989,
+        "threshold": 0.35
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.0177,
+        "dev_macro_f1": 0.9992,
+        "dev_micro_f1": 0.9992,
+        "threshold": 0.4
+      }
+    ],
+    "artifact": "/workspace/docs/minors-ai-protection/p2/artifacts/tiny_roberta_l2h128/model.pt",
+    "note": "small Chinese Transformer for on-device path; export ONNX separately"
+  },
+  "test": {
+    "split": "test",
+    "n": 13397,
+    "macro_f1": 0.9983,
+    "micro_f1": 0.9983,
+    "per_label": {
+      "age_probe": {
+        "f1": 0.9987,
+        "recall": 1.0,
+        "support": 1518
+      },
+      "privacy_request": {
+        "f1": 0.9987,
+        "recall": 0.9993,
+        "support": 1537
+      },
+      "contact_request": {
+        "f1": 0.999,
+        "recall": 0.9994,
+        "support": 1553
+      },
+      "school_request": {
+        "f1": 0.9988,
+        "recall": 0.9982,
+        "support": 1682
+      },
+      "photo_request": {
+        "f1": 0.999,
+        "recall": 0.9993,
+        "support": 1499
+      },
+      "offline_meeting": {
+        "f1": 0.997,
+        "recall": 0.9982,
+        "support": 1646
+      },
+      "emotional_manipulation": {
+        "f1": 0.9979,
+        "recall": 0.9979,
+        "support": 1453
+      },
+      "threat": {
+        "f1": 0.9976,
+        "recall": 0.9972,
+        "support": 1441
+      }
+    },
+    "high_risk_recall": {
+      "contact_request": 0.9994,
+      "offline_meeting": 0.9982,
+      "threat": 0.9972
+    },
+    "normal_false_positive_rate": 0.008,
+    "n_normal": 1874,
+    "threshold": 0.4,
+    "infer_seconds": 2.054,
+    "ms_per_sample": 0.153,
+    "report_text": "                        precision    recall  f1-score   support\n\n             age_probe       1.00      1.00      1.00      1518\n       privacy_request       1.00      1.00      1.00      1537\n       contact_request       1.00      1.00      1.00      1553\n        school_request       1.00      1.00      1.00      1682\n         photo_request       1.00      1.00      1.00      1499\n       offline_meeting       1.00      1.00      1.00      1646\nemotional_manipulation       1.00      1.00      1.00      1453\n                threat       1.00      1.00      1.00      1441\n\n             micro avg       1.00      1.00      1.00     12329\n             macro avg       1.00      1.00      1.00     12329\n          weighted avg       1.00      1.00      1.00     12329\n           samples avg       0.86      0.86      0.86     12329\n"
+  },
+  "adv": {
+    "split": "adv",
+    "n": 800,
+    "macro_f1": 0.9563,
+    "micro_f1": 0.9541,
+    "per_label": {
+      "age_probe": {
+        "f1": 1.0,
+        "recall": 1.0,
+        "support": 100
+      },
+      "privacy_request": {
+        "f1": 0.9259,
+        "recall": 1.0,
+        "support": 100
+      },
+      "contact_request": {
+        "f1": 1.0,
+        "recall": 1.0,
+        "support": 100
+      },
+      "school_request": {
+        "f1": 0.995,
+        "recall": 1.0,
+        "support": 100
+      },
+      "photo_request": {
+        "f1": 1.0,
+        "recall": 1.0,
+        "support": 100
+      },
+      "offline_meeting": {
+        "f1": 0.8889,
+        "recall": 0.8,
+        "support": 100
+      },
+      "emotional_manipulation": {
+        "f1": 1.0,
+        "recall": 1.0,
+        "support": 100
+      },
+      "threat": {
+        "f1": 0.8403,
+        "recall": 1.0,
+        "support": 100
+      }
+    },
+    "high_risk_recall": {
+      "contact_request": 1.0,
+      "offline_meeting": 0.8,
+      "threat": 1.0
+    },
+    "normal_false_positive_rate": 0.0,
+    "n_normal": 0,
+    "threshold": 0.4,
+    "infer_seconds": 0.16,
+    "ms_per_sample": 0.2,
+    "report_text": "                        precision    recall  f1-score   support\n\n             age_probe       1.00      1.00      1.00       100\n       privacy_request       0.86      1.00      0.93       100\n       contact_request       1.00      1.00      1.00       100\n        school_request       0.99      1.00      1.00       100\n         photo_request       1.00      1.00      1.00       100\n       offline_meeting       1.00      0.80      0.89       100\nemotional_manipulation       1.00      1.00      1.00       100\n                threat       0.72      1.00      0.84       100\n\n             micro avg       0.93      0.97      0.95       800\n             macro avg       0.95      0.97      0.96       800\n          weighted avg       0.95      0.97      0.96       800\n           samples avg       0.94      0.97      0.95       800\n"
+  },
+  "gates": {
+    "macro_f1_target": 0.8,
+    "high_risk_recall_target": 0.9,
+    "normal_fp_target": 0.03
+  },
+  "gate_results": {
+    "macro_f1": true,
+    "high_risk_recall": true,
+    "normal_fp": true
+  }
+}

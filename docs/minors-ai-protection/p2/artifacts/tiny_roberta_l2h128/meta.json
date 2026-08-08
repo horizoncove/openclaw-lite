@@ -1,0 +1,46 @@
+{
+  "model": "tiny_roberta_l2h128_multilabel",
+  "backbone": "uer/chinese_roberta_L-2_H-128",
+  "labels": [
+    "age_probe",
+    "privacy_request",
+    "contact_request",
+    "school_request",
+    "photo_request",
+    "offline_meeting",
+    "emotional_manipulation",
+    "threat"
+  ],
+  "data_version": "v0.4",
+  "n_train": 30000,
+  "n_dev": 10494,
+  "epochs": 2,
+  "batch_size": 64,
+  "lr": 0.0003,
+  "max_length": 64,
+  "seed": 42,
+  "device": "cpu",
+  "n_params": 3184520,
+  "approx_fp32_mb": 12.15,
+  "train_seconds": 55.05,
+  "threshold": 0.4,
+  "dev_macro_f1_best": 0.9992,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.1365,
+      "dev_macro_f1": 0.9989,
+      "dev_micro_f1": 0.9989,
+      "threshold": 0.35
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.0177,
+      "dev_macro_f1": 0.9992,
+      "dev_micro_f1": 0.9992,
+      "threshold": 0.4
+    }
+  ],
+  "artifact": "/workspace/docs/minors-ai-protection/p2/artifacts/tiny_roberta_l2h128/model.pt",
+  "note": "small Chinese Transformer for on-device path; export ONNX separately"
+}

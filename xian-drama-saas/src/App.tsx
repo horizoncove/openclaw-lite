@@ -1,4 +1,5 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { getAllianceToken, getCenterToken } from "./api/client";
 import AllianceLayout from "./layouts/AllianceLayout";
 import MemberLayout from "./layouts/MemberLayout";
 import CenterLayout from "./layouts/CenterLayout";
@@ -29,13 +30,13 @@ import AIPage from "./pages/centers/AIPage";
 
 function RequireAllianceAuth() {
   const { user } = useAllianceStore();
-  if (!user) return <Navigate to="/alliance/login" replace />;
+  if (!user || !getAllianceToken()) return <Navigate to="/alliance/login" replace />;
   return <Outlet />;
 }
 
 function RequireCenterAuth() {
   const { user } = useCenterStore();
-  if (!user) return <Navigate to="/center/login" replace />;
+  if (!user || !getCenterToken()) return <Navigate to="/center/login" replace />;
   return <Outlet />;
 }
 
