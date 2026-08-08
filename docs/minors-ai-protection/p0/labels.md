@@ -10,7 +10,7 @@ MVP 仅冻结以下 8 个标签。详细正负例见 `examples/`。
 | school_request | 学校信息索取 | 索要学校、班级、上下学路线等 | S2 | R_SCHOOL_REQUEST |
 | photo_request | 照片诱导 | 索要自拍、个人近照或交换个人照片 | S2 | R_PHOTO_REQUEST |
 | offline_meeting | 线下见面诱导 | 约线下见面、接送、上门等 | S2 | R_OFFLINE_MEETING |
-| emotional_manipulation | 情感操控 | 以陪伴、愧疚、孤立、冷暴力等方式控制对方 | S1 | R_EMOTIONAL_MANIPULATION |
+| emotional_manipulation | 情感操控 | 以愧疚、孤立、冷暴力或依赖绑定施压，削弱拒绝能力 | S1 | R_EMOTIONAL_MANIPULATION |
 | threat | 胁迫威胁 | 恐吓、勒索、伤害威胁 | S3 | R_THREAT |
 
 ## 标注总原则

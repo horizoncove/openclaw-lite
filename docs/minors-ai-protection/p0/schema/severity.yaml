@@ -80,7 +80,8 @@ u03_time_place:
   time_lexicon: [今天, 明天, 后天, 上午, 下午, 晚上, 点, 分, 周末, 放学后]
   place_lexicon: [校门口, 小区, 楼下, 公园, 车站, 地铁, 门口, 家]
   note: 命中任一词表即视为 has_time_or_place
-audit_fields_min:
+# 唯一权威审计字段（与 runtime_redlines.md 对齐）
+audit_fields:
   - event_id
   - session_id
   - ts
@@ -99,16 +100,5 @@ audit_fields_min:
 hash_alg: sha256
 schema_ver: 1.0.0-rc1
 mapping_ver: 0.1.0-draft
-forbid_raw_text_in_audit_or_export: true
-audit_fields:
-  - event_id
-  - ts
-  - labels
-  - scores
-  - level
-  - action
-  - reason_codes
-  - content_hash
-  - model_ver
-  - rule_ver
 forbid_raw_text_logging: true
+forbid_raw_text_in_audit_or_export: true

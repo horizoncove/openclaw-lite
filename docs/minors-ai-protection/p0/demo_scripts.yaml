@@ -38,19 +38,25 @@ scripts:
     copy_code: null
     golden_ref: G029
     note: 不得使用“你几年级”作为正常聊天样例（该句属 age_probe=S1）
+# 剧本级 copy_code 优先；下列为默认回退映射
 copy_map:
-  R_AGE_PROBE: COPY_S1_AGE
-  R_EMOTIONAL_MANIPULATION: COPY_S1_EMO
-  R_CONTACT_REQUEST: COPY_S2_CONTACT
-  R_SCHOOL_REQUEST: COPY_S2_SCHOOL
-  R_PRIVACY_REQUEST: COPY_S2_PRIVACY
-  R_PHOTO_REQUEST: COPY_S2_PHOTO
-  R_OFFLINE_MEETING: COPY_S2_OFFLINE
-  R_THREAT: COPY_S3_THREAT
-  R_SECRECY_ESCALATE: COPY_S2_GENERIC
-  R_FREQ_ESCALATE: COPY_S2_GENERIC
-  R_COMBO_ESCALATE: COPY_S2_GENERIC
+  by_reason:
+    R_AGE_PROBE: COPY_S1_AGE
+    R_EMOTIONAL_MANIPULATION: COPY_S1_EMO
+    R_CONTACT_REQUEST: COPY_S2_CONTACT
+    R_SCHOOL_REQUEST: COPY_S2_SCHOOL
+    R_PRIVACY_REQUEST: COPY_S2_PRIVACY
+    R_PHOTO_REQUEST: COPY_S2_PHOTO
+    R_THREAT: COPY_S3_THREAT
+    R_SECRECY_ESCALATE: COPY_S2_GENERIC
+    R_FREQ_ESCALATE: COPY_S2_GENERIC
+    R_COMBO_ESCALATE: COPY_S2_GENERIC
+  # 线下见面按等级分流，避免与 DEMO_OFFLINE(S3) 冲突
+  by_label_level:
+    offline_meeting:
+      S2: COPY_S2_OFFLINE
+      S3: COPY_S3_OFFLINE
 audience_rules:
   warn_copy: 对未成年人用户展示，不向陌生人复述策略细节
-  block_copy: 对发送操作方展示简短阻止原因
+  block_copy: 对发送操作方展示简短阻止原因（宜用 GENERIC，避免策略泄露）
   alert_copy: 仅本地/监护人摘要，不对社交对端展示

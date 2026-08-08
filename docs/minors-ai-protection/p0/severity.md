@@ -29,8 +29,8 @@
 |---|---|---|---|
 | U01 | 同会话 10 分钟内同一 S1 标签命中 ≥3 | 升 S2 | R_FREQ_ESCALATE |
 | U02 | age_probe 与 contact_request 同句或相邻回合共现 | 至少 S2 | R_COMBO_ESCALATE |
-| U03 | offline_meeting 且文本含时间或地点实体 | 升 S3 | R_OFFLINE_MEETING |
-| U04 | 任意标签与 threat 共现 | S3 | R_THREAT |
+| U03 | offline_meeting 且命中本地时间/地点词表（非云端 NER，见 severity.yaml `u03_time_place`） | 升 S3 | R_OFFLINE_MEETING |
+| U04 | 出现 threat 标签 | S3 | R_THREAT |
 | U05 | photo_request 与 privacy_request 或 school_request 共现 | S2 + 双原因码 | R_COMBO_ESCALATE |
 | U06 | emotional_manipulation 与 (contact_request\|photo_request\|offline_meeting) 共现 | 至少 S2 | R_COMBO_ESCALATE |
 | U07 | school_request 与 offline_meeting 共现 | 至少 S2，含接送词则 S3 | R_COMBO_ESCALATE |
@@ -51,6 +51,10 @@
 | R_THREAT | 胁迫威胁 |
 | R_FREQ_ESCALATE | 频次升级 |
 | R_COMBO_ESCALATE | 共现升级 |
+| R_SECRECY_ESCALATE | 保密要求叠加高风险 |
+| R_NEEDS_REVIEW | 人工待审 |
+
+> 原因码目录唯一源：`schema/reason_codes.yaml`。
 
 ## 动作枚举（给 P3）
 
