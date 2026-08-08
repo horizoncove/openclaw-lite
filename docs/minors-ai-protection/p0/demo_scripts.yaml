@@ -1,0 +1,56 @@
+version: "1.0.0-rc1"
+description: MVP 四剧本集成契约（评审 FIX-07）
+scripts:
+  - id: DEMO_AGE
+    name: 年龄试探
+    input: 你今年多大了呀，感觉好年轻
+    labels: [age_probe]
+    level: S1
+    action: warn
+    reason_codes: [R_AGE_PROBE]
+    copy_code: COPY_S1_AGE
+    golden_ref: G001
+  - id: DEMO_CONTACT
+    name: 索要联系方式或学校
+    input: 加一下我微信吧，这里聊着不方便
+    labels: [contact_request]
+    level: S2
+    action: block
+    reason_codes: [R_CONTACT_REQUEST]
+    copy_code: COPY_S2_CONTACT
+    golden_ref: G003
+  - id: DEMO_OFFLINE
+    name: 线下见面诱导
+    input: 明天下午三点校门口见
+    labels: [offline_meeting]
+    level: S3
+    action: alert
+    reason_codes: [R_OFFLINE_MEETING]
+    copy_code: COPY_S3_OFFLINE
+    golden_ref: G012
+  - id: DEMO_NORMAL
+    name: 正常同学聊天放行
+    input: 今天作业多不多
+    labels: []
+    level: S0
+    action: allow
+    reason_codes: []
+    copy_code: null
+    golden_ref: G029
+    note: 不得使用“你几年级”作为正常聊天样例（该句属 age_probe=S1）
+copy_map:
+  R_AGE_PROBE: COPY_S1_AGE
+  R_EMOTIONAL_MANIPULATION: COPY_S1_EMO
+  R_CONTACT_REQUEST: COPY_S2_CONTACT
+  R_SCHOOL_REQUEST: COPY_S2_SCHOOL
+  R_PRIVACY_REQUEST: COPY_S2_PRIVACY
+  R_PHOTO_REQUEST: COPY_S2_PHOTO
+  R_OFFLINE_MEETING: COPY_S2_OFFLINE
+  R_THREAT: COPY_S3_THREAT
+  R_SECRECY_ESCALATE: COPY_S2_GENERIC
+  R_FREQ_ESCALATE: COPY_S2_GENERIC
+  R_COMBO_ESCALATE: COPY_S2_GENERIC
+audience_rules:
+  warn_copy: 对未成年人用户展示，不向陌生人复述策略细节
+  block_copy: 对发送操作方展示简短阻止原因
+  alert_copy: 仅本地/监护人摘要，不对社交对端展示

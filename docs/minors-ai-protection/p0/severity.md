@@ -35,7 +35,7 @@
 | U06 | emotional_manipulation 与 (contact_request\|photo_request\|offline_meeting) 共现 | 至少 S2 | R_COMBO_ESCALATE |
 | U07 | school_request 与 offline_meeting 共现 | 至少 S2，含接送词则 S3 | R_COMBO_ESCALATE |
 | U08 | privacy_request 与 offline_meeting 共现 | 至少 S2 | R_COMBO_ESCALATE |
-| U09 | 出现保密词（别告诉家长等）且叠加高风险标签 | 至少 S2 | R_COMBO_ESCALATE / R_SECRECY_ESCALATE |
+| U09 | 出现保密词（别告诉家长等）且叠加高风险标签 | 至少 S2 | R_SECRECY_ESCALATE |
 
 ## 原因码
 
@@ -58,11 +58,11 @@
 allow | warn | block | alert | escalate
 ```
 
-## 审计字段（预留，P3 实现）
+## 审计字段（最小完备集，见 runtime_redlines.md）
 
-`event_id, ts, labels, scores, level, action, reason_codes, content_hash, model_ver, rule_ver`
+`event_id, session_id, ts, labels, scores, level, action, reason_codes, rule_ids, content_hash, hash_alg, model_ver, rule_ver, schema_ver, mapping_ver`
 
-**禁止落盘原文。**
+**禁止落盘原文；证据包不得含原文。hash_alg=sha256。**
 
 ## 伪代码（可编码性自检通过）
 

@@ -29,3 +29,15 @@
 1. 组织 review_pack 评审会（60–90 分钟）
 2. 消化开放项后打 `v1.0` tag
 3. 启动 P1：按金标与标签字典扩合成训练集
+
+## 2026-08-08 — 十人评审会 + 会后 FIX
+
+### 已完成
+- 组织 10 角色 Agent 并行评审（全票有条件通过）
+- 纪要：`review_meeting_v1/01_minutes_v1.md`
+- 决议：冻结 **p0-v1.0-rc1**
+- 会后 FIX：G011/G021、U09 原因码、EM 污染清洗、demo_scripts、runtime_redlines、decisions 终裁
+
+### 下一步
+1. 人类法学签字 → 正式 p0-v1.0
+2. 启动 P1 合成数据流水线

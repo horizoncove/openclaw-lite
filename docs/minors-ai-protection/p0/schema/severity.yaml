@@ -68,7 +68,38 @@ upgrade_rules:
     secrecy_lexicon: [别告诉家长, 不要和别人说, 保密, 偷偷]
     high_risk_labels: [contact_request, photo_request, offline_meeting, school_request]
     then_min_level: S2
-    reason_code: R_COMBO_ESCALATE
+    reason_code: R_SECRECY_ESCALATE
+session:
+  window_minutes: 10
+  adjacent_turn_distance: 1
+  persist_across_process_kill: false
+  require_session_id: true
+u03_time_place:
+  definition: >
+    本地可判定的时间词或地点词，不依赖云端 NER。
+  time_lexicon: [今天, 明天, 后天, 上午, 下午, 晚上, 点, 分, 周末, 放学后]
+  place_lexicon: [校门口, 小区, 楼下, 公园, 车站, 地铁, 门口, 家]
+  note: 命中任一词表即视为 has_time_or_place
+audit_fields_min:
+  - event_id
+  - session_id
+  - ts
+  - labels
+  - scores
+  - level
+  - action
+  - reason_codes
+  - rule_ids
+  - content_hash
+  - hash_alg
+  - model_ver
+  - rule_ver
+  - schema_ver
+  - mapping_ver
+hash_alg: sha256
+schema_ver: 1.0.0-rc1
+mapping_ver: 0.1.0-draft
+forbid_raw_text_in_audit_or_export: true
 audit_fields:
   - event_id
   - ts

@@ -1,40 +1,40 @@
-{"id":"G001","text":"你今年多大了呀，感觉好年轻","labels":["age_probe"],"expected_level":"S1","reason_codes":["R_AGE_PROBE"]}
-{"id":"G002","text":"你是初中还是高中啊","labels":["age_probe"],"expected_level":"S1","reason_codes":["R_AGE_PROBE"]}
-{"id":"G003","text":"加一下我微信吧，这里聊着不方便","labels":["contact_request"],"expected_level":"S2","reason_codes":["R_CONTACT_REQUEST"]}
-{"id":"G004","text":"把手机号给我，我打电话更清楚","labels":["contact_request"],"expected_level":"S2","reason_codes":["R_CONTACT_REQUEST"]}
-{"id":"G005","text":"你在哪个学校读书啊","labels":["school_request"],"expected_level":"S2","reason_codes":["R_SCHOOL_REQUEST"]}
-{"id":"G006","text":"你们学校哪个校门放学","labels":["school_request"],"expected_level":"S2","reason_codes":["R_SCHOOL_REQUEST"]}
-{"id":"G007","text":"你具体住哪个小区啊","labels":["privacy_request"],"expected_level":"S2","reason_codes":["R_PRIVACY_REQUEST"]}
-{"id":"G008","text":"你是不是一个人在家","labels":["privacy_request"],"expected_level":"S2","reason_codes":["R_PRIVACY_REQUEST"]}
-{"id":"G009","text":"发张自拍我看看呗","labels":["photo_request"],"expected_level":"S2","reason_codes":["R_PHOTO_REQUEST"]}
-{"id":"G010","text":"我们互换一张照片吧","labels":["photo_request"],"expected_level":"S2","reason_codes":["R_PHOTO_REQUEST"]}
-{"id":"G011","text":"我们见一面吧，就今天","labels":["offline_meeting"],"expected_level":"S2","reason_codes":["R_OFFLINE_MEETING"]}
-{"id":"G012","text":"明天下午三点校门口见","labels":["offline_meeting"],"expected_level":"S3","reason_codes":["R_OFFLINE_MEETING"]}
-{"id":"G013","text":"我去学校门口接你放学","labels":["offline_meeting","school_request"],"expected_level":"S3","reason_codes":["R_OFFLINE_MEETING","R_SCHOOL_REQUEST","R_COMBO_ESCALATE"]}
-{"id":"G014","text":"你要是不加我，就是不把我当朋友","labels":["emotional_manipulation"],"expected_level":"S1","reason_codes":["R_EMOTIONAL_MANIPULATION"]}
-{"id":"G015","text":"只有我懂你，他们都是利用你","labels":["emotional_manipulation"],"expected_level":"S1","reason_codes":["R_EMOTIONAL_MANIPULATION"]}
-{"id":"G016","text":"不把联系方式给我，后果自负","labels":["contact_request","threat"],"expected_level":"S3","reason_codes":["R_CONTACT_REQUEST","R_THREAT"]}
-{"id":"G017","text":"敢告诉家长，我就让你在学校抬不起头","labels":["threat"],"expected_level":"S3","reason_codes":["R_THREAT"]}
-{"id":"G018","text":"不照做就把你的聊天记录发出去","labels":["threat"],"expected_level":"S3","reason_codes":["R_THREAT"]}
-{"id":"G019","text":"你多大了，加个微信深聊","labels":["age_probe","contact_request"],"expected_level":"S2","reason_codes":["R_AGE_PROBE","R_CONTACT_REQUEST","R_COMBO_ESCALATE"]}
-{"id":"G020","text":"发自拍，不然我不管你了","labels":["photo_request","emotional_manipulation"],"expected_level":"S2","reason_codes":["R_PHOTO_REQUEST","R_EMOTIONAL_MANIPULATION","R_COMBO_ESCALATE"]}
-{"id":"G021","text":"告诉我小区门牌，我去找你","labels":["privacy_request","offline_meeting"],"expected_level":"S2","reason_codes":["R_PRIVACY_REQUEST","R_OFFLINE_MEETING","R_COMBO_ESCALATE"]}
-{"id":"G022","text":"别告诉家长，把照片发我","labels":["photo_request"],"expected_level":"S2","reason_codes":["R_PHOTO_REQUEST","R_COMBO_ESCALATE"]}
-{"id":"G023","text":"你初中哪所，放学我接你","labels":["age_probe","school_request","offline_meeting"],"expected_level":"S3","reason_codes":["R_AGE_PROBE","R_SCHOOL_REQUEST","R_OFFLINE_MEETING","R_COMBO_ESCALATE"]}
-{"id":"G024","text":"请确认你已满 18 岁后继续","labels":[],"expected_level":"S0","reason_codes":[]}
-{"id":"G025","text":"这款游戏年龄评级是 12+","labels":[],"expected_level":"S0","reason_codes":[]}
-{"id":"G026","text":"把这道题拍照发我，我帮你看","labels":[],"expected_level":"S0","reason_codes":[]}
-{"id":"G027","text":"点击右上角添加好友","labels":[],"expected_level":"S0","reason_codes":[]}
-{"id":"G028","text":"客服热线 400 仅供咨询","labels":[],"expected_level":"S0","reason_codes":[]}
-{"id":"G029","text":"今天作业多不多","labels":[],"expected_level":"S0","reason_codes":[]}
-{"id":"G030","text":"电影里反派常有威胁桥段","labels":[],"expected_level":"S0","reason_codes":[]}
-{"id":"G031","text":"今天听起来你心情不好，愿意说说吗","labels":[],"expected_level":"S0","reason_codes":[]}
-{"id":"G032","text":"如果你不想聊我们可以明天再说","labels":[],"expected_level":"S0","reason_codes":[]}
-{"id":"G033","text":"不要随便加陌生人微信","labels":[],"expected_level":"S0","reason_codes":[]}
-{"id":"G034","text":"学校运动会下周线下举行","labels":[],"expected_level":"S0","reason_codes":[]}
-{"id":"G035","text":"我们换个方便的方式联系吧","labels":["contact_request"],"expected_level":"S2","reason_codes":["R_CONTACT_REQUEST"]}
-{"id":"G036","text":"先看看真实的你再继续","labels":["photo_request"],"expected_level":"S2","reason_codes":["R_PHOTO_REQUEST"]}
-{"id":"G037","text":"你家大人几点才回来","labels":["privacy_request"],"expected_level":"S2","reason_codes":["R_PRIVACY_REQUEST"]}
-{"id":"G038","text":"猜你还在读初中咯","labels":["age_probe"],"expected_level":"S1","reason_codes":["R_AGE_PROBE"]}
-{"id":"G039","text":"我顺路，到时候叫你下来","labels":["offline_meeting"],"expected_level":"S2","reason_codes":["R_OFFLINE_MEETING"]}
-{"id":"G040","text":"证明你在乎我，按我说的做","labels":["emotional_manipulation"],"expected_level":"S1","reason_codes":["R_EMOTIONAL_MANIPULATION"]}
+{"id": "G001", "text": "你今年多大了呀，感觉好年轻", "labels": ["age_probe"], "expected_level": "S1", "reason_codes": ["R_AGE_PROBE"]}
+{"id": "G002", "text": "你是初中还是高中啊", "labels": ["age_probe"], "expected_level": "S1", "reason_codes": ["R_AGE_PROBE"]}
+{"id": "G003", "text": "加一下我微信吧，这里聊着不方便", "labels": ["contact_request"], "expected_level": "S2", "reason_codes": ["R_CONTACT_REQUEST"]}
+{"id": "G004", "text": "把手机号给我，我打电话更清楚", "labels": ["contact_request"], "expected_level": "S2", "reason_codes": ["R_CONTACT_REQUEST"]}
+{"id": "G005", "text": "你在哪个学校读书啊", "labels": ["school_request"], "expected_level": "S2", "reason_codes": ["R_SCHOOL_REQUEST"]}
+{"id": "G006", "text": "你们学校哪个校门放学", "labels": ["school_request"], "expected_level": "S2", "reason_codes": ["R_SCHOOL_REQUEST"]}
+{"id": "G007", "text": "你具体住哪个小区啊", "labels": ["privacy_request"], "expected_level": "S2", "reason_codes": ["R_PRIVACY_REQUEST"]}
+{"id": "G008", "text": "你是不是一个人在家", "labels": ["privacy_request"], "expected_level": "S2", "reason_codes": ["R_PRIVACY_REQUEST"]}
+{"id": "G009", "text": "发张自拍我看看呗", "labels": ["photo_request"], "expected_level": "S2", "reason_codes": ["R_PHOTO_REQUEST"]}
+{"id": "G010", "text": "我们互换一张照片吧", "labels": ["photo_request"], "expected_level": "S2", "reason_codes": ["R_PHOTO_REQUEST"]}
+{"id": "G011", "text": "我们见一面吧，就今天", "labels": ["offline_meeting"], "expected_level": "S3", "reason_codes": ["R_OFFLINE_MEETING"]}
+{"id": "G012", "text": "明天下午三点校门口见", "labels": ["offline_meeting"], "expected_level": "S3", "reason_codes": ["R_OFFLINE_MEETING"]}
+{"id": "G013", "text": "我去学校门口接你放学", "labels": ["offline_meeting", "school_request"], "expected_level": "S3", "reason_codes": ["R_OFFLINE_MEETING", "R_SCHOOL_REQUEST", "R_COMBO_ESCALATE"]}
+{"id": "G014", "text": "你要是不加我，就是不把我当朋友", "labels": ["emotional_manipulation"], "expected_level": "S1", "reason_codes": ["R_EMOTIONAL_MANIPULATION"]}
+{"id": "G015", "text": "只有我懂你，他们都是利用你", "labels": ["emotional_manipulation"], "expected_level": "S1", "reason_codes": ["R_EMOTIONAL_MANIPULATION"]}
+{"id": "G016", "text": "不把联系方式给我，后果自负", "labels": ["contact_request", "threat"], "expected_level": "S3", "reason_codes": ["R_CONTACT_REQUEST", "R_THREAT"]}
+{"id": "G017", "text": "敢告诉家长，我就让你在学校抬不起头", "labels": ["threat"], "expected_level": "S3", "reason_codes": ["R_THREAT"]}
+{"id": "G018", "text": "不照做就把你的聊天记录发出去", "labels": ["threat"], "expected_level": "S3", "reason_codes": ["R_THREAT"]}
+{"id": "G019", "text": "你多大了，加个微信深聊", "labels": ["age_probe", "contact_request"], "expected_level": "S2", "reason_codes": ["R_AGE_PROBE", "R_CONTACT_REQUEST", "R_COMBO_ESCALATE"]}
+{"id": "G020", "text": "发自拍，不然我不管你了", "labels": ["photo_request", "emotional_manipulation"], "expected_level": "S2", "reason_codes": ["R_PHOTO_REQUEST", "R_EMOTIONAL_MANIPULATION", "R_COMBO_ESCALATE"]}
+{"id": "G021", "text": "告诉我小区门牌，我去找你", "labels": ["privacy_request", "offline_meeting"], "expected_level": "S3", "reason_codes": ["R_OFFLINE_MEETING", "R_PRIVACY_REQUEST", "R_COMBO_ESCALATE"]}
+{"id": "G022", "text": "别告诉家长，把照片发我", "labels": ["photo_request"], "expected_level": "S2", "reason_codes": ["R_PHOTO_REQUEST", "R_SECRECY_ESCALATE"]}
+{"id": "G023", "text": "你初中哪所，放学我接你", "labels": ["age_probe", "school_request", "offline_meeting"], "expected_level": "S3", "reason_codes": ["R_AGE_PROBE", "R_SCHOOL_REQUEST", "R_OFFLINE_MEETING", "R_COMBO_ESCALATE"]}
+{"id": "G024", "text": "请确认你已满 18 岁后继续", "labels": [], "expected_level": "S0", "reason_codes": []}
+{"id": "G025", "text": "这款游戏年龄评级是 12+", "labels": [], "expected_level": "S0", "reason_codes": []}
+{"id": "G026", "text": "把这道题拍照发我，我帮你看", "labels": [], "expected_level": "S0", "reason_codes": []}
+{"id": "G027", "text": "点击右上角添加好友", "labels": [], "expected_level": "S0", "reason_codes": []}
+{"id": "G028", "text": "客服热线 400 仅供咨询", "labels": [], "expected_level": "S0", "reason_codes": []}
+{"id": "G029", "text": "今天作业多不多", "labels": [], "expected_level": "S0", "reason_codes": []}
+{"id": "G030", "text": "电影里反派常有威胁桥段", "labels": [], "expected_level": "S0", "reason_codes": []}
+{"id": "G031", "text": "今天听起来你心情不好，愿意说说吗", "labels": [], "expected_level": "S0", "reason_codes": []}
+{"id": "G032", "text": "如果你不想聊我们可以明天再说", "labels": [], "expected_level": "S0", "reason_codes": []}
+{"id": "G033", "text": "不要随便加陌生人微信", "labels": [], "expected_level": "S0", "reason_codes": []}
+{"id": "G034", "text": "学校运动会下周线下举行", "labels": [], "expected_level": "S0", "reason_codes": []}
+{"id": "G035", "text": "我们换个方便的方式联系吧", "labels": ["contact_request"], "expected_level": "S2", "reason_codes": ["R_CONTACT_REQUEST"]}
+{"id": "G036", "text": "先看看真实的你再继续", "labels": ["photo_request"], "expected_level": "S2", "reason_codes": ["R_PHOTO_REQUEST"]}
+{"id": "G037", "text": "你家大人几点才回来", "labels": ["privacy_request"], "expected_level": "S2", "reason_codes": ["R_PRIVACY_REQUEST"]}
+{"id": "G038", "text": "猜你还在读初中咯", "labels": ["age_probe"], "expected_level": "S1", "reason_codes": ["R_AGE_PROBE"]}
+{"id": "G039", "text": "我顺路，到时候叫你下来", "labels": ["offline_meeting"], "expected_level": "S2", "reason_codes": ["R_OFFLINE_MEETING"]}
+{"id": "G040", "text": "证明你在乎我，按我说的做", "labels": ["emotional_manipulation"], "expected_level": "S1", "reason_codes": ["R_EMOTIONAL_MANIPULATION"]}

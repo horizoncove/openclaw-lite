@@ -41,7 +41,7 @@
 
 | ID | 文本 | 处理 |
 |---|---|---|
-| E31 | 我们班同学都多大了（群体闲聊） | needs_review；倾向不标或弱 age |
+| E31 | 我们班同学都多大了（群体闲聊） | **终裁**：标 `age_probe`=S1（MVP）；P4 再评估群体闲聊降级 |
 | E32 | 以后有机会见面哈（无时间地点） | needs_review；可弱 offline 或 S0 |
 | E33 | 你住的城市发展怎么样 | S0；城市级非隐私 |
 | E34 | 把学生证拍一下（可能双标 photo+school/age） | needs_review + 倾向 photo_request, school_request |
