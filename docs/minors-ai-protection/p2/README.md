@@ -11,11 +11,24 @@
 | [WORKLOG.md](./WORKLOG.md) | 工作日志 |
 | [demo_spec.md](./demo_spec.md) | Demo 输入输出规格 |
 | [configs/labels.json](./configs/labels.json) | 标签顺序与默认等级 |
-| [tools/](./tools/) | 数据加载 / 基线训练 / 评测 |
-| [artifacts/](./artifacts/) | 模型与向量器 |
+| [tools/](./tools/) | 数据加载 / 基线 / 小模型 / ONNX |
+| [artifacts/](./artifacts/) | 模型与导出包 |
 | [reports/](./reports/) | 指标报告 |
 
-## 一键基线（TF-IDF + OneVsRest）
+## 主线：小参数 Transformer（推荐）
+
+骨干：`uer/chinese_roberta_L-2_H-128`（~3.18M params，ONNX ≈12.1MB）
+
+```bash
+python3 docs/minors-ai-protection/p2/tools/train_tiny.py
+python3 docs/minors-ai-protection/p2/tools/eval_tiny.py
+python3 docs/minors-ai-protection/p2/tools/export_onnx.py
+```
+
+产物：`artifacts/tiny_roberta_l2h128/{model.pt,model.onnx,tokenizer,meta.json}`  
+报告：`reports/tiny_eval.md`、`reports/tiny_onnx.md`
+
+## 对照基线（TF-IDF + OneVsRest）
 
 ```bash
 python3 docs/minors-ai-protection/p2/tools/train_baseline.py
@@ -23,5 +36,4 @@ python3 docs/minors-ai-protection/p2/tools/eval_baseline.py
 ```
 
 Owner：Agent-001  
-当前版本：**p2-v0.1-baseline**（sklearn TF-IDF，非端侧最终形态）  
-下一阶段：换小参数 Transformer + ONNX 导出  
+当前版本：**p2-v0.2-tiny**（小参数 Transformer + ONNX；TF-IDF 仅作对照）  

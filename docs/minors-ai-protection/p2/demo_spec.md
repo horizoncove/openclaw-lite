@@ -11,7 +11,7 @@
 {
   "labels": [{"key": "contact_request", "score": 0.91}],
   "expected_level_hint": "S2",
-  "model_ver": "baseline_tfidf@p2-v0.1",
+  "model_ver": "tiny_roberta_l2h128@p2-v0.2",
   "data_ver": "p1-v1.0/v0.4"
 }
 ```
