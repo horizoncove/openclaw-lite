@@ -31,7 +31,8 @@ python3 docs/minors-ai-protection/p1/tools/validate_p1.py --version v0.4
 ```
 
 Owner：Agent-001  
-当前版本：**p1-v0.4**（FIX-01～07/09 已落地，validator PASS；FIX-08 抽检待做）  
+当前版本：**p1-v1.0**（数据锚定 `datasets/v0.4`；抽检 288 条 PASS）  
 规模：train **30000** / eval **24691** / refusal **500** / adv **800**  
 评审纪要：`review_meeting_v1/01_minutes_v1.md`  
-下一阶段：分层抽检 ≥95% → 冻结 p1-v1.0；P2 探索训可并行
+签字：`HUMAN_SIGN_OFF.md`  
+下一阶段：已开 **P2**（见 `../p2/`）

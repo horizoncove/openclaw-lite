@@ -1,0 +1,145 @@
+{
+  "model_meta": {
+    "model": "tfidf_charwb_2_4_ovr_logreg",
+    "labels": [
+      "age_probe",
+      "privacy_request",
+      "contact_request",
+      "school_request",
+      "photo_request",
+      "offline_meeting",
+      "emotional_manipulation",
+      "threat"
+    ],
+    "data_version": "v0.4",
+    "n_train": 30000,
+    "n_dev": 10494,
+    "train_seconds": 2.03,
+    "dev_macro_f1": 0.9992,
+    "dev_micro_f1": 0.9992,
+    "artifact": "/workspace/docs/minors-ai-protection/p2/artifacts/baseline_tfidf/model.joblib",
+    "note": "sklearn baseline; not the final on-device Transformer"
+  },
+  "test": {
+    "split": "test",
+    "n": 13397,
+    "macro_f1": 0.9985,
+    "micro_f1": 0.9985,
+    "per_label": {
+      "age_probe": {
+        "f1": 0.999,
+        "recall": 0.998,
+        "support": 1518
+      },
+      "privacy_request": {
+        "f1": 0.999,
+        "recall": 0.998,
+        "support": 1537
+      },
+      "contact_request": {
+        "f1": 0.9987,
+        "recall": 0.9987,
+        "support": 1553
+      },
+      "school_request": {
+        "f1": 0.9985,
+        "recall": 0.997,
+        "support": 1682
+      },
+      "photo_request": {
+        "f1": 0.9987,
+        "recall": 0.9973,
+        "support": 1499
+      },
+      "offline_meeting": {
+        "f1": 0.9982,
+        "recall": 0.997,
+        "support": 1646
+      },
+      "emotional_manipulation": {
+        "f1": 0.999,
+        "recall": 0.9979,
+        "support": 1453
+      },
+      "threat": {
+        "f1": 0.9969,
+        "recall": 0.9938,
+        "support": 1441
+      }
+    },
+    "high_risk_recall": {
+      "contact_request": 0.9987,
+      "offline_meeting": 0.997,
+      "threat": 0.9938
+    },
+    "normal_false_positive_rate": 0.0005,
+    "n_normal": 1874,
+    "report_text": "                        precision    recall  f1-score   support\n\n             age_probe       1.00      1.00      1.00      1518\n       privacy_request       1.00      1.00      1.00      1537\n       contact_request       1.00      1.00      1.00      1553\n        school_request       1.00      1.00      1.00      1682\n         photo_request       1.00      1.00      1.00      1499\n       offline_meeting       1.00      1.00      1.00      1646\nemotional_manipulation       1.00      1.00      1.00      1453\n                threat       1.00      0.99      1.00      1441\n\n             micro avg       1.00      1.00      1.00     12329\n             macro avg       1.00      1.00      1.00     12329\n          weighted avg       1.00      1.00      1.00     12329\n           samples avg       0.86      0.86      0.86     12329\n"
+  },
+  "adv": {
+    "split": "adv",
+    "n": 800,
+    "macro_f1": 0.9209,
+    "micro_f1": 0.9229,
+    "per_label": {
+      "age_probe": {
+        "f1": 0.8571,
+        "recall": 0.75,
+        "support": 100
+      },
+      "privacy_request": {
+        "f1": 0.8701,
+        "recall": 0.77,
+        "support": 100
+      },
+      "contact_request": {
+        "f1": 1.0,
+        "recall": 1.0,
+        "support": 100
+      },
+      "school_request": {
+        "f1": 0.8421,
+        "recall": 0.8,
+        "support": 100
+      },
+      "photo_request": {
+        "f1": 0.9418,
+        "recall": 0.89,
+        "support": 100
+      },
+      "offline_meeting": {
+        "f1": 0.9362,
+        "recall": 0.88,
+        "support": 100
+      },
+      "emotional_manipulation": {
+        "f1": 0.995,
+        "recall": 0.99,
+        "support": 100
+      },
+      "threat": {
+        "f1": 0.9247,
+        "recall": 0.86,
+        "support": 100
+      }
+    },
+    "high_risk_recall": {
+      "contact_request": 1.0,
+      "offline_meeting": 0.88,
+      "threat": 0.86
+    },
+    "normal_false_positive_rate": 0.0,
+    "n_normal": 0,
+    "report_text": "                        precision    recall  f1-score   support\n\n             age_probe       1.00      0.75      0.86       100\n       privacy_request       1.00      0.77      0.87       100\n       contact_request       1.00      1.00      1.00       100\n        school_request       0.89      0.80      0.84       100\n         photo_request       1.00      0.89      0.94       100\n       offline_meeting       1.00      0.88      0.94       100\nemotional_manipulation       1.00      0.99      0.99       100\n                threat       1.00      0.86      0.92       100\n\n             micro avg       0.99      0.87      0.92       800\n             macro avg       0.99      0.87      0.92       800\n          weighted avg       0.99      0.87      0.92       800\n           samples avg       0.87      0.87      0.87       800\n"
+  },
+  "gates": {
+    "macro_f1_target": 0.8,
+    "high_risk_recall_target": 0.9,
+    "normal_fp_target": 0.03
+  },
+  "gate_results": {
+    "macro_f1": true,
+    "high_risk_recall": true,
+    "normal_fp": true
+  }
+}

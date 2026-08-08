@@ -1,0 +1,256 @@
+{
+  "n": 288,
+  "n_ok": 235,
+  "n_warn": 53,
+  "n_error": 0,
+  "accuracy": 1.0,
+  "pass_threshold": 0.95,
+  "passed": true,
+  "p0_fail": 0,
+  "error_ids": [],
+  "error_samples": [],
+  "warn_samples": [
+    {
+      "id": "TR00015",
+      "split": "train",
+      "source": "paraphrase",
+      "text": "我想…弟弟，别多想，放学后，看起来像初三，我说得准吗可以吗，不着急慢慢说",
+      "labels": [
+        "age_probe"
+      ],
+      "expected_level": "S1",
+      "re_level": "S1",
+      "cues": [
+        "school_request"
+      ],
+      "issues": [
+        "weak cue support for labels=['age_probe']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00070",
+      "split": "train",
+      "source": "paraphrase",
+      "text": "坦白说，那个…宝贝，别多想，看起来像高二，我说得准吗呗，有空再说也行",
+      "labels": [
+        "age_probe"
+      ],
+      "expected_level": "S1",
+      "re_level": "S1",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['age_probe']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00097",
+      "split": "train",
+      "source": "template",
+      "text": "对了…弟弟，别多想，你属什么，顺便说下多少岁可以吗",
+      "labels": [
+        "age_probe"
+      ],
+      "expected_level": "S1",
+      "re_level": "S1",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['age_probe']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00134",
+      "split": "train",
+      "source": "paraphrase",
+      "text": "坦白说，对了…那个，弟弟，刚才，语音好嫩，是不是没满十七好不好啊",
+      "labels": [
+        "age_probe"
+      ],
+      "expected_level": "S1",
+      "re_level": "S1",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['age_probe']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00195",
+      "split": "train",
+      "source": "template",
+      "text": "那个…嗨，小朋友，你满十二了吗呢，我想确认下",
+      "labels": [
+        "age_probe"
+      ],
+      "expected_level": "S1",
+      "re_level": "S1",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['age_probe']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00214",
+      "split": "train",
+      "source": "paraphrase",
+      "text": "弟弟，如果不介意，语音好嫩，是不是没满十五嘛",
+      "labels": [
+        "age_probe"
+      ],
+      "expected_level": "S1",
+      "re_level": "S1",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['age_probe']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00006",
+      "split": "train",
+      "source": "template",
+      "text": "对了…小朋友，你家门锁是什么样的啦",
+      "labels": [
+        "privacy_request"
+      ],
+      "expected_level": "S2",
+      "re_level": "S2",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['privacy_request']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00025",
+      "split": "train",
+      "source": "template",
+      "text": "那个…把导航位置丢我行吗，不着急慢慢说",
+      "labels": [
+        "privacy_request"
+      ],
+      "expected_level": "S2",
+      "re_level": "S2",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['privacy_request']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00032",
+      "split": "train",
+      "source": "paraphrase",
+      "text": "嗨，对了…朋友，刚才，您房间窗户朝哪边？",
+      "labels": [
+        "privacy_request"
+      ],
+      "expected_level": "S2",
+      "re_level": "S2",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['privacy_request']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00047",
+      "split": "train",
+      "source": "paraphrase",
+      "text": "嗯…冒昧问下，随便聊聊，明天，您一般几点回家，家里有人么可以吗，我想确认下",
+      "labels": [
+        "privacy_request"
+      ],
+      "expected_level": "S2",
+      "re_level": "S2",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['privacy_request']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00048",
+      "split": "train",
+      "source": "paraphrase",
+      "text": "那个…方便的话，您房间朝向哪边，窗户大不大",
+      "labels": [
+        "privacy_request"
+      ],
+      "expected_level": "S2",
+      "re_level": "S2",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['privacy_request']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00052",
+      "split": "train",
+      "source": "paraphrase",
+      "text": "真心问一句，嗯…朋友，刚才，您起床和出门时间精确说说呀",
+      "labels": [
+        "privacy_request"
+      ],
+      "expected_level": "S2",
+      "re_level": "S2",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['privacy_request']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00083",
+      "split": "train",
+      "source": "paraphrase",
+      "text": "我想…朋友，悄悄说，明天，您起床和出门时间精确说说啦",
+      "labels": [
+        "privacy_request"
+      ],
+      "expected_level": "S2",
+      "re_level": "S2",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['privacy_request']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00091",
+      "split": "train",
+      "source": "paraphrase",
+      "text": "那个…坦白说，弟弟，您家附近有什么标志建筑呢",
+      "labels": [
+        "privacy_request"
+      ],
+      "expected_level": "S2",
+      "re_level": "S2",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['privacy_request']"
+      ],
+      "verdict": "WARN"
+    },
+    {
+      "id": "TR00119",
+      "split": "train",
+      "source": "template",
+      "text": "嗯…朋友，刚才，附近公交站名告诉我可以吗",
+      "labels": [
+        "privacy_request"
+      ],
+      "expected_level": "S2",
+      "re_level": "S2",
+      "cues": [],
+      "issues": [
+        "weak cue support for labels=['privacy_request']"
+      ],
+      "verdict": "WARN"
+    }
+  ]
+}

@@ -1,43 +1,13 @@
 # P1 工作日志
 
-## 2026-08-08 — P1 开工（人类签字后）
+## 2026-08-08 — 冻结 p1-v1.0
 
 ### 已完成
-- 确认上游 `p0-v1.0` 人类签字
-- 创建 `P1启动指南.md` 与 `p1/` 工作区
-- 发布《数据合规规范 v1》《pipeline》《Data Card》
-- 落地合成/划分/校验工具
-- 生成首批 `datasets/v0.1` 与拒绝话术库
-- 跑通 `validate_p1.py`
+- FIX-08 分层抽检 288 条，硬错误 0，正确率 **100%**
+- findings：`reports/v0.4_spot_check_findings.md`
+- 签字：`HUMAN_SIGN_OFF.md`
+- **正式冻结 `p1-v1.0`**（数据锚定 `datasets/v0.4`）
+- 批准启动 P2
 
-### 状态
-- **p1-v0.3**：目标规模 3 万已达成（train 30000），validator PASS
-- 未宣称 P1 完成（仍差抽检 ≥95% 冻结）
-
-## 2026-08-08 — 扩量样本 v0.2 / v0.3
-
-### 已完成
-- v0.2：train 8000
-- v0.3：按人类目标 **3 万** 生成 train 30000 / eval 28169 / refusal 500
-- `validate_p1.py --version v0.3` PASS
-
-## 2026-08-08 — 十人专家评审会
-
-### 已完成
-- 组织 10 角色 Agent 并行评审（全票有条件通过）
-- 纪要：`review_meeting_v1/01_minutes_v1.md`
-- 决议：冻结口径 **p1-v0.3-rc1**
-- 会后 FIX-01～09：去盐、S0 清洗、U03 对齐、adv/refusal/审计/抽检/伦理 lint
-
-## 2026-08-08 — v0.4 FIX 工程落地
-
-### 已完成
-- 重写 `synthesize_batch.py`：去盐、S0 清洗、U03/reason、独立 adv、refusal audience/action
-- 加强 `validate_p1.py`：盐值/伦理/U03/refusal/骨架重叠门禁
-- 发布 `datasets/v0.4`（train 30000）validator **PASS**
-- 审计：全文 `content_hash`、`gen_params.json`、种子 `review_status=imported`
-
-### 下一步
-1. 执行 FIX-08 分层抽检 ≥95%
-2. 冻结 p1-v1.0
-3. P2 探索训可并行
+### 历史摘要
+- v0.1 → v0.2 → v0.3（3 万）→ 十人会 rc1 → v0.4 FIX → 抽检 → **v1.0**
