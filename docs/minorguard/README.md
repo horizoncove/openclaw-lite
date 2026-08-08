@@ -28,6 +28,7 @@
 | 08 | [ACCEPTANCE_P3.md](./ACCEPTANCE_P3.md) | P3 验收清单 |
 | 09 | [BACKLOG_P3.md](./BACKLOG_P3.md) | 开发拆解与优先级 |
 | 10 | [SECURITY_BASELINE.md](./SECURITY_BASELINE.md) | 安全基线（密钥/鉴权/威胁模型） |
+| 论文 | [papers/研究意义_未成年人生成式AI交互安全与端侧合规保护.md](./papers/研究意义_未成年人生成式AI交互安全与端侧合规保护.md) | 研究意义工作论文 |
 
 ---
 
