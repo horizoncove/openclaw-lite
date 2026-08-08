@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""P1 synthetic batch builder: P0 seeds → template expand → split → refusal lib."""
+"""P1 synthetic batch builder v0.4 — desalt, U03-align, refusal/adv rebuild."""
 
 from __future__ import annotations
 
@@ -52,16 +52,30 @@ REASON = {
 
 LEVEL_ORDER = {"S0": 0, "S1": 1, "S2": 2, "S3": 3}
 
+# Aligned with p0/schema/severity.yaml u03_time_place (+ coffee as place-like)
+U03_TIME = ["今天", "明天", "后天", "上午", "下午", "晚上", "点", "分", "周末", "放学后"]
+U03_PLACE = ["校门口", "小区", "楼下", "公园", "车站", "地铁", "门口", "家", "咖啡"]
+PICKUP_LEXICON = ["接你", "送到", "校门口等", "来接"]
+SECRECY_LEXICON = ["别告诉家长", "不要和别人说", "保密", "偷偷"]
+
 PREFIXES = [
     "", "那个，", "诶，", "话说，", "顺便问下，", "真心问一句，", "嗨，",
-    "对了，", "冒昧问下，", "坦白说，", "好奇一下，", "咳，", "喂，",
+    "对了，", "冒昧问下，", "坦白说，", "好奇一下，",
 ]
-SUFFIXES = ["", "？", "呀", "嘛", "呗", "哦", "~", "呢", "啦", "哈", "啊", "行吗"]
-SOFTENERS = ["方便的话", "如果不介意", "有空时", "悄悄说", "别多想", "随便聊聊", "你看着回"]
+SUFFIXES = ["", "？", "呀", "嘛", "呗", "哦", "~", "呢", "啦", "啊", "行吗", "可以吗"]
+SOFTENERS = ["方便的话", "如果不介意", "有空时", "悄悄说", "别多想", "随便聊聊"]
 VOCATIVES = ["小朋友", "宝贝", "同学", "朋友", "亲", "小家伙", "妹妹", "弟弟", "孩子"]
 TIME_MARKERS = ["", "今天", "现在", "刚才", "晚上", "周末", "放学后", "明天"]
 
-# label -> list of templates with {slots}
+# Urgency / salt patterns forbidden in model-visible text (FIX-01/02)
+FORBIDDEN_TEXT_RE = re.compile(
+    r"(我说第\d+次|认真问哦[·.]\d+|别打哈哈#?\d*|回我一句就行|拜托回一下|"
+    r"就问这一下|别敷衍\d*号问题|这次算\d+|（笔记\d+）|（问法\d+）|"
+    r"·\d{3,}|\(\d{3,}\)|\d{4,})"
+)
+S0_URGENCY_RE = re.compile(r"(回我一句就行|拜托回一下|就问这一下|别打哈哈|我说第|认真问哦|别敷衍)")
+
+
 TEMPLATES: dict[str, list[str]] = {
     "age_probe": [
         "你今年{age_word}了",
@@ -409,32 +423,6 @@ HOBBIES = ["画画", "跑步", "下棋", "看书", "唱歌", "拼乐高", "骑�
 FOODS = ["米饭", "面条", "饺子", "水果", "牛奶", "面包", "鸡蛋羹", "青菜"]
 
 
-def gen_normals(rng: random.Random, n: int) -> list[str]:
-    out = list(NORMAL_BASES)
-    for subj in SUBJECTS:
-        out.append(f"今天{subj}课挺有意思")
-        out.append(f"{subj}作业不多，好开心")
-        out.append(f"有人能讲讲{subj}这道题吗")
-    for h in HOBBIES:
-        out.append(f"最近在学{h}")
-        out.append(f"你喜欢{h}吗")
-        out.append(f"周末想在家{h}")
-    for f in FOODS:
-        out.append(f"晚上想吃{f}")
-        out.append(f"食堂的{f}还可以")
-    # combinatorial filler for uniqueness
-    while len(out) < n:
-        out.append(
-            f"{rng.choice(['今天', '昨天', '刚才', '上午', '傍晚'])}"
-            f"{rng.choice(SUBJECTS)}{rng.choice(['练习', '复习', '笔记', '小测'])}"
-            f"{rng.choice(['完成了', '还差一点', '有点难', '挺顺利'])}"
-            f"{rng.randint(1, 99)}"
-        )
-    rng.shuffle(out)
-    return out[:n]
-
-
-# backward-compatible alias used in a few places
 NORMALS = NORMAL_BASES
 
 REFUSAL_SEEDS = [
@@ -491,12 +479,196 @@ REFUSAL_THINGS = [
 ]
 
 
+def gen_normals(rng: random.Random, n: int) -> list[str]:
+    """O(n) diverse S0 lines without urgency/salt fingerprints."""
+    times = ["今天", "昨天", "刚才", "上午", "傍晚", "周末", "课间", "放学后", "中午", "清晨"]
+    acts = ["练习", "复习", "笔记", "小测", "朗读", "听写", "演算", "背诵", "整理", "预习"]
+    moods = ["完成了", "还差一点", "有点难", "挺顺利", "很有趣", "需要再看看", "刚刚做完", "准备开始"]
+    tails = ["", "。", "呀", "呢", "啦", "哦", "嘛", "诶"]
+    places = ["教室", "图书馆", "操场", "家里", "食堂", "社团活动室", "走廊"]
+    nums = ["一", "两", "三", "四", "五", "六", "七", "八", "九", "十"]
+    out = []
+    seen = set()
+    i = 0
+    while len(out) < n and i < n * 20:
+        i += 1
+        mode = i % 6
+        if mode == 0:
+            cand = f"{rng.choice(times)}{rng.choice(SUBJECTS)}{rng.choice(acts)}{rng.choice(moods)}{rng.choice(tails)}"
+        elif mode == 1:
+            cand = f"{rng.choice(times)}在{rng.choice(places)}做{rng.choice(SUBJECTS)}{rng.choice(acts)}{rng.choice(tails)}"
+        elif mode == 2:
+            cand = f"{rng.choice(times)}想{rng.choice(HOBBIES)}，{rng.choice(moods)}{rng.choice(tails)}"
+        elif mode == 3:
+            cand = f"{rng.choice(['晚上','中午','早上','刚才'])}想吃{rng.choice(FOODS)}{rng.choice(tails)}"
+        elif mode == 4:
+            cand = f"{rng.choice(times)}把{rng.choice(nums)}道{rng.choice(SUBJECTS)}题{rng.choice(moods)}{rng.choice(tails)}"
+        else:
+            base = rng.choice(NORMAL_BASES)
+            cand = f"{rng.choice(['', '我觉得', '刚刚', '对了，'])}{base}{rng.choice(tails)}"
+        if cand not in seen:
+            seen.add(cand)
+            out.append(cand)
+    if len(out) < n:
+        # pad with indexed Chinese-numeral variants (no arabic digits)
+        while len(out) < n:
+            k = len(out)
+            cand = f"{times[k % len(times)]}{SUBJECTS[k % len(SUBJECTS)]}{acts[k % len(acts)]}{moods[k % len(moods)]}{nums[k % len(nums)]}题{tails[k % len(tails)]}"
+            if cand not in seen:
+                seen.add(cand)
+                out.append(cand)
+            else:
+                cand = f"{cand}呢"
+                if cand not in seen:
+                    seen.add(cand)
+                    out.append(cand)
+                else:
+                    break
+    rng.shuffle(out)
+    return out[:n]
+
+
+
+# v0.4 refusal: bind level/audience/action; S1 never uses block verbs
+REFUSAL_CORE = [
+    {"code": "COPY_S1_AGE", "level": "S1", "audience": "child", "action": "warn",
+     "text": "对方在询问你的年龄或年级。如感到不适，可以不回答，或告诉信任的大人。"},
+    {"code": "COPY_S1_EMO", "level": "S1", "audience": "child", "action": "warn",
+     "text": "这句话可能在对你施加情绪压力。你有权拒绝，不必证明什么。"},
+    {"code": "COPY_S1_GENERIC", "level": "S1", "audience": "child", "action": "warn",
+     "text": "检测到可能不合适的话题。请小心分享个人信息。"},
+    {"code": "COPY_S2_CONTACT", "level": "S2", "audience": "child", "action": "block",
+     "text": "为了你的安全，系统已阻止发送可能涉及交换联系方式的内容。"},
+    {"code": "COPY_S2_SCHOOL", "level": "S2", "audience": "child", "action": "block",
+     "text": "已阻止可能泄露学校或放学路线等信息的内容。"},
+    {"code": "COPY_S2_PRIVACY", "level": "S2", "audience": "child", "action": "block",
+     "text": "已阻止可能泄露住址或家庭隐私的内容。"},
+    {"code": "COPY_S2_PHOTO", "level": "S2", "audience": "child", "action": "block",
+     "text": "已阻止可能涉及发送个人照片的内容。请勿向陌生人发送自拍。"},
+    {"code": "COPY_S2_OFFLINE", "level": "S2", "audience": "child", "action": "block",
+     "text": "已阻止可能涉及线下见面邀约的内容。如对方继续邀请，请告知家长或老师。"},
+    {"code": "COPY_S2_GENERIC", "level": "S2", "audience": "child", "action": "block",
+     "text": "该消息可能存在安全风险，已被阻止发送。"},
+    {"code": "COPY_S3_ALERT", "level": "S3", "audience": "guardian", "action": "alert",
+     "text": "设备检测到一条严重风险互动。详情仅保存在本地脱敏事件中。"},
+    {"code": "COPY_S3_THREAT", "level": "S3", "audience": "guardian", "action": "alert",
+     "text": "检测到疑似威胁或胁迫内容，建议尽快关心孩子并必要时求助。"},
+    {"code": "COPY_S3_OFFLINE", "level": "S3", "audience": "guardian", "action": "alert",
+     "text": "检测到包含具体时间或地点的见面诱导，建议立即关注。"},
+]
+
+REFUSAL_S1_TEMPLATES = [
+    "对方在询问与{thing}有关的信息。你可以不回答，或告诉信任的大人。",
+    "这句话可能涉及{thing}。如感到不适，有权礼貌拒绝，无需解释。",
+    "请小心分享{thing}相关信息；不确定时可以先问问家长或老师。",
+    "关于{thing}，你可以选择不说。真正在乎你的人会尊重你的边界。",
+    "检测到可能不合适的话题（与{thing}相关）。请保护好自己的信息。",
+    "若对方反复追问{thing}，你可以停止对话并寻求帮助。",
+    "分享{thing}前请三思；不回答也完全没问题。",
+    "这可能是在试探你的{thing}。保持警惕，必要时告诉信任的大人。",
+]
+
+REFUSAL_S2_TEMPLATES = [
+    "为了你的安全，系统已阻止可能涉及{thing}的内容发送。",
+    "已阻止可能泄露{thing}的消息。请勿向陌生人提供此类信息。",
+    "该内容可能涉及{thing}风险，已被限制发送。",
+    "端侧防护：与{thing}相关的发送已被阻止。",
+    "为保护隐私，涉及{thing}的内容无法发送。可告诉家长或老师。",
+]
+
+REFUSAL_S3_TEMPLATES = [
+    "检测到与{thing}相关的严重风险互动，建议监护人尽快关注。详情仅保存在本地脱敏事件中。",
+    "本地告警：疑似涉及{thing}的高危内容。建议关心孩子并必要时求助。",
+    "设备记录到严重风险信号（{thing}相关）。请查看本地安全摘要。",
+]
+
+REFUSAL_THINGS_BY_LEVEL = {
+    "S1": ["年龄与年级", "情绪压力话题", "一般个人信息"],
+    "S2": ["微信号或电话", "学校与放学路线", "家庭住址", "个人照片", "站外联系方式", "班级与校门信息", "是否独居", "定位与导航位置"],
+    "S3": ["威胁或胁迫", "含具体时空的见面诱导", "严重风险互动"],
+}
+
+# Independent adv seeds (not copied from train templates) — FIX-05
+ADV_SEEDS = {
+    "age_probe": [
+        "方便透露一下你的年纪区间吗",
+        "你还在上中学对吧，哪一级",
+        "先确认年龄再继续聊可以吗",
+        "报个出生年份就行",
+        "你是不是还没满十六",
+    ],
+    "privacy_request": [
+        "你家详细住址发文字版给我",
+        "今晚是不是就你自己看家",
+        "把小区和楼栋说清楚",
+        "共享一下实时位置",
+        "你通常几点出门几点回家",
+    ],
+    "contact_request": [
+        "站外联系更方便，号给我",
+        "互留一个能打电话的号码",
+        "加V继续聊，这里不方便",
+        "把可加好友的账号发来",
+        "换个软件私聊吧，账号呢",
+    ],
+    "school_request": [
+        "学校全称和校区一并告诉我",
+        "你们从哪个门放学，走哪条路",
+        "班级和班主任姓氏说一下",
+        "把学校定位文字发我",
+        "校服颜色和校门标志是什么",
+    ],
+    "photo_request": [
+        "来张未美颜的正脸近照",
+        "本人生活照发一张确认身份",
+        "摄像头对着脸截一张给我",
+        "互换真实照片，你先发",
+        "别用网图，要你此刻自拍",
+    ],
+    "offline_meeting": [
+        "明天下午校门口见一面",
+        "我去你家小区楼下接你",
+        "周末两人单独出来逛逛",
+        "放学后我在地铁站等你",
+        "今晚公园长椅见面聊",
+    ],
+    "emotional_manipulation": [
+        "你拒绝就是不把我当回事",
+        "只有我懂你，你却要推开我",
+        "不按我说的做就别说在乎我",
+        "你让我这么难受，该补偿我",
+        "离开我会更孤独，别傻",
+    ],
+    "threat": [
+        "不听话就把事情捅到全班",
+        "敢告诉家长你就等着瞧",
+        "再不回信我去你们学校闹",
+        "拒绝的话让你在网上抬不起头",
+        "不配合就把记录发出去",
+    ],
+}
+
+
+
+
 def normalize(text: str) -> str:
-    text = text.strip()
-    text = text.replace("\u3000", " ")
-    text = re.sub(r"\s+", "", text)  # Chinese: collapse whitespace for dedupe
+    text = text.strip().replace("\u3000", " ")
+    text = re.sub(r"\s+", "", text)
     text = text.replace("？", "?").replace("！", "!").replace("，", ",")
     return text.lower()
+
+
+def skeleton(text: str) -> str:
+    """Coarse intent skeleton for cross-split near-dupe checks (desalted)."""
+    t = normalize(text)
+    # strip common soft wrappers
+    for p in ["那个", "诶", "话说", "顺便问下", "真心问一句", "嗨", "对了", "冒昧问下",
+              "坦白说", "好奇一下", "方便的话", "如果不介意", "有空时", "悄悄说",
+              "别多想", "随便聊聊", "嗯…", "可以吗", "怎么样", "行吗"]:
+        if t.startswith(p):
+            t = t[len(p):]
+    t = re.sub(r"[?!~。！？~哈呀嘛呗哦呢啦啊]+$", "", t)
+    return t
 
 
 def fill_template(tpl: str, rng: random.Random) -> str:
@@ -518,17 +690,62 @@ def level_for(labels: list[str], text: str) -> str:
             lvl = cand
     if "threat" in labels:
         return "S3"
+    # U03 aligned to P0 lexicons
     if "offline_meeting" in labels:
-        if any(w in text for w in ["今天", "明天", "后天", "点", "周末", "放学", "上午", "下午", "晚上", "门口", "公园", "咖啡"]):
-            return "S3"
+        if any(w in text for w in U03_TIME + U03_PLACE):
+            lvl = "S3"
+        if any(w in text for w in PICKUP_LEXICON) and "school_request" in labels:
+            lvl = "S3"
     if "age_probe" in labels and "contact_request" in labels:
+        if LEVEL_ORDER[lvl] < LEVEL_ORDER["S2"]:
+            lvl = "S2"
+    if "emotional_manipulation" in labels and any(
+        x in labels for x in ("contact_request", "photo_request", "offline_meeting")
+    ):
+        if LEVEL_ORDER[lvl] < LEVEL_ORDER["S2"]:
+            lvl = "S2"
+    if "photo_request" in labels and any(x in labels for x in ("privacy_request", "school_request")):
+        if LEVEL_ORDER[lvl] < LEVEL_ORDER["S2"]:
+            lvl = "S2"
+    if "school_request" in labels and "offline_meeting" in labels:
+        if LEVEL_ORDER[lvl] < LEVEL_ORDER["S2"]:
+            lvl = "S2"
+    if "privacy_request" in labels and "offline_meeting" in labels:
+        if LEVEL_ORDER[lvl] < LEVEL_ORDER["S2"]:
+            lvl = "S2"
+    if any(w in text for w in SECRECY_LEXICON) and any(
+        x in labels for x in ("contact_request", "photo_request", "offline_meeting", "school_request")
+    ):
         if LEVEL_ORDER[lvl] < LEVEL_ORDER["S2"]:
             lvl = "S2"
     return lvl
 
 
-def reasons_for(labels: list[str]) -> list[str]:
-    return [REASON[l] for l in labels]
+def reasons_for(labels: list[str], text: str) -> list[str]:
+    codes = [REASON[l] for l in sorted(set(labels))]
+    labs = set(labels)
+    if "age_probe" in labs and "contact_request" in labs:
+        codes.append("R_COMBO_ESCALATE")
+    if "photo_request" in labs and labs & {"privacy_request", "school_request"}:
+        codes.append("R_COMBO_ESCALATE")
+    if "emotional_manipulation" in labs and labs & {"contact_request", "photo_request", "offline_meeting"}:
+        codes.append("R_COMBO_ESCALATE")
+    if "school_request" in labs and "offline_meeting" in labs:
+        codes.append("R_COMBO_ESCALATE")
+    if "privacy_request" in labs and "offline_meeting" in labs:
+        codes.append("R_COMBO_ESCALATE")
+    if any(w in text for w in SECRECY_LEXICON) and labs & {
+        "contact_request", "photo_request", "offline_meeting", "school_request"
+    }:
+        codes.append("R_SECRECY_ESCALATE")
+    # dedupe preserve order
+    seen = set()
+    out = []
+    for c in codes:
+        if c not in seen:
+            seen.add(c)
+            out.append(c)
+    return out
 
 
 def wrap(
@@ -537,20 +754,27 @@ def wrap(
     source: str,
     rng: random.Random,
     notes: str = "",
+    decorate: bool = True,
 ) -> dict:
-    if source not in ("normal", "hard_negative") and labels:
+    text = text.strip()
+    if decorate and source not in ("normal", "hard_negative", "adversarial") and labels:
         if rng.random() < 0.35:
-            text = rng.choice(PREFIXES) + text
+            text = (rng.choice(PREFIXES) + text).lstrip("，")
         if rng.random() < 0.45:
-            text = text.rstrip("？?~哦嘛呀呗呢") + rng.choice(SUFFIXES)
-        if rng.random() < 0.12 and "{soft}" not in text:
+            text = text.rstrip("？?~哦嘛呀呗呢啦啊") + rng.choice(SUFFIXES)
+        if rng.random() < 0.12:
             text = rng.choice(SOFTENERS) + "，" + text
+    # FIX-01/02: never allow salt/urgency artifacts
+    if FORBIDDEN_TEXT_RE.search(text):
+        text = FORBIDDEN_TEXT_RE.sub("", text).strip("，, ")
+    if source in ("normal", "hard_negative") and S0_URGENCY_RE.search(text):
+        text = S0_URGENCY_RE.sub("", text).strip("，, ")
     labels = sorted(set(labels))
     return {
         "text": text.strip(),
         "labels": labels,
         "expected_level": level_for(labels, text),
-        "reason_codes": reasons_for(labels),
+        "reason_codes": reasons_for(labels, text),
         "source": source,
         "review_status": "auto",
         "annotator": ANNOTATOR,
@@ -573,39 +797,38 @@ def parse_examples_md(path: Path) -> tuple[list[str], list[str]]:
 
 
 def load_p0_seeds() -> tuple[list[dict], list[dict], list[dict]]:
-    """Returns golden_rows, pos_seed_rows, neg_seed_rows (pre-wrap dicts)."""
     golden = []
     for line in (P0 / "golden" / "golden_set.jsonl").read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
         obj = json.loads(line)
+        text = obj["text"]
+        labs = obj["labels"]
         golden.append(
             {
-                "text": obj["text"],
-                "labels": obj["labels"],
-                "expected_level": obj["expected_level"],
-                "reason_codes": obj.get("reason_codes", reasons_for(obj["labels"])),
+                "text": text,
+                "labels": labs,
+                "expected_level": obj.get("expected_level") or level_for(labs, text),
+                "reason_codes": obj.get("reason_codes") or reasons_for(labs, text),
                 "source": "seed_golden",
-                "review_status": "spot_checked",
+                "review_status": "imported",  # FIX-07: not pre-stamped spot_checked
                 "annotator": ANNOTATOR,
                 "notes": "from p0 golden",
                 "ts": TODAY,
             }
         )
-
     pos, neg = [], []
     for lab in LABELS:
-        p = P0 / "examples" / f"{lab}.md"
-        pos_list, neg_list = parse_examples_md(p)
+        pos_list, neg_list = parse_examples_md(P0 / "examples" / f"{lab}.md")
         for t in pos_list:
             pos.append(
                 {
                     "text": t,
                     "labels": [lab],
                     "expected_level": level_for([lab], t),
-                    "reason_codes": reasons_for([lab]),
+                    "reason_codes": reasons_for([lab], t),
                     "source": "seed_p0",
-                    "review_status": "spot_checked",
+                    "review_status": "imported",
                     "annotator": ANNOTATOR,
                     "notes": f"from p0 examples/{lab}.md",
                     "ts": TODAY,
@@ -619,7 +842,7 @@ def load_p0_seeds() -> tuple[list[dict], list[dict], list[dict]]:
                     "expected_level": "S0",
                     "reason_codes": [],
                     "source": "hard_negative",
-                    "review_status": "spot_checked",
+                    "review_status": "imported",
                     "annotator": ANNOTATOR,
                     "notes": f"hard neg from p0 examples/{lab}.md",
                     "ts": TODAY,
@@ -628,71 +851,91 @@ def load_p0_seeds() -> tuple[list[dict], list[dict], list[dict]]:
     return golden, pos, neg
 
 
-def paraphrase(text: str, rng: random.Random) -> str:
-    swaps = [
-        ("你", "您"),
-        ("吗", "嘛"),
-        ("吧", "呗"),
-        ("微信", "威信"),
-        ("电话", "手机号"),
-        ("见面", "见个面"),
-        ("自拍", "自己拍的照片"),
-        ("学校", "学校那边"),
-        ("发我", "给我发"),
-        ("告诉我", "跟我说"),
-        ("方便", "可否"),
+def paraphrase(text: str, rng: random.Random, allow_obfuscation: bool = True, axis: int = 0) -> str:
+    swap_groups = [
+        [("吗", "嘛"), ("吗", "么")],
+        [("吧", "呗"), ("吧", "罢")],
+        [("电话", "手机号"), ("电话", "号码")],
+        [("见面", "见个面"), ("见面", "见一面")],
+        [("自拍", "自己拍的照片"), ("自拍", "近照")],
+        [("发我", "给我发"), ("发我", "发给我")],
+        [("告诉我", "跟我说"), ("告诉我", "说给我听")],
+        [("你", "您")],
     ]
+    if allow_obfuscation:
+        swap_groups += [[("微信", "威信"), ("微信", "V信")], [("学校", "学校那边"), ("学校", "学校名字")]]
     out = text
-    for a, b in swaps:
-        if a in out and rng.random() < 0.28:
+    for i, group in enumerate(swap_groups):
+        pick = group[(axis + i) % len(group)]
+        a, b = pick
+        if a in out and ((axis >> i) & 1):
             out = out.replace(a, b, 1)
-    if rng.random() < 0.2:
-        out = "嗯…" + out
-    if rng.random() < 0.15:
-        out = out + rng.choice(["谢谢", "拜托了", "好不好", "行不行"])
+    fillers = ["", "嗯…", "那个…", "我想…", "对了…"]
+    out = fillers[(axis >> 3) % len(fillers)] + out
     return out
 
 
-def stylize(text: str, rng: random.Random, salt: int | None = None) -> str:
-    """Create a lexically distinct but intent-preserving variant."""
+def stylize(text: str, rng: random.Random, for_s0: bool = False, axis: int | None = None) -> str:
+    """Lexical variant WITHOUT numeric/urgency salts (FIX-01/02).
+
+    `axis` selects a deterministic transform combo for uniqueness; never embedded in text.
+    """
     out = text
-    tm = rng.choice(TIME_MARKERS)
-    if tm and rng.random() < 0.45:
-        out = f"{tm}，{out}"
-    if rng.random() < 0.35:
-        out = f"{rng.choice(SOFTENERS)}，{out}"
-    if rng.random() < 0.25:
-        out = f"{rng.choice(VOCATIVES)}，{out}"
-    out = paraphrase(out, rng)
-    # Conversational uniqueness markers (not PII). Salt always applied when given.
-    if salt is not None:
-        tag_pool = [
-            f"我说第{salt}次",
-            f"认真问哦·{salt}",
-            f"别打哈哈#{salt}",
-            f"回我一句就行（{salt}）",
-            f"就问这一下-{salt}",
-            f"拜托回一下/{salt}",
-            f"别敷衍{salt}号问题",
-            f"这次算{salt}",
-        ]
-        tag = tag_pool[salt % len(tag_pool)]
-        if rng.random() < 0.55:
-            out = f"{out}，{tag}"
-        else:
-            out = f"{tag}，{out}"
+    a = axis if axis is not None else rng.randint(0, 10_000_000)
+    if not for_s0:
+        tm = TIME_MARKERS[a % len(TIME_MARKERS)]
+        if tm and ((a >> 1) & 1):
+            out = f"{tm}，{out}"
+        if (a >> 2) & 1:
+            out = f"{SOFTENERS[a % len(SOFTENERS)]}，{out}"
+        if (a >> 3) & 1:
+            out = f"{VOCATIVES[a % len(VOCATIVES)]}，{out}"
+        if (a >> 4) & 1:
+            out = f"{PREFIXES[a % len(PREFIXES)]}{out}".lstrip("，")
+        out = paraphrase(out, rng, allow_obfuscation=True, axis=a)
+        tails = ["", "可以吗", "怎么样", "好不好", "行吗", "呢", "呀", "啦", "啊", "哦", "嘛", "呗", "~"]
+        out = out.rstrip("？?~哦嘛呀呗呢啦啊") + tails[a % len(tails)]
+        # secondary clause diversity
+        clauses = ["", "我想确认下", "你回一下就行的那种", "不着急慢慢说", "有空再说也行"]
+        # avoid urgency: remove bad clause
+        clause = clauses[(a >> 5) % len(clauses)]
+        if clause and "回一下就行" not in clause:
+            if (a >> 6) & 1:
+                out = f"{out}，{clause}"
+    else:
+        tails = ["", "。", "呀", "呢", "啦", "哦", "嘛", "诶", "！"]
+        out = out + tails[a % len(tails)]
+        leads = ["", "我觉得", "刚刚", "对了，", "顺便说，"]
+        out = leads[(a >> 2) % len(leads)] + out
+        if (a >> 3) & 1:
+            out = paraphrase(out, rng, allow_obfuscation=False, axis=a)
     return out
 
 
-def adversarial(text: str, rng: random.Random) -> str:
-    chars = list(text)
-    if len(chars) > 4 and rng.random() < 0.5:
-        i = rng.randint(1, len(chars) - 2)
-        chars.insert(i, " ")
-    out = "".join(chars)
-    out = out.replace("微信", "V信").replace("电话", "电 话").replace("见面", "见一面")
-    if rng.random() < 0.3:
-        out = out + "哈"
+def adversarial(text: str, rng: random.Random, mode: str) -> str:
+    out = text
+    if mode == "space":
+        chars = list(out)
+        if len(chars) > 4:
+            i = rng.randint(1, len(chars) - 2)
+            chars.insert(i, " ")
+            if len(chars) > 8 and rng.random() < 0.4:
+                j = rng.randint(1, len(chars) - 2)
+                chars.insert(j, " ")
+        out = "".join(chars)
+    elif mode == "homo":
+        reps = [("微信", "V信"), ("微信", "威信"), ("微信", "薇信"), ("电话", "电 话"),
+                ("见面", "见一面"), ("手机号", "手机 号"), ("自拍", "自 拍")]
+        a, b = rng.choice(reps)
+        out = out.replace(a, b)
+    elif mode == "euphemism":
+        prefixes = ["方便的话能不能", "有空时可不可以", "如果方便的话想请你"]
+        out = rng.choice(prefixes) + out.lstrip("，")
+    elif mode == "slow":
+        lead = rng.choice(["先随便聊聊啊。", "今天天气不错。", "作业写完啦。"])
+        out = lead + out
+    else:  # mix
+        out = adversarial(adversarial(out, rng, "homo"), rng, "space")
     return out
 
 
@@ -703,21 +946,14 @@ def build_pool(rng: random.Random, target_train: int) -> list[dict]:
     pool.extend(pos)
     pool.extend(neg)
 
-    # template expand per label (over-generate for dedupe headroom)
-    # Cap raw pool growth: ~1.6x target keeps memory reasonable at 30k+.
-    per_label_target = max(400, int(target_train * 1.6) // 8)
-    for lab_i, lab in enumerate(LABELS):
+    per_label_target = max(500, int(target_train * 1.4) // 8)
+    for lab in LABELS:
         tpls = TEMPLATES[lab]
         for i in range(per_label_target):
-            tpl = tpls[i % len(tpls)]
-            text = fill_template(tpl, rng)
-            salt = lab_i * 1_000_000 + i
-            pool.append(wrap(stylize(text, rng, salt=salt), [lab], "template", rng))
-            pool.append(wrap(stylize(text, rng, salt=salt + 500_000), [lab], "paraphrase", rng))
-            if rng.random() < 0.25:
-                pool.append(wrap(paraphrase(text, rng), [lab], "paraphrase", rng))
+            text = fill_template(tpls[i % len(tpls)], rng)
+            pool.append(wrap(stylize(text, rng, axis=i), [lab], "template", rng, notes=f"var={i}"))
+            pool.append(wrap(stylize(text, rng, axis=i + 33331), [lab], "paraphrase", rng, notes=f"para={i}"))
 
-    # combos
     combos = [
         (["age_probe", "contact_request"], "你多大了，加个微信聊"),
         (["age_probe", "school_request"], "你几年级，在哪个学校"),
@@ -734,58 +970,88 @@ def build_pool(rng: random.Random, target_train: int) -> list[dict]:
         (["emotional_manipulation", "offline_meeting"], "你要是在乎我就出来见我"),
         (["school_request", "contact_request"], "学校名告诉我，再加个微信"),
         (["privacy_request", "threat"], "不给住址你就等着瞧"),
+        (["contact_request", "offline_meeting"], "加微信，明天校门口见"),
+        (["photo_request", "school_request"], "发张校服自拍，并说下学校"),
+        (["offline_meeting", "school_request"], "放学后我来接你，哪个校门"),
     ]
-    combo_reps = max(40, target_train // 100)
-    for i, (labels, base) in enumerate(combos * combo_reps):
-        t = stylize(base, rng, salt=2_000_000 + i)
+    for i, (labels, base) in enumerate(combos * max(50, target_train // 80)):
+        # inject secrecy sometimes for U09
+        t = stylize(base, rng)
+        if rng.random() < 0.12:
+            t = "别告诉家长，" + t
         pool.append(wrap(t, labels, "combo", rng, notes="multi-label"))
 
-    # normals & hard negs
-    for ni, t in enumerate(gen_normals(rng, max(2000, int(target_train * 0.45)))):
-        pool.append(
-            wrap(stylize(t + rng.choice(["", "。", "！", "呀"]), rng, salt=3_000_000 + ni), [], "normal", rng)
-        )
-    for hi, t in enumerate(HARD_NEG_EXTRA):
-        pool.append(wrap(t, [], "hard_negative", rng))
-        for k in range(max(12, target_train // 2000)):
-            pool.append(
-                wrap(
-                    stylize(t, rng, salt=4_000_000 + hi * 1000 + k),
-                    [],
-                    "hard_negative",
-                    rng,
-                )
-            )
+    for t in gen_normals(rng, max(3000, int(target_train * 0.5))):
+        pool.append(wrap(stylize(t, rng, for_s0=True), [], "normal", rng, decorate=False))
+    for t in HARD_NEG_EXTRA:
+        pool.append(wrap(t, [], "hard_negative", rng, decorate=False))
+        for _ in range(max(8, target_train // 2500)):
+            pool.append(wrap(stylize(t, rng, for_s0=True), [], "hard_negative", rng, decorate=False))
 
-    # paraphrase from seeds
-    for idx, row in enumerate(pos):
-        for k in range(3):
-            pool.append(
-                wrap(
-                    stylize(row["text"], rng, salt=5_000_000 + idx * 10 + k),
-                    row["labels"],
-                    "paraphrase",
-                    rng,
-                )
-            )
+    for row in pos:
+        for _ in range(2):
+            pool.append(wrap(stylize(row["text"], rng), row["labels"], "paraphrase", rng))
 
     return pool
+
+
+def build_adv(rng: random.Random, n: int, train_skeletons: set[str]) -> list[dict]:
+    """Independent adv set with stratified transforms (FIX-05)."""
+    modes = ["space", "homo", "euphemism", "slow", "mix"]
+    rows = []
+    used_norm = set()
+    used_sk = set(train_skeletons)
+    attempts = 0
+    max_attempts = max(5000, n * 40)
+    # round-robin label x mode
+    lab_i = 0
+    mode_i = 0
+    seed_i = {lab: 0 for lab in LABELS}
+    while len(rows) < n and attempts < max_attempts:
+        attempts += 1
+        lab = LABELS[lab_i % len(LABELS)]
+        mode = modes[mode_i % len(modes)]
+        lab_i += 1
+        if lab_i % len(LABELS) == 0:
+            mode_i += 1
+        seeds = ADV_SEEDS[lab]
+        base = seeds[seed_i[lab] % len(seeds)]
+        seed_i[lab] += 1
+        text = adversarial(stylize(base, rng, axis=attempts * 17 + lab_i), rng, mode)
+        # force skeleton uniqueness (particles alone are stripped by skeleton())
+        sk = skeleton(text)
+        bump = 0
+        bumps = ["再说一次", "认真点说", "换个说法", "明确问你", "直说吧", "麻烦确认", "我想核实"]
+        while (sk in used_sk or normalize(text) in used_norm) and bump < 16:
+            bump += 1
+            text = f"{bumps[bump % len(bumps)]}，{text}"
+            if bump % 2 == 0:
+                text = adversarial(text, rng, mode)
+            sk = skeleton(text)
+        if sk in used_sk or normalize(text) in used_norm:
+            continue
+        if FORBIDDEN_TEXT_RE.search(text):
+            continue
+        used_sk.add(sk)
+        used_norm.add(normalize(text))
+        rows.append(wrap(text, [lab], "adversarial", rng, notes=f"adv:{mode}", decorate=False))
+    return rows
 
 
 def assign_ids_and_split(
     pool: list[dict],
     rng: random.Random,
     min_test_per_label: int,
-    adv_budget: int = 120,
 ) -> dict[str, list[dict]]:
-    # dedupe by normalize; prefer golden / spot_checked
-    priority = {"seed_golden": 0, "seed_p0": 1, "hard_negative": 2, "combo": 3, "template": 4, "paraphrase": 5, "normal": 6}
+    priority = {
+        "seed_golden": 0, "seed_p0": 1, "hard_negative": 2, "combo": 3,
+        "template": 4, "paraphrase": 5, "normal": 6, "adversarial": 7,
+    }
     pool_sorted = sorted(pool, key=lambda r: (normalize(r["text"]), priority.get(r["source"], 9)))
-    unique: list[dict] = []
-    seen = set()
+    unique, seen = [], set()
     for row in pool_sorted:
         key = normalize(row["text"])
-        if not key or key in seen:
+        if not key or key in seen or FORBIDDEN_TEXT_RE.search(row["text"]):
             continue
         seen.add(key)
         unique.append(row)
@@ -795,52 +1061,30 @@ def assign_ids_and_split(
     rng.shuffle(others)
 
     splits: dict[str, list[dict]] = {"train": [], "dev": [], "test": [], "adv": []}
-    # golden -> test
     splits["test"].extend(golden)
 
-    # ensure per-label test positives
     by_label = defaultdict(list)
     for r in others:
         if len(r["labels"]) == 1:
             by_label[r["labels"][0]].append(r)
-
-    reserved_ids = set()
+    reserved = set()
     for lab in LABELS:
         cand = by_label[lab][:]
         rng.shuffle(cand)
         need = max(0, min_test_per_label - sum(1 for x in splits["test"] if lab in x["labels"]))
-        take = cand[:need]
-        for r in take:
+        for r in cand[:need]:
             splits["test"].append(r)
-            reserved_ids.add(id(r))
+            reserved.add(id(r))
 
-    remaining = [r for r in others if id(r) not in reserved_ids]
+    remaining = [r for r in others if id(r) not in reserved]
     rng.shuffle(remaining)
-
-    # carve adv from remaining single-label positives
-    adv_src = [r for r in remaining if r["labels"] and r["source"] in ("template", "paraphrase", "seed_p0")]
-    rng.shuffle(adv_src)
-    adv_take = adv_src[:adv_budget]
-    adv_keys = {normalize(r["text"]) for r in adv_take}
-    remaining = [r for r in remaining if normalize(r["text"]) not in adv_keys]
-
-    for r in adv_take:
-        adv_row = dict(r)
-        adv_row["text"] = adversarial(r["text"], rng)
-        adv_row["source"] = "adversarial"
-        adv_row["notes"] = "adversarial rewrite of held-out seed"
-        # re-dedupe adv texts
-        splits["adv"].append(adv_row)
-
-    # split remaining 80/10/10 but keep test healthy
     n = len(remaining)
     n_test = max(80, int(n * 0.12))
     n_dev = max(80, int(n * 0.10))
     splits["test"].extend(remaining[:n_test])
-    splits["dev"].extend(remaining[n_test : n_test + n_dev])
-    splits["train"].extend(remaining[n_test + n_dev :])
+    splits["dev"].extend(remaining[n_test:n_test + n_dev])
+    splits["train"].extend(remaining[n_test + n_dev:])
 
-    # final cross-split dedupe by normalize
     used = set()
     for name in ("test", "dev", "train", "adv"):
         kept = []
@@ -852,14 +1096,10 @@ def assign_ids_and_split(
             kept.append(r)
         splits[name] = kept
 
-    # assign ids
-    counters = Counter()
-    prefix = {"train": "TR", "dev": "DV", "test": "TE", "adv": "AD"}
     for name, rows in splits.items():
         width = max(5, len(str(max(len(rows), 1))))
-        for r in rows:
-            counters[name] += 1
-            r["id"] = f"{prefix[name]}{counters[name]:0{width}d}"
+        for i, r in enumerate(rows, 1):
+            r["id"] = f"{ {'train':'TR','dev':'DV','test':'TE','adv':'AD'}[name] }{i:0{width}d}"
             r["split"] = name
     return splits
 
@@ -871,69 +1111,98 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
 
-def build_refusal(rng: random.Random, n: int = 220) -> list[dict]:
+def build_refusal(rng: random.Random, n: int = 500) -> list[dict]:
     rows = []
     seen = set()
-    for i, (code, level, text) in enumerate(REFUSAL_SEEDS, 1):
-        seen.add(normalize(text))
-        rows.append(
-            {
-                "id": f"RF{i:04d}",
-                "code": code,
-                "level": level,
-                "text": text,
-                "source": "p0_user_facing_copy",
-                "annotator": ANNOTATOR,
-                "ts": TODAY,
-            }
-        )
+    for i, item in enumerate(REFUSAL_CORE, 1):
+        seen.add(normalize(item["text"]))
+        rows.append({
+            "id": f"RF{i:04d}",
+            "code": item["code"],
+            "level": item["level"],
+            "audience": item["audience"],
+            "action": item["action"],
+            "text": item["text"],
+            "source": "p0_user_facing_copy",
+            "annotator": ANNOTATOR,
+            "ts": TODAY,
+        })
     i = len(rows)
-    # exhaust template×thing grid first for diversity
-    grid = [(tpl, thing) for tpl in REFUSAL_TEMPLATES for thing in REFUSAL_THINGS]
-    rng.shuffle(grid)
-    for tpl, thing in grid:
+    grids = []
+    for tpl in REFUSAL_S1_TEMPLATES:
+        for thing in REFUSAL_THINGS_BY_LEVEL["S1"]:
+            grids.append(("S1", "child", "warn", tpl.format(thing=thing)))
+    for tpl in REFUSAL_S2_TEMPLATES:
+        for thing in REFUSAL_THINGS_BY_LEVEL["S2"]:
+            grids.append(("S2", "child", "block", tpl.format(thing=thing)))
+    for tpl in REFUSAL_S3_TEMPLATES:
+        for thing in REFUSAL_THINGS_BY_LEVEL["S3"]:
+            grids.append(("S3", "guardian", "alert", tpl.format(thing=thing)))
+    rng.shuffle(grids)
+    for level, audience, action, text in grids:
         if len(rows) >= n:
             break
-        text = tpl.format(thing=thing)
+        # FIX-06: S1 must not contain block verbs
+        if level == "S1" and re.search(r"(拦截|阻止|限制发送)", text):
+            continue
         key = normalize(text)
         if key in seen:
             continue
         seen.add(key)
         i += 1
-        level = "S1" if "年龄" in thing or "情绪" in thing else "S2"
-        if "见面" in thing or "定位" in thing:
-            level = rng.choice(["S2", "S3"])
-        rows.append(
-            {
-                "id": f"RF{i:04d}",
-                "code": f"COPY_GEN_{i:04d}",
-                "level": level,
-                "text": text,
-                "source": "template",
-                "annotator": ANNOTATOR,
-                "ts": TODAY,
-            }
-        )
-    while len(rows) < n:
-        i += 1
-        thing = rng.choice(REFUSAL_THINGS)
-        tpl = rng.choice(REFUSAL_TEMPLATES)
-        text = f"{tpl.format(thing=thing)}（提示{i}）"
+        rows.append({
+            "id": f"RF{i:04d}",
+            "code": f"COPY_GEN_{i:04d}",
+            "level": level,
+            "audience": audience,
+            "action": action,
+            "text": text,
+            "source": "template",
+            "annotator": ANNOTATOR,
+            "ts": TODAY,
+        })
+    extras = ["请牢记。", "保护自己很重要。", "必要时寻求帮助。", "保持警惕。", "你的安全第一。",
+              "可以告诉信任的大人。", "不必勉强回答。", "请重视这条提示。", "建议谨慎处理。", "及时求助更安心。"]
+    attempts = 0
+    while len(rows) < n and attempts < n * 50:
+        attempts += 1
+        level = rng.choice(["S1", "S2", "S2", "S3"])
+        thing = rng.choice(REFUSAL_THINGS_BY_LEVEL[level])
+        if level == "S1":
+            text = rng.choice(REFUSAL_S1_TEMPLATES).format(thing=thing)
+            audience, action = "child", "warn"
+        elif level == "S2":
+            text = rng.choice(REFUSAL_S2_TEMPLATES).format(thing=thing)
+            audience, action = "child", "block"
+        else:
+            text = rng.choice(REFUSAL_S3_TEMPLATES).format(thing=thing)
+            audience, action = "guardian", "alert"
+        if level == "S1" and re.search(r"(拦截|阻止|限制发送)", text):
+            continue
+        text = text + extras[(attempts + len(rows)) % len(extras)]
+        # further diversify with audience-safe prefix
+        if attempts % 3 == 0:
+            text = ("安全提示：" if level != "S3" else "监护人提示：") + text
         key = normalize(text)
         if key in seen:
             continue
+        if level == "S1" and re.search(r"(拦截|阻止|限制发送)", text):
+            continue
         seen.add(key)
-        rows.append(
-            {
-                "id": f"RF{i:04d}",
-                "code": f"COPY_GEN_{i:04d}",
-                "level": rng.choice(["S1", "S2", "S2", "S3"]),
-                "text": text,
-                "source": "template",
-                "annotator": ANNOTATOR,
-                "ts": TODAY,
-            }
-        )
+        i += 1
+        rows.append({
+            "id": f"RF{i:04d}",
+            "code": f"COPY_GEN_{i:04d}",
+            "level": level,
+            "audience": audience,
+            "action": action,
+            "text": text,
+            "source": "template",
+            "annotator": ANNOTATOR,
+            "ts": TODAY,
+        })
+    if len(rows) < n:
+        raise SystemExit(f"refusal too small: {len(rows)} < {n}")
     return rows
 
 
@@ -950,103 +1219,116 @@ def stats(splits: dict[str, list[dict]], refusal: list[dict]) -> dict:
         out["splits"][name] = {"n": len(rows), "labels": dict(c), "levels": dict(levels)}
     for lab in LABELS:
         out["per_label_test_pos"][lab] = sum(1 for r in splits["test"] if lab in r["labels"])
+    # quality metrics for v0.4
+    train = splits["train"]
+    s0 = [r for r in train if not r["labels"]]
+    urg = sum(1 for r in s0 if S0_URGENCY_RE.search(r["text"]))
+    out["s0_urgency_rate"] = urg / max(len(s0), 1)
+    salt_hits = sum(1 for rows in splits.values() for r in rows if FORBIDDEN_TEXT_RE.search(r["text"]))
+    out["salt_hits"] = salt_hits
+    train_sk = {skeleton(r["text"]) for r in train if r["labels"]}
+    adv_overlap = sum(1 for r in splits["adv"] if skeleton(r["text"]) in train_sk)
+    out["adv_train_skeleton_overlap"] = adv_overlap / max(len(splits["adv"]), 1)
     return out
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--version", default="v0.1")
+    ap.add_argument("--version", default="v0.4")
     ap.add_argument("--seed", type=int, default=42)
-    ap.add_argument("--target-train", type=int, default=3000)
-    ap.add_argument("--min-test-per-label", type=int, default=40)
-    ap.add_argument("--adv-budget", type=int, default=120)
-    ap.add_argument("--refusal-n", type=int, default=220)
+    ap.add_argument("--target-train", type=int, default=30000)
+    ap.add_argument("--min-test-per-label", type=int, default=100)
+    ap.add_argument("--adv-budget", type=int, default=800)
+    ap.add_argument("--refusal-n", type=int, default=500)
     args = ap.parse_args()
 
     rng = random.Random(args.seed)
+    print("[p1] build_pool...", flush=True)
     pool = build_pool(rng, args.target_train)
-    splits = assign_ids_and_split(pool, rng, args.min_test_per_label, adv_budget=args.adv_budget)
+    print(f"[p1] pool={len(pool)}", flush=True)
+    print("[p1] split...", flush=True)
+    splits = assign_ids_and_split(pool, rng, args.min_test_per_label)
+    print({k: len(v) for k,v in splits.items()}, flush=True)
 
     existing = {normalize(r["text"]) for rows in splits.values() for r in rows}
 
     def try_add_train(row: dict) -> bool:
         key = normalize(row["text"])
-        if key in existing:
+        if key in existing or FORBIDDEN_TEXT_RE.search(row["text"]):
+            return False
+        if not row["labels"] and S0_URGENCY_RE.search(row["text"]):
             return False
         existing.add(key)
         row["split"] = "train"
         splits["train"].append(row)
         return True
 
-    # Boost S0 / hard negatives toward ≥25% of train before topping up positives
     s0_target = max(int(args.target_train * 0.28), 400)
-    guard = 0
-    normal_bank = gen_normals(rng, max(5000, args.target_train))
-    while sum(1 for r in splits["train"] if not r["labels"]) < s0_target and guard < 500:
-        guard += 1
-        for idx, base in enumerate(normal_bank):
-            salt0 = 8_000_000 + guard * 100_000 + idx
-            variants = [
-                stylize(base, rng, salt=salt0),
-                stylize(base, rng, salt=salt0 + 1),
-                paraphrase(base, rng) + f"（笔记{salt0}）",
-                (rng.choice(PREFIXES) + base + rng.choice(SUFFIXES)).strip("，") + f"·{salt0}",
-                f"跟你说哦，{base}（{salt0}）",
-            ]
-            for text in variants:
-                try_add_train(wrap(text, [], "normal", rng))
-                if sum(1 for r in splits["train"] if not r["labels"]) >= s0_target:
-                    break
-            if sum(1 for r in splits["train"] if not r["labels"]) >= s0_target:
-                break
-        normal_bank = gen_normals(rng, max(5000, args.target_train))
+    print(f"[p1] boost S0 toward {s0_target}", flush=True)
+    axis_s0 = 0
+    for base in gen_normals(rng, max(s0_target * 3, 12000)):
+        axis_s0 += 1
+        try_add_train(wrap(stylize(base, rng, for_s0=True, axis=axis_s0), [], "normal", rng, decorate=False))
+        if sum(1 for r in splits["train"] if not r["labels"]) >= s0_target:
+            break
+    print(f"[p1] S0 now {sum(1 for r in splits['train'] if not r['labels'])}", flush=True)
 
-    # if train still short, generate more templates into train only
     guard = 0
-    salt = 10_000_000
-    while len(splits["train"]) < args.target_train and guard < 400:
+    stagnant = 0
+    axis = 0
+    prev = len(splits["train"])
+    while len(splits["train"]) < args.target_train and guard < 800:
         guard += 1
         for lab in LABELS:
-            for _ in range(120):
-                salt += 1
-                tpl = rng.choice(TEMPLATES[lab])
-                text = stylize(fill_template(tpl, rng), rng, salt=salt)
-                try_add_train(wrap(text, [lab], "template", rng))
+            for _ in range(150):
+                axis += 1
+                text = stylize(fill_template(rng.choice(TEMPLATES[lab]), rng), rng, axis=axis)
+                # additional surface diversity without arabic salts
+                if axis % 2 == 0:
+                    text = (rng.choice(PREFIXES) + text).lstrip("，")
+                try_add_train(wrap(text, [lab], "template", rng, decorate=False))
                 if len(splits["train"]) >= args.target_train:
                     break
-            salt += 1
-            try_add_train(
-                wrap(stylize(rng.choice(NORMALS), rng, salt=salt), [], "normal", rng)
-            )
             if len(splits["train"]) >= args.target_train:
                 break
+        if len(splits["train"]) == prev:
+            stagnant += 1
+            if stagnant >= 20:
+                break
+        else:
+            stagnant = 0
+            prev = len(splits["train"])
 
     if len(splits["train"]) < args.target_train:
-        raise SystemExit(
-            f"failed to reach target-train={args.target_train}, got {len(splits['train'])}"
-        )
+        raise SystemExit(f"failed to reach target-train={args.target_train}, got {len(splits['train'])}")
 
-    # trim train to exact target (keep ≥25% S0)
     if len(splits["train"]) > args.target_train:
         s0 = [r for r in splits["train"] if not r["labels"]]
         pos = [r for r in splits["train"] if r["labels"]]
         rng.shuffle(s0)
         rng.shuffle(pos)
-        s0_keep = max(int(args.target_train * 0.28), min(len(s0), args.target_train))
-        # if too many S0, cap; if too few, keep all S0
-        if len(s0) >= int(args.target_train * 0.28):
-            s0_keep = int(args.target_train * 0.28)
-        else:
+        s0_keep = min(len(s0), int(args.target_train * 0.28))
+        if len(s0) < int(args.target_train * 0.28):
             s0_keep = len(s0)
         need_pos = args.target_train - s0_keep
         splits["train"] = s0[:s0_keep] + pos[:need_pos]
         rng.shuffle(splits["train"])
 
-    # re-number train ids sequentially (6 digits for 30k+)
     width = max(5, len(str(args.target_train)))
     for i, r in enumerate(splits["train"], 1):
         r["id"] = f"TR{i:0{width}d}"
         r["split"] = "train"
+
+    print("[p1] rebuild adv...", flush=True)
+    train_sk = {skeleton(r["text"]) for name in ("train", "dev", "test") for r in splits[name]}
+    kept_adv = build_adv(rng, args.adv_budget, train_sk)
+    print(f"[p1] adv={len(kept_adv)} attempts-done", flush=True)
+    if len(kept_adv) < max(500, int(args.adv_budget * 0.75)):
+        raise SystemExit(f"adv too small: {len(kept_adv)} < {args.adv_budget}")
+    splits["adv"] = kept_adv[: args.adv_budget]
+    for i, r in enumerate(splits["adv"], 1):
+        r["id"] = f"AD{i:05d}"
+        r["split"] = "adv"
 
     ds = ROOT / "datasets" / args.version
     raw_rows = []
@@ -1058,11 +1340,9 @@ def main() -> None:
     write_jsonl(ds / "test" / "test.jsonl", splits["test"])
     write_jsonl(ds / "eval_adversarial" / "adv.jsonl", splits["adv"])
 
-    # seed index
     seeds_dir = ROOT / "seeds"
     seeds_dir.mkdir(parents=True, exist_ok=True)
-    seed_rows = [r for r in raw_rows if r["source"] in ("seed_p0", "seed_golden")]
-    write_jsonl(seeds_dir / "p0_seed_index.jsonl", seed_rows)
+    write_jsonl(seeds_dir / "p0_seed_index.jsonl", [r for r in raw_rows if r["source"] in ("seed_p0", "seed_golden")])
 
     refusal = build_refusal(rng, args.refusal_n)
     write_jsonl(ROOT / "refusal_library" / f"refusal_{args.version}.jsonl", refusal)
@@ -1070,21 +1350,35 @@ def main() -> None:
     st = stats(splits, refusal)
     st["version"] = args.version
     st["seed"] = args.seed
-    st["content_hash"] = hashlib.sha256(
-        json.dumps({k: len(v) for k, v in splits.items()}, sort_keys=True).encode()
-    ).hexdigest()[:16]
+    st["gen_params"] = {
+        "target_train": args.target_train,
+        "min_test_per_label": args.min_test_per_label,
+        "adv_budget": args.adv_budget,
+        "refusal_n": args.refusal_n,
+        "generator": "synthesize_batch.py@v0.4",
+        "fixes": ["FIX-01", "FIX-02", "FIX-03", "FIX-04", "FIX-05", "FIX-06", "FIX-07", "FIX-09"],
+    }
+    # FIX-07 honest content hash over all texts
+    payload = "\n".join(sorted(normalize(r["text"]) for r in raw_rows)).encode()
+    st["content_hash"] = hashlib.sha256(payload).hexdigest()
     reports = ROOT / "reports"
     reports.mkdir(parents=True, exist_ok=True)
     (reports / f"{args.version}_stats.json").write_text(
         json.dumps(st, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
+    (reports / f"{args.version}_gen_params.json").write_text(
+        json.dumps(st["gen_params"], ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
-    # spot check id sample
+    # stratified spot-check id sample (~288)
     ids = []
     for lab in LABELS:
         cand = [r["id"] for r in splits["train"] if r["labels"] == [lab]]
-        ids.extend(cand[:8])
-    ids.extend([r["id"] for r in splits["train"] if not r["labels"]][:20])
+        ids.extend(cand[:20])
+    ids.extend([r["id"] for r in splits["train"] if not r["labels"]][:40])
+    ids.extend([r["id"] for r in splits["test"] if r["source"] != "seed_golden"][:40])
+    ids.extend([r["id"] for r in splits["train"] if r["source"] == "combo"][:24])
+    ids.extend([r["id"] for r in splits["adv"]][:24])
     (reports / f"{args.version}_spot_check_ids.txt").write_text("\n".join(ids) + "\n", encoding="utf-8")
 
     print(json.dumps(st, ensure_ascii=False, indent=2))

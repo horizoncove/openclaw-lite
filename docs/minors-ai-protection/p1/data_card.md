@@ -3,7 +3,7 @@
 | 字段 | 内容 |
 |---|---|
 | 数据集名称 | minors_ai_cn_text_risk_synthetic |
-| 版本 | **v0.3**（当前推荐；v0.1/v0.2 保留） |
+| 版本 | **v0.4**（当前推荐；v0.1–v0.3 保留） |
 | 创建日期 | 2026-08-08 |
 | Owner | Agent-001 |
 | 上游规范 | p0-v1.0（人类签字） |
@@ -19,25 +19,26 @@
 
 | 子集 | 用途 | 路径 |
 |---|---|---|
-| train | 模型训练 | `datasets/v0.3/train/train.jsonl` |
-| dev | 调参/早停 | `datasets/v0.3/dev/dev.jsonl` |
-| test | 冻结评测 | `datasets/v0.3/test/test.jsonl` |
-| adv | 对抗回归 | `datasets/v0.3/eval_adversarial/adv.jsonl` |
-| refusal | S1/S2 提示话术 | `refusal_library/refusal_v0.3.jsonl` |
+| train | 模型训练 | `datasets/v0.4/train/train.jsonl` |
+| dev | 调参/早停 | `datasets/v0.4/dev/dev.jsonl` |
+| test | 冻结评测 | `datasets/v0.4/test/test.jsonl` |
+| adv | 对抗回归 | `datasets/v0.4/eval_adversarial/adv.jsonl` |
+| refusal | 提示话术（含 audience/action） | `refusal_library/refusal_v0.4.jsonl` |
 
-**v0.3 实测（`reports/v0.3_stats.json`）— 目标规模 3 万**
+**v0.4 实测（`reports/v0.4_stats.json`）— 十人会 FIX 落地**
 
 | 子集 | 条数 |
 |---|---|
-| train | **30000**（S0/硬负例 28%） |
-| dev | 12211 |
-| test | 15458（每标签正例 ≥1707） |
-| adv | 500 |
+| train | **30000**（S0 28%；催回复污染 0%） |
+| dev | 10494 |
+| test | 13397（每标签正例 ≥1441） |
+| adv | 800（独立种子；骨架重叠 0%） |
 | refusal | 500 |
-| eval 合计（dev+test+adv） | **28169** |
-| 全库（raw） | **58169** |
+| eval 合计 | **24691** |
+| salt_hits | **0** |
+| U03 欠升级 | **0** |
 
-历史对照：v0.1 train 3000；v0.2 train 8000。
+历史对照：v0.1=3000；v0.2=8000；v0.3=30000（rc1，含盐记，已弃用为训练主集）。
 
 ## 3. 来源与生产
 

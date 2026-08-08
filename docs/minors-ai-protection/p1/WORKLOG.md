@@ -29,7 +29,15 @@
 - 决议：冻结口径 **p1-v0.3-rc1**
 - 会后 FIX-01～09：去盐、S0 清洗、U03 对齐、adv/refusal/审计/抽检/伦理 lint
 
+## 2026-08-08 — v0.4 FIX 工程落地
+
+### 已完成
+- 重写 `synthesize_batch.py`：去盐、S0 清洗、U03/reason、独立 adv、refusal audience/action
+- 加强 `validate_p1.py`：盐值/伦理/U03/refusal/骨架重叠门禁
+- 发布 `datasets/v0.4`（train 30000）validator **PASS**
+- 审计：全文 `content_hash`、`gen_params.json`、种子 `review_status=imported`
+
 ### 下一步
-1. 执行 FIX → 发布 v0.4
-2. 分层抽检 ≥95% 签字
-3. 冻结 p1-v1.0；P2 探索训可与 FIX 并行
+1. 执行 FIX-08 分层抽检 ≥95%
+2. 冻结 p1-v1.0
+3. P2 探索训可并行

@@ -41,7 +41,23 @@
     },
     "reason_codes": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string",
+        "enum": [
+          "R_AGE_PROBE",
+          "R_PRIVACY_REQUEST",
+          "R_CONTACT_REQUEST",
+          "R_SCHOOL_REQUEST",
+          "R_PHOTO_REQUEST",
+          "R_OFFLINE_MEETING",
+          "R_EMOTIONAL_MANIPULATION",
+          "R_THREAT",
+          "R_FREQ_ESCALATE",
+          "R_COMBO_ESCALATE",
+          "R_SECRECY_ESCALATE",
+          "R_NEEDS_REVIEW"
+        ]
+      }
     },
     "split": {
       "type": "string",
@@ -62,7 +78,7 @@
     },
     "review_status": {
       "type": "string",
-      "enum": ["auto", "spot_checked", "needs_review", "rejected"]
+      "enum": ["auto", "imported", "spot_checked", "needs_review", "rejected"]
     },
     "annotator": { "type": "string" },
     "notes": { "type": "string" },

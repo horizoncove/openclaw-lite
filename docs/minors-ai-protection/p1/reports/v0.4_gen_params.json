@@ -1,0 +1,17 @@
+{
+  "target_train": 30000,
+  "min_test_per_label": 100,
+  "adv_budget": 800,
+  "refusal_n": 500,
+  "generator": "synthesize_batch.py@v0.4",
+  "fixes": [
+    "FIX-01",
+    "FIX-02",
+    "FIX-03",
+    "FIX-04",
+    "FIX-05",
+    "FIX-06",
+    "FIX-07",
+    "FIX-09"
+  ]
+}

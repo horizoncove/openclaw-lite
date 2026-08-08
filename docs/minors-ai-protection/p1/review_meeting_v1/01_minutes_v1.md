@@ -44,15 +44,15 @@
 
 | ID | 问题 | 提出方 | Owner | 状态 |
 |---|---|---|---|---|
-| FIX-01 | **去盐**：`stylize()` 不得把盐值写入模型可见 `text`；validator 加盐值门禁；重生数据集 | NLP/红队/T&S | 数据+算法 | 会后立即改 → v0.4 |
-| FIX-02 | **S0 催回复污染**：normal/hard_negative 禁止复用风险话术 urgency 前缀；S0 命中率目标 <10% | T&S/NLP | 数据 | 随 v0.4 |
-| FIX-03 | **U03/等级对齐 P0**：`level_for()` 词表对齐 `p0/schema/severity.yaml`；约 694 条 offline 欠升级 | 端侧/标注 | 算法 | 随 v0.4 |
-| FIX-04 | **升级 reason_codes 落盘**：combo/secrecy 等按 U02–U09 写入，schema 收紧枚举 | 端侧 | 算法 | 随 v0.4 |
-| FIX-05 | **adv 重建**：独立对抗种子；去盐骨架跨 split 重叠 <5%；谐音/委婉/慢诱导分层配额 | 红队 | 红队+数据 | 随 v0.4 |
-| FIX-06 | **refusal 清洗**：S1 禁止「拦截/阻止」；绑定 (level, audience, action)；对齐 P0 文案 | 教育/T&S | 产品+数据 | 随 v0.4 |
-| FIX-07 | **审计字段诚实化**：`content_hash` 对全文；种子勿预盖 `spot_checked`；生成参数落盘 | 审计 | 数据 | 随 v0.4 |
-| FIX-08 | **分层抽检闭环**：按 plan ≥288 条，findings 落盘，正确率 ≥95%，签字位补齐 | 全员共识 | 标注+法学 | 冻结前必做 |
-| FIX-09 | **伦理 lint 门禁**：性化/逼真门牌等关键词扫描进 validator | 伦理 | 伦理+工程 | 随 v0.4 |
+| FIX-01 | **去盐**：`stylize()` 不得把盐值写入模型可见 `text`；validator 加盐值门禁；重生数据集 | NLP/红队/T&S | 数据+算法 | **已落地 v0.4** |
+| FIX-02 | **S0 催回复污染**：normal/hard_negative 禁止复用风险话术 urgency 前缀；S0 命中率目标 <10% | T&S/NLP | 数据 | **已落地 v0.4（0%）** |
+| FIX-03 | **U03/等级对齐 P0**：`level_for()` 词表对齐 `p0/schema/severity.yaml`；约 694 条 offline 欠升级 | 端侧/标注 | 算法 | **已落地 v0.4** |
+| FIX-04 | **升级 reason_codes 落盘**：combo/secrecy 等按 U02–U09 写入，schema 收紧枚举 | 端侧 | 算法 | **已落地 v0.4** |
+| FIX-05 | **adv 重建**：独立对抗种子；去盐骨架跨 split 重叠 <5%；谐音/委婉/慢诱导分层配额 | 红队 | 红队+数据 | **已落地 v0.4（800，重叠 0%）** |
+| FIX-06 | **refusal 清洗**：S1 禁止「拦截/阻止」；绑定 (level, audience, action)；对齐 P0 文案 | 教育/T&S | 产品+数据 | **已落地 v0.4** |
+| FIX-07 | **审计字段诚实化**：`content_hash` 对全文；种子勿预盖 `spot_checked`；生成参数落盘 | 审计 | 数据 | **已落地 v0.4** |
+| FIX-08 | **分层抽检闭环**：按 plan ≥288 条，findings 落盘，正确率 ≥95%，签字位补齐 | 全员共识 | 标注+法学 | **待做（冻结阻断）** |
+| FIX-09 | **伦理 lint 门禁**：性化/逼真门牌等关键词扫描进 validator | 伦理 | 伦理+工程 | **已落地 v0.4** |
 
 ---
 

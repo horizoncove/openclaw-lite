@@ -21,19 +21,17 @@
 ## 一键生成与校验
 
 ```bash
-# 目标规模 3 万（当前推荐）
+# 当前推荐 v0.4（十人会 FIX 落地）
 python3 docs/minors-ai-protection/p1/tools/synthesize_batch.py \
-  --version v0.3 --target-train 30000 --min-test-per-label 100 \
-  --adv-budget 500 --refusal-n 500
+  --version v0.4 --target-train 30000 --min-test-per-label 100 \
+  --adv-budget 800 --refusal-n 500
 
-# 校验
-python3 docs/minors-ai-protection/p1/tools/validate_p1.py \
-  --version v0.3 --min-train 30000 --min-eval 2000 \
-  --min-test-per-label 100 --min-refusal 500
+# 校验（含去盐/U03/伦理/refusal 门禁）
+python3 docs/minors-ai-protection/p1/tools/validate_p1.py --version v0.4
 ```
 
 Owner：Agent-001  
-当前版本：**p1-v0.3-rc1**（十人评审 10/10 有条件通过；数据包仍为 v0.3）  
-规模：train **30000** / eval **28169** / refusal **500** / 全库约 **58169**  
+当前版本：**p1-v0.4**（FIX-01～07/09 已落地，validator PASS；FIX-08 抽检待做）  
+规模：train **30000** / eval **24691** / refusal **500** / adv **800**  
 评审纪要：`review_meeting_v1/01_minutes_v1.md`  
-下一阶段：会后 FIX → v0.4 → 抽检 ≥95% → 冻结 p1-v1.0；P2 探索训可并行
+下一阶段：分层抽检 ≥95% → 冻结 p1-v1.0；P2 探索训可并行

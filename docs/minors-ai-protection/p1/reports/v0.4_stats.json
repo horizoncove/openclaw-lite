@@ -1,0 +1,116 @@
+{
+  "splits": {
+    "train": {
+      "n": 30000,
+      "labels": {
+        "emotional_manipulation": 2777,
+        "threat": 2676,
+        "offline_meeting": 3135,
+        "privacy_request": 2899,
+        "__empty__": 8400,
+        "age_probe": 2870,
+        "photo_request": 2937,
+        "school_request": 3037,
+        "contact_request": 2923
+      },
+      "levels": {
+        "S1": 5013,
+        "S3": 4867,
+        "S2": 11720,
+        "S0": 8400
+      }
+    },
+    "dev": {
+      "n": 10494,
+      "labels": {
+        "school_request": 1295,
+        "photo_request": 1102,
+        "contact_request": 1215,
+        "privacy_request": 1182,
+        "age_probe": 1171,
+        "emotional_manipulation": 1152,
+        "__empty__": 1546,
+        "offline_meeting": 1304,
+        "threat": 1160
+      },
+      "levels": {
+        "S2": 4839,
+        "S1": 2075,
+        "S0": 1546,
+        "S3": 2034
+      }
+    },
+    "test": {
+      "n": 13397,
+      "labels": {
+        "contact_request": 1553,
+        "threat": 1441,
+        "__empty__": 1874,
+        "age_probe": 1518,
+        "school_request": 1682,
+        "privacy_request": 1537,
+        "offline_meeting": 1646,
+        "emotional_manipulation": 1453,
+        "photo_request": 1499
+      },
+      "levels": {
+        "S3": 2577,
+        "S0": 1874,
+        "S1": 2657,
+        "S2": 6289
+      }
+    },
+    "adv": {
+      "n": 800,
+      "labels": {
+        "age_probe": 100,
+        "privacy_request": 100,
+        "contact_request": 100,
+        "school_request": 100,
+        "photo_request": 100,
+        "offline_meeting": 100,
+        "emotional_manipulation": 100,
+        "threat": 100
+      },
+      "levels": {
+        "S1": 200,
+        "S2": 400,
+        "S3": 200
+      }
+    }
+  },
+  "per_label_test_pos": {
+    "age_probe": 1518,
+    "privacy_request": 1537,
+    "contact_request": 1553,
+    "school_request": 1682,
+    "photo_request": 1499,
+    "offline_meeting": 1646,
+    "emotional_manipulation": 1453,
+    "threat": 1441
+  },
+  "refusal": 500,
+  "s0_urgency_rate": 0.0,
+  "salt_hits": 0,
+  "adv_train_skeleton_overlap": 0.0,
+  "version": "v0.4",
+  "seed": 42,
+  "gen_params": {
+    "target_train": 30000,
+    "min_test_per_label": 100,
+    "adv_budget": 800,
+    "refusal_n": 500,
+    "generator": "synthesize_batch.py@v0.4",
+    "fixes": [
+      "FIX-01",
+      "FIX-02",
+      "FIX-03",
+      "FIX-04",
+      "FIX-05",
+      "FIX-06",
+      "FIX-07",
+      "FIX-09"
+    ]
+  },
+  "content_hash": "2ac96625b72e9e8eba227761dc64c0ea881e4b5d25a9f155871facc73fec877a"
+}
