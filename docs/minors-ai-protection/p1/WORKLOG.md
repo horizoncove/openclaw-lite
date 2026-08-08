@@ -21,7 +21,15 @@
 - v0.3：按人类目标 **3 万** 生成 train 30000 / eval 28169 / refusal 500
 - `validate_p1.py --version v0.3` PASS
 
+## 2026-08-08 — 十人专家评审会
+
+### 已完成
+- 组织 10 角色 Agent 并行评审（全票有条件通过）
+- 纪要：`review_meeting_v1/01_minutes_v1.md`
+- 决议：冻结口径 **p1-v0.3-rc1**
+- 会后 FIX-01～09：去盐、S0 清洗、U03 对齐、adv/refusal/审计/抽检/伦理 lint
+
 ### 下一步
-1. 按 spot_check_plan（v0.3）完成抽检
-2. 抽检通过后冻结 p1-v1.0
-3. 开 P2
+1. 执行 FIX → 发布 v0.4
+2. 分层抽检 ≥95% 签字
+3. 冻结 p1-v1.0；P2 探索训可与 FIX 并行

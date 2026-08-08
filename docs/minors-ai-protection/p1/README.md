@@ -33,6 +33,7 @@ python3 docs/minors-ai-protection/p1/tools/validate_p1.py \
 ```
 
 Owner：Agent-001  
-当前版本：**p1-v0.3**（目标规模 3 万；v0.1/v0.2 保留对照）  
+当前版本：**p1-v0.3-rc1**（十人评审 10/10 有条件通过；数据包仍为 v0.3）  
 规模：train **30000** / eval **28169** / refusal **500** / 全库约 **58169**  
-下一阶段：抽检 ≥95% 后冻结 p1-v1.0 → 开 P2
+评审纪要：`review_meeting_v1/01_minutes_v1.md`  
+下一阶段：会后 FIX → v0.4 → 抽检 ≥95% → 冻结 p1-v1.0；P2 探索训可并行
