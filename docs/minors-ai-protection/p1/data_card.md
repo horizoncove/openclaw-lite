@@ -3,7 +3,7 @@
 | 字段 | 内容 |
 |---|---|
 | 数据集名称 | minors_ai_cn_text_risk_synthetic |
-| 版本 | **v0.2**（当前推荐；v0.1 保留） |
+| 版本 | **v0.3**（当前推荐；v0.1/v0.2 保留） |
 | 创建日期 | 2026-08-08 |
 | Owner | Agent-001 |
 | 上游规范 | p0-v1.0（人类签字） |
@@ -19,24 +19,25 @@
 
 | 子集 | 用途 | 路径 |
 |---|---|---|
-| train | 模型训练 | `datasets/v0.2/train/train.jsonl` |
-| dev | 调参/早停 | `datasets/v0.2/dev/dev.jsonl` |
-| test | 冻结评测 | `datasets/v0.2/test/test.jsonl` |
-| adv | 对抗回归 | `datasets/v0.2/eval_adversarial/adv.jsonl` |
-| refusal | S1/S2 提示话术 | `refusal_library/refusal_v0.2.jsonl` |
+| train | 模型训练 | `datasets/v0.3/train/train.jsonl` |
+| dev | 调参/早停 | `datasets/v0.3/dev/dev.jsonl` |
+| test | 冻结评测 | `datasets/v0.3/test/test.jsonl` |
+| adv | 对抗回归 | `datasets/v0.3/eval_adversarial/adv.jsonl` |
+| refusal | S1/S2 提示话术 | `refusal_library/refusal_v0.3.jsonl` |
 
-**v0.2 实测（`reports/v0.2_stats.json`）**
+**v0.3 实测（`reports/v0.3_stats.json`）— 目标规模 3 万**
 
 | 子集 | 条数 |
 |---|---|
-| train | 8000（S0/硬负例约 41%） |
-| dev | 3296 |
-| test | 4439（每标签正例 ≥469） |
-| adv | 240 |
-| refusal | 320 |
-| eval 合计（dev+test+adv） | 7975 |
+| train | **30000**（S0/硬负例 28%） |
+| dev | 12211 |
+| test | 15458（每标签正例 ≥1707） |
+| adv | 500 |
+| refusal | 500 |
+| eval 合计（dev+test+adv） | **28169** |
+| 全库（raw） | **58169** |
 
-历史对照 v0.1：train 3000 / eval 1245 / refusal 220（`datasets/v0.1/`）。
+历史对照：v0.1 train 3000；v0.2 train 8000。
 
 ## 3. 来源与生产
 

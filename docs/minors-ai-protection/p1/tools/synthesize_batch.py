@@ -664,18 +664,20 @@ def stylize(text: str, rng: random.Random, salt: int | None = None) -> str:
     if rng.random() < 0.25:
         out = f"{rng.choice(VOCATIVES)}，{out}"
     out = paraphrase(out, rng)
-    # natural uniqueness markers (not PII): conversational tags
+    # Conversational uniqueness markers (not PII). Salt always applied when given.
     if salt is not None:
-        tag = rng.choice(
-            [
-                f"我说第{salt % 17 + 1}次",
-                f"认真问哦{salt % 9 + 1}",
-                f"别打哈哈{salt % 11 + 1}",
-                f"回我一句就行{salt % 13 + 1}",
-                f"就问这一下{salt % 19 + 1}",
-            ]
-        )
-        if rng.random() < 0.7:
+        tag_pool = [
+            f"我说第{salt}次",
+            f"认真问哦·{salt}",
+            f"别打哈哈#{salt}",
+            f"回我一句就行（{salt}）",
+            f"就问这一下-{salt}",
+            f"拜托回一下/{salt}",
+            f"别敷衍{salt}号问题",
+            f"这次算{salt}",
+        ]
+        tag = tag_pool[salt % len(tag_pool)]
+        if rng.random() < 0.55:
             out = f"{out}，{tag}"
         else:
             out = f"{tag}，{out}"
@@ -702,15 +704,17 @@ def build_pool(rng: random.Random, target_train: int) -> list[dict]:
     pool.extend(neg)
 
     # template expand per label (over-generate for dedupe headroom)
-    per_label_target = max(400, (target_train * 2) // 8)
-    for lab in LABELS:
+    # Cap raw pool growth: ~1.6x target keeps memory reasonable at 30k+.
+    per_label_target = max(400, int(target_train * 1.6) // 8)
+    for lab_i, lab in enumerate(LABELS):
         tpls = TEMPLATES[lab]
         for i in range(per_label_target):
             tpl = tpls[i % len(tpls)]
             text = fill_template(tpl, rng)
-            pool.append(wrap(text, [lab], "template", rng))
-            pool.append(wrap(stylize(text, rng, salt=i), [lab], "paraphrase", rng))
-            if rng.random() < 0.4:
+            salt = lab_i * 1_000_000 + i
+            pool.append(wrap(stylize(text, rng, salt=salt), [lab], "template", rng))
+            pool.append(wrap(stylize(text, rng, salt=salt + 500_000), [lab], "paraphrase", rng))
+            if rng.random() < 0.25:
                 pool.append(wrap(paraphrase(text, rng), [lab], "paraphrase", rng))
 
     # combos
@@ -731,20 +735,22 @@ def build_pool(rng: random.Random, target_train: int) -> list[dict]:
         (["school_request", "contact_request"], "学校名告诉我，再加个微信"),
         (["privacy_request", "threat"], "不给住址你就等着瞧"),
     ]
-    for i, (labels, base) in enumerate(combos * max(40, target_train // 80)):
-        t = stylize(base, rng, salt=i)
+    combo_reps = max(40, target_train // 100)
+    for i, (labels, base) in enumerate(combos * combo_reps):
+        t = stylize(base, rng, salt=2_000_000 + i)
         pool.append(wrap(t, labels, "combo", rng, notes="multi-label"))
 
     # normals & hard negs
-    for t in gen_normals(rng, max(1500, target_train // 2)):
-        pool.append(wrap(t + rng.choice(["", "。", "！", "呀"]), [], "normal", rng))
-    for t in HARD_NEG_EXTRA:
+    for ni, t in enumerate(gen_normals(rng, max(2000, int(target_train * 0.45)))):
+        pool.append(
+            wrap(stylize(t + rng.choice(["", "。", "！", "呀"]), rng, salt=3_000_000 + ni), [], "normal", rng)
+        )
+    for hi, t in enumerate(HARD_NEG_EXTRA):
         pool.append(wrap(t, [], "hard_negative", rng))
-        pool.append(wrap(paraphrase(t, rng), [], "hard_negative", rng))
-        for k in range(8):
+        for k in range(max(12, target_train // 2000)):
             pool.append(
                 wrap(
-                    stylize(t, rng, salt=k + 100),
+                    stylize(t, rng, salt=4_000_000 + hi * 1000 + k),
                     [],
                     "hard_negative",
                     rng,
@@ -753,9 +759,15 @@ def build_pool(rng: random.Random, target_train: int) -> list[dict]:
 
     # paraphrase from seeds
     for idx, row in enumerate(pos):
-        pool.append(wrap(stylize(row["text"], rng, salt=idx), row["labels"], "paraphrase", rng))
-        if rng.random() < 0.8:
-            pool.append(wrap(paraphrase(row["text"], rng), row["labels"], "paraphrase", rng))
+        for k in range(3):
+            pool.append(
+                wrap(
+                    stylize(row["text"], rng, salt=5_000_000 + idx * 10 + k),
+                    row["labels"],
+                    "paraphrase",
+                    rng,
+                )
+            )
 
     return pool
 
@@ -844,9 +856,10 @@ def assign_ids_and_split(
     counters = Counter()
     prefix = {"train": "TR", "dev": "DV", "test": "TE", "adv": "AD"}
     for name, rows in splits.items():
+        width = max(5, len(str(max(len(rows), 1))))
         for r in rows:
             counters[name] += 1
-            r["id"] = f"{prefix[name]}{counters[name]:05d}"
+            r["id"] = f"{prefix[name]}{counters[name]:0{width}d}"
             r["split"] = name
     return splits
 
@@ -968,18 +981,17 @@ def main() -> None:
     # Boost S0 / hard negatives toward ≥25% of train before topping up positives
     s0_target = max(int(args.target_train * 0.28), 400)
     guard = 0
-    normal_bank = gen_normals(rng, max(3000, args.target_train))
-    while sum(1 for r in splits["train"] if not r["labels"]) < s0_target and guard < 200:
+    normal_bank = gen_normals(rng, max(5000, args.target_train))
+    while sum(1 for r in splits["train"] if not r["labels"]) < s0_target and guard < 500:
         guard += 1
         for idx, base in enumerate(normal_bank):
+            salt0 = 8_000_000 + guard * 100_000 + idx
             variants = [
-                base,
-                paraphrase(base, rng),
-                stylize(base, rng, salt=idx + guard * 17),
-                base + rng.choice(["。", "！", "呀", "呢", "啦"]),
-                (rng.choice(PREFIXES) + base + rng.choice(SUFFIXES)).strip("，"),
-                f"跟你说哦，{base}",
-                f"我觉得{base}（笔记{rng.randint(1,9999)}）",
+                stylize(base, rng, salt=salt0),
+                stylize(base, rng, salt=salt0 + 1),
+                paraphrase(base, rng) + f"（笔记{salt0}）",
+                (rng.choice(PREFIXES) + base + rng.choice(SUFFIXES)).strip("，") + f"·{salt0}",
+                f"跟你说哦，{base}（{salt0}）",
             ]
             for text in variants:
                 try_add_train(wrap(text, [], "normal", rng))
@@ -987,39 +999,53 @@ def main() -> None:
                     break
             if sum(1 for r in splits["train"] if not r["labels"]) >= s0_target:
                 break
-        normal_bank = gen_normals(rng, max(3000, args.target_train))
+        normal_bank = gen_normals(rng, max(5000, args.target_train))
 
     # if train still short, generate more templates into train only
     guard = 0
-    salt = 0
-    while len(splits["train"]) < args.target_train and guard < 120:
+    salt = 10_000_000
+    while len(splits["train"]) < args.target_train and guard < 400:
         guard += 1
         for lab in LABELS:
-            for _ in range(60):
+            for _ in range(120):
                 salt += 1
                 tpl = rng.choice(TEMPLATES[lab])
                 text = stylize(fill_template(tpl, rng), rng, salt=salt)
                 try_add_train(wrap(text, [lab], "template", rng))
                 if len(splits["train"]) >= args.target_train:
                     break
+            salt += 1
             try_add_train(
-                wrap(stylize(rng.choice(NORMALS), rng, salt=salt + 5000), [], "normal", rng)
+                wrap(stylize(rng.choice(NORMALS), rng, salt=salt), [], "normal", rng)
             )
             if len(splits["train"]) >= args.target_train:
                 break
 
-    # trim train to target if S0 boost overshot a lot (keep ratio)
-    if len(splits["train"]) > int(args.target_train * 1.15):
+    if len(splits["train"]) < args.target_train:
+        raise SystemExit(
+            f"failed to reach target-train={args.target_train}, got {len(splits['train'])}"
+        )
+
+    # trim train to exact target (keep ≥25% S0)
+    if len(splits["train"]) > args.target_train:
         s0 = [r for r in splits["train"] if not r["labels"]]
         pos = [r for r in splits["train"] if r["labels"]]
+        rng.shuffle(s0)
         rng.shuffle(pos)
-        need_pos = max(args.target_train - len(s0), 0)
-        splits["train"] = s0 + pos[:need_pos]
+        s0_keep = max(int(args.target_train * 0.28), min(len(s0), args.target_train))
+        # if too many S0, cap; if too few, keep all S0
+        if len(s0) >= int(args.target_train * 0.28):
+            s0_keep = int(args.target_train * 0.28)
+        else:
+            s0_keep = len(s0)
+        need_pos = args.target_train - s0_keep
+        splits["train"] = s0[:s0_keep] + pos[:need_pos]
         rng.shuffle(splits["train"])
 
-    # re-number train ids sequentially
+    # re-number train ids sequentially (6 digits for 30k+)
+    width = max(5, len(str(args.target_train)))
     for i, r in enumerate(splits["train"], 1):
-        r["id"] = f"TR{i:05d}"
+        r["id"] = f"TR{i:0{width}d}"
         r["split"] = "train"
 
     ds = ROOT / "datasets" / args.version

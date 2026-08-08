@@ -11,18 +11,17 @@
 - 跑通 `validate_p1.py`
 
 ### 状态
-- **p1-v0.1**：首批合成已落地
-- **p1-v0.2**：扩量完成（train 8000），validator PASS
+- **p1-v0.3**：目标规模 3 万已达成（train 30000），validator PASS
 - 未宣称 P1 完成（仍差抽检 ≥95% 冻结）
 
-## 2026-08-08 — 扩量样本 v0.2
+## 2026-08-08 — 扩量样本 v0.2 / v0.3
 
 ### 已完成
-- 模板库扩至每标签约 30 句式；增加 stylize 改写轴
-- 生成 `datasets/v0.2`：train 8000 / eval 7975 / refusal 320
-- `validate_p1.py --version v0.2` PASS
+- v0.2：train 8000
+- v0.3：按人类目标 **3 万** 生成 train 30000 / eval 28169 / refusal 500
+- `validate_p1.py --version v0.3` PASS
 
 ### 下一步
-1. 按 spot_check_plan（v0.2）完成抽检
+1. 按 spot_check_plan（v0.3）完成抽检
 2. 抽检通过后冻结 p1-v1.0
 3. 开 P2

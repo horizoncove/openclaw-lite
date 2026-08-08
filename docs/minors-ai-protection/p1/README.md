@@ -21,18 +21,18 @@
 ## 一键生成与校验
 
 ```bash
-# 从 P0 导入种子 + 模板扩写 + 划分（扩量示例）
+# 目标规模 3 万（当前推荐）
 python3 docs/minors-ai-protection/p1/tools/synthesize_batch.py \
-  --version v0.2 --target-train 8000 --min-test-per-label 60 \
-  --adv-budget 240 --refusal-n 320
+  --version v0.3 --target-train 30000 --min-test-per-label 100 \
+  --adv-budget 500 --refusal-n 500
 
 # 校验
 python3 docs/minors-ai-protection/p1/tools/validate_p1.py \
-  --version v0.2 --min-train 8000 --min-eval 800 \
-  --min-test-per-label 60 --min-refusal 300
+  --version v0.3 --min-train 30000 --min-eval 2000 \
+  --min-test-per-label 100 --min-refusal 500
 ```
 
 Owner：Agent-001  
-当前版本：**p1-v0.2**（扩量合成；v0.1 保留对照）  
-规模：train 8000 / eval ~7975 / refusal 320  
+当前版本：**p1-v0.3**（目标规模 3 万；v0.1/v0.2 保留对照）  
+规模：train **30000** / eval **28169** / refusal **500** / 全库约 **58169**  
 下一阶段：抽检 ≥95% 后冻结 p1-v1.0 → 开 P2

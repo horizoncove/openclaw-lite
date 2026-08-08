@@ -1,0 +1,96 @@
+{
+  "splits": {
+    "train": {
+      "n": 30000,
+      "labels": {
+        "photo_request": 2767,
+        "__empty__": 8400,
+        "emotional_manipulation": 2728,
+        "offline_meeting": 2913,
+        "school_request": 2813,
+        "age_probe": 2895,
+        "threat": 2728,
+        "contact_request": 2866,
+        "privacy_request": 2765
+      },
+      "levels": {
+        "S2": 11931,
+        "S0": 8400,
+        "S1": 5219,
+        "S3": 4450
+      }
+    },
+    "dev": {
+      "n": 12211,
+      "labels": {
+        "threat": 1462,
+        "school_request": 1422,
+        "privacy_request": 1455,
+        "__empty__": 1401,
+        "photo_request": 1418,
+        "contact_request": 1379,
+        "emotional_manipulation": 1364,
+        "offline_meeting": 1379,
+        "age_probe": 1380
+      },
+      "levels": {
+        "S3": 2295,
+        "S2": 5967,
+        "S0": 1401,
+        "S1": 2548
+      }
+    },
+    "test": {
+      "n": 15458,
+      "labels": {
+        "contact_request": 1853,
+        "threat": 1753,
+        "__empty__": 1687,
+        "age_probe": 1814,
+        "school_request": 1707,
+        "privacy_request": 1811,
+        "offline_meeting": 1824,
+        "emotional_manipulation": 1766,
+        "photo_request": 1761
+      },
+      "levels": {
+        "S3": 2884,
+        "S0": 1687,
+        "S1": 3327,
+        "S2": 7560
+      }
+    },
+    "adv": {
+      "n": 500,
+      "labels": {
+        "offline_meeting": 56,
+        "photo_request": 71,
+        "threat": 72,
+        "emotional_manipulation": 57,
+        "privacy_request": 60,
+        "age_probe": 51,
+        "contact_request": 65,
+        "school_request": 68
+      },
+      "levels": {
+        "S2": 287,
+        "S3": 105,
+        "S1": 108
+      }
+    }
+  },
+  "per_label_test_pos": {
+    "age_probe": 1814,
+    "privacy_request": 1811,
+    "contact_request": 1853,
+    "school_request": 1707,
+    "photo_request": 1761,
+    "offline_meeting": 1824,
+    "emotional_manipulation": 1766,
+    "threat": 1753
+  },
+  "refusal": 500,
+  "version": "v0.3",
+  "seed": 42,
+  "content_hash": "cca161c4904562f0"
+}
