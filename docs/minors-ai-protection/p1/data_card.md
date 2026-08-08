@@ -44,15 +44,15 @@
 
 - P0 `examples/*.md` 正负例种子  
 - P0 `golden/golden_set.jsonl`（进入 test）  
-- 模板槽位填充与轻量同义改写（`tools/synthesize_batch.py`）  
+- 模板槽位填充与轻量同义改写（`tools/synthesize_batch.py@v0.4`，无盐值指纹）  
 - **未使用**真实用户日志、未授权抓取、成人业务语料  
-- v0.1 **未启用**外部 LLM API
+- **未启用**外部 LLM API  
 
 ## 4. 标注
 
 - 标签体系：p0 `schema/labels.yaml`  
-- 等级：默认映射 + 简化升级启发（threat→S3；offline+时间地点→S3）  
-- `review_status=auto` 表示规则生成待抽检  
+- 等级：对齐 P0 U03 词表 + 升级 reason_codes（combo/secrecy）  
+- `review_status=auto` 表示规则生成待抽检；P0 种子为 `imported`（非预盖章 spot_checked）  
 - 抽检计划：`reports/spot_check_plan.md`
 
 ## 5. 伦理与风险
