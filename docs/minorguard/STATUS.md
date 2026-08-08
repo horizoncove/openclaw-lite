@@ -63,8 +63,22 @@ P2 foundation ──► 本文档冻结 ──► P3 开发 ──► P3 验收
 - 双轨映射（产品四类风险 ↔ 研究标签/等级）
 - 安全与密钥处理基线
 
-### 不做（本轮只写文档，不写业务代码）
+### 不做（文档阶段）
 
 - 不把演示包源码/密钥提交进仓库
 - 不宣称已具备法律合规认证
 - 不估算日历工期；只定义交付物与技术依赖
+
+## 5. 编码进展（2026-08-08）
+
+已落地：`apps/minorguard-api`（`0.4.0-p3-mvp`）
+
+| Epic | 状态 |
+|---|---|
+| A 工程骨架 | 完成 |
+| B 领域迁移（规则/策略/LLM/编排） | 完成（本地规则+可选云） |
+| C SQLite 台账 + Admin 鉴权 + 审计 | 完成（Postgres 可选未做） |
+| D p3-check / security-scan / contract | 完成（全量红队续接） |
+| E ONNX Adapter | 仅 stub |
+
+验证：`npm run test:contract && npm run p3:check && npm run security:scan` 已通过。

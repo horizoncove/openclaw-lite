@@ -32,6 +32,10 @@
 
 ---
 
+## 实现入口
+
+代码：[`apps/minorguard-api/`](../../apps/minorguard-api/)（`npm start` → `:5178`）
+
 ## 下一阶段一句话
 
 > **把已可演示的 MinorGuard（规则 + LLM + 策略）升级为可部署 MVP：模块化服务、持久化台账、鉴权审计、稳定契约，并与研究轨端侧模型对齐。**

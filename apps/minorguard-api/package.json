@@ -1,0 +1,18 @@
+{
+  "name": "minorguard-api",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "description": "MinorGuard P3 MVP API — on-device-first minors generative-AI safety",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "p3:check": "node scripts/p3-check.mjs",
+    "security:scan": "node scripts/security-scan.mjs",
+    "test:contract": "node tests/contract.test.mjs",
+    "redteam:smoke": "node -e \"process.env.REDTEAM_MAX_CASES='3'; import('./scripts/redteam-smoke.mjs')\""
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

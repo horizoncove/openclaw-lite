@@ -1,5 +1,11 @@
 # MinorGuard 文档工作日志
 
+## 2026-08-08 — P3 编码启动（Epic A–D）
+
+- 新增 `apps/minorguard-api`：模块化 API、SQLite、`/api`+`/api/v1`、Demo 静态页
+- 脚本：`p3:check` / `security:scan` / `test:contract` / `redteam:smoke` 通过
+- 未入库任何云 API Key；ONNX 适配器仅占位
+
 ## 2026-08-08 — 研究意义论文
 
 - 新增工作论文：`papers/研究意义_未成年人生成式AI交互安全与端侧合规保护.md`
