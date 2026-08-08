@@ -137,7 +137,7 @@ id, text, labels, expected_level, reason_codes, split, source, review_status, an
 4. `offline_meeting` + 简化时间/地点词 → S3  
 5. `age_probe`+`contact_request` → 至少 S2  
 
-复算结果：相对生成器自身 **580168/58169 一致**（仅金标 `TE00022` 有意偏离且更正确）。  
+复算结果：相对生成器自身 **58168/58169 一致**（仅金标 `TE00022` 有意偏离且更正确）。  
 相对 P0 权威词表：**≈694 条 offline 欠升级**——这是端侧规则引擎与数据集监督信号对齐的核心缺陷，不是随机噪声。
 
 ## 7) 端侧工程专项意见
