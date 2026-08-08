@@ -1,15 +1,17 @@
-# P0 工作区
+# P0 工作区（Agent-001 执行中）
 
-本目录存放 P0 四件交付物。启动方法见上一级 `P0启动指南.md`。
+启动方法见上一级 `P0启动指南.md`。
 
 | 文件 | 状态 |
 |---|---|
-| [decisions.md](./decisions.md) | 待填写 |
-| [scenarios.md](./scenarios.md) | 骨架已给 |
-| [labels.md](./labels.md) | 骨架已给 |
-| [severity.md](./severity.md) | 初稿已给 |
-| [law_mapping.csv](./law_mapping.csv) | 表头+示例 |
-| [examples/](./examples/) | 按标签补例 |
+| [decisions.md](./decisions.md) | 已启动 |
+| [scenarios.md](./scenarios.md) | 执行稿 |
+| [labels.md](./labels.md) | 执行稿 |
+| [severity.md](./severity.md) | 执行稿 |
+| [law_mapping.csv](./law_mapping.csv) | 22 条 |
+| [examples/](./examples/) | 8/8 标签草稿齐 |
+| [encoding_checklist.md](./encoding_checklist.md) | 自检 PASS |
+| [WORKLOG.md](./WORKLOG.md) | 首日日志 |
 
-Owner：待指定  
-目标评审日：Kickoff 后第 14 天
+Owner：Agent-001（临时）  
+正式 v1.0：待法学复核后冻结

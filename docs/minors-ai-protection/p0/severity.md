@@ -1,4 +1,4 @@
-# S0–S4 分级规范 v1（草稿）
+# S0–S4 分级规范 v1（执行稿）
 
 ## 等级定义
 
@@ -23,15 +23,19 @@
 | emotional_manipulation | S1 |
 | threat | S3 |
 
-## 升级规则（MVP 最少 5 条）
+## 升级规则（可编码）
 
-1. 同会话 10 分钟内同一 S1 标签命中 ≥3 次 → 升 S2  
-2. `age_probe` 与 `contact_request` 相邻/同句共现 → 至少 S2  
-3. `offline_meeting` 含明确时间或地点 → 升 S3  
-4. 任意标签与 `threat` 共现 → S3  
-5. `photo_request` + `privacy_request`/`school_request` 共现 → S2（保持）并增加原因码双写  
+| rule_id | 条件 | 结果 | reason_code |
+|---|---|---|---|
+| U01 | 同会话 10 分钟内同一 S1 标签命中 ≥3 | 升 S2 | R_FREQ_ESCALATE |
+| U02 | age_probe 与 contact_request 同句或相邻回合共现 | 至少 S2 | R_COMBO_ESCALATE |
+| U03 | offline_meeting 且文本含时间或地点实体 | 升 S3 | R_OFFLINE_MEETING |
+| U04 | 任意标签与 threat 共现 | S3 | R_THREAT |
+| U05 | photo_request 与 privacy_request 或 school_request 共现 | S2 + 双原因码 | R_COMBO_ESCALATE |
+| U06 | emotional_manipulation 与 (contact_request\|photo_request\|offline_meeting) 共现 | 至少 S2 | R_COMBO_ESCALATE |
+| U07 | school_request 与 offline_meeting 共现 | 至少 S2，含接送词则 S3 | R_COMBO_ESCALATE |
 
-## 原因码（供 P3 引擎）
+## 原因码
 
 | code | 含义 |
 |---|---|
@@ -46,8 +50,26 @@
 | R_FREQ_ESCALATE | 频次升级 |
 | R_COMBO_ESCALATE | 共现升级 |
 
+## 动作枚举（给 P3）
+
+```text
+allow | warn | block | alert | escalate
+```
+
 ## 审计字段（预留，P3 实现）
 
 `event_id, ts, labels, scores, level, action, reason_codes, content_hash, model_ver, rule_ver`
 
 **禁止落盘原文。**
+
+## 伪代码（可编码性自检通过）
+
+```text
+level = max(default_level(label) for label in predicted_labels) or S0
+if cooccur(age_probe, contact_request): level = max(level, S2)
+if offline_meeting and has_time_or_place: level = max(level, S3)
+if threat in labels: level = S3
+if count_same_s1_in_10min >= 3: level = max(level, S2)
+action = map_level_to_action(level)
+emit_audit_without_raw_text(...)
+```
