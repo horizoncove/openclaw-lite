@@ -1,16 +1,22 @@
-# P0 可编码性自检（Agent-001）
+# P0 可编码性自检（强化后）
 
-日期：2026-08-08
+日期：2026-08-08  
+执行：`python3 tools/validate_p0.py`
 
 | 检查项 | 结果 | 说明 |
 |---|---|---|
-| 每个标签有稳定英文 key | PASS | 见 labels.md |
-| 每个等级有唯一 action 枚举 | PASS | allow/warn/block/alert/escalate |
-| 有明确共现/频次升级规则 | PASS | U01–U07 |
-| 输出原因码枚举 | PASS | R_* |
-| 不依赖模糊语感作为唯一依据 | PASS | 标签定义+正负例边界 |
-| 日志字段已列出且无原文 | PASS | severity.md |
-| 条款映射 ≥20 | PASS | law_mapping.csv 22 行数据 |
+| 每个标签有稳定英文 key | PASS | schema/labels.yaml |
+| 每个等级有唯一 action 枚举 | PASS | schema/severity.yaml |
+| 共现/频次/保密升级规则 | PASS | U01–U09 |
+| 原因码枚举 | PASS | schema/reason_codes.yaml |
+| 冲突裁决表 | PASS | conflict_matrix.md |
+| 标注手册 | PASS | annotation_guide.md |
+| 金标集 ≥40 且覆盖 8 标签 | PASS | golden/golden_set.jsonl |
+| 条款映射 ≥20 | PASS | law_mapping.csv 22 行 |
 | 每标签 ≥20 正例 / ≥10 负例 | PASS | examples/* |
+| 用户提示文案 | PASS | user_facing_copy.md |
+| 自动化校验脚本 | PASS | tools/validate_p0.py |
+| 日志字段无原文 | PASS | forbid_raw_text_logging |
 
-**结论：P0 技术可编码性通过。正式 v1.0 仍待法学复核后冻结。**
+**技术结论：P0 强化稿达到可评审冻结条件。**  
+**管理结论：正式 v1.0 仍待法学签字（见 review_pack.md）。**

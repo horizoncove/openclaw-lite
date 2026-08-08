@@ -34,6 +34,8 @@
 | U05 | photo_request 与 privacy_request 或 school_request 共现 | S2 + 双原因码 | R_COMBO_ESCALATE |
 | U06 | emotional_manipulation 与 (contact_request\|photo_request\|offline_meeting) 共现 | 至少 S2 | R_COMBO_ESCALATE |
 | U07 | school_request 与 offline_meeting 共现 | 至少 S2，含接送词则 S3 | R_COMBO_ESCALATE |
+| U08 | privacy_request 与 offline_meeting 共现 | 至少 S2 | R_COMBO_ESCALATE |
+| U09 | 出现保密词（别告诉家长等）且叠加高风险标签 | 至少 S2 | R_COMBO_ESCALATE / R_SECRECY_ESCALATE |
 
 ## 原因码
 

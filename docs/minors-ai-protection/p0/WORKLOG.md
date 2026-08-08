@@ -3,23 +3,29 @@
 ## 2026-08-08 — Agent-001 入职首日
 
 ### 已完成
-- 担任临时 P0 Owner，启动执行稿（非最终法学签字版）
-- 更新 `decisions.md` / `labels.md` / `scenarios.md` / `severity.md`
+- 担任临时 P0 Owner，启动执行稿
+- 更新 decisions / labels / scenarios / severity
 - 完成 8 个 MVP 标签合成正负例（各 20/10）
-- `law_mapping.csv` 扩至 22 条映射
-- 完成可编码性自检 `encoding_checklist.md`
+- law_mapping 扩至 22 条
+- 可编码性自检 PASS
 
-### 未完成（需真人协作）
-- 法学复核条款编号与同学问年级降级策略
-- 标注员交叉抽检 examples
-- 正式评审会签字冻结 v1.0
+## 2026-08-08 — P0 强化回合
 
-### 下一步（P0 收尾 → P1）
-1. 安排法学 1 次 60 分钟复核会
-2. 抽检每标签 5 条正例/3 条负例
-3. 通过后开 P1：合成数据流水线与评测集冻结
+### 已完成
+- 机器可读 schema：`labels.yaml` / `severity.yaml` / `reason_codes.yaml`
+- 标注手册、冲突裁决表、硬边角案例
+- 金标集 40 条（`golden/golden_set.jsonl`）
+- 用户提示文案库
+- 评审冻结包 `review_pack.md`
+- 条款映射审校说明
+- 校验脚本 `tools/validate_p0.py`（本地 PASS）
+- 升级规则扩展到 U09（保密加成）
 
-### 工时记录（约）
-- 规范与场景：1.5h
-- 八标签示例：2.5h
-- 映射与自检：0.5h
+### 当前状态
+- **技术侧：可进入评审冻结**
+- **管理侧：等待法学/产品签字**
+
+### 下一步
+1. 组织 review_pack 评审会（60–90 分钟）
+2. 消化开放项后打 `v1.0` tag
+3. 启动 P1：按金标与标签字典扩合成训练集
