@@ -711,7 +711,12 @@ async function loadHealth() {
   try {
     const response = await fetch("/api/health");
     if (response.ok) {
-      serverStatus = await response.json();
+      const data = await response.json();
+      serverStatus = {
+        ...data,
+        provider: data.llm?.enabled ? data.llm.provider : data.provider || "local",
+        model: data.llm?.enabled ? data.llm.model : data.model || "local-rules",
+      };
     }
   } catch {
     serverStatus = {

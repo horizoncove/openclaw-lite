@@ -20,7 +20,8 @@ function walk(dir) {
       for (const m of text.matchAll(KEY_RE)) {
         const val = m[0];
         if (val.includes("your_deepseek") || val.endsWith("here")) continue;
-        if (name === ".env.example" && /your_|change.me|example/i.test(text)) continue;
+        if (/sk-(xxxx|test|example|mock)/i.test(val)) continue;
+        if (name === ".env.example" && /your_|change.me|example|sk-xxxx/i.test(text)) continue;
         hits.push({ file: path.relative(ROOT, p), sample: val.slice(0, 12) + "…" });
       }
     }

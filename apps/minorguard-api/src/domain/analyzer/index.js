@@ -1,4 +1,4 @@
-import { cloudEnabled, config } from "../../infra/config.js";
+import { llmEnabled, resolveProvider } from "../llm/providers.js";
 import {
   analyzeConversation as pipelineAnalyze,
   analyzeLocal,
@@ -10,15 +10,14 @@ import {
 
 /** Respect CLOUD_LLM_ENABLED / missing key by forcing local path. */
 export async function analyzeConversation(conversation) {
-  if (!cloudEnabled()) {
+  if (!llmEnabled()) {
+    const provider = resolveProvider();
     const local = analyzeLocal(conversation);
     return applyPolicyTuning(conversation, {
       ...local,
       provider: "local",
       model: "local-rules",
-      note: config.DEEPSEEK_API_KEY
-        ? "CLOUD_LLM_ENABLED=false，使用本地规则。"
-        : "未配置 DEEPSEEK_API_KEY，使用本地规则。",
+      note: `云模型未启用（${provider.id}: ${provider.reason}），使用本地规则。`,
     });
   }
   return pipelineAnalyze(conversation);
@@ -53,14 +52,15 @@ export async function chat(messagesInput, { save } = {}) {
   const combinedRisk = highRiskFastPath
     ? applyPolicyTuning(`${userText}\nAI：${reply}`, risk)
     : await analyzeConversation(`${userText}\nAI：${reply}`);
+  const provider = resolveProvider();
   return {
     reply,
     risk: combinedRisk,
     userText,
     fastPath: highRiskFastPath,
     policyMode: highRiskFastPath ? "high_risk_fast_path" : "model_assisted",
-    provider: cloudEnabled() ? "deepseek" : "local",
-    model: cloudEnabled() ? config.DEEPSEEK_MODEL : "local-rules",
+    provider: llmEnabled() ? provider.id : "local",
+    model: llmEnabled() ? provider.model : "local-rules",
     save,
   };
 }

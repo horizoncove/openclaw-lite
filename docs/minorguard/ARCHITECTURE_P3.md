@@ -20,7 +20,7 @@
 │  Domain Services                                         │
 │  ├─ Analyzer      (pipeline orchestrator)                │
 │  ├─ LocalRules    (keywords/regex)                       │
-│  ├─ CloudLLM      (DeepSeek-compatible)                  │
+│  ├─ CloudLLM      (Doubao/Ark · DeepSeek · OpenAI-compat) │
 │  ├─ OnDeviceModel (ONNX optional adapter)                │
 │  ├─ PolicyEngine  (forced high / noise reduction)        │
 │  ├─ EventStore    (persist + sanitize)                   │

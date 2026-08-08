@@ -1,5 +1,12 @@
 # MinorGuard 文档工作日志
 
+## 2026-08-08 — 豆包 / 火山方舟接入
+
+- 多厂商 LLM 层：`doubao`（优先）/ `deepseek` / `openai_compatible` / `none`
+- 环境变量：`DOUBAO_API_KEY`/`ARK_API_KEY` + `DOUBAO_MODEL`（Endpoint ID `ep-xxxx`）
+- 文档：`DOUBAO.md`；联调页：`/docs/doubao.html`；脚本：`npm run doubao:smoke`
+- 无密钥时 mock 方舟完成接线验收；有密钥时可 `DOUBAO_SMOKE_LIVE=1` 实调
+
 ## 2026-08-08 — App 接入能力
 
 - `AUTH_MODE=strict` + `MINORGUARD_API_TOKEN` 服务鉴权；CORS 可配置

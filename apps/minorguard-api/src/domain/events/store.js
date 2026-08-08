@@ -14,7 +14,7 @@ import {
   sanitizeEventForExport,
   sanitizeValue,
 } from "../pipeline.js";
-import { cloudEnabled } from "../../infra/config.js";
+import { llmEnabled, resolveProvider } from "../llm/providers.js";
 
 function rowToEvent(row) {
   return JSON.parse(row.payload_json);
@@ -56,8 +56,8 @@ export function createRiskEvent({ source, inputText, result, reply = "" }) {
     modelScore: result.modelScore ?? null,
     ruleScore: result.ruleScore ?? result.score,
     confidence: result.confidence ?? null,
-    provider: result.provider || (cloudEnabled() ? "deepseek" : "local"),
-    model: result.model || (cloudEnabled() ? config.DEEPSEEK_MODEL : "local-rules"),
+    provider: result.provider || (llmEnabled() ? resolveProvider().id : "local"),
+    model: result.model || (llmEnabled() ? resolveProvider().model : "local-rules"),
     minorLikelihood: sanitizeValue(
       result.minorLikelihood || {
         level: "unknown",

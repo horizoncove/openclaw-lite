@@ -1,6 +1,6 @@
 # MinorGuard 第三方 App 接入指南
 
-版本：与 `apps/minorguard-api@0.4.1` 对齐  
+版本：与 `apps/minorguard-api@0.5.0` 对齐  
 适用：聊天 App、教育平台、青少年模式硬件网关、自有后端风控中台
 
 ---
@@ -39,6 +39,10 @@ MINORGUARD_API_TOKEN=app_xxx_replace_me          # App 调用 analyze/chat
 MINORGUARD_ADMIN_TOKEN=admin_xxx_replace_me      # 仅运营读台账
 CORS_ORIGIN=https://your-bff.example.com         # 若浏览器直连（不推荐）
 CLOUD_LLM_ENABLED=true                           # 可 false 纯本地
+# 可选云 LLM（推荐豆包/方舟，见 DOUBAO.md）
+# LLM_PROVIDER=doubao
+# DOUBAO_API_KEY=sk-xxxx
+# DOUBAO_MODEL=ep-xxxx
 ```
 
 | 模式 | analyze/chat | events 台账 |
@@ -62,7 +66,8 @@ x-api-key: <MINORGUARD_API_TOKEN>
 curl -s http://127.0.0.1:5178/api/v1/health
 ```
 
-关注：`apiAuthRequired`、`authMode`、`policyVersion`、`provider`。
+关注：`apiAuthRequired`、`authMode`、`policyVersion`、`provider`、`llm`（豆包/DeepSeek 启用状态）。  
+豆包专项配置见 [DOUBAO.md](./DOUBAO.md)。
 
 ---
 

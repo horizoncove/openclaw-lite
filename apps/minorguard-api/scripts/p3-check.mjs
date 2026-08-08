@@ -40,7 +40,10 @@ async function main() {
       PORT: String(PORT),
       HOST: "127.0.0.1",
       CLOUD_LLM_ENABLED: "false",
+      LLM_PROVIDER: "none",
       DEEPSEEK_API_KEY: "",
+      DOUBAO_API_KEY: "",
+      ARK_API_KEY: "",
       AUTH_MODE: "admin_token",
       MINORGUARD_ADMIN_TOKEN: TOKEN,
       DB_PATH: path.join(ROOT, "data", "p3-check.db"),
@@ -84,11 +87,16 @@ async function main() {
     const health = await req("GET", "/api/v1/health");
     check(
       "health fields",
-      health.json?.version && health.json?.policyVersion && health.json?.authRequired === true,
+      health.json?.version &&
+        health.json?.policyVersion &&
+        health.json?.authRequired === true &&
+        health.json?.llm &&
+        typeof health.json.llm.provider === "string",
       JSON.stringify({
         version: health.json?.version,
         authRequired: health.json?.authRequired,
         provider: health.json?.provider,
+        llm: health.json?.llm,
       }),
     );
 
@@ -140,7 +148,10 @@ async function main() {
       PORT: String(PORT + 1),
       HOST: "127.0.0.1",
       CLOUD_LLM_ENABLED: "false",
+      LLM_PROVIDER: "none",
       DEEPSEEK_API_KEY: "",
+      DOUBAO_API_KEY: "",
+      ARK_API_KEY: "",
       AUTH_MODE: "strict",
       MINORGUARD_API_TOKEN: API,
       MINORGUARD_ADMIN_TOKEN: TOKEN,

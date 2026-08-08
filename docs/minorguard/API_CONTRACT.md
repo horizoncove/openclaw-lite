@@ -61,7 +61,7 @@
 
 | 方法 | 路径 | 鉴权 | 说明 |
 |---|---|---|---|
-| GET | `/api/v1/health` | 无 | 版本与 auth 模式 |
+| GET | `/api/v1/health` | 无 | 版本、auth、`llm`（provider/enabled/model） |
 | POST | `/api/v1/analyze` | 按 `AUTH_MODE` | body: `{ conversation, save? }` |
 | POST | `/api/v1/local-analyze` | 按模式 | 仅本地规则；字段名必须是 `conversation` |
 | POST | `/api/v1/chat` | 按模式 | body: `{ messages[], save? }` |

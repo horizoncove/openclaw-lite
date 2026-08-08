@@ -1,8 +1,9 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { config, authRequired, cloudEnabled } from "../infra/config.js";
+import { config, authRequired } from "../infra/config.js";
 import { getDb } from "../infra/db/sqlite.js";
 import { analyzeConversation, analyzeLocalOnly, chat } from "../domain/analyzer/index.js";
+import { llmEnabled, resolveProvider } from "../domain/llm/providers.js";
 import {
   clearEvents,
   createRiskEvent,
@@ -36,21 +37,31 @@ const mimeTypes = {
 
 function healthPayload() {
   getDb(); // ensure migrated
+  const llm = resolveProvider();
   return {
     ok: true,
     version: config.APP_VERSION,
     policyVersion: POLICY_VERSION,
     ruleSetVersion: RULE_SET_VERSION,
-    provider: cloudEnabled() ? "deepseek" : "local",
-    model: cloudEnabled() ? config.DEEPSEEK_MODEL : "local-rules",
+    provider: llm.enabled ? llm.id : "local",
+    model: llm.enabled ? llm.model : "local-rules",
+    llm: {
+      provider: llm.id,
+      enabled: llm.enabled,
+      reason: llm.reason,
+      model: llm.model || null,
+      baseUrl: llm.enabled ? llm.baseUrl : null,
+    },
     authRequired: authRequired(),
     apiAuthRequired: serviceAuthRequired(),
     authMode: config.AUTH_MODE || "demo_open",
     storage: "sqlite",
+    cloudEnabled: llmEnabled(),
     integration: {
       analyze: "POST /api/v1/analyze",
       chat: "POST /api/v1/chat",
       docs: "/docs/integration.html",
+      doubao: "/docs/doubao.html",
     },
   };
 }

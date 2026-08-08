@@ -71,15 +71,16 @@ P2 foundation ──► 本文档冻结 ──► P3 开发 ──► P3 验收
 
 ## 5. 编码进展（2026-08-08）
 
-已落地：`apps/minorguard-api`（`0.4.0-p3-mvp`）
+已落地：`apps/minorguard-api`（`0.5.0-doubao`）
 
 | Epic | 状态 |
 |---|---|
 | A 工程骨架 | 完成 |
-| B 领域迁移（规则/策略/LLM/编排） | 完成（本地规则+可选云） |
+| B 领域迁移（规则/策略/LLM/编排） | 完成（本地规则 + 多厂商云 LLM） |
 | C SQLite 台账 + Admin 鉴权 + 审计 | 完成（Postgres 可选未做） |
 | D p3-check / security-scan / contract | 完成（全量红队续接） |
 | E ONNX Adapter | 仅 stub |
 | App 接入 | `INTEGRATION.md` + JS SDK + Node/Python/cURL 示例 + strict API Token |
+| 豆包 / 方舟 | `DOUBAO.md` + `LLM_PROVIDER=doubao` + `doubao:smoke` |
 
-验证：`npm run test:contract && npm run p3:check && npm run security:scan`；接入鉴权含 strict 模式。
+验证：`npm run test:contract && npm run test:providers && npm run doubao:smoke && npm run p3:check && npm run security:scan`。

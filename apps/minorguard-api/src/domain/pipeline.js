@@ -1,13 +1,11 @@
 /** Auto-ported domain pipeline from MinorGuard demo (P2 foundation) → P3 modules. */
 import { config } from '../infra/config.js';
+import { resolveProvider, llmEnabled } from './llm/providers.js';
+import { analyzeRiskWithLlm, generateSafeReplyWithLlm } from './llm/analyze.js';
 
 const {
-  DEEPSEEK_API_KEY,
-  DEEPSEEK_MODEL,
-  DEEPSEEK_BASE_URL,
   POLICY_VERSION,
   RULE_SET_VERSION,
-  LLM_TIMEOUT_MS,
 } = config;
 
 const levelCodeByRank = ["none", "low", "medium", "high"];
@@ -125,156 +123,55 @@ const demoSeedScenarios = [
 ];
 
 
+
 async function analyzeConversation(conversation) {
   const local = analyzeLocal(conversation);
+  const provider = resolveProvider();
 
-  if (!DEEPSEEK_API_KEY || !conversation.trim()) {
+  if (!provider.enabled || !conversation.trim()) {
     return applyPolicyTuning(conversation, {
       ...local,
       provider: "local",
       model: "local-rules",
-      note: DEEPSEEK_API_KEY ? "空文本，使用本地规则。" : "未配置 DEEPSEEK_API_KEY，使用本地规则。"
+      note: !conversation.trim()
+        ? "空文本，使用本地规则。"
+        : `未启用云模型（${provider.id}:${provider.reason}），使用本地规则。`
     });
   }
 
   try {
-    const ai = await analyzeWithDeepSeek(conversation, local);
+    const ai = await analyzeRiskWithLlm(conversation, local);
     return applyPolicyTuning(conversation, {
       ...mergeAiWithLocal(normalizeAiResult(ai, local), local),
-      provider: "deepseek",
-      model: DEEPSEEK_MODEL,
-      note: "已调用 DeepSeek API。"
+      provider: provider.id,
+      model: provider.model,
+      note: `已调用 ${provider.id} API。`
     });
   } catch (error) {
     return applyPolicyTuning(conversation, {
       ...local,
       provider: "local",
       model: "local-rules",
-      note: `DeepSeek 调用失败，已回退本地规则：${error instanceof Error ? error.message : String(error)}`
+      note: `${provider.id} 调用失败，已回退本地规则：${error instanceof Error ? error.message : String(error)}`
     });
   }
 }
+
 
 async function analyzeWithDeepSeek(conversation, local) {
-  const response = await fetch(`${DEEPSEEK_BASE_URL}/chat/completions`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${DEEPSEEK_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: DEEPSEEK_MODEL,
-      temperature: 0.2,
-      response_format: { type: "json_object" },
-      messages: [
-        {
-          role: "system",
-          content: `你是未成年人生成式 AI 交互安全风控分析器。只输出 JSON，不要输出 Markdown。
-
-你必须遵守：
-1. 不复述未成年人隐私原文。
-2. 不生成违法、规避、攻击、自伤、色情等操作细节。
-3. 只做风险识别、分级、摘要和保护性建议。
-
-JSON Schema:
-{
-  "level": "未见明显风险|低风险|中风险|高风险",
-  "score": 0-100,
-  "action": "放行|提示并观察|提醒并限流|阻断并复核",
-  "summary": "一句话脱敏摘要",
-  "minorLikelihood": {
-    "level": "confirmed_minor|likely_minor|possible_minor|unknown|adult_likely",
-    "label": "已确认未成年人|高度疑似未成年人|可能是未成年人|未知|大概率成年人",
-    "score": 0-100,
-    "reasons": ["脱敏语义线索，例如校园身份线索、年龄表述"],
-    "note": "说明这是概率判断，不是实名身份结论"
-  },
-  "categories": [
-    {
-      "id": "content|interaction|tool|data",
-      "name": "AI 内容风险|AI 交互风险|AI 工具滥用风险|AI 数据风险",
-      "score": 0-100,
-      "level": "未见明显风险|低|中|高",
-      "reason": "脱敏原因，不复述隐私",
-      "hits": ["只放风险标签，不放身份证、手机号等原文"]
-    }
-  ],
-  "recommendations": {
-    "family": ["建议1", "建议2"],
-    "platform": ["建议1", "建议2"],
-    "regulator": ["建议1", "建议2"]
-  }
-}`
-        },
-        {
-          role: "user",
-          content: `请分析以下 AI 对话的未成年人风险。四类风险必须都返回。可参考本地规则初筛结果，但以你的语义判断为准。
-
-本地初筛：
-${JSON.stringify(local, null, 2)}
-
-待分析对话：
-${conversation}`
-        }
-      ]
-    })
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`HTTP ${response.status}: ${text.slice(0, 300)}`);
-  }
-
-  const data = await response.json();
-  const content = data?.choices?.[0]?.message?.content;
-  if (!content) {
-    throw new Error("DeepSeek 返回内容为空");
-  }
-
-  return JSON.parse(content);
+  // backward-compatible alias → multi-provider LLM
+  return analyzeRiskWithLlm(conversation, local);
 }
 
+
 async function generateSafeReply(messages, risk) {
-  if (!DEEPSEEK_API_KEY) {
+  const provider = resolveProvider();
+  if (!provider.enabled) {
     return fallbackReply(risk);
   }
-
   try {
-    const response = await fetch(`${DEEPSEEK_BASE_URL}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${DEEPSEEK_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: DEEPSEEK_MODEL,
-        temperature: 0.4,
-        messages: [
-          {
-            role: "system",
-            content: `你是 MinorGuard 演示中的未成年人友好型 AI 助手。
-
-你的目标：
-1. 正常回答学习、生活、常识类问题。
-2. 如果出现隐私、陌生人、色情、暴力、自伤、违法、攻击、绕过规则、账号越权、作弊等风险，只给安全替代建议。
-3. 不索取、不复述、不扩散手机号、身份证、学校、住址等敏感信息。
-4. 不输出违法操作步骤、规避检测技巧、攻击代码、自伤方法、色情内容。
-5. 回复要简短、中文、温和，适合未成年人理解。
-
-当前风险判断：${risk.level}，建议动作：${risk.action}。`
-          },
-          ...messages.slice(-10)
-        ]
-      })
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`HTTP ${response.status}: ${text.slice(0, 200)}`);
-    }
-
-    const data = await response.json();
-    return String(data?.choices?.[0]?.message?.content || "").trim() || fallbackReply(risk);
+    const content = await generateSafeReplyWithLlm(messages, risk);
+    return content || fallbackReply(risk);
   } catch {
     return fallbackReply(risk);
   }
@@ -579,10 +476,12 @@ function applyPolicyTuning(text, result) {
   tuned.level = getOverallLevel(tuned.score);
   tuned.action = getAction(tuned.level);
   tuned.policyTrace = policyTrace;
+  const cloudProviders = new Set(["doubao", "deepseek", "openai_compatible"]);
+  const isCloud = cloudProviders.has(result.provider);
   return finalizeRiskResult(tuned, {
     ruleScore: tuned.score,
-    modelScore: result.provider === "deepseek" ? result.score : null,
-    scoreSource: result.provider === "deepseek" ? "max(model,local,policy)" : "local_rule",
+    modelScore: isCloud ? result.score : null,
+    scoreSource: isCloud ? "max(model,local,policy)" : "local_rule",
     confidence: estimateConfidence(tuned, policyTrace)
   });
 }
@@ -659,7 +558,8 @@ function estimateConfidence(result, policyTrace = []) {
   const categoryMax = Math.max(...(result.categories || []).map((item) => clampNumber(item.score)), 0);
   const changedRules = policyTrace.filter((item) => item.effect === "changed").length;
   const minorScore = clampNumber(result.minorLikelihood?.score || 0);
-  const base = result.provider === "deepseek" ? 0.7 : 0.58;
+  const cloudProviders = new Set(["doubao", "deepseek", "openai_compatible"]);
+  const base = cloudProviders.has(result.provider) ? 0.7 : 0.58;
   const scoreSignal = categoryMax >= 70 || minorScore >= 60 ? 0.14 : categoryMax >= 35 ? 0.08 : 0.02;
   const policySignal = changedRules ? 0.08 : 0;
   return clampConfidence(base + scoreSignal + policySignal);
@@ -1093,6 +993,8 @@ function shouldSaveEvent(body) {
 export {
   POLICY_VERSION,
   RULE_SET_VERSION,
+  llmEnabled,
+  resolveProvider,
   riskRules,
   minorSignals,
   demoSeedScenarios,
