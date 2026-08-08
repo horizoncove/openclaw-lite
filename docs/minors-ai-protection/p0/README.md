@@ -31,7 +31,8 @@
 python3 docs/minors-ai-protection/p0/tools/validate_p0.py
 ```
 
-Owner：Agent-001（临时）  
-当前版本：**p0-v1.0-rc1**（10 人评审会有条件冻结）  
-正式 v1.0：待人类法学签字  
+Owner：Agent-001  
+当前版本：**p0-v1.0**（人类已签字）  
+签字凭证：`HUMAN_SIGN_OFF.md`  
+下一阶段：`../p1/`  
 评审纪要：`review_meeting_v1/01_minutes_v1.md`

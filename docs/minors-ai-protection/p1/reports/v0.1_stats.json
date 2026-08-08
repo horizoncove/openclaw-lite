@@ -1,0 +1,96 @@
+{
+  "splits": {
+    "train": {
+      "n": 3000,
+      "labels": {
+        "contact_request": 287,
+        "age_probe": 306,
+        "threat": 262,
+        "privacy_request": 288,
+        "__empty__": 948,
+        "offline_meeting": 247,
+        "emotional_manipulation": 285,
+        "photo_request": 256,
+        "school_request": 259
+      },
+      "levels": {
+        "S2": 1142,
+        "S1": 531,
+        "S3": 379,
+        "S0": 948
+      }
+    },
+    "dev": {
+      "n": 364,
+      "labels": {
+        "__empty__": 116,
+        "threat": 33,
+        "photo_request": 24,
+        "offline_meeting": 36,
+        "age_probe": 35,
+        "contact_request": 39,
+        "emotional_manipulation": 33,
+        "school_request": 40,
+        "privacy_request": 27
+      },
+      "levels": {
+        "S0": 116,
+        "S3": 47,
+        "S2": 137,
+        "S1": 64
+      }
+    },
+    "test": {
+      "n": 761,
+      "labels": {
+        "contact_request": 75,
+        "threat": 78,
+        "__empty__": 143,
+        "age_probe": 84,
+        "school_request": 89,
+        "privacy_request": 78,
+        "offline_meeting": 78,
+        "emotional_manipulation": 86,
+        "photo_request": 78
+      },
+      "levels": {
+        "S3": 118,
+        "S0": 143,
+        "S1": 159,
+        "S2": 341
+      }
+    },
+    "adv": {
+      "n": 120,
+      "labels": {
+        "school_request": 21,
+        "threat": 12,
+        "age_probe": 10,
+        "offline_meeting": 13,
+        "photo_request": 19,
+        "emotional_manipulation": 12,
+        "privacy_request": 21,
+        "contact_request": 12
+      },
+      "levels": {
+        "S2": 79,
+        "S3": 19,
+        "S1": 22
+      }
+    }
+  },
+  "per_label_test_pos": {
+    "age_probe": 84,
+    "privacy_request": 78,
+    "contact_request": 75,
+    "school_request": 89,
+    "photo_request": 78,
+    "offline_meeting": 78,
+    "emotional_manipulation": 86,
+    "threat": 78
+  },
+  "refusal": 220,
+  "version": "v0.1",
+  "seed": 42,
+  "content_hash": "51fe4908b3ec288d"
+}

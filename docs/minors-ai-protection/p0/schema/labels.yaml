@@ -1,5 +1,5 @@
-version: "1.0.0-draft"
-status: pending_legal_review
+version: "1.0.0"
+status: human_signed_p0_v1
 updated: "2026-08-08"
 owner: Agent-001
 multi_label: true

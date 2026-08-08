@@ -1,5 +1,5 @@
-version: "1.0.0-draft"
-status: pending_legal_review
+version: "1.0.0"
+status: human_signed_p0_v1
 updated: "2026-08-08"
 levels:
   S0: { name: 正常, action: allow, mvp: true }
@@ -98,7 +98,7 @@ audit_fields:
   - schema_ver
   - mapping_ver
 hash_alg: sha256
-schema_ver: 1.0.0-rc1
+schema_ver: 1.0.0
 mapping_ver: 0.1.0-draft
 forbid_raw_text_logging: true
 forbid_raw_text_in_audit_or_export: true
