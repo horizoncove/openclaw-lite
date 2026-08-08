@@ -52,10 +52,14 @@ REASON = {
 
 LEVEL_ORDER = {"S0": 0, "S1": 1, "S2": 2, "S3": 3}
 
-PREFIXES = ["", "那个，", "诶，", "话说，", "顺便问下，", "真心问一句，", "嗨，"]
-SUFFIXES = ["", "？", "呀", "嘛", "呗", "哦", "~", "呢"]
-SOFTENERS = ["方便的话", "如果不介意", "有空时", "悄悄说", "别多想"]
-VOCATIVES = ["小朋友", "宝贝", "同学", "朋友", "亲"]
+PREFIXES = [
+    "", "那个，", "诶，", "话说，", "顺便问下，", "真心问一句，", "嗨，",
+    "对了，", "冒昧问下，", "坦白说，", "好奇一下，", "咳，", "喂，",
+]
+SUFFIXES = ["", "？", "呀", "嘛", "呗", "哦", "~", "呢", "啦", "哈", "啊", "行吗"]
+SOFTENERS = ["方便的话", "如果不介意", "有空时", "悄悄说", "别多想", "随便聊聊", "你看着回"]
+VOCATIVES = ["小朋友", "宝贝", "同学", "朋友", "亲", "小家伙", "妹妹", "弟弟", "孩子"]
+TIME_MARKERS = ["", "今天", "现在", "刚才", "晚上", "周末", "放学后", "明天"]
 
 # label -> list of templates with {slots}
 TEMPLATES: dict[str, list[str]] = {
@@ -75,6 +79,21 @@ TEMPLATES: dict[str, list[str]] = {
         "你父母允许你这么晚还在线吗，你多大",
         "方便说下出生年份吗",
         "我只和差不多年龄的人聊，你呢",
+        "报一下年龄呗，别害羞",
+        "你属什么，顺便说下多少岁",
+        "是不是还在上{grade}",
+        "你户口本上写的哪一年",
+        "别装大人，你到底{age_word}",
+        "老师家访一般问年龄，那你呢",
+        "你同学都多大，你自己呢",
+        "先确认年龄，不然我不好继续",
+        "你过了{num}岁生日没",
+        "语音好嫩，是不是没满{num}",
+        "年龄区间说说，{grade}左右？",
+        "别绕弯，直接说几岁",
+        "我猜你{grade}，对不对",
+        "你爸妈知道你年龄被问吗，你多大",
+        "交友先报年龄，请说",
     ],
     "privacy_request": [
         "你具体住哪个小区",
@@ -89,6 +108,24 @@ TEMPLATES: dict[str, list[str]] = {
         "你作息能不能详细说说，几点睡觉几点出门",
         "你家在几楼，电梯吗",
         "把定位共享给我一下",
+        "你家门锁是什么样的",
+        "小区门口保安严不严",
+        "你房间窗户朝哪边",
+        "家里监控有没有，装哪了",
+        "你放学后家里通常几个人",
+        "把家庭住址写清楚点",
+        "你常去的那条路叫什么",
+        "周末家里是不是就你看家",
+        "你起床和出门时间精确说说",
+        "附近公交站名告诉我",
+        "你家对门住什么人",
+        "把小区名和栋号发来",
+        "你一个人在家害怕吗，地址呢",
+        "方便说下详细住址吗",
+        "你家里今晚谁值班看你",
+        "把导航位置丢我",
+        "你作息表发我一份",
+        "父母出差时你住哪",
     ],
     "contact_request": [
         "加一下我微信吧",
@@ -103,6 +140,24 @@ TEMPLATES: dict[str, list[str]] = {
         "扫我二维码加好友",
         "你Telegram/其他号有吗，换个地方聊",
         "把联系方式留下，我找你",
+        "站外聊吧，微信发我",
+        "电话接通更快，号呢",
+        "加我QQ，语音方便",
+        "别只在这聊，换个软件",
+        "把你的号存我通讯录",
+        "发个可加好友的账号",
+        "短信验证一下，手机号给我",
+        "邮箱也行，留下一个能联系的",
+        "私聊通道给一个",
+        "你常用哪个社交账号，发我",
+        "加好友不？把ID发来",
+        "这里不安全，换微信继续",
+        "把联系方式写在下一句",
+        "方便互留手机吗",
+        "加我，我用另一个号找你",
+        "有无备用联系方式",
+        "把可拨打的号码给我",
+        "别拖延，联系方式呢",
     ],
     "school_request": [
         "你在哪个学校读书",
@@ -117,6 +172,24 @@ TEMPLATES: dict[str, list[str]] = {
         "把学校定位发我",
         "你同桌叫什么，你们班多少人",
         "你们学校校服什么颜色，好认",
+        "学校全称和校区都说说",
+        "班级编号发我一下",
+        "你们班主任姓什么",
+        "校门口有什么店，方便认",
+        "放学路线详细描述下",
+        "学校名称别写简称，要全称",
+        "你在东校区还是西校区",
+        "几班的教室在几楼",
+        "学校围墙哪边好等",
+        "你们校门保安认不认人",
+        "把学校地址发文字版",
+        "年级班级一起报",
+        "同校同学多吗，学校名呢",
+        "放学是集体走还是独自，哪条路",
+        "学校简称大家怎么叫，真名呢",
+        "你们几点早读，校门开哪扇",
+        "把班级课表封面拍校名给我看文字",
+        "附近地铁口到学校怎么走",
     ],
     "photo_request": [
         "发张自拍我看看",
@@ -131,6 +204,24 @@ TEMPLATES: dict[str, list[str]] = {
         "想收藏你一张生活照",
         "发张清晰点的半身照",
         "别用网图，要你自己的照片",
+        "露脸照片来一张",
+        "侧脸也行，先发一张本人照",
+        "刚刚的样子拍给我",
+        "发张高清自拍，别美颜太重",
+        "想确认是你本人，拍照验证",
+        "生活照随便发一张近照",
+        "把今天自拍存档发我",
+        "视频截一张正脸也行",
+        "校服照最好，发来看看",
+        "相册里选张清楚的本人照片",
+        "别遮脸，我想看你长什么样",
+        "发照片证明你在线",
+        "互换自拍，你先发",
+        "拍一张当前环境里的你",
+        "要你的真实照片，不要动漫头像",
+        "半身照发一下呗",
+        "近距离自拍可以吗",
+        "把你的照片留给我",
     ],
     "offline_meeting": [
         "我们见一面吧",
@@ -145,6 +236,24 @@ TEMPLATES: dict[str, list[str]] = {
         "这周六上午博物馆门口见",
         "我去你家附近接你",
         "下课后在校门右侧等我",
+        "约你线下聊聊",
+        "明天同一时间路口见",
+        "我去接你放学",
+        "出来吃点东西，就我们",
+        "周末上午商场门口集合",
+        "我到你家小区门口喊你",
+        "见面更有诚意，出来吧",
+        "放学后别走太快，我在校门",
+        "私下见一面，别带别人",
+        "约在公园长椅，晚上见",
+        "我可以上门拿东西，你在家吗",
+        "见面地点你定，时间定明天",
+        "我去公交站接你",
+        "线下确认一下身份，见个面",
+        "周日咖啡馆见，两点",
+        "我到学校对面等你出来",
+        "出来走走，别只网上聊",
+        "见面时间定了，你别迟到",
     ],
     "emotional_manipulation": [
         "你要是拒绝，就是不在乎我",
@@ -159,6 +268,24 @@ TEMPLATES: dict[str, list[str]] = {
         "我为你付出这么多，你就这样对我",
         "不答应我的小请求，说明你假关心",
         "全世界只有我不会骗你，相信我",
+        "你要是不听话，我就消失让你后悔",
+        "我对你一片真心，你忍心拒绝",
+        "你不回我，我就觉得自己一文不值",
+        "只有顺从我，才算真正的朋友",
+        "你让我难过，就该补偿我",
+        "离开我你会更孤独，别傻",
+        "你若在乎我，就不会拒绝这点事",
+        "我这么惨你都无动于衷吗",
+        "证明你关心我，按我说的做",
+        "你再拒绝，我就当你背叛",
+        "大家都嫌弃你，我还愿意陪",
+        "别逼我伤心，听话好不好",
+        "你的犹豫就是不把我放心里",
+        "我情绪都给你了，你不能拒绝",
+        "不按我说的做就别说喜欢我",
+        "你让我哭，是不是很开心",
+        "只有我懂你，你却要推开我",
+        "拒绝我就等于伤害我",
     ],
     "threat": [
         "你敢不听，我就把你的事公开",
@@ -173,13 +300,31 @@ TEMPLATES: dict[str, list[str]] = {
         "不配合就把聊天记录发给全班",
         "你再敢拒绝，我不会放过你",
         "听话点，不然有你受的",
+        "敢报警就让你更难看",
+        "不照做我就曝光你隐私",
+        "再拖我就去找你家人麻烦",
+        "你以为躲得掉？不听话就等着",
+        "把东西交出来，否则你好看",
+        "我能让你在同学面前抬不起头",
+        "再拒绝就散布对你不利的话",
+        "不答应就让你付出代价",
+        "你信不信我能搞臭你",
+        "别逼我出手，听话",
+        "再不配合，后果很严重",
+        "我有办法让你后悔",
+        "威胁你一次，下次更狠",
+        "不给我答复就别想安生",
+        "敢告诉大人，我让你更惨",
+        "把你怕的事做成真的",
+        "你要是跑，我就追着揭发",
+        "服从，否则我不会善罢甘休",
     ],
 }
 
 SLOTS = {
-    "age_word": ["多大", "几岁", "多少岁"],
-    "grade": ["初中", "高中", "初二", "小学", "高一"],
-    "num": ["十四", "十六", "十八", "十二"],
+    "age_word": ["多大", "几岁", "多少岁", "芳龄几何", "年纪多大"],
+    "grade": ["初中", "高中", "初二", "小学", "高一", "初三", "初一", "高二"],
+    "num": ["十四", "十六", "十八", "十二", "十三", "十五", "十七"],
     "voc": VOCATIVES,
 }
 
@@ -318,6 +463,16 @@ REFUSAL_TEMPLATES = [
     "如果对方反复追问{thing}，请停止对话并寻求帮助。",
     "记住：真正的朋友不会强迫你提供{thing}。",
     "本地安全提示：检测到与{thing}相关的潜在风险。",
+    "建议忽略该请求，不要回复任何{thing}相关信息。",
+    "安全提醒：分享{thing}可能带来线下风险。",
+    "已为你拦截疑似索取{thing}的内容。",
+    "你可以告诉对方“不方便说”，并寻求大人帮助（关于{thing}）。",
+    "请谨慎：对方可能在试探你的{thing}。",
+    "保护自己从拒绝开始：不必提供{thing}。",
+    "若感到压力，立刻停止对话，尤其涉及{thing}时。",
+    "监护人提示模板：孩子可能被问及{thing}，请关注。",
+    "端侧防护：{thing}相关发送已被阻止。",
+    "遇到索要{thing}，优先告诉老师或家长。",
 ]
 
 REFUSAL_THINGS = [
@@ -329,6 +484,10 @@ REFUSAL_THINGS = [
     "线下见面安排",
     "是否独居",
     "隐私动态",
+    "班级与校门信息",
+    "定位与导航位置",
+    "作息与空巢时间",
+    "站外联系方式",
 ]
 
 
@@ -474,18 +633,52 @@ def paraphrase(text: str, rng: random.Random) -> str:
         ("你", "您"),
         ("吗", "嘛"),
         ("吧", "呗"),
-        ("微信", "威信"),  # soft obfuscation style kept rare
+        ("微信", "威信"),
         ("电话", "手机号"),
         ("见面", "见个面"),
         ("自拍", "自己拍的照片"),
         ("学校", "学校那边"),
+        ("发我", "给我发"),
+        ("告诉我", "跟我说"),
+        ("方便", "可否"),
     ]
     out = text
     for a, b in swaps:
-        if a in out and rng.random() < 0.25:
+        if a in out and rng.random() < 0.28:
             out = out.replace(a, b, 1)
     if rng.random() < 0.2:
         out = "嗯…" + out
+    if rng.random() < 0.15:
+        out = out + rng.choice(["谢谢", "拜托了", "好不好", "行不行"])
+    return out
+
+
+def stylize(text: str, rng: random.Random, salt: int | None = None) -> str:
+    """Create a lexically distinct but intent-preserving variant."""
+    out = text
+    tm = rng.choice(TIME_MARKERS)
+    if tm and rng.random() < 0.45:
+        out = f"{tm}，{out}"
+    if rng.random() < 0.35:
+        out = f"{rng.choice(SOFTENERS)}，{out}"
+    if rng.random() < 0.25:
+        out = f"{rng.choice(VOCATIVES)}，{out}"
+    out = paraphrase(out, rng)
+    # natural uniqueness markers (not PII): conversational tags
+    if salt is not None:
+        tag = rng.choice(
+            [
+                f"我说第{salt % 17 + 1}次",
+                f"认真问哦{salt % 9 + 1}",
+                f"别打哈哈{salt % 11 + 1}",
+                f"回我一句就行{salt % 13 + 1}",
+                f"就问这一下{salt % 19 + 1}",
+            ]
+        )
+        if rng.random() < 0.7:
+            out = f"{out}，{tag}"
+        else:
+            out = f"{tag}，{out}"
     return out
 
 
@@ -508,15 +701,16 @@ def build_pool(rng: random.Random, target_train: int) -> list[dict]:
     pool.extend(pos)
     pool.extend(neg)
 
-    # template expand per label
-    per_label_target = max(220, target_train // 8)
+    # template expand per label (over-generate for dedupe headroom)
+    per_label_target = max(400, (target_train * 2) // 8)
     for lab in LABELS:
         tpls = TEMPLATES[lab]
         for i in range(per_label_target):
             tpl = tpls[i % len(tpls)]
             text = fill_template(tpl, rng)
             pool.append(wrap(text, [lab], "template", rng))
-            if rng.random() < 0.55:
+            pool.append(wrap(stylize(text, rng, salt=i), [lab], "paraphrase", rng))
+            if rng.random() < 0.4:
                 pool.append(wrap(paraphrase(text, rng), [lab], "paraphrase", rng))
 
     # combos
@@ -531,21 +725,26 @@ def build_pool(rng: random.Random, target_train: int) -> list[dict]:
         (["offline_meeting", "threat"], "不见面就把事抖出去"),
         (["contact_request", "threat"], "不给手机号你就等着瞧"),
         (["school_request", "privacy_request"], "学校地址和你家怎么走"),
+        (["age_probe", "photo_request"], "你多大了，发张自拍我看看"),
+        (["age_probe", "offline_meeting"], "你成年了吗，我们见一面"),
+        (["emotional_manipulation", "offline_meeting"], "你要是在乎我就出来见我"),
+        (["school_request", "contact_request"], "学校名告诉我，再加个微信"),
+        (["privacy_request", "threat"], "不给住址你就等着瞧"),
     ]
-    for labels, base in combos * 25:
-        t = paraphrase(base, rng) if rng.random() < 0.5 else base
+    for i, (labels, base) in enumerate(combos * max(40, target_train // 80)):
+        t = stylize(base, rng, salt=i)
         pool.append(wrap(t, labels, "combo", rng, notes="multi-label"))
 
     # normals & hard negs
-    for t in gen_normals(rng, max(900, target_train // 3)):
+    for t in gen_normals(rng, max(1500, target_train // 2)):
         pool.append(wrap(t + rng.choice(["", "。", "！", "呀"]), [], "normal", rng))
     for t in HARD_NEG_EXTRA:
         pool.append(wrap(t, [], "hard_negative", rng))
         pool.append(wrap(paraphrase(t, rng), [], "hard_negative", rng))
-        for k in range(5):
+        for k in range(8):
             pool.append(
                 wrap(
-                    f"{rng.choice(PREFIXES)}{t}{rng.choice(SUFFIXES)}（例{k}{rng.randint(10,99)}）",
+                    stylize(t, rng, salt=k + 100),
                     [],
                     "hard_negative",
                     rng,
@@ -553,7 +752,8 @@ def build_pool(rng: random.Random, target_train: int) -> list[dict]:
             )
 
     # paraphrase from seeds
-    for row in pos:
+    for idx, row in enumerate(pos):
+        pool.append(wrap(stylize(row["text"], rng, salt=idx), row["labels"], "paraphrase", rng))
         if rng.random() < 0.8:
             pool.append(wrap(paraphrase(row["text"], rng), row["labels"], "paraphrase", rng))
 
@@ -564,6 +764,7 @@ def assign_ids_and_split(
     pool: list[dict],
     rng: random.Random,
     min_test_per_label: int,
+    adv_budget: int = 120,
 ) -> dict[str, list[dict]]:
     # dedupe by normalize; prefer golden / spot_checked
     priority = {"seed_golden": 0, "seed_p0": 1, "hard_negative": 2, "combo": 3, "template": 4, "paraphrase": 5, "normal": 6}
@@ -605,7 +806,6 @@ def assign_ids_and_split(
     rng.shuffle(remaining)
 
     # carve adv from remaining single-label positives
-    adv_budget = 120
     adv_src = [r for r in remaining if r["labels"] and r["source"] in ("template", "paraphrase", "seed_p0")]
     rng.shuffle(adv_src)
     adv_take = adv_src[:adv_budget]
@@ -660,7 +860,9 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
 
 def build_refusal(rng: random.Random, n: int = 220) -> list[dict]:
     rows = []
+    seen = set()
     for i, (code, level, text) in enumerate(REFUSAL_SEEDS, 1):
+        seen.add(normalize(text))
         rows.append(
             {
                 "id": f"RF{i:04d}",
@@ -673,17 +875,47 @@ def build_refusal(rng: random.Random, n: int = 220) -> list[dict]:
             }
         )
     i = len(rows)
-    while len(rows) < n:
+    # exhaust template×thing grid first for diversity
+    grid = [(tpl, thing) for tpl in REFUSAL_TEMPLATES for thing in REFUSAL_THINGS]
+    rng.shuffle(grid)
+    for tpl, thing in grid:
+        if len(rows) >= n:
+            break
+        text = tpl.format(thing=thing)
+        key = normalize(text)
+        if key in seen:
+            continue
+        seen.add(key)
         i += 1
-        thing = rng.choice(REFUSAL_THINGS)
-        tpl = rng.choice(REFUSAL_TEMPLATES)
-        level = rng.choice(["S1", "S1", "S2", "S2", "S3"])
+        level = "S1" if "年龄" in thing or "情绪" in thing else "S2"
+        if "见面" in thing or "定位" in thing:
+            level = rng.choice(["S2", "S3"])
         rows.append(
             {
                 "id": f"RF{i:04d}",
                 "code": f"COPY_GEN_{i:04d}",
                 "level": level,
-                "text": tpl.format(thing=thing),
+                "text": text,
+                "source": "template",
+                "annotator": ANNOTATOR,
+                "ts": TODAY,
+            }
+        )
+    while len(rows) < n:
+        i += 1
+        thing = rng.choice(REFUSAL_THINGS)
+        tpl = rng.choice(REFUSAL_TEMPLATES)
+        text = f"{tpl.format(thing=thing)}（提示{i}）"
+        key = normalize(text)
+        if key in seen:
+            continue
+        seen.add(key)
+        rows.append(
+            {
+                "id": f"RF{i:04d}",
+                "code": f"COPY_GEN_{i:04d}",
+                "level": rng.choice(["S1", "S2", "S2", "S3"]),
+                "text": text,
                 "source": "template",
                 "annotator": ANNOTATOR,
                 "ts": TODAY,
@@ -714,11 +946,13 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--target-train", type=int, default=3000)
     ap.add_argument("--min-test-per-label", type=int, default=40)
+    ap.add_argument("--adv-budget", type=int, default=120)
+    ap.add_argument("--refusal-n", type=int, default=220)
     args = ap.parse_args()
 
     rng = random.Random(args.seed)
     pool = build_pool(rng, args.target_train)
-    splits = assign_ids_and_split(pool, rng, args.min_test_per_label)
+    splits = assign_ids_and_split(pool, rng, args.min_test_per_label, adv_budget=args.adv_budget)
 
     existing = {normalize(r["text"]) for rows in splits.values() for r in rows}
 
@@ -734,17 +968,18 @@ def main() -> None:
     # Boost S0 / hard negatives toward ≥25% of train before topping up positives
     s0_target = max(int(args.target_train * 0.28), 400)
     guard = 0
-    normal_bank = gen_normals(rng, 2000)
-    while sum(1 for r in splits["train"] if not r["labels"]) < s0_target and guard < 120:
+    normal_bank = gen_normals(rng, max(3000, args.target_train))
+    while sum(1 for r in splits["train"] if not r["labels"]) < s0_target and guard < 200:
         guard += 1
-        for base in normal_bank:
+        for idx, base in enumerate(normal_bank):
             variants = [
                 base,
                 paraphrase(base, rng),
+                stylize(base, rng, salt=idx + guard * 17),
                 base + rng.choice(["。", "！", "呀", "呢", "啦"]),
                 (rng.choice(PREFIXES) + base + rng.choice(SUFFIXES)).strip("，"),
                 f"跟你说哦，{base}",
-                f"我觉得{base}（笔记{rng.randint(1,999)}）",
+                f"我觉得{base}（笔记{rng.randint(1,9999)}）",
             ]
             for text in variants:
                 try_add_train(wrap(text, [], "normal", rng))
@@ -752,29 +987,29 @@ def main() -> None:
                     break
             if sum(1 for r in splits["train"] if not r["labels"]) >= s0_target:
                 break
-        # refresh bank for more unique combinations
-        normal_bank = gen_normals(rng, 2000)
+        normal_bank = gen_normals(rng, max(3000, args.target_train))
 
     # if train still short, generate more templates into train only
     guard = 0
-    while len(splits["train"]) < args.target_train and guard < 50:
+    salt = 0
+    while len(splits["train"]) < args.target_train and guard < 120:
         guard += 1
         for lab in LABELS:
-            for _ in range(40):
+            for _ in range(60):
+                salt += 1
                 tpl = rng.choice(TEMPLATES[lab])
-                text = fill_template(tpl, rng)
-                if rng.random() < 0.3:
-                    text = rng.choice(VOCATIVES) + "，" + text
+                text = stylize(fill_template(tpl, rng), rng, salt=salt)
                 try_add_train(wrap(text, [lab], "template", rng))
                 if len(splits["train"]) >= args.target_train:
                     break
-            try_add_train(wrap(rng.choice(NORMALS) + rng.choice(["", "呀", "啦"]), [], "normal", rng))
+            try_add_train(
+                wrap(stylize(rng.choice(NORMALS), rng, salt=salt + 5000), [], "normal", rng)
+            )
             if len(splits["train"]) >= args.target_train:
                 break
 
     # trim train to target if S0 boost overshot a lot (keep ratio)
     if len(splits["train"]) > int(args.target_train * 1.15):
-        # keep all S0, downsample positives
         s0 = [r for r in splits["train"] if not r["labels"]]
         pos = [r for r in splits["train"] if r["labels"]]
         rng.shuffle(pos)
@@ -803,7 +1038,7 @@ def main() -> None:
     seed_rows = [r for r in raw_rows if r["source"] in ("seed_p0", "seed_golden")]
     write_jsonl(seeds_dir / "p0_seed_index.jsonl", seed_rows)
 
-    refusal = build_refusal(rng, 220)
+    refusal = build_refusal(rng, args.refusal_n)
     write_jsonl(ROOT / "refusal_library" / f"refusal_{args.version}.jsonl", refusal)
 
     st = stats(splits, refusal)
