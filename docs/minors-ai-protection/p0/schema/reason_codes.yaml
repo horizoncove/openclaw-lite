@@ -1,0 +1,14 @@
+version: "1.0.0-draft"
+reason_codes:
+  R_AGE_PROBE: 年龄试探
+  R_PRIVACY_REQUEST: 隐私索取
+  R_CONTACT_REQUEST: 联系方式索取
+  R_SCHOOL_REQUEST: 学校信息索取
+  R_PHOTO_REQUEST: 照片诱导
+  R_OFFLINE_MEETING: 线下见面诱导
+  R_EMOTIONAL_MANIPULATION: 情感操控
+  R_THREAT: 胁迫威胁
+  R_FREQ_ESCALATE: 频次升级
+  R_COMBO_ESCALATE: 共现升级
+  R_SECRECY_ESCALATE: 保密要求叠加高风险
+  R_NEEDS_REVIEW: 人工待审

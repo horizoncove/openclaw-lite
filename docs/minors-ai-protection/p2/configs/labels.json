@@ -1,0 +1,25 @@
+{
+  "version": "p1-v1.0",
+  "data_version": "v0.4",
+  "labels": [
+    "age_probe",
+    "privacy_request",
+    "contact_request",
+    "school_request",
+    "photo_request",
+    "offline_meeting",
+    "emotional_manipulation",
+    "threat"
+  ],
+  "default_level": {
+    "age_probe": "S1",
+    "privacy_request": "S2",
+    "contact_request": "S2",
+    "school_request": "S2",
+    "photo_request": "S2",
+    "offline_meeting": "S2",
+    "emotional_manipulation": "S1",
+    "threat": "S3"
+  },
+  "level_order": ["S0", "S1", "S2", "S3"]
+}

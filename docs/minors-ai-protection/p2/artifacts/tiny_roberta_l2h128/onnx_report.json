@@ -1,0 +1,27 @@
+{
+  "onnx_path": "/workspace/docs/minors-ai-protection/p2/artifacts/tiny_roberta_l2h128/model.onnx",
+  "size_mb": 12.147,
+  "size_target_mb": 30,
+  "size_pass": true,
+  "latency_ms_cpu_single": {
+    "p50": 0.682,
+    "p95": 0.706,
+    "n": 200,
+    "note": "CPU ORT single-sample; not mid-range phone"
+  },
+  "latency_target_p95_ms": 80,
+  "latency_pass_cpu_proxy": true,
+  "threshold": 0.4,
+  "labels": [
+    "age_probe",
+    "privacy_request",
+    "contact_request",
+    "school_request",
+    "photo_request",
+    "offline_meeting",
+    "emotional_manipulation",
+    "threat"
+  ],
+  "max_length": 64,
+  "n_params": 3184520
+}

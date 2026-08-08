@@ -1,0 +1,21 @@
+{
+  "model": "tfidf_charwb_2_4_ovr_logreg",
+  "labels": [
+    "age_probe",
+    "privacy_request",
+    "contact_request",
+    "school_request",
+    "photo_request",
+    "offline_meeting",
+    "emotional_manipulation",
+    "threat"
+  ],
+  "data_version": "v0.4",
+  "n_train": 30000,
+  "n_dev": 10494,
+  "train_seconds": 2.03,
+  "dev_macro_f1": 0.9992,
+  "dev_micro_f1": 0.9992,
+  "artifact": "/workspace/docs/minors-ai-protection/p2/artifacts/baseline_tfidf/model.joblib",
+  "note": "sklearn baseline; not the final on-device Transformer"
+}
