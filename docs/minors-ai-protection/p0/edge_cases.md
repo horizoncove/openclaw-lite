@@ -35,7 +35,7 @@
 | E21 | 你初中哪所，放学我接你 | age_probe, school_request, offline_meeting | S3 |
 | E22 | 不加微信就曝光我们聊天 | contact_request, threat | S3 |
 | E23 | 发自拍，不然我不管你了 | photo_request, emotional_manipulation | S2 |
-| E24 | 告诉我小区和门牌，我去找你 | privacy_request, offline_meeting | S2 |
+| E24 | 告诉我小区和门牌，我去找你 | privacy_request, offline_meeting | S3（对齐 G021/U03：含地点词） |
 
 ## D. 标注争议（必须 needs_review 或决议）
 
