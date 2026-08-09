@@ -82,5 +82,7 @@ P2 foundation ──► 本文档冻结 ──► P3 开发 ──► P3 验收
 | E ONNX Adapter | 仅 stub |
 | App 接入 | `INTEGRATION.md` + JS SDK + Node/Python/cURL 示例 + strict API Token |
 | 豆包 / 方舟 | `DOUBAO.md` + `LLM_PROVIDER=doubao` + `doubao:smoke` |
+| GitHub Pages | 静态浏览器 MVP：`/minorguard/` + `DEPLOY_PAGES.md` |
 
-验证：`npm run test:contract && npm run test:providers && npm run doubao:smoke && npm run p3:check && npm run security:scan`。
+验证：`npm run test:contract && npm run test:providers && npm run doubao:smoke && npm run p3:check && npm run security:scan`。  
+在线演示：https://horizoncove.github.io/openclaw-lite/minorguard/

@@ -27,6 +27,11 @@ DOUBAO_MODEL=ep-xxxx
 - Demo：`http://localhost:5178`
 - 接入联调页：`http://localhost:5178/docs/integration.html`
 - 豆包状态页：`http://localhost:5178/docs/doubao.html`
+- **GitHub Pages 在线演示**：<https://horizoncove.github.io/openclaw-lite/minorguard/>（浏览器 MVP，无需后端）
+
+```bash
+npm run build:pages   # 产出 dist-pages/，供 Pages 部署
+```
 
 ## 给其他 App 接入（最短路径）
 

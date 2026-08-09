@@ -31,6 +31,7 @@
 | 论文 | [papers/研究意义_未成年人生成式AI交互安全与端侧合规保护.md](./papers/研究意义_未成年人生成式AI交互安全与端侧合规保护.md) | 研究意义工作论文 |
 | 接入 | [INTEGRATION.md](./INTEGRATION.md) | **第三方 App HTTP/SDK 接入指南** |
 | 豆包 | [DOUBAO.md](./DOUBAO.md) | **豆包 / 火山方舟 LLM 接入** |
+| 部署 | [DEPLOY_PAGES.md](./DEPLOY_PAGES.md) | **GitHub Pages 在线演示部署** |
 
 ---
 

@@ -116,32 +116,96 @@ function countHits(text, keywords) {
   return keywords.filter((keyword) => lower.includes(keyword.toLowerCase()));
 }
 
+const LEDGER_KEY = "minorguard.pages.events.v1";
+let apiAvailable = false;
+let offlineMode = true;
+
 function analyze(text) {
-  const normalized = text.trim();
-  const categories = riskRules.map((rule) => {
-    const hits = countHits(normalized, rule.keywords);
-    const score = Math.min(100, hits.length * rule.weight);
+  const engine = window.MinorGuardEngine;
+  if (!engine) {
     return {
-      ...rule,
-      hits,
-      score,
-      level: getCategoryLevel(score)
+      categories: riskRules.map((rule) => ({ ...rule, hits: [], score: 0, level: "未见明显风险" })),
+      score: 0,
+      level: "未见明显风险",
+      action: "放行",
+      minorLikelihood: getUnknownMinor(),
+      provider: "local-browser",
+      model: "browser-rules",
+      createdAt: new Date()
     };
-  });
+  }
+  const result = engine.analyze(text);
+  return normalizeServerResult(result);
+}
 
-  const maxScore = Math.max(...categories.map((item) => item.score), 0);
-  const totalHits = categories.reduce((sum, item) => sum + item.hits.length, 0);
-  const score = Math.min(100, Math.round(maxScore * 0.72 + Math.min(28, totalHits * 4)));
-  const level = getOverallLevel(score);
+function readLocalLedger() {
+  try {
+    const raw = localStorage.getItem(LEDGER_KEY);
+    const parsed = raw ? JSON.parse(raw) : { events: [] };
+    return Array.isArray(parsed.events) ? parsed.events : [];
+  } catch {
+    return [];
+  }
+}
 
-  return {
-    text: normalized,
-    categories,
-    score,
-    level,
-    action: getAction(level),
-    createdAt: new Date()
+function writeLocalLedger(events) {
+  localStorage.setItem(LEDGER_KEY, JSON.stringify({ events: events.slice(0, 500) }));
+}
+
+function saveLocalEvent({ source, inputText, result, reply = "" }) {
+  const engine = window.MinorGuardEngine;
+  if (!engine) return null;
+  const event = engine.buildEvent(source, inputText, result, reply);
+  const events = [event, ...readLocalLedger()];
+  writeLocalLedger(events);
+  return event;
+}
+
+function localEventsPayload() {
+  const events = readLocalLedger();
+  const stats = window.MinorGuardEngine
+    ? window.MinorGuardEngine.buildEventStats(events)
+    : { total: events.length, byLevel: {}, bySource: {}, byMinorLikelihood: {}, byCategory: {} };
+  return { events, stats };
+}
+
+function downloadText(filename, content, mime) {
+  const blob = new Blob([content], { type: mime || "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportLocalMarkdown() {
+  const { events, stats } = localEventsPayload();
+  const lines = [
+    "# MinorGuard 风险事件台账导出",
+    "",
+    `导出时间：${new Date().toLocaleString("zh-CN", { hour12: false })}`,
+    `事件总数：${stats.total || 0}`,
+    "",
+  ];
+  for (const event of events) {
+    lines.push(`## ${event.id}`, `- 风险：${event.level} / ${event.score}`, `- 动作：${event.action}`, `- 摘要：${event.summary || ""}`, "");
+  }
+  downloadText(`minorguard-events-${Date.now()}.md`, lines.join("\n") + "\n", "text/markdown;charset=utf-8");
+}
+
+function exportLocalJson() {
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    mode: offlineMode ? "browser-mvp" : "api",
+    ...localEventsPayload(),
   };
+  downloadText(`minorguard-events-${Date.now()}.json`, JSON.stringify(payload, null, 2), "application/json");
+}
+
+function setStatusPill(label) {
+  const el = document.getElementById("statusPillText");
+  if (el) el.textContent = label;
 }
 
 async function analyzeRemote(text) {
@@ -436,29 +500,49 @@ chatForm.addEventListener("submit", async (event) => {
   appendMessage("system", "正在进行风险检测并生成安全回复...");
 
   try {
-    const result = await chatRemote(chatHistory);
+    let result;
+    if (apiAvailable) {
+      result = await chatRemote(chatHistory);
+    } else {
+      result = window.MinorGuardEngine.chat(chatHistory);
+    }
     if (sessionVersion !== chatSessionVersion) return;
     removeLastSystemMessage();
     const reply = result.reply || "我现在无法生成回复，但已完成风险检测。";
     chatHistory.push({ role: "assistant", content: reply });
     appendMessage("assistant", reply);
-    renderChatRisk(normalizeServerResult(result.risk), {
+    const risk = normalizeServerResult(result.risk);
+    renderChatRisk(risk, {
       fastPath: result.fastPath,
       policyMode: result.policyMode
     });
+    if (!apiAvailable) {
+      saveLocalEvent({
+        source: "realtime-chat",
+        inputText: chatHistory.filter((m) => m.role === "user").map((m) => `用户：${m.content}`).join("\n"),
+        result: risk,
+        reply
+      });
+    }
     loadEvents();
   } catch {
     if (sessionVersion !== chatSessionVersion) return;
     removeLastSystemMessage();
-    const localRisk = analyze(chatHistory.map((item) => `${item.role === "user" ? "用户" : "AI"}：${item.content}`).join("\n"));
-    const reply = "后端暂时不可用。我先用本地规则做了风险检测，请不要输入真实个人隐私或危险请求。";
+    const local = window.MinorGuardEngine
+      ? window.MinorGuardEngine.chat(chatHistory)
+      : { reply: "本地引擎不可用。", risk: analyze(""), fastPath: false };
+    const reply = local.reply;
     chatHistory.push({ role: "assistant", content: reply });
     appendMessage("assistant", reply);
-    renderChatRisk({
-      ...localRisk,
-      provider: "local-browser",
-      model: "browser-rules"
+    const risk = normalizeServerResult(local.risk);
+    renderChatRisk(risk, { fastPath: local.fastPath, policyMode: "browser_mvp" });
+    saveLocalEvent({
+      source: "realtime-chat",
+      inputText: chatHistory.filter((m) => m.role === "user").map((m) => `用户：${m.content}`).join("\n"),
+      result: risk,
+      reply
     });
+    loadEvents();
   } finally {
     if (sessionVersion === chatSessionVersion) {
       chatSending = false;
@@ -493,11 +577,19 @@ seedEventsBtn.addEventListener("click", async () => {
   seedEventsBtn.disabled = true;
   seedEventsBtn.textContent = "生成中";
   try {
-    const result = await seedEventsRemote({ count: 80, clear: clearFirst });
-    await loadEvents();
-    eventDetailText.textContent = `已生成 ${result.created || 0} 条脱敏合成样本。\n\n这些样本仅用于本地演示、统计验证和红队回归，不包含真实未成年人数据。`;
-  } catch {
-    eventDetailText.textContent = "生成样本失败，请确认后端服务正在运行。";
+    if (apiAvailable) {
+      const result = await seedEventsRemote({ count: 80, clear: clearFirst });
+      await loadEvents();
+      eventDetailText.textContent = `已生成 ${result.created || 0} 条脱敏合成样本。\n\n这些样本仅用于本地演示、统计验证和红队回归，不包含真实未成年人数据。`;
+    } else {
+      const seeded = window.MinorGuardEngine.seedDemoEvents(80);
+      const events = clearFirst ? seeded : [...seeded, ...readLocalLedger()];
+      writeLocalLedger(events);
+      await loadEvents();
+      eventDetailText.textContent = `已在浏览器本地生成 ${seeded.length} 条脱敏合成样本（localStorage）。\n\n不包含真实未成年人数据。`;
+    }
+  } catch (error) {
+    eventDetailText.textContent = `生成样本失败：${error instanceof Error ? error.message : String(error)}`;
   } finally {
     seedEventsBtn.disabled = false;
     seedEventsBtn.textContent = "生成80条样本";
@@ -505,13 +597,17 @@ seedEventsBtn.addEventListener("click", async () => {
 });
 
 clearEventsBtn.addEventListener("click", async () => {
-  const confirmed = window.confirm("确定清空本地风险事件台账吗？此操作只影响 demo 本地 data/events.json。");
+  const confirmed = window.confirm("确定清空风险事件台账吗？GitHub Pages / 离线模式会清空浏览器 localStorage。");
   if (!confirmed) return;
 
   clearEventsBtn.disabled = true;
   clearEventsBtn.textContent = "清空中";
   try {
-    await clearEventsRemote();
+    if (apiAvailable) {
+      await clearEventsRemote();
+    } else {
+      writeLocalLedger([]);
+    }
     renderEvents([], {
       total: 0,
       byLevel: {},
@@ -520,7 +616,7 @@ clearEventsBtn.addEventListener("click", async () => {
       byCategory: {}
     });
   } catch {
-    eventDetailText.textContent = "清空失败，请确认后端服务是否正在运行。";
+    eventDetailText.textContent = "清空失败。";
   } finally {
     clearEventsBtn.disabled = false;
     clearEventsBtn.textContent = "清空台账";
@@ -534,7 +630,7 @@ async function runAnalysis() {
       ...analyze(""),
       summary: "请输入需要分析的 AI 对话内容。",
       provider: "local-browser",
-      model: "browser-rules"
+      model: "browser-rules-mvp"
     });
     overallText.textContent = "请输入需要分析的 AI 对话内容。空文本不会写入风险事件台账。";
     return;
@@ -545,17 +641,20 @@ async function runAnalysis() {
   setAnalysisBusy(true);
   analyzeBtn.textContent = "分析中";
   try {
-    const result = await analyzeRemote(text);
-    renderResult(normalizeServerResult(result));
+    let result;
+    if (apiAvailable) {
+      result = normalizeServerResult(await analyzeRemote(text));
+    } else {
+      result = analyze(text);
+      saveLocalEvent({ source: "manual-analysis", inputText: text, result });
+    }
+    renderResult(result);
     loadEvents();
   } catch {
     const result = analyze(conversation.value);
-    renderResult({
-      ...result,
-      provider: "local-browser",
-      model: "browser-rules",
-      note: "后端不可用，已使用浏览器本地规则。"
-    });
+    saveLocalEvent({ source: "manual-analysis", inputText: text, result });
+    renderResult(result);
+    loadEvents();
   } finally {
     analysisInFlight = false;
     setAnalysisBusy(false);
@@ -573,18 +672,25 @@ function setAnalysisBusy(value) {
 function normalizeServerResult(result) {
   return {
     ...result,
-    createdAt: result.createdAt ? new Date(result.createdAt) : new Date()
+    createdAt: result.createdAt ? new Date(result.createdAt) : new Date(),
+    provider: result.provider || serverStatus.provider,
+    model: result.model || serverStatus.model
   };
 }
 
 async function loadEvents() {
   refreshEventsBtn.disabled = true;
   try {
-    const data = await fetchEvents();
-    renderEvents(data.events || [], data.stats || {});
+    if (apiAvailable) {
+      const data = await fetchEvents();
+      renderEvents(data.events || [], data.stats || {});
+    } else {
+      const data = localEventsPayload();
+      renderEvents(data.events, data.stats);
+    }
   } catch {
-    ledgerSummary.innerHTML = `<span class="ledger-stat">台账服务暂不可用</span>`;
-    eventsTable.innerHTML = `<tr><td colspan="7">无法读取事件台账，请确认后端服务正在运行。</td></tr>`;
+    const data = localEventsPayload();
+    renderEvents(data.events, data.stats);
   } finally {
     refreshEventsBtn.disabled = false;
   }
@@ -709,22 +815,48 @@ function sourceLabel(source) {
 
 async function loadHealth() {
   try {
-    const response = await fetch("/api/health");
+    const response = await fetch("/api/v1/health", { signal: AbortSignal.timeout(1200) });
     if (response.ok) {
       const data = await response.json();
+      apiAvailable = true;
+      offlineMode = false;
       serverStatus = {
         ...data,
         provider: data.llm?.enabled ? data.llm.provider : data.provider || "local",
         model: data.llm?.enabled ? data.llm.model : data.model || "local-rules",
       };
+      setStatusPill(`API 模式 · ${serverStatus.provider}/${serverStatus.model}`);
+      return;
     }
   } catch {
-    serverStatus = {
-      provider: "local-browser",
-      model: "browser-rules"
-    };
+    /* static / pages mode */
   }
+  apiAvailable = false;
+  offlineMode = true;
+  serverStatus = {
+    provider: "local-browser",
+    model: "browser-rules-mvp",
+    version: window.MinorGuardEngine?.VERSION || "pages-mvp"
+  };
+  setStatusPill("GitHub Pages · 浏览器 MVP（本地规则）");
 }
+
+document.getElementById("exportMdBtn")?.addEventListener("click", (event) => {
+  event.preventDefault();
+  if (apiAvailable) {
+    window.open("/api/events/export.md", "_blank", "noopener");
+  } else {
+    exportLocalMarkdown();
+  }
+});
+document.getElementById("exportJsonBtn")?.addEventListener("click", (event) => {
+  event.preventDefault();
+  if (apiAvailable) {
+    window.open("/api/events/export.json", "_blank", "noopener");
+  } else {
+    exportLocalJson();
+  }
+});
 
 loadHealth().finally(() => {
   setSample("safe", { analyze: false });

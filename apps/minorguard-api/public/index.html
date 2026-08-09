@@ -15,9 +15,15 @@
       </div>
       <div class="status-pill">
         <span class="dot"></span>
-        本地演示模式
+        <span id="statusPillText">浏览器 MVP</span>
       </div>
     </header>
+    <nav class="demo-nav" aria-label="演示导航">
+      <a href="./">工作台</a>
+      <a href="./docs/integration.html">App 接入</a>
+      <a href="./docs/doubao.html">豆包接入</a>
+      <a href="https://github.com/horizoncove/openclaw-lite/tree/main/docs/minorguard" target="_blank" rel="noreferrer">文档</a>
+    </nav>
 
     <section class="workspace">
       <aside class="panel input-panel">
@@ -129,8 +135,8 @@
         <div class="ledger-actions">
           <button id="seedEventsBtn" class="ghost-btn small">生成80条样本</button>
           <button id="refreshEventsBtn" class="ghost-btn small">刷新</button>
-          <a class="ghost-link small" href="/api/events/export.md" target="_blank" rel="noreferrer">导出 Markdown</a>
-          <a class="ghost-link small" href="/api/events/export.json" target="_blank" rel="noreferrer">导出 JSON</a>
+          <button id="exportMdBtn" class="ghost-btn small" type="button">导出 Markdown</button>
+          <button id="exportJsonBtn" class="ghost-btn small" type="button">导出 JSON</button>
           <button id="clearEventsBtn" class="ghost-btn small danger">清空台账</button>
         </div>
       </div>
@@ -160,6 +166,7 @@
     </section>
   </main>
 
+  <script src="./engine.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>

@@ -1,5 +1,12 @@
 # MinorGuard 文档工作日志
 
+## 2026-08-09 — GitHub Pages 静态 MVP 演示
+
+- 浏览器引擎 `public/engine.js`：规则+策略、聊天拒答、localStorage 台账
+- 构建：`npm run build:pages` → `dist-pages/`
+- 工作流：`.github/workflows/deploy-minorguard-pages.yml` 发布到 `gh-pages/minorguard`
+- 在线：https://horizoncove.github.io/openclaw-lite/minorguard/
+
 ## 2026-08-08 — 豆包 / 火山方舟接入
 
 - 多厂商 LLM 层：`doubao`（优先）/ `deepseek` / `openai_compatible` / `none`

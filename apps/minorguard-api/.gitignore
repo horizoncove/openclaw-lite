@@ -6,4 +6,5 @@ DS.env
 *.db
 *.db-*
 reports/
+dist-pages/
 .DS_Store
