@@ -1,0 +1,42 @@
+name: Deploy MinorGuard Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/minorguard-api/public/**"
+      - "apps/minorguard-api/sdk/js/**"
+      - "apps/minorguard-api/scripts/build-pages.mjs"
+      - ".github/workflows/deploy-minorguard-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: minorguard-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build static bundle
+        run: node apps/minorguard-api/scripts/build-pages.mjs
+
+      - name: Publish to gh-pages/minorguard
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/minorguard-api/dist-pages
+          destination_dir: minorguard
+          keep_files: true
+          commit_message: "deploy(minorguard): static browser MVP pages"

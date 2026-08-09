@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://minorguard.local/schemas/risk-result.json",
+  "title": "RiskResult",
+  "type": "object",
+  "required": [
+    "level",
+    "levelCode",
+    "score",
+    "finalScore",
+    "action",
+    "actionCode",
+    "summary",
+    "categories",
+    "minorLikelihoodCode",
+    "policyVersion",
+    "ruleSetVersion"
+  ],
+  "properties": {
+    "levelCode": { "enum": ["none", "low", "medium", "high"] },
+    "actionCode": { "enum": ["allow", "observe", "throttle", "block_review"] },
+    "minorLikelihoodCode": {
+      "enum": ["confirmed_minor", "likely_minor", "possible_minor", "unknown", "adult_likely"]
+    },
+    "finalScore": { "type": "number", "minimum": 0, "maximum": 100 },
+    "categories": { "type": "array", "minItems": 4 },
+    "policyTrace": { "type": "array" }
+  }
+}

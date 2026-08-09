@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MinorGuard App 接入联调</title>
+  <style>
+    :root { font-family: "Segoe UI", system-ui, sans-serif; color: #14212b; }
+    body { margin: 0; background: #f4f7f8; }
+    main { max-width: 920px; margin: 0 auto; padding: 1.5rem; }
+    card, .card { display:block; background:#fff; border-radius:12px; padding:1rem 1.2rem; margin-bottom:1rem; box-shadow:0 1px 0 rgba(0,0,0,.04); }
+    label { display:block; font-size:.85rem; color:#5b6b75; margin:.6rem 0 .25rem; }
+    input, textarea { width:100%; box-sizing:border-box; padding:.6rem .7rem; border:1px solid #d5dee3; border-radius:8px; font:inherit; }
+    textarea { min-height: 120px; }
+    button { margin-top:.8rem; margin-right:.5rem; border:0; border-radius:8px; padding:.55rem 1rem; background:#0b6e4f; color:#fff; font-weight:600; cursor:pointer; }
+    button.secondary { background:#334155; }
+    pre { background:#0f172a; color:#e2e8f0; padding:1rem; border-radius:10px; overflow:auto; font-size:12px; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; }
+    @media (max-width:720px){ .row{grid-template-columns:1fr;} }
+    code { background:#e8eef1; padding:0 .25rem; border-radius:4px; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="card">
+      <h1>MinorGuard · App 接入联调</h1>
+      <p>完整说明见仓库 <code>docs/minorguard/INTEGRATION.md</code>。生产环境请在服务端持有 Token，勿把密钥打进客户端包。返回 <a href="../">工作台</a>。</p>
+      <p>在 GitHub Pages 上本页主要用于查看接入字段；真实 API 联调请指向自建 <code>minorguard-api</code> Base URL。</p>
+      <div class="row">
+        <div>
+          <label>Base URL</label>
+          <input id="baseUrl" value="" />
+        </div>
+        <div>
+          <label>API Token（Bearer）</label>
+          <input id="token" placeholder="strict 模式必填" />
+        </div>
+      </div>
+      <label>conversation</label>
+      <textarea id="text">用户：我是初中生，网友让我把手机号发给他换装备，还说别告诉爸妈。</textarea>
+      <button id="btnHealth" class="secondary" type="button">Health</button>
+      <button id="btnAnalyze" type="button">Analyze</button>
+      <button id="btnChat" type="button">Chat</button>
+    </div>
+    <div class="card">
+      <h2>结果</h2>
+      <pre id="out">等待请求…</pre>
+    </div>
+  </main>
+  <script type="module">
+    import { MinorGuardClient } from "/sdk/minorguard.js";
+    const baseInput = document.getElementById("baseUrl");
+    baseInput.value = location.origin;
+    const out = document.getElementById("out");
+    function client() {
+      return new MinorGuardClient({
+        baseUrl: baseInput.value.trim(),
+        apiToken: document.getElementById("token").value.trim(),
+      });
+    }
+    function show(data) {
+      out.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+    }
+    document.getElementById("btnHealth").onclick = async () => {
+      try { show(await client().health()); } catch (e) { show(String(e.message || e)); }
+    };
+    document.getElementById("btnAnalyze").onclick = async () => {
+      try {
+        const risk = await client().analyze(document.getElementById("text").value, {
+          save: false,
+          source: "integration-html",
+        });
+        show({ risk, decision: MinorGuardClient.decide(risk.actionCode) });
+      } catch (e) { show(e.payload || String(e.message || e)); }
+    };
+    document.getElementById("btnChat").onclick = async () => {
+      try {
+        const text = document.getElementById("text").value.replace(/^用户：/, "");
+        show(await client().chat([{ role: "user", content: text }], { save: false }));
+      } catch (e) { show(e.payload || String(e.message || e)); }
+    };
+  </script>
+</body>
+</html>
