@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MinorGuard · 豆包 / 方舟接入</title>
+  <style>
+    :root { font-family: "Segoe UI", system-ui, sans-serif; color: #14212b; }
+    body { margin: 0; background: linear-gradient(160deg, #eef6f3 0%, #f7fafc 45%, #edf2f7 100%); min-height: 100vh; }
+    main { max-width: 880px; margin: 0 auto; padding: 1.5rem; }
+    .card { background: #fff; border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1rem; box-shadow: 0 1px 0 rgba(0,0,0,.04); }
+    pre { background: #0f172a; color: #e2e8f0; padding: 1rem; border-radius: 10px; overflow: auto; font-size: 12px; }
+    code { background: #e8eef1; padding: 0 .25rem; border-radius: 4px; }
+    button { border: 0; border-radius: 8px; padding: .55rem 1rem; background: #0b6e4f; color: #fff; font-weight: 600; cursor: pointer; margin-right: .5rem; }
+    button.secondary { background: #334155; }
+    a { color: #0b6e4f; }
+    .ok { color: #0b6e4f; font-weight: 600; }
+    .bad { color: #b42318; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="card">
+      <h1>豆包 / 火山方舟接入状态</h1>
+      <p>完整文档：仓库 <code>docs/minorguard/DOUBAO.md</code>。App 接入见 <a href="./integration.html">integration.html</a>。返回 <a href="../">工作台</a>。</p>
+      <p>GitHub Pages 静态演示默认走浏览器本地规则；豆包云调用需自建 API 并配置 Key。</p>
+      <button id="btnHealth" type="button">刷新 Health</button>
+      <button id="btnAnalyze" class="secondary" type="button">试跑 Analyze（当前进程）</button>
+      <p id="status">读取中…</p>
+    </div>
+    <div class="card">
+      <h2>建议 .env</h2>
+      <pre>LLM_PROVIDER=doubao
+CLOUD_LLM_ENABLED=true
+DOUBAO_API_KEY=sk-xxxx
+DOUBAO_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+DOUBAO_MODEL=ep-xxxx</pre>
+      <p><code>DOUBAO_MODEL</code> 必须是方舟推理接入点 ID（<code>ep-...</code>），不是展示名。</p>
+    </div>
+    <div class="card">
+      <h2>输出</h2>
+      <pre id="out">等待请求…</pre>
+    </div>
+  </main>
+  <script type="module">
+    const out = document.getElementById("out");
+    const status = document.getElementById("status");
+    async function refresh() {
+      const res = await fetch("/api/v1/health");
+      const data = await res.json();
+      out.textContent = JSON.stringify(data, null, 2);
+      const llm = data.llm || {};
+      if (llm.provider === "doubao" && llm.enabled) {
+        status.innerHTML = `<span class="ok">豆包已启用</span> · model=${llm.model}`;
+      } else if (llm.provider === "doubao") {
+        status.innerHTML = `<span class="bad">豆包未启用</span> · ${llm.reason || ""}`;
+      } else {
+        status.innerHTML = `当前 provider=<code>${llm.provider || data.provider}</code> · ${llm.reason || "local"}`;
+      }
+    }
+    document.getElementById("btnHealth").onclick = () => refresh().catch((e) => {
+      status.textContent = String(e);
+    });
+    document.getElementById("btnAnalyze").onclick = async () => {
+      const res = await fetch("/api/v1/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversation: "用户：我是初中生，网友让我发手机号，别告诉爸妈。",
+          save: false,
+        }),
+      });
+      const data = await res.json();
+      out.textContent = JSON.stringify(data, null, 2);
+      status.textContent = `analyze provider=${data.provider} level=${data.levelCode} action=${data.actionCode}`;
+    };
+    refresh().catch((e) => { status.textContent = String(e); });
+  </script>
+</body>
+</html>
